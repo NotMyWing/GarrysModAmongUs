@@ -2,7 +2,9 @@ include "shared.lua"
 include "sv_net.lua"
 include "sv_spectate.lua"
 include "sv_resources.lua"
+include "sv_lookups.lua"
 
+AddCSLuaFile "sh_lookups.lua"
 AddCSLuaFile "vgui/vgui_shutup.lua"
 AddCSLuaFile "vgui/vgui_splash.lua"
 AddCSLuaFile "vgui/vgui_hud.lua"
@@ -18,38 +20,38 @@ resource.AddWorkshop "2227901495"
 
 lastStateCheck = CurTime!
 GM.Think = =>
-	if GetGlobalBool("NMW AU GameInProgress") and CurTime! - lastStateCheck >= 5
+	if @IsGameInProgress! and CurTime! - lastStateCheck >= 5
 		lastStateCheck = CurTime!
 		@CheckWin!
 
-with GM
-	.KillCooldownRemainders = {}
-	.ActivePlayersMapId = {}
-	.ActivePlayersMap = {}
-	.ActivePlayers = {}
-	.KillCooldowns = {}
-	.DeadPlayers = {}
-	.Imposters = {}
-	.Timers = {}
-	.VotesMap = {}
-	.Votes = {}
-	.Vented = {}
-	.VentCooldown = {}
-
 hook.Add "PlayerDisconnected", "NMW AU CheckWin", ->
-	if GAMEMODE.ActivePlayers
+	if GAMEMODE.GameData.ActivePlayers
 		GAMEMODE\CheckWin!
 
+GM.GameOver = (reason) =>
+	for index, ply in ipairs player.GetAll!
+		ply\Freeze true
+
+	@SetGameInProgress false
+	@BroadcastDead!
+	@BroadcastGameOver reason
+
+	handle = "game"
+
+	@GameData.Timers[handle] = true
+	timer.Create handle, 9, 1, ->
+		@Restart!
+
 GM.CheckWin = =>
-	if not GetGlobalBool "NMW AU GameInProgress"
+	if not @IsGameInProgress!
 		return
 
 	numImposters = 0
 	numPlayers = 0
 
-	for _, ply in pairs @ActivePlayers
-		if IsValid(ply.entity) and not @DeadPlayers[ply]
-			if @Imposters[ply]
+	for _, ply in pairs @GameData.ActivePlayers
+		if IsValid(ply.entity) and not @GameData.DeadPlayers[ply]
+			if @GameData.Imposters[ply]
 				numImposters += 1
 			else
 				numPlayers += 1
@@ -60,20 +62,7 @@ GM.CheckWin = =>
 		@GameOverReason.Imposter
 
 	if reason
-		SetGlobalBool "NMW AU GameInProgress", false
-
-		for index, ply in ipairs player.GetAll!
-			ply\Freeze true
-
-		@BroadcastDead!
-		@BroadcastGameOver reason
-
-		handle = "game"
-		@Timers[handle] = true
-
-		timer.Create handle, 9, 1, ->
-			@Restart!
-
+		@GameOver!
 		return true
 
 GM.PlayerSpawn = (ply) =>
@@ -88,10 +77,10 @@ GM.PlayerSpawn = (ply) =>
 	ply\SetNoCollideWithTeammates true
 
 GM.StartMeeting = (ply, bodyColor) =>
-	aply = @ActivePlayersMap[ply]
+	aply = @GameData.ActivePlayersMap[ply]
 
 	handle = "meeting"
-	if @DeadPlayers[aply] 
+	if @GameData.DeadPlayers[aply] 
 		return
 
 	if timer.Exists handle
@@ -100,19 +89,19 @@ GM.StartMeeting = (ply, bodyColor) =>
 	for index, ply in ipairs player.GetAll!
 		ply\Freeze true
 
-	@Timers[handle] = true
+	@GameData.Timers[handle] = true
 	timer.Create handle, 0.2, 1, ->
 		@BroadcastDead!
 		@BroadcastMeeting aply.id, bodyColor
 
 		timer.Create handle, 3, 1, ->
-			for imposter, _ in pairs @Imposters
-				if @Vented[imposter]
-					@Vented[imposter] = false
+			for imposter, _ in pairs @GameData.Imposters
+				if @GameData.Vented[imposter]
+					@GameData.Vented[imposter] = false
 					@NotifyVent imposter, @VentNotifyReason.UnVent
 
 			spawns = ents.FindByClass "info_player_start"
-			for index, ply in ipairs @ActivePlayers
+			for index, ply in ipairs @GameData.ActivePlayers
 				if IsValid ply.entity
 					with ply.entity
 						point = spawns[(index % #spawns) + 1]
@@ -124,8 +113,8 @@ GM.StartMeeting = (ply, bodyColor) =>
 
 			timer.Create handle, @ConVars.VotePreTime\GetInt! + 3, 1, ->
 				@Voting = true
-				table.Empty @Votes
-				table.Empty @VotesMap
+				table.Empty @GameData.Votes
+				table.Empty @GameData.VotesMap
 
 				for _, ply in ipairs player.GetAll!
 					if false and ply\IsBot!
@@ -139,23 +128,12 @@ GM.StartMeeting = (ply, bodyColor) =>
 	return true
 
 GM.CleanUp = =>
-	for handle, _ in pairs @Timers
+	for handle, _ in pairs @GameData.Timers
 		timer.Remove handle
 
-	table.Empty @Timers
-	table.Empty @Imposters
-	table.Empty @Vented
-	table.Empty @VentCooldown
-	table.Empty @ActivePlayers
-	table.Empty @ActivePlayersMap
-	table.Empty @ActivePlayersMapId
-	table.Empty @DeadPlayers
-	table.Empty @KillCooldowns
-	table.Empty @KillCooldownRemainders
-	table.Empty @Votes
-	table.Empty @VotesMap
+	GAMEMODE\PurgeGameData!
 
-	SetGlobalBool "NMW AU GameInProgress", false
+	@SetGameInProgress false
 	@Voting = false
 
 	@UnhideEveryone!
@@ -185,10 +163,10 @@ GM.StartGame = =>
 	@CleanUp!
 
 	handle = "game"
-	@Timers[handle] = true
+	@GameData.Timers[handle] = true
 
-	@ActivePlayers = {}
-	@ActivePlayersMapId = {}
+	@GameData.ActivePlayers = {}
+	@GameData.ActivePlayersMapId = {}
 	id = 0
 	for _, ply in ipairs player.GetAll!
 		id += 1
@@ -199,14 +177,14 @@ GM.StartGame = =>
 			id: id
 		}
 
-		table.insert @ActivePlayers, t
-		@ActivePlayersMapId[id] = t
+		table.insert @GameData.ActivePlayers, t
+		@GameData.ActivePlayersMapId[id] = t
 
 	@BroadcastCountdown CurTime! + 3
-	SetGlobalBool "NMW AU GameInProgress", true
+	@SetGameInProgress true
 	timer.Create handle, 3, 1, ->
 		memo = {}
-		table.sort @ActivePlayers, (a, b) ->
+		table.sort @GameData.ActivePlayers, (a, b) ->
 			if not a.entity\IsBot!
 				memo[a] = 1
 			if not b.entity\IsBot!
@@ -216,23 +194,23 @@ GM.StartGame = =>
 			memo[b] = memo[b] or math.random!
 			memo[a] > memo[b]
 
-		for index, ply in ipairs @ActivePlayers
-			@ActivePlayersMap[ply.entity] = ply
+		for index, ply in ipairs @GameData.ActivePlayers
+			@GameData.ActivePlayersMap[ply.entity] = ply
 			if index <= @ConVars.ImposterCount\GetInt!
-				@Imposters[ply] = true
+				@GameData.Imposters[ply] = true
 
 			if IsValid ply.entity
 				with ply.entity
-					ply.color = @Colors[math.floor(#@Colors / #@ActivePlayers) * index]
+					ply.color = @Colors[math.floor(#@Colors / #@GameData.ActivePlayers) * index]
 
 					\Freeze true
 					\SetColor ply.color
 					\SetNW2Int "NMW AU Meetings", @ConVars.MeetingsPerPlayer\GetInt!
 
-			print string.format "%s is %s", ply.entity\Nick!, @Imposters[ply] and "an imposter" or "a crewmate"
+			print string.format "%s is %s", ply.entity\Nick!, @GameData.Imposters[ply] and "an imposter" or "a crewmate"
 
 		memo = {}
-		table.sort @ActivePlayers, (a, b) ->
+		table.sort @GameData.ActivePlayers, (a, b) ->
 			memo[a] = memo[a] or math.random!
 			memo[b] = memo[b] or math.random!
 			memo[a] > memo[b]
@@ -242,7 +220,7 @@ GM.StartGame = =>
 		timer.Create handle, 2, 1, ->
 			@StartRound!
 
-			for index, ply in ipairs @ActivePlayers
+			for index, ply in ipairs @GameData.ActivePlayers
 				if IsValid ply.entity
 					ply.entity\Freeze true
 
@@ -250,13 +228,13 @@ GM.StartGame = =>
 				if @CheckWin!
 					return
 
-				for index, ply in ipairs @ActivePlayers
+				for index, ply in ipairs @GameData.ActivePlayers
 					if IsValid ply.entity
 						ply.entity\Freeze false
 
 					@SendGameState ply.entity, @GameState.Playing
 
-				for ply in pairs @Imposters
+				for ply in pairs @GameData.Imposters
 					if IsValid ply.entity
 						@UpdateKillCooldown ply
 
@@ -267,7 +245,7 @@ GM.ResetMeetingCooldown = =>
 
 GM.StartRound = =>
 	spawns = ents.FindByClass "info_player_start"
-	for index, ply in ipairs @ActivePlayers
+	for index, ply in ipairs @GameData.ActivePlayers
 		if IsValid ply.entity
 			with ply.entity
 				point = spawns[(index % #spawns) + 1]
@@ -281,7 +259,7 @@ GM.StartRound = =>
 		if 0 ~= body\GetNW2Int "NMW AU PlayerID"
 			body\Remove!
 
-	for ply in pairs @Imposters
+	for ply in pairs @GameData.Imposters
 		@UpdateKillCooldown ply
 
 	@ResetMeetingCooldown!
@@ -301,10 +279,10 @@ hook.Add "EntityTakeDamage", "NMW AU Damage", (target, dmg) ->
 	dmg\ScaleDamage 0
 
 hook.Add "PlayerUse", "NMW AU Use", (activator, ent) ->
-	aply = GAMEMODE.ActivePlayersMap[activator]
-	if aply and GetGlobalBool "NMW AU GameInProgress"
+	aply = GAMEMODE.GameData.ActivePlayersMap[activator]
+	if aply and GAMEMODE\IsGameInProgress!
 		bodyid = ent\GetNW2Int "NMW AU PlayerID"
-		victim = GAMEMODE.ActivePlayersMapId[bodyid]
+		victim = GAMEMODE.GameData.ActivePlayersMapId[bodyid]
 		if victim
 			GAMEMODE\StartMeeting activator, victim.color
 
@@ -313,8 +291,8 @@ hook.Add "FindUseEntity", "NMW AU FindUse", (ply, default) ->
 	return usable
 
 GM.UnVent = (playerTable) =>
-	if vent = @Vented[playerTable]
-		@VentCooldown[playerTable] = CurTime! + 1.5
+	if vent = @GameData.Vented[playerTable]
+		@GameData.VentCooldown[playerTable] = CurTime! + 1.5
 
 		@NotifyVent playerTable, @VentNotifyReason.UnVent
 		playerTable.entity\SetPos vent\GetPos!
@@ -322,7 +300,7 @@ GM.UnVent = (playerTable) =>
 		handle = "vent" .. playerTable.nickname
 		@BroadcastVent playerTable.entity, vent\GetPos!, true
 		timer.Create handle, 0.5, 1, ->
-			@Vented[playerTable] = nil
+			@GameData.Vented[playerTable] = nil
 			if IsValid playerTable.entity
 				@UnhidePlayer playerTable.entity
 				playerTable.entity\SetPos vent\GetPos! + Vector 0, 0, 5
@@ -337,25 +315,25 @@ GM.PackVentLinks = (vent) =>
 		return links
 
 GM.VentTo = (playerTable, targetVentId) =>
-	vent = @Vented[playerTable]
+	vent = @GameData.Vented[playerTable]
 
-	if @Imposters[playerTable] and vent and vent.Links and IsValid(vent.Links[targetVentId]) and (@VentCooldown[playerTable] or 0) <= CurTime!
+	if @GameData.Imposters[playerTable] and vent and vent.Links and IsValid(vent.Links[targetVentId]) and (@GameData.VentCooldown[playerTable] or 0) <= CurTime!
 		targetVent = vent.Links[targetVentId]
-		@Vented[playerTable] = targetVent
+		@GameData.Vented[playerTable] = targetVent
 		
 		@NotifyVent playerTable, @VentNotifyReason.Move, @PackVentLinks targetVent
-		@VentCooldown[playerTable] = CurTime! + 0.25
+		@GameData.VentCooldown[playerTable] = CurTime! + 0.25
 
 		if IsValid playerTable.entity
 			playerTable.entity\SetPos targetVent\GetPos!
 			playerTable.entity\SetEyeAngles targetVent.ViewAngle
 
 GM.Vent = (playerTable, vent) =>
-	if @Imposters[playerTable] and not @Vented[playerTable]
+	if @GameData.Imposters[playerTable] and not @GameData.Vented[playerTable]
 		@NotifyVent playerTable, @VentNotifyReason.Vent, @PackVentLinks vent
 
-		@Vented[playerTable] = vent
-		@VentCooldown[playerTable] = CurTime! + 0.75
+		@GameData.Vented[playerTable] = vent
+		@GameData.VentCooldown[playerTable] = CurTime! + 0.75
 
 		handle = "vent" .. playerTable.nickname
 
@@ -375,8 +353,8 @@ GM.Vent = (playerTable, vent) =>
 hook.Add "KeyPress", "NMW AU KeyPress", (ply, key) ->
 	@ = GAMEMODE
 
-	playerTable = @ActivePlayersMap[ply]
+	playerTable = @GameData.ActivePlayersMap[ply]
 	switch key
 		when IN_USE
-			if @Imposters[playerTable] and @Vented[playerTable] and (@VentCooldown[playerTable] or 0) <= CurTime!
+			if @GameData.Imposters[playerTable] and @GameData.Vented[playerTable] and (@VentCooldown[playerTable] or 0) <= CurTime!
 				@UnVent playerTable

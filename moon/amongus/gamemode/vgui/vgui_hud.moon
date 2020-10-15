@@ -53,7 +53,7 @@ hud.SetupButtons = (state, impostor) =>
 			.Paint = (_, w, h) ->
 				color = if GAMEMODE.KillCooldown >= CurTime!
 					Color 255, 255, 255, 32
-				elseif IsValid(GAMEMODE.KillHighlight) and not GAMEMODE.Imposters[GAMEMODE.KillHighlight]
+				elseif IsValid(GAMEMODE.KillHighlight) and not GAMEMODE.GameData.Imposters[GAMEMODE.KillHighlight]
 					Color 255, 255, 255
 				else
 					Color 255, 255, 255, 32

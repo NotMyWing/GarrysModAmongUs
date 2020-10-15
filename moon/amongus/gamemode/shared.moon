@@ -144,10 +144,10 @@ GM.Move = (ply, mvd) =>
 	if mvd\KeyDown IN_WALK
 		mvd\SetButtons bit.band mvd\GetButtons!, bit.bnot IN_WALK
 
-	if @ActivePlayersMap
-		playerTable = @ActivePlayersMap[ply]
+	if @GameData.ActivePlayersMap
+		playerTable = @GameData.ActivePlayersMap[ply]
 
-		if (CLIENT and @Vented) or (SERVER and @Vented[playerTable])
+		if (CLIENT and @GameData.Vented) or (SERVER and @GameData.Vented[playerTable])
 			mvd\SetVelocity Vector 0, 0, 0
 			return true
 
@@ -156,10 +156,10 @@ GM.SplashScreenTime = 8
 GM.GetAlivePlayers = =>
 	players = {}
 
-	if @ActivePlayers and @DeadPlayers
-		for _, v in ipairs @ActivePlayers
+	if @GameData.ActivePlayers and @GameData.DeadPlayers
+		for _, v in ipairs @GameData.ActivePlayers
 			disconnected = not IsValid v.entity
-			if not disconnected and not @DeadPlayers[v]
+			if not disconnected and not @GameData.DeadPlayers[v]
 				table.insert players, v
 
 	return players
@@ -194,8 +194,8 @@ GM.TracePlayer = (ply) =>
 	usable = {}
 	killable = {}
 
-	lply = GAMEMODE.ActivePlayersMap and GAMEMODE.ActivePlayersMap[ply]
-	if not lply or (SERVER and @Vented[lply]) or (CLIENT and @Vented)
+	lply = GAMEMODE.GameData.ActivePlayersMap and GAMEMODE.GameData.ActivePlayersMap[ply]
+	if not lply or (SERVER and @GameData.Vented[lply]) or (CLIENT and @GameData.Vented)
 		return
 
 	for _, ent in ipairs entities
@@ -203,11 +203,10 @@ GM.TracePlayer = (ply) =>
 			continue
 	
 		if whitelist[ent\GetClass!]
-			aply = GAMEMODE.ActivePlayersMap and GAMEMODE.ActivePlayersMap[ent]
+			aply = GAMEMODE.GameData.ActivePlayersMap and GAMEMODE.GameData.ActivePlayersMap[ent]
 
-			isKillable = aply and ent\IsPlayer! and GAMEMODE.Imposters and GAMEMODE.DeadPlayers and
-				GAMEMODE.Imposters[lply] and not GAMEMODE.Imposters[aply] and
-				not GAMEMODE.DeadPlayers[aply]
+			isKillable = aply and ent\IsPlayer! and GAMEMODE.GameData.Imposters[lply] and 
+				not GAMEMODE.GameData.Imposters[aply] and not GAMEMODE.GameData.DeadPlayers[aply]
 
 			isUsable = not isKillable and not ent\IsPlayer!
 			if isKillable
@@ -223,9 +222,11 @@ GM.TracePlayer = (ply) =>
 	return killable[#killable], usable[#usable]
 
 hook.Add "PlayerFootstep", "NMW AU Footsteps", (ply) ->
-	aply = GAMEMODE.ActivePlayersMap and GAMEMODE.ActivePlayersMap[ply]
-	if GAMEMODE.DeadPlayers and GAMEMODE.DeadPlayers[aply] 
+	aply = GAMEMODE.GameData.ActivePlayersMap[ply]
+	if GAMEMODE.GameData.DeadPlayers and GAMEMODE.GameData.DeadPlayers[aply] 
 		return true
 
 GM.PlayerSwitchWeapon = (ply, oldWeapon, newWeapon) =>
 	return true
+
+GM.IsGameInProgress = => GetGlobalBool "NMW AU GameInProgress"

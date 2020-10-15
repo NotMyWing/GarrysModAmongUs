@@ -40,5 +40,5 @@ hook.Add "KeyPress", "NMW AU Spectate Cycle", (ply, key) ->
 				ply\Spectate OBS_MODE_ROAMING
 
 hook.Add "PlayerInitialSpawn", "NMW AU Spec", (ply) ->
-	if GetGlobalBool("NMW AU GameInProgress")
+	if GAMEMODE\IsGameInProgress!
 		GAMEMODE\CycleSpectateEntity ply

@@ -8,16 +8,17 @@ hook.Add "InitPostEntity", "NMW AU Flash", ->
 		system.FlashWindow!
 
 key_num = (key) ->
-	if GAMEMODE.Vented
+	if GAMEMODE.GameData.Vented
 		GAMEMODE\VentRequest key - 1
 
 keyBinds = {
 	[KEY_Q]: ->
-		if GAMEMODE.ActivePlayersMap
-			lply = GAMEMODE.ActivePlayersMap[LocalPlayer!]
+		with GAMEMODE
+			if .GameData.ActivePlayersMap
+				lply = .GameData.ActivePlayersMap[LocalPlayer!]
 
-			if GAMEMODE.Imposters and GAMEMODE.Imposters[lply] and IsValid(GAMEMODE.KillHighlight) and GAMEMODE.KillHighlight\IsPlayer!
-				GAMEMODE\KillRequest GAMEMODE.KillHighlight
+				if .GameData.Imposters[lply] and IsValid(GAMEMODE.KillHighlight) and GAMEMODE.KillHighlight\IsPlayer!
+					\KillRequest .KillHighlight
 
 	[KEY_1]: key_num
 	[KEY_2]: key_num
@@ -65,9 +66,9 @@ hook.Add "PostDrawOpaqueRenderables", "NMW AU Nicknames", ->
 	export distSort_player = LocalPlayer!
 	table.sort players, distSort
 
-	aply = GAMEMODE.ActivePlayersMap and GAMEMODE.ActivePlayersMap[LocalPlayer!]
+	aply = GAMEMODE.GameData.ActivePlayersMap and GAMEMODE.GameData.ActivePlayersMap[LocalPlayer!]
 	for _, ply in ipairs players
-		lply = aply and GAMEMODE.ActivePlayersMap[ply]				
+		lply = aply and GAMEMODE.GameData.ActivePlayersMap[ply]				
 		if ply\IsDormant! or ply == LocalPlayer!
 			continue
 			
@@ -85,7 +86,7 @@ hook.Add "PostDrawOpaqueRenderables", "NMW AU Nicknames", ->
 		do
 			tW, tH = surface.GetTextSize ply\Nick!
 
-			color = if lply and GAMEMODE.Imposters[lply]
+			color = if lply and GAMEMODE.GameData.Imposters[lply]
 				color_imposter
 			else
 				color_crew

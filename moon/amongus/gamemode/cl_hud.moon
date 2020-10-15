@@ -28,20 +28,6 @@ if GAMEMODE and IsValid GAMEMODE.Hud
 hook.Add "Initialize", "Init Hud", ->
 	GAMEMODE\HUDReset!
 
-concommand.Add "au_debug_meeting_test", ->
-	if IsValid GAMEMODE.Hud.Meeting
-		GAMEMODE.Hud.Meeting\Remove!
-
-	GAMEMODE.Hud.Meeting = with vgui.CreateFromTable VGUI_MEETING, GAMEMODE.Hud
-		\StartEmergency!
-	
-concommand.Add "au_debug_eject_test", ->
-	if IsValid GAMEMODE.Hud.Eject
-		GAMEMODE.Hud.Eject\Remove!
-
-	GAMEMODE.Hud.Eject = with vgui.CreateFromTable VGUI_EJECT, GAMEMODE.Hud
-		\Eject! -- table.Random GAMEMODE.ActivePlayers
-
 hook.Add "HUDPaintBackground", "NMW AU Hud", ->
 	if IsValid GAMEMODE.Hud
 		cam.Start2D!

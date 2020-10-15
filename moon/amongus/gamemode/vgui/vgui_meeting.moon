@@ -146,7 +146,7 @@ meeting.DisableAllButtons = =>
 			btn.buttonOverlay\Remove!
 
 meeting.CanIVote = =>
-	@ActivePlayersMap and @DeadPlayers and @ActivePlayersMap[LocalPlayer!] and not @DeadPlayers[LocalPlayer!]
+	@GameData.ActivePlayersMap[LocalPlayer!] and not @GameData.DeadPlayers[LocalPlayer!]
 
 meeting.OpenDiscuss = (caller) =>
 	with @discussWindow = vgui.Create "DPanel", @
@@ -304,20 +304,20 @@ meeting.OpenDiscuss = (caller) =>
 						\SetSpaceY scroll\GetWide! * 0.0125
 						\SetSpaceX scroll\GetTall! * 0.02
 
-						table.sort GAMEMODE.ActivePlayers, (a, b) ->
+						table.sort GAMEMODE.GameData.ActivePlayers, (a, b) ->
 							disconnected = not IsValid a.entity
-							alive = not disconnected and not GAMEMODE.DeadPlayers[a]
-							va = (alive and GAMEMODE.Imposters[a] and 1) or alive and 0.5 or 0
+							alive = not disconnected and not GAMEMODE.GameData.DeadPlayers[a]
+							va = (alive and GAMEMODE.GameData.Imposters[a] and 1) or alive and 0.5 or 0
 							
 							disconnected = not IsValid b.entity
-							alive = not disconnected and not GAMEMODE.DeadPlayers[b]
-							vb = (alive and GAMEMODE.Imposters[b] and 1) or alive and 0.5 or 0
+							alive = not disconnected and not GAMEMODE.GameData.DeadPlayers[b]
+							vb = (alive and GAMEMODE.GameData.Imposters[b] and 1) or alive and 0.5 or 0
 
 							return va > vb
 
-						for _, ply in ipairs GAMEMODE.ActivePlayers or {}
+						for _, ply in ipairs GAMEMODE.GameData.ActivePlayers or {}
 							disconnected = not IsValid ply.entity
-							alive = not disconnected and not GAMEMODE.DeadPlayers[ply]
+							alive = not disconnected and not GAMEMODE.GameData.DeadPlayers[ply]
 
 							with container = list\Add "DPanel"
 								\SetSize scroll\GetWide! * 0.475, scroll\GetTall! * 0.165
@@ -427,7 +427,7 @@ meeting.OpenDiscuss = (caller) =>
 
 									with upper = listItem\Add "DPanel"
 										\SetTall listItem\GetTall! / 2
-										clr = if GAMEMODE.Imposters and GAMEMODE.Imposters[ply]
+										clr = if GAMEMODE.GameData.Imposters[ply]
 											Color 255, 30, 0
 										else
 											Color 255, 255, 255
@@ -623,7 +623,7 @@ meeting.End = (results) =>
 		if IsValid @skipButton.confirm
 			@skipButton.confirm\Remove!
 	
-	if @buttons and GAMEMODE.ActivePlayersMap
+	if @buttons and GAMEMODE.GameData.ActivePlayersMap
 		@skipArea\AlphaTo 255, 0.25, 0, ->
 			for _, btn in ipairs @buttons
 				if IsValid btn.confirm
@@ -655,7 +655,7 @@ meeting.End = (results) =>
 										.Image = CREW_MINI_LAYERS[i]
 										.Paint = GAMEMODE.Render.DermaFitImage
 								
-								aply = GAMEMODE.ActivePlayersMapId[voter]
+								aply = GAMEMODE.GameData.ActivePlayersMapId[voter]
 								if aply
 									layers[1].Color = aply.color
 

@@ -31,12 +31,7 @@ moveSounds = {
 
 net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	when GAMEMODE.FlowTypes.GameStart
-		GAMEMODE.ActivePlayers = {}
-		GAMEMODE.ActivePlayersMap = {}
-		GAMEMODE.ActivePlayersMapId = {}
-		GAMEMODE.Imposters = {}
-		GAMEMODE.DeadPlayers = {}
-		GAMEMODE.Vented = nil
+		GAMEMODE\PurgeGameData!
 
 		playerCount = net.ReadUInt 8
 		for i = 1, playerCount
@@ -47,23 +42,23 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 				entity: net.ReadEntity!
 				id: net.ReadUInt 8
 			}
-			table.insert GAMEMODE.ActivePlayers, t
-			GAMEMODE.ActivePlayersMapId[t.id] = t
-			GAMEMODE.ActivePlayersMap[t.entity] = t
+			table.insert GAMEMODE.GameData.ActivePlayers, t
+			GAMEMODE.GameData.ActivePlayersMapId[t.id] = t
+			GAMEMODE.GameData.ActivePlayersMap[t.entity] = t
 
 		GAMEMODE.ImposterCount = net.ReadUInt 8
 		imposter = net.ReadBool!
 		if imposter
 			for i = 1, GAMEMODE.ImposterCount
 				plyid = net.ReadUInt 8
-				ply = GAMEMODE.ActivePlayersMapId[plyid]
-				GAMEMODE.Imposters[ply] = true
+				ply = GAMEMODE.GameData.ActivePlayersMapId[plyid]
+				GAMEMODE.GameData.Imposters[ply] = true
 
 		count = net.ReadUInt 8
 		for i = 1, count
 			id = net.ReadUInt 8
-			if playerTable = GAMEMODE.ActivePlayersMapId[id]
-				GAMEMODE.DeadPlayers[playerTable] = true
+			if playerTable = GAMEMODE.GameData.ActivePlayersMapId[id]
+				GAMEMODE.GameData.DeadPlayers[playerTable] = true
 
 		GAMEMODE\HUDReset!
 		GAMEMODE.Hud.Splash = with vgui.CreateFromTable VGUI_SPLASH, GAMEMODE.Hud
@@ -74,12 +69,12 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 			GAMEMODE.Hud\Countdown net.ReadDouble!
 
 	when GAMEMODE.FlowTypes.SetDead
-		if GAMEMODE.ActivePlayersMapId
+		if GAMEMODE.GameData.ActivePlayersMapId
 			count = net.ReadUInt 8
 			for i = 1, count
 				id = net.ReadUInt 8
-				if playerTable = GAMEMODE.ActivePlayersMapId[id]
-					GAMEMODE.DeadPlayers[playerTable] = true
+				if playerTable = GAMEMODE.GameData.ActivePlayersMapId[id]
+					GAMEMODE.GameData.DeadPlayers[playerTable] = true
 
 	when GAMEMODE.FlowTypes.KillRequest
 		surface.PlaySound "au/impostor_kill.wav"
@@ -90,11 +85,11 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		switch reason
 			when GAMEMODE.VentNotifyReason.Vent
 				surface.PlaySound "au/vent_open.wav"
-				GAMEMODE.Vented = true
+				GAMEMODE.GameData.Vented = true
 
 			when GAMEMODE.VentNotifyReason.UnVent
 				surface.PlaySound "au/vent_open.wav"
-				GAMEMODE.Vented = false
+				GAMEMODE.GameData.Vented = false
 
 			when GAMEMODE.VentNotifyReason.Move
 				surface.PlaySound table.Random moveSounds
@@ -123,7 +118,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 
 	when GAMEMODE.FlowTypes.Meeting
 		plyid = net.ReadUInt 8
-		ply = GAMEMODE.ActivePlayersMapId[plyid]
+		ply = GAMEMODE.GameData.ActivePlayersMapId[plyid]
 
 		if IsValid GAMEMODE.Hud.Meeting
 			GAMEMODE.Hud.Meeting\Remove!
@@ -136,14 +131,14 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 
 	when GAMEMODE.FlowTypes.OpenDiscuss
 		plyid = net.ReadUInt 8
-		ply = GAMEMODE.ActivePlayersMapId[plyid]
+		ply = GAMEMODE.GameData.ActivePlayersMapId[plyid]
 
 		if IsValid GAMEMODE.Hud.Meeting
 			GAMEMODE.Hud.Meeting\OpenDiscuss ply
 
 	when GAMEMODE.FlowTypes.Vote
 		plyid = net.ReadUInt 8
-		ply = GAMEMODE.ActivePlayersMapId[plyid]
+		ply = GAMEMODE.GameData.ActivePlayersMapId[plyid]
 
 		if IsValid GAMEMODE.Hud.Meeting
 			GAMEMODE.Hud.Meeting\ApplyVote ply
@@ -175,7 +170,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 
 		reason = net.ReadUInt 4
 		ply = if net.ReadBool!
-			GAMEMODE.ActivePlayersMapId[net.ReadUInt 8]
+			GAMEMODE.GameData.ActivePlayersMapId[net.ReadUInt 8]
 
 		confirm = net.ReadBool!
 		imposter, remaining = if confirm
@@ -188,14 +183,12 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		state = net.ReadUInt 4
 
 		if state == GAMEMODE.GameState.Preparing
-			GAMEMODE.ActivePlayers = {}
-			GAMEMODE.Imposters = {}
-			GAMEMODE.DeadPlayers = {}
+			GAMEMODE\PurgeGameData!
 			GAMEMODE\HUDReset!
 
 			GAMEMODE.Hud\SetupButtons state
 		else
-			GAMEMODE.Hud\SetupButtons state, GAMEMODE.Imposters[GAMEMODE.ActivePlayersMap[LocalPlayer!]]
+			GAMEMODE.Hud\SetupButtons state, GAMEMODE.IGameData.mposters[GAMEMODE.GameData.ActivePlayersMap[LocalPlayer!]]
 
 	when GAMEMODE.FlowTypes.GameOver
 		reason = net.ReadUInt 4
@@ -204,7 +197,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 			GAMEMODE.ImposterCount = net.ReadUInt 8
 			for i = 1, GAMEMODE.ImposterCount
 				plyid = net.ReadUInt 8
-				ply = GAMEMODE.ActivePlayersMapId[plyid]
-				GAMEMODE.Imposters[ply] = true
+				ply = GAMEMODE.GameData.ActivePlayersMapId[plyid]
+				GAMEMODE.GameData.Imposters[ply] = true
 
 			\DisplayGameOver reason

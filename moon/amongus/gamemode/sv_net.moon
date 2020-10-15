@@ -31,12 +31,12 @@ GM.BroadcastEject = (reason, plyid) =>
 	confirm = @ConVars.ConfirmEjects\GetBool!
 	net.WriteBool confirm
 	if confirm
-		imposter = @Imposters[@ActivePlayersMapId[plyid]]
+		imposter = @GameData.Imposters[@GameData.ActivePlayersMapId[plyid]]
 		net.WriteBool imposter
 
 		numImposters = 0
-		for _, ply in pairs @ActivePlayers
-			if IsValid(ply.entity) and not @DeadPlayers[ply] and @Imposters[ply] and ply.id ~= plyid
+		for _, ply in pairs @GameData.ActivePlayers
+			if IsValid(ply.entity) and not @GameData.DeadPlayers[ply] and @GameData.Imposters[ply] and ply.id ~= plyid
 				numImposters += 1
 
 		net.WriteUInt numImposters, 8
@@ -79,8 +79,8 @@ GM.BroadcastGameOver = (reason) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.GameOver, @FlowSize
 	net.WriteUInt reason, 4
-	net.WriteUInt table.Count(@Imposters), 8
-	for imposter in pairs @Imposters
+	net.WriteUInt table.Count(@GameData.Imposters), 8
+	for imposter in pairs @GameData.Imposters
 		net.WriteUInt imposter.id, 8
 
 	net.Broadcast!
@@ -97,24 +97,24 @@ GM.SendGameData = (ply) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.GameStart, @FlowSize
 
-	net.WriteUInt #@ActivePlayers, 8
-	for _, aply in ipairs @ActivePlayers
+	net.WriteUInt #@GameData.ActivePlayers, 8
+	for _, aply in ipairs @GameData.ActivePlayers
 		net.WriteString aply.steamid
 		net.WriteString aply.nickname
 		net.WriteColor aply.color
 		net.WriteEntity aply.entity
 		net.WriteUInt aply.id, 8
 
-	net.WriteUInt table.Count(@Imposters), 8
-	if @Imposters[GAMEMODE.ActivePlayersMap[ply]]
+	net.WriteUInt table.Count(@GameData.Imposters), 8
+	if @GameData.Imposters[GAMEMODE.GameData.ActivePlayersMap[ply]]
 		net.WriteBool true
-		for imposter in pairs @Imposters
+		for imposter in pairs @GameData.Imposters
 			net.WriteUInt imposter.id, 8
 	else
 		net.WriteBool false
 
 	dead = {}
-	for deadPlayerTable, _ in pairs @DeadPlayers
+	for deadPlayerTable, _ in pairs @GameData.DeadPlayers
 		table.insert dead, deadPlayerTable.id
 
 	net.WriteUInt #dead, 8
@@ -124,13 +124,13 @@ GM.SendGameData = (ply) =>
 	net.Send ply
 
 GM.BroadcastStart = =>
-	for index, ply in ipairs @ActivePlayers
+	for index, ply in ipairs @GameData.ActivePlayers
 		if IsValid ply.entity
 			@SendGameData ply.entity
 
 GM.UpdateKillCooldown = (ply) =>
 	cd = CurTime! + @ConVars.KillCooldown\GetFloat!
-	@KillCooldowns[ply] = cd
+	@GameData.KillCooldowns[ply] = cd
 
 	if IsValid ply.entity
 		net.Start "NMW AU Flow"
@@ -139,18 +139,18 @@ GM.UpdateKillCooldown = (ply) =>
 		net.Send ply.entity
 
 GM.PauseKillCooldown = (ply, pause = true) =>
-	if @KillCooldowns[ply]
+	if @GameData.KillCooldowns[ply]
 		net.Start "NMW AU Flow"
 		net.WriteUInt @FlowTypes.KillCooldownPause, @FlowSize
 
 		remainder = if pause
-			CurTime! - @KillCooldowns[ply]
+			CurTime! - @GameData.KillCooldowns[ply]
 
 		if remainder
-			@KillCooldownRemainders[ply] = remainder
+			@GameData.KillCooldownRemainders[ply] = remainder
 		else
-			@KillCooldowns[ply] = CurTime! + @PauseKillCooldown[ply]
-			@KillCooldownRemainders[ply] = nil
+			@GameData.KillCooldowns[ply] = CurTime! + @PauseKillCooldown[ply]
+			@GameData.KillCooldownRemainders[ply] = nil
 
 		if IsValid ply.entity
 			if remainder
@@ -168,11 +168,11 @@ GM.SetDead = (playerTable) =>
 	if IsValid playerTable.entity
 		@HidePlayer playerTable.entity
 
-	@DeadPlayers[playerTable] = true
+	@GameData.DeadPlayers[playerTable] = true
 
 GM.BroadcastDead = =>
 	dead = {}
-	for playerTable, _ in pairs @DeadPlayers
+	for playerTable, _ in pairs @GameData.DeadPlayers
 		table.insert dead, playerTable.id
 
 	net.Start "NMW AU Flow"
@@ -205,12 +205,12 @@ GM.NotifyVent = (playerTable, reason, links) =>
 
 GM.Kill = (victim, attacker, silent) =>
 	if attacker
-		if not (@Imposters[attacker]) or (@Imposters[victim]) or
-			(@KillCooldowns[attacker] >= CurTime!) or
-			(@KillCooldownRemainders[attacker])
+		if not (@GameData.Imposters[attacker]) or (@GameData.Imposters[victim]) or
+			(@GameData.KillCooldowns[attacker] >= CurTime!) or
+			(@GameData.KillCooldownRemainders[attacker])
 				return
 
-	if not @DeadPlayers[plvictimy]
+	if not @GameData.DeadPlayers[plvictimy]
 		if attacker
 			@UpdateKillCooldown attacker
 
@@ -270,8 +270,8 @@ GM.VoteEnd = =>
 skipPlaceholder = { id: 0 }
 
 GM.Vote = (playerTable, target) =>
-	if playerTable and GetGlobalBool("NMW AU GameInProgress") and @Voting and not @VotesMap[playerTable] and not @DeadPlayers[playerTable]
-		@VotesMap[playerTable] = true
+	if playerTable and @IsGameInProgress! and @Voting and not @GameData.VotesMap[playerTable] and not @GameData.DeadPlayers[playerTable]
+		@GameData.VotesMap[playerTable] = true
 
 		if not target
 			target = skipPlaceholder
@@ -280,11 +280,11 @@ GM.Vote = (playerTable, target) =>
 		table.insert @Votes[target], playerTable
 
 		countAlive = 0
-		for _, ply in pairs @ActivePlayers
-			if IsValid(ply.entity) and not GAMEMODE.DeadPlayers[ply]
+		for _, ply in pairs @GameData.ActivePlayers
+			if IsValid(ply.entity) and not GAMEMODE.GameData.DeadPlayers[ply]
 				countAlive += 1
 
-		needed = table.Count(@VotesMap)
+		needed = table.Count(@GameData.VotesMap)
 
 		@BroadcastVote playerTable.id, countAlive, needed
 
@@ -317,28 +317,28 @@ GM.FinalizeVotes = =>
 	return voteTable, @EjectReason.Vote, voteTable[1].target
 
 net.Receive "NMW AU Flow", (len, ply) ->
-	playerTable = GAMEMODE.ActivePlayersMap[ply]
+	playerTable = GAMEMODE.GameData.ActivePlayersMap[ply]
 
 	switch net.ReadUInt GAMEMODE.FlowSize
 		when GAMEMODE.FlowTypes.KillRequest
-			if playerTable and GetGlobalBool("NMW AU GameInProgress") and GAMEMODE.Imposters[playerTable] and not ply\IsFrozen!
+			if playerTable and @IsGameInProgress! and GAMEMODE.GameData.Imposters[playerTable] and not ply\IsFrozen!
 				target = net.ReadEntity!
 
-				if target = GAMEMODE.ActivePlayersMap[target]
+				if target = GAMEMODE.GameData.ActivePlayersMap[target]
 					GAMEMODE\Kill target, playerTable
 
 		when GAMEMODE.FlowTypes.VentRequest
-			if playerTable and GetGlobalBool("NMW AU GameInProgress") and GAMEMODE.Vented[playerTable] and not ply\IsFrozen!
+			if playerTable and @IsGameInProgress! and GAMEMODE.GameData.Vented[playerTable] and not ply\IsFrozen!
 				target = net.ReadUInt 8
 				GAMEMODE\VentTo playerTable, target
 
 		when GAMEMODE.FlowTypes.Vote
-			if playerTable and GetGlobalBool("NMW AU GameInProgress")
+			if playerTable and @IsGameInProgress!
 				skip = net.ReadBool!
 				target = if not skip
 					net.ReadUInt 8
 
-				target = GAMEMODE.ActivePlayersMapId[target]
+				target = GAMEMODE.GameData.ActivePlayersMapId[target]
 				GAMEMODE\Vote playerTable, target
 
 		when GAMEMODE.FlowTypes.RequestUpdate
@@ -352,11 +352,11 @@ GM.HidePlayer = (ply, hide = true) =>
 		if otherPly ~= ply
 			ply\SetPreventTransmit otherPly, hide
 
-
-
 GM.UnhidePlayer = (ply) =>
 	@HidePlayer ply, false
 
 GM.UnhideEveryone = =>
 	for _, ply in ipairs player.GetAll!
 		@UnhidePlayer ply
+
+GM.SetGameInProgress = (state) => SetGlobalBool "NMW AU GameInProgress", state

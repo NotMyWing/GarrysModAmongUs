@@ -53,7 +53,7 @@ vent.ShowVents = (vents) =>
 				.Paint = GAMEMODE.Render.DermaFitImage
 
 vent.Think = =>
-	if not GAMEMODE or not GAMEMODE.Vented
+	if not GAMEMODE or not GAMEMODE.GameData.Vented
 		@Remove!
 
 vent.Paint = ->

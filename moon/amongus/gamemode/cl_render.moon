@@ -13,7 +13,7 @@ hook.Add "Think", "Think_Lights!", ->
 		.DieTime = CurTime! + 0.2
 
 hook.Add "CalcView", "MyCalcView", ( ply, pos, angles, fov ) ->
-	newOrigin = if GAMEMODE.Vented
+	newOrigin = if GAMEMODE.GameData.Vented
 		ply\GetPos! + Vector 0, 0, 10
 	else
 		pos - Vector 0, 0, 15

@@ -140,7 +140,7 @@ splash.DisplayShush = =>
 				surface.DisableClipping false
 
 splash.DisplayPlayers = (reason) =>
-	localPlayerTable = GAMEMODE.ActivePlayersMap[LocalPlayer!]
+	localPlayerTable = GAMEMODE.GameData.ActivePlayersMap[LocalPlayer!]
 
 	time = if reason
 		8
@@ -155,7 +155,7 @@ splash.DisplayPlayers = (reason) =>
 		\SetAlpha 0
 		.Paint = ->
 		\AlphaTo 255, 0.25, 0, ->
-			imposter = GAMEMODE.Imposters[localPlayerTable]
+			imposter = GAMEMODE.GameData.Imposters[localPlayerTable]
 			victory = if reason
 				(reason == GAMEMODE.GameOverReason.Imposter and imposter) or
 					(reason == GAMEMODE.GameOverReason.Crewmate and not imposter)
@@ -243,15 +243,15 @@ splash.DisplayPlayers = (reason) =>
 						.LayoutEntity = ->
 
 				players = {}
-				for _, playerTable in ipairs GAMEMODE.ActivePlayers
+				for _, playerTable in ipairs GAMEMODE.GameData.ActivePlayers
 					if playerTable.entity ~= LocalPlayer!
 						if reason
-							if reason == GAMEMODE.GameOverReason.Imposter and GAMEMODE.Imposters[playerTable]
+							if reason == GAMEMODE.GameOverReason.Imposter and GAMEMODE.GameData.Imposters[playerTable]
 								table.insert players, playerTable
-							elseif reason == GAMEMODE.GameOverReason.Crewmate and not GAMEMODE.Imposters[playerTable]
+							elseif reason == GAMEMODE.GameOverReason.Crewmate and not GAMEMODE.GameData.Imposters[playerTable]
 								table.insert players, playerTable
 						else
-							if imposter and GAMEMODE.Imposters[playerTable]
+							if imposter and GAMEMODE.GameData.Imposters[playerTable]
 								table.insert players, playerTable
 							elseif not imposter
 								table.insert players, playerTable
@@ -267,7 +267,7 @@ splash.DisplayPlayers = (reason) =>
 					width_mod = 1
 					for i = 1, math.ceil #players / 2
 						with create_mdl @left_bar
-							dead = GAMEMODE.DeadPlayers[players[i]]
+							dead = GAMEMODE.GameData.DeadPlayers[players[i]]
 							\SetColor Color 0, 0, 0, dead and 127 or 255
 							color = players[i].color
 							if dead
@@ -293,7 +293,7 @@ splash.DisplayPlayers = (reason) =>
 						width_mod = 1
 						for i = 1 + (math.ceil #players / 2), #players
 							with create_mdl @right_bar
-								dead = GAMEMODE.DeadPlayers[players[i]]
+								dead = GAMEMODE.GameData.DeadPlayers[players[i]]
 								\SetColor Color 0, 0, 0, dead and 127 or 255
 								color = players[i].color
 								if dead
@@ -313,7 +313,7 @@ splash.DisplayPlayers = (reason) =>
 						\Dock FILL
 						.Paint = ->
 						color = localPlayerTable.color
-						if GAMEMODE.DeadPlayers[localPlayerTable]
+						if GAMEMODE.GameData.DeadPlayers[localPlayerTable]
 							color.a = 127
 
 						with create_mdl @middle_player, color
