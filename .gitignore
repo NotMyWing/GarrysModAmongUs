@@ -1,0 +1,5 @@
+node_modules/
+moon/itc/
+gamemodes/**/*.lua
+downloaded/
+lua/
