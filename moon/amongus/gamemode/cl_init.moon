@@ -14,8 +14,8 @@ key_num = (key) ->
 keyBinds = {
 	[KEY_Q]: ->
 		with GAMEMODE
-			if .GameData.ActivePlayersMap
-				lply = .GameData.ActivePlayersMap[LocalPlayer!]
+			if .GameData.Lookup_PlayerByEntity
+				lply = .GameData.Lookup_PlayerByEntity[LocalPlayer!]
 
 				if .GameData.Imposters[lply] and IsValid(GAMEMODE.KillHighlight) and GAMEMODE.KillHighlight\IsPlayer!
 					\KillRequest .KillHighlight
@@ -66,9 +66,9 @@ hook.Add "PostDrawOpaqueRenderables", "NMW AU Nicknames", ->
 	export distSort_player = LocalPlayer!
 	table.sort players, distSort
 
-	aply = GAMEMODE.GameData.ActivePlayersMap and GAMEMODE.GameData.ActivePlayersMap[LocalPlayer!]
+	aply = GAMEMODE.GameData.Lookup_PlayerByEntity and GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
 	for _, ply in ipairs players
-		lply = aply and GAMEMODE.GameData.ActivePlayersMap[ply]				
+		lply = aply and GAMEMODE.GameData.Lookup_PlayerByEntity[ply]				
 		if ply\IsDormant! or ply == LocalPlayer!
 			continue
 			

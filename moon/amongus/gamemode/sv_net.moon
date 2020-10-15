@@ -31,11 +31,11 @@ GM.BroadcastEject = (reason, plyid) =>
 	confirm = @ConVars.ConfirmEjects\GetBool!
 	net.WriteBool confirm
 	if confirm
-		imposter = @GameData.Imposters[@GameData.ActivePlayersMapId[plyid]]
+		imposter = @GameData.Imposters[@GameData.Lookup_PlayerByID[plyid]]
 		net.WriteBool imposter
 
 		numImposters = 0
-		for _, ply in pairs @GameData.ActivePlayers
+		for _, ply in pairs @GameData.PlayerTables
 			if IsValid(ply.entity) and not @GameData.DeadPlayers[ply] and @GameData.Imposters[ply] and ply.id ~= plyid
 				numImposters += 1
 
@@ -97,8 +97,8 @@ GM.SendGameData = (ply) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.GameStart, @FlowSize
 
-	net.WriteUInt #@GameData.ActivePlayers, 8
-	for _, aply in ipairs @GameData.ActivePlayers
+	net.WriteUInt #@GameData.PlayerTables, 8
+	for _, aply in ipairs @GameData.PlayerTables
 		net.WriteString aply.steamid
 		net.WriteString aply.nickname
 		net.WriteColor aply.color
@@ -106,7 +106,7 @@ GM.SendGameData = (ply) =>
 		net.WriteUInt aply.id, 8
 
 	net.WriteUInt table.Count(@GameData.Imposters), 8
-	if @GameData.Imposters[GAMEMODE.GameData.ActivePlayersMap[ply]]
+	if @GameData.Imposters[GAMEMODE.GameData.Lookup_PlayerByEntity[ply]]
 		net.WriteBool true
 		for imposter in pairs @GameData.Imposters
 			net.WriteUInt imposter.id, 8
@@ -124,7 +124,7 @@ GM.SendGameData = (ply) =>
 	net.Send ply
 
 GM.BroadcastStart = =>
-	for index, ply in ipairs @GameData.ActivePlayers
+	for index, ply in ipairs @GameData.PlayerTables
 		if IsValid ply.entity
 			@SendGameData ply.entity
 
@@ -280,7 +280,7 @@ GM.Vote = (playerTable, target) =>
 		table.insert @Votes[target], playerTable
 
 		countAlive = 0
-		for _, ply in pairs @GameData.ActivePlayers
+		for _, ply in pairs @GameData.PlayerTables
 			if IsValid(ply.entity) and not GAMEMODE.GameData.DeadPlayers[ply]
 				countAlive += 1
 
@@ -317,14 +317,14 @@ GM.FinalizeVotes = =>
 	return voteTable, @EjectReason.Vote, voteTable[1].target
 
 net.Receive "NMW AU Flow", (len, ply) ->
-	playerTable = GAMEMODE.GameData.ActivePlayersMap[ply]
+	playerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
 
 	switch net.ReadUInt GAMEMODE.FlowSize
 		when GAMEMODE.FlowTypes.KillRequest
 			if playerTable and @IsGameInProgress! and GAMEMODE.GameData.Imposters[playerTable] and not ply\IsFrozen!
 				target = net.ReadEntity!
 
-				if target = GAMEMODE.GameData.ActivePlayersMap[target]
+				if target = GAMEMODE.GameData.Lookup_PlayerByEntity[target]
 					GAMEMODE\Kill target, playerTable
 
 		when GAMEMODE.FlowTypes.VentRequest
@@ -338,7 +338,7 @@ net.Receive "NMW AU Flow", (len, ply) ->
 				target = if not skip
 					net.ReadUInt 8
 
-				target = GAMEMODE.GameData.ActivePlayersMapId[target]
+				target = GAMEMODE.GameData.Lookup_PlayerByID[target]
 				GAMEMODE\Vote playerTable, target
 
 		when GAMEMODE.FlowTypes.RequestUpdate

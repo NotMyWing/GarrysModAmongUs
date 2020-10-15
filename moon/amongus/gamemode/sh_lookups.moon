@@ -2,20 +2,21 @@ with GM
 	.GameData or= {}
 
 	with .GameData
-		.KillCooldownRemainders or= {}
-		.ActivePlayersMapId or= {}
-		.ActivePlayersMap or= {}
-		.ActivePlayers or= {}
-		.KillCooldowns or= {}
-		.DeadPlayers or= {}
-		.Imposters or= {}
+		.Lookup_PlayerByID     or= {}
+		.Lookup_PlayerByEntity or= {}
+		
+		.PlayerTables or= {}
+		.DeadPlayers  or= {}
+		.Imposters    or= {}
 
 		if SERVER
-			.Timers or= {}
-			.VotesMap or= {}
-			.Votes or= {}
-			.Vented or= {}
-			.VentCooldown or= {}
+			.Timers                 or= {}
+			.VotesMap               or= {}
+			.Votes                  or= {}
+			.Vented                 or= {}
+			.VentCooldown           or= {}
+			.KillCooldownRemainders or= {}
+			.KillCooldowns          or= {}
 
 	.PurgeGameData = =>
 		for key, dataTable in pairs @GameData

@@ -140,7 +140,7 @@ splash.DisplayShush = =>
 				surface.DisableClipping false
 
 splash.DisplayPlayers = (reason) =>
-	localPlayerTable = GAMEMODE.GameData.ActivePlayersMap[LocalPlayer!]
+	localPlayerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
 
 	time = if reason
 		8
@@ -243,7 +243,7 @@ splash.DisplayPlayers = (reason) =>
 						.LayoutEntity = ->
 
 				players = {}
-				for _, playerTable in ipairs GAMEMODE.GameData.ActivePlayers
+				for _, playerTable in ipairs GAMEMODE.GameData.PlayerTables
 					if playerTable.entity ~= LocalPlayer!
 						if reason
 							if reason == GAMEMODE.GameOverReason.Imposter and GAMEMODE.GameData.Imposters[playerTable]

@@ -42,22 +42,22 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 				entity: net.ReadEntity!
 				id: net.ReadUInt 8
 			}
-			table.insert GAMEMODE.GameData.ActivePlayers, t
-			GAMEMODE.GameData.ActivePlayersMapId[t.id] = t
-			GAMEMODE.GameData.ActivePlayersMap[t.entity] = t
+			table.insert GAMEMODE.GameData.PlayerTables, t
+			GAMEMODE.GameData.Lookup_PlayerByID[t.id] = t
+			GAMEMODE.GameData.Lookup_PlayerByEntity[t.entity] = t
 
 		GAMEMODE.ImposterCount = net.ReadUInt 8
 		imposter = net.ReadBool!
 		if imposter
 			for i = 1, GAMEMODE.ImposterCount
 				plyid = net.ReadUInt 8
-				ply = GAMEMODE.GameData.ActivePlayersMapId[plyid]
+				ply = GAMEMODE.GameData.Lookup_PlayerByID[plyid]
 				GAMEMODE.GameData.Imposters[ply] = true
 
 		count = net.ReadUInt 8
 		for i = 1, count
 			id = net.ReadUInt 8
-			if playerTable = GAMEMODE.GameData.ActivePlayersMapId[id]
+			if playerTable = GAMEMODE.GameData.Lookup_PlayerByID[id]
 				GAMEMODE.GameData.DeadPlayers[playerTable] = true
 
 		GAMEMODE\HUDReset!
@@ -69,11 +69,11 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 			GAMEMODE.Hud\Countdown net.ReadDouble!
 
 	when GAMEMODE.FlowTypes.SetDead
-		if GAMEMODE.GameData.ActivePlayersMapId
+		if GAMEMODE.GameData.Lookup_PlayerByID
 			count = net.ReadUInt 8
 			for i = 1, count
 				id = net.ReadUInt 8
-				if playerTable = GAMEMODE.GameData.ActivePlayersMapId[id]
+				if playerTable = GAMEMODE.GameData.Lookup_PlayerByID[id]
 					GAMEMODE.GameData.DeadPlayers[playerTable] = true
 
 	when GAMEMODE.FlowTypes.KillRequest
@@ -118,7 +118,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 
 	when GAMEMODE.FlowTypes.Meeting
 		plyid = net.ReadUInt 8
-		ply = GAMEMODE.GameData.ActivePlayersMapId[plyid]
+		ply = GAMEMODE.GameData.Lookup_PlayerByID[plyid]
 
 		if IsValid GAMEMODE.Hud.Meeting
 			GAMEMODE.Hud.Meeting\Remove!
@@ -131,14 +131,14 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 
 	when GAMEMODE.FlowTypes.OpenDiscuss
 		plyid = net.ReadUInt 8
-		ply = GAMEMODE.GameData.ActivePlayersMapId[plyid]
+		ply = GAMEMODE.GameData.Lookup_PlayerByID[plyid]
 
 		if IsValid GAMEMODE.Hud.Meeting
 			GAMEMODE.Hud.Meeting\OpenDiscuss ply
 
 	when GAMEMODE.FlowTypes.Vote
 		plyid = net.ReadUInt 8
-		ply = GAMEMODE.GameData.ActivePlayersMapId[plyid]
+		ply = GAMEMODE.GameData.Lookup_PlayerByID[plyid]
 
 		if IsValid GAMEMODE.Hud.Meeting
 			GAMEMODE.Hud.Meeting\ApplyVote ply
@@ -170,7 +170,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 
 		reason = net.ReadUInt 4
 		ply = if net.ReadBool!
-			GAMEMODE.GameData.ActivePlayersMapId[net.ReadUInt 8]
+			GAMEMODE.GameData.Lookup_PlayerByID[net.ReadUInt 8]
 
 		confirm = net.ReadBool!
 		imposter, remaining = if confirm
@@ -188,7 +188,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 
 			GAMEMODE.Hud\SetupButtons state
 		else
-			GAMEMODE.Hud\SetupButtons state, GAMEMODE.IGameData.mposters[GAMEMODE.GameData.ActivePlayersMap[LocalPlayer!]]
+			GAMEMODE.Hud\SetupButtons state, GAMEMODE.IGameData.mposters[GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]]
 
 	when GAMEMODE.FlowTypes.GameOver
 		reason = net.ReadUInt 4
@@ -197,7 +197,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 			GAMEMODE.ImposterCount = net.ReadUInt 8
 			for i = 1, GAMEMODE.ImposterCount
 				plyid = net.ReadUInt 8
-				ply = GAMEMODE.GameData.ActivePlayersMapId[plyid]
+				ply = GAMEMODE.GameData.Lookup_PlayerByID[plyid]
 				GAMEMODE.GameData.Imposters[ply] = true
 
 			\DisplayGameOver reason

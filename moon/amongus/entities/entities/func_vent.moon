@@ -38,7 +38,7 @@ ENT.Draw = =>
 
 ENT.Use = (ply) =>
 	if SERVER
-		if playerTable = GAMEMODE.GameData.ActivePlayersMap[ply]
+		if playerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
 			GAMEMODE\Vent playerTable, @
 
 ENT.KeyValue = (key, value) =>

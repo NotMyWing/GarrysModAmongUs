@@ -146,7 +146,7 @@ meeting.DisableAllButtons = =>
 			btn.buttonOverlay\Remove!
 
 meeting.CanIVote = =>
-	@GameData.ActivePlayersMap[LocalPlayer!] and not @GameData.DeadPlayers[LocalPlayer!]
+	@GameData.Lookup_PlayerByEntity[LocalPlayer!] and not @GameData.DeadPlayers[LocalPlayer!]
 
 meeting.OpenDiscuss = (caller) =>
 	with @discussWindow = vgui.Create "DPanel", @
@@ -304,7 +304,7 @@ meeting.OpenDiscuss = (caller) =>
 						\SetSpaceY scroll\GetWide! * 0.0125
 						\SetSpaceX scroll\GetTall! * 0.02
 
-						table.sort GAMEMODE.GameData.ActivePlayers, (a, b) ->
+						table.sort GAMEMODE.GameData.PlayerTables, (a, b) ->
 							disconnected = not IsValid a.entity
 							alive = not disconnected and not GAMEMODE.GameData.DeadPlayers[a]
 							va = (alive and GAMEMODE.GameData.Imposters[a] and 1) or alive and 0.5 or 0
@@ -315,7 +315,7 @@ meeting.OpenDiscuss = (caller) =>
 
 							return va > vb
 
-						for _, ply in ipairs GAMEMODE.GameData.ActivePlayers or {}
+						for _, ply in ipairs GAMEMODE.GameData.PlayerTables or {}
 							disconnected = not IsValid ply.entity
 							alive = not disconnected and not GAMEMODE.GameData.DeadPlayers[ply]
 
@@ -623,7 +623,7 @@ meeting.End = (results) =>
 		if IsValid @skipButton.confirm
 			@skipButton.confirm\Remove!
 	
-	if @buttons and GAMEMODE.GameData.ActivePlayersMap
+	if @buttons and GAMEMODE.GameData.Lookup_PlayerByEntity
 		@skipArea\AlphaTo 255, 0.25, 0, ->
 			for _, btn in ipairs @buttons
 				if IsValid btn.confirm
@@ -655,7 +655,7 @@ meeting.End = (results) =>
 										.Image = CREW_MINI_LAYERS[i]
 										.Paint = GAMEMODE.Render.DermaFitImage
 								
-								aply = GAMEMODE.GameData.ActivePlayersMapId[voter]
+								aply = GAMEMODE.GameData.Lookup_PlayerByID[voter]
 								if aply
 									layers[1].Color = aply.color
 

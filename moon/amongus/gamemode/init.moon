@@ -25,7 +25,7 @@ GM.Think = =>
 		@CheckWin!
 
 hook.Add "PlayerDisconnected", "NMW AU CheckWin", ->
-	if GAMEMODE.GameData.ActivePlayers
+	if GAMEMODE.GameData.PlayerTables
 		GAMEMODE\CheckWin!
 
 GM.GameOver = (reason) =>
@@ -49,7 +49,7 @@ GM.CheckWin = =>
 	numImposters = 0
 	numPlayers = 0
 
-	for _, ply in pairs @GameData.ActivePlayers
+	for _, ply in pairs @GameData.PlayerTables
 		if IsValid(ply.entity) and not @GameData.DeadPlayers[ply]
 			if @GameData.Imposters[ply]
 				numImposters += 1
@@ -77,7 +77,7 @@ GM.PlayerSpawn = (ply) =>
 	ply\SetNoCollideWithTeammates true
 
 GM.StartMeeting = (ply, bodyColor) =>
-	aply = @GameData.ActivePlayersMap[ply]
+	aply = @GameData.Lookup_PlayerByEntity[ply]
 
 	handle = "meeting"
 	if @GameData.DeadPlayers[aply] 
@@ -101,7 +101,7 @@ GM.StartMeeting = (ply, bodyColor) =>
 					@NotifyVent imposter, @VentNotifyReason.UnVent
 
 			spawns = ents.FindByClass "info_player_start"
-			for index, ply in ipairs @GameData.ActivePlayers
+			for index, ply in ipairs @GameData.PlayerTables
 				if IsValid ply.entity
 					with ply.entity
 						point = spawns[(index % #spawns) + 1]
@@ -165,8 +165,8 @@ GM.StartGame = =>
 	handle = "game"
 	@GameData.Timers[handle] = true
 
-	@GameData.ActivePlayers = {}
-	@GameData.ActivePlayersMapId = {}
+	@GameData.PlayerTables = {}
+	@GameData.Lookup_PlayerByID = {}
 	id = 0
 	for _, ply in ipairs player.GetAll!
 		id += 1
@@ -177,14 +177,14 @@ GM.StartGame = =>
 			id: id
 		}
 
-		table.insert @GameData.ActivePlayers, t
-		@GameData.ActivePlayersMapId[id] = t
+		table.insert @GameData.PlayerTables, t
+		@GameData.Lookup_PlayerByID[id] = t
 
 	@BroadcastCountdown CurTime! + 3
 	@SetGameInProgress true
 	timer.Create handle, 3, 1, ->
 		memo = {}
-		table.sort @GameData.ActivePlayers, (a, b) ->
+		table.sort @GameData.PlayerTables, (a, b) ->
 			if not a.entity\IsBot!
 				memo[a] = 1
 			if not b.entity\IsBot!
@@ -194,14 +194,14 @@ GM.StartGame = =>
 			memo[b] = memo[b] or math.random!
 			memo[a] > memo[b]
 
-		for index, ply in ipairs @GameData.ActivePlayers
-			@GameData.ActivePlayersMap[ply.entity] = ply
+		for index, ply in ipairs @GameData.PlayerTables
+			@GameData.Lookup_PlayerByEntity[ply.entity] = ply
 			if index <= @ConVars.ImposterCount\GetInt!
 				@GameData.Imposters[ply] = true
 
 			if IsValid ply.entity
 				with ply.entity
-					ply.color = @Colors[math.floor(#@Colors / #@GameData.ActivePlayers) * index]
+					ply.color = @Colors[math.floor(#@Colors / #@GameData.PlayerTables) * index]
 
 					\Freeze true
 					\SetColor ply.color
@@ -210,7 +210,7 @@ GM.StartGame = =>
 			print string.format "%s is %s", ply.entity\Nick!, @GameData.Imposters[ply] and "an imposter" or "a crewmate"
 
 		memo = {}
-		table.sort @GameData.ActivePlayers, (a, b) ->
+		table.sort @GameData.PlayerTables, (a, b) ->
 			memo[a] = memo[a] or math.random!
 			memo[b] = memo[b] or math.random!
 			memo[a] > memo[b]
@@ -220,7 +220,7 @@ GM.StartGame = =>
 		timer.Create handle, 2, 1, ->
 			@StartRound!
 
-			for index, ply in ipairs @GameData.ActivePlayers
+			for index, ply in ipairs @GameData.PlayerTables
 				if IsValid ply.entity
 					ply.entity\Freeze true
 
@@ -228,7 +228,7 @@ GM.StartGame = =>
 				if @CheckWin!
 					return
 
-				for index, ply in ipairs @GameData.ActivePlayers
+				for index, ply in ipairs @GameData.PlayerTables
 					if IsValid ply.entity
 						ply.entity\Freeze false
 
@@ -245,7 +245,7 @@ GM.ResetMeetingCooldown = =>
 
 GM.StartRound = =>
 	spawns = ents.FindByClass "info_player_start"
-	for index, ply in ipairs @GameData.ActivePlayers
+	for index, ply in ipairs @GameData.PlayerTables
 		if IsValid ply.entity
 			with ply.entity
 				point = spawns[(index % #spawns) + 1]
@@ -279,10 +279,10 @@ hook.Add "EntityTakeDamage", "NMW AU Damage", (target, dmg) ->
 	dmg\ScaleDamage 0
 
 hook.Add "PlayerUse", "NMW AU Use", (activator, ent) ->
-	aply = GAMEMODE.GameData.ActivePlayersMap[activator]
+	aply = GAMEMODE.GameData.Lookup_PlayerByEntity[activator]
 	if aply and GAMEMODE\IsGameInProgress!
 		bodyid = ent\GetNW2Int "NMW AU PlayerID"
-		victim = GAMEMODE.GameData.ActivePlayersMapId[bodyid]
+		victim = GAMEMODE.GameData.Lookup_PlayerByID[bodyid]
 		if victim
 			GAMEMODE\StartMeeting activator, victim.color
 
@@ -353,7 +353,7 @@ GM.Vent = (playerTable, vent) =>
 hook.Add "KeyPress", "NMW AU KeyPress", (ply, key) ->
 	@ = GAMEMODE
 
-	playerTable = @GameData.ActivePlayersMap[ply]
+	playerTable = @GameData.Lookup_PlayerByEntity[ply]
 	switch key
 		when IN_USE
 			if @GameData.Imposters[playerTable] and @GameData.Vented[playerTable] and (@VentCooldown[playerTable] or 0) <= CurTime!

@@ -144,8 +144,8 @@ GM.Move = (ply, mvd) =>
 	if mvd\KeyDown IN_WALK
 		mvd\SetButtons bit.band mvd\GetButtons!, bit.bnot IN_WALK
 
-	if @GameData.ActivePlayersMap
-		playerTable = @GameData.ActivePlayersMap[ply]
+	if @GameData.Lookup_PlayerByEntity
+		playerTable = @GameData.Lookup_PlayerByEntity[ply]
 
 		if (CLIENT and @GameData.Vented) or (SERVER and @GameData.Vented[playerTable])
 			mvd\SetVelocity Vector 0, 0, 0
@@ -156,8 +156,8 @@ GM.SplashScreenTime = 8
 GM.GetAlivePlayers = =>
 	players = {}
 
-	if @GameData.ActivePlayers and @GameData.DeadPlayers
-		for _, v in ipairs @GameData.ActivePlayers
+	if @GameData.PlayerTables and @GameData.DeadPlayers
+		for _, v in ipairs @GameData.PlayerTables
 			disconnected = not IsValid v.entity
 			if not disconnected and not @GameData.DeadPlayers[v]
 				table.insert players, v
@@ -194,7 +194,7 @@ GM.TracePlayer = (ply) =>
 	usable = {}
 	killable = {}
 
-	lply = GAMEMODE.GameData.ActivePlayersMap and GAMEMODE.GameData.ActivePlayersMap[ply]
+	lply = GAMEMODE.GameData.Lookup_PlayerByEntity and GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
 	if not lply or (SERVER and @GameData.Vented[lply]) or (CLIENT and @GameData.Vented)
 		return
 
@@ -203,7 +203,7 @@ GM.TracePlayer = (ply) =>
 			continue
 	
 		if whitelist[ent\GetClass!]
-			aply = GAMEMODE.GameData.ActivePlayersMap and GAMEMODE.GameData.ActivePlayersMap[ent]
+			aply = GAMEMODE.GameData.Lookup_PlayerByEntity and GAMEMODE.GameData.Lookup_PlayerByEntity[ent]
 
 			isKillable = aply and ent\IsPlayer! and GAMEMODE.GameData.Imposters[lply] and 
 				not GAMEMODE.GameData.Imposters[aply] and not GAMEMODE.GameData.DeadPlayers[aply]
@@ -222,7 +222,7 @@ GM.TracePlayer = (ply) =>
 	return killable[#killable], usable[#usable]
 
 hook.Add "PlayerFootstep", "NMW AU Footsteps", (ply) ->
-	aply = GAMEMODE.GameData.ActivePlayersMap[ply]
+	aply = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
 	if GAMEMODE.GameData.DeadPlayers and GAMEMODE.GameData.DeadPlayers[aply] 
 		return true
 
