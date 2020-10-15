@@ -36,7 +36,7 @@ ENT.Use = (ply) =>
 		if time > 0
 			return
 
-		if GAMEMODE\StartMeeting ply
+		if GAMEMODE\Meeting_Start ply
 			@EmitSound "au/panel_emergencyButton.wav", 60
 			ply\SetNW2Int "NMW AU Meetings", ply\GetNW2Int("NMW AU Meetings") - 1
 
@@ -49,6 +49,9 @@ ENT.Draw = =>
 
 ENT.DrawTranslucent = =>
 	@DrawModel!
+
+	if not GAMEMODE\IsGameInProgress!
+		return
 
 	pos = @GetPos!
 	pos = pos + Vector( 0, 0, math.cos( CurTime() / 2 ) + 30 )

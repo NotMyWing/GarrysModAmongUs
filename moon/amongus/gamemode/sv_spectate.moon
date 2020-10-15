@@ -1,6 +1,6 @@
 GM.SpectateMap = {}
 
-GM.CycleSpectateEntity = (ply, delta = 0) =>
+GM.Spectate_CycleEntity = (ply, delta = 0) =>
 	pool = {}
 	local cur, first
 	for i, otherPly in ipairs player.GetAll!
@@ -14,7 +14,7 @@ GM.CycleSpectateEntity = (ply, delta = 0) =>
 
 	ply\SpectateEntity pool[@SpectateMap[ply]]
 
-GM.CycleSpectateMode = (ply) =>
+GM.Spectate_CycleMode = (ply) =>
 	current = ply\GetObserverMode!
 
 	switch current
@@ -31,14 +31,14 @@ hook.Add "KeyPress", "NMW AU Spectate Cycle", (ply, key) ->
 	if ply\GetObserverMode! > 0
 		switch key
 			when IN_ATTACK
-				GAMEMODE\CycleSpectateEntity ply, 1
+				GAMEMODE\Spectate_CycleEntity ply, 1
 			when IN_ATTACK2
-				GAMEMODE\CycleSpectateEntity ply, -1
+				GAMEMODE\Spectate_CycleEntity ply, -1
 			when IN_JUMP
-				GAMEMODE\CycleSpectateMode ply
+				GAMEMODE\Spectate_CycleMode ply
 			when IN_DUCK
 				ply\Spectate OBS_MODE_ROAMING
 
 hook.Add "PlayerInitialSpawn", "NMW AU Spec", (ply) ->
 	if GAMEMODE\IsGameInProgress!
-		GAMEMODE\CycleSpectateEntity ply
+		GAMEMODE\Spectate_CycleEntity ply

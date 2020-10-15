@@ -12,92 +12,106 @@ surface.CreateFont "NMW AU Eject Subtext", {
 	outline: true
 }
 
-eject = {}
+MAT_STARRY = Material "au/gui/eject/starry.png", "noclamp smooth"
 
-eject.Init = => with @
-	\SetSize ScrW!, ScrH!
-	\SetAlpha 0
-	\AlphaTo 255, 0.5, 0
-	\NewAnimation 8, 0, -1, ->
-		\AlphaTo 0, 0.4, 0, ->
-			\Remove!
-
-	with @canvas = \Add "DPanel"
-		\SetSize @GetWide!, @GetTall!
-		\SetAlpha 255
-		\AlphaTo 0, 0.4, 0, ->
-			\Remove!
-
-		.Paint = (_, w, h) ->
-			surface.SetDrawColor 0, 0, 0
-			surface.DrawRect 0, 0, w, h
-
-eject.EjectText = (ply) =>
-
-VGUI_STARRY = Material "au/gui/eject/starry.png", "noclamp smooth"
-VGUI_CREWMATE = {
+MAT_CREWMATE = {
 	Material "au/gui/eject/crewmate1.png", "smooth"
 	Material "au/gui/eject/crewmate2.png", "smooth"
 }
 
-eject.Eject = (reason, ply, confirm, imposter, remaining, total) => with @
-	size = 0.15 * math.min @GetTall!, @GetWide!
+eject = {}
 
-	label = @Add "DPanel"
-	with label
-		\SetSize @GetWide!, ScreenScale 22
-		\SetPos 0, @GetTall!/2 - (ScreenScale 22)/2
+eject.Init = => with @
+	\AlphaTo 255, 0.5, 0
+	\SetAlpha 0
+	\SetSize ScrW!, ScrH!
+	\NewAnimation 8, 0, -1, ->
+		\AlphaTo 0, 0.4, 0, ->
+			\Remove!
+
+--- Writes text in the middle of the screen.
+-- Much like in the original game.
+-- @param text The text to write.
+-- @param subtext Subtext. Optional.
+eject.WriteText = (text, subtext) =>
+	if IsValid @ejectTextLabel
+		@ejectTextLabel\Remove!
+
+	if IsValid @ejectTextSubLabel
+		@ejectTextLabel\Remove!
+
+	@ejectTextLabel = with @Add "DPanel"
 		\SetContentAlignment 5
+		\SetPos 0, @GetTall!/2 - (ScreenScale 22)/2
+		\SetSize @GetWide!, ScreenScale 22
 
 		color = Color 255, 255, 255
 		.Text = ""
 		.Paint = (_, w, h) ->
 			draw.SimpleText .Text, "NMW AU Eject Text", w/2, h/2, color, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER
 
-	local subLabel 
-	if confirm
-		subLabel = @Add "DPanel"
-		with subLabel
+	if subtext
+		@ejectTextSubLabel = with @Add "DPanel"
+			x, y = @ejectTextLabel\GetPos!
+			\SetPos x, y + @ejectTextLabel\GetTall!
+
+			\SetAlpha 0
+			\SetContentAlignment 5
 			\SetSize @GetWide!, ScreenScale 14
 
-			x, y = label\GetPos!
-			\SetPos x, y + label\GetTall!
-			\SetContentAlignment 5
-			\SetAlpha 0
-			\AlphaTo 255, 0.25, 4
 			color = Color 255, 255, 255
-			.Text = if remaining == 1
-				string.format "1 Imposter remains."
-			else
-				string.format "%d Imposters remain.", remaining
-
 			.Paint = (_, w, h) ->
-				draw.SimpleText .Text, "NMW AU Eject Subtext", w/2, h/2, color, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER
+				if \GetAlpha! ~= 0
+					draw.SimpleText subtext, "NMW AU Eject Subtext", w/2, h/2, color, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER
 
-	writeText = (text) ->
-		i = 0
-		callback = ->
-			i += 1
+	i = 0
+	callback = ->
+		i += 1
 
-			label.Text ..= text[i]
-			surface.PlaySound "au/eject_text.wav"
-			if i ~= #text
-				\NewAnimation 1.5/#text, 0, 0, callback
-		callback!
+		@ejectTextLabel.Text ..= text[i]
+		surface.PlaySound "au/eject_text.wav"
+		if i ~= #text
+			@ejectTextLabel\NewAnimation 1.5/#text, 0, 0, callback
+		elseif @ejectTextSubLabel
+			@ejectTextSubLabel\AlphaTo 255, 0.25, 1
+
+	callback!
+
+--- Ejects something.
+-- @param reason Why are we ejecting? See GM.EjectReason in shared.moon
+-- @param ply The person we're ejecting. Optional.
+-- @param confirm Are confirm ejects on? Optional.
+-- @param imposter Was the ejected person an imposter? Optional.
+-- @param remaining How many imposters left? Optional, but total must be provided.
+-- @param total How many imposters are there in the game? Optional.
+eject.Eject = (reason, ply, confirm = false, imposter = false, remaining = 0, total = 0) => with @
+	subtext = if confirm and total ~= 0
+		if remaining == 1
+			string.format "1 Imposter remains."
+		else
+			string.format "%d Imposters remain.", remaining
 
 	if not ply
+		-- If we're not ejecting anyone, print that nobody was ejected.
 		\NewAnimation 2, 0, -1, ->
 			switch reason
 				when GAMEMODE.EjectReason.Tie
-					writeText "Nobody was ejected. (Tie)"
+					@WriteText "Nobody was ejected. (Tie)", subtext
 				when GAMEMODE.EjectReason.Skipped
-					writeText "Nobody was ejected. (Skipped)"
+					@WriteText "Nobody was ejected. (Skipped)", subtext
 				else
-					writeText "Nobody was ejected."
+					@WriteText "Nobody was ejected.", subtext
 	else
+		-- However if we are, print the name and optionally the role of the ejected person.
+		-- Create and animate a crewmate sprite flying across the screen.
 		with crewmate = \Add "DPanel"
+			size = 0.15 * math.min @GetTall!, @GetWide!
 			\SetSize size, size
 			\SetPos -size, @GetTall!/2 - size/2
+			\SetZPos 1
+
+			-- Split the animation in half and print the text
+			-- when the crewmate is in the middle of the screen.
 			\MoveTo @GetWide! / 2 - size / 2, @GetTall!/2 - size/2, 2, 1, 1, ->
 				\MoveTo @GetWide!, @GetTall!/2 - size/2, 3, 0, 1
 
@@ -115,12 +129,14 @@ eject.Eject = (reason, ply, confirm, imposter, remaining, total) => with @
 				else
 					"%s was ejected."
 
-				writeText string.format text, ply.nickname
+				@WriteText (string.format text, ply.nickname), subtext
 
 			.accumulator = 0
 			starttime = SysTime!
 			endtime = SysTime! + 5
 
+			-- This is ever so slightly bad.
+			-- Just a tiny bit.
 			.Paint = (_, w, h) ->
 				curtime = math.max 0.1, (endtime - SysTime!) / (endtime - starttime)
 				.accumulator += curtime * 1.5
@@ -140,17 +156,17 @@ eject.Eject = (reason, ply, confirm, imposter, remaining, total) => with @
 				do
 					surface.DisableClipping true
 					surface.SetDrawColor ply.color
-					surface.SetMaterial VGUI_CREWMATE[1]
+					surface.SetMaterial MAT_CREWMATE[1]
 					surface.DrawTexturedRect 0, 0, w, h
-					
+
 					surface.SetDrawColor 255, 255, 255
-					surface.SetMaterial VGUI_CREWMATE[2]
+					surface.SetMaterial MAT_CREWMATE[2]
 					surface.DrawTexturedRect 0, 0, w, h
 					surface.DisableClipping false
 				cam.PopModelMatrix!
 
-VGUI_STARRY = Material "au/gui/eject/starry.png", "noclamp smooth"
-
+--- Paints the starry sky.
+-- Which is quite literally just three layers of the same star picture.
 eject.Paint = (w, h) => with @
 	surface.SetDrawColor 0, 0, 0
 	surface.DrawRect 0, 0, w, h
@@ -159,7 +175,7 @@ eject.Paint = (w, h) => with @
 	scale = 1
 	alpha = 255
 
-	surface.SetMaterial VGUI_STARRY
+	surface.SetMaterial MAT_STARRY
 	for i = 1, 3
 		surface.SetDrawColor Color 255, 255, 255, alpha
 		surface.DrawTexturedRectUV 0, 0, w, h, -time * scale, 0, (-time + w/h) * scale, scale

@@ -17,6 +17,7 @@ with GM
 			.VentCooldown           or= {}
 			.KillCooldownRemainders or= {}
 			.KillCooldowns          or= {}
+			.KillCooldownPause      or= {}
 
 	.PurgeGameData = =>
 		for key, dataTable in pairs @GameData

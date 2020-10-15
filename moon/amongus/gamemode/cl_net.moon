@@ -1,7 +1,3 @@
-VGUI_SPLASH = include "vgui/vgui_splash.lua"
-VGUI_MEETING = include "vgui/vgui_meeting.lua"
-VGUI_EJECT = include "vgui/vgui_eject.lua"
-
 GM.VentRequest = (vent) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.VentRequest, @FlowSize
@@ -16,7 +12,7 @@ GM.KillRequest = (ply) =>
 
 GM.SendVote = (plyid) =>
 	net.Start "NMW AU Flow"
-	net.WriteUInt @FlowTypes.Vote, @FlowSize
+	net.WriteUInt @FlowTypes.MeetingVote, @FlowSize
 	net.WriteBool not plyid
 	if plyid
 		net.WriteUInt plyid, 8
@@ -30,45 +26,63 @@ moveSounds = {
 }
 
 net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
+	--
+	-- Define player tables and other necessary game data.
+	--
 	when GAMEMODE.FlowTypes.GameStart
 		GAMEMODE\PurgeGameData!
 
+		-- Fill player tables.
 		playerCount = net.ReadUInt 8
 		for i = 1, playerCount
-			t = {
+			playerTable = {
 				steamid: net.ReadString!
 				nickname: net.ReadString!
 				color: net.ReadColor!
 				entity: net.ReadEntity!
 				id: net.ReadUInt 8
 			}
-			table.insert GAMEMODE.GameData.PlayerTables, t
-			GAMEMODE.GameData.Lookup_PlayerByID[t.id] = t
-			GAMEMODE.GameData.Lookup_PlayerByEntity[t.entity] = t
 
+			table.insert GAMEMODE.GameData.PlayerTables, playerTable
+			GAMEMODE.GameData.Lookup_PlayerByID[playerTable.id] = playerTable
+			GAMEMODE.GameData.Lookup_PlayerByEntity[playerTable.entity] = playerTable
+
+		-- Read imposters.
+		-- If we're an imposter, let us be aware of other imposters.
 		GAMEMODE.ImposterCount = net.ReadUInt 8
 		imposter = net.ReadBool!
 		if imposter
 			for i = 1, GAMEMODE.ImposterCount
-				plyid = net.ReadUInt 8
-				ply = GAMEMODE.GameData.Lookup_PlayerByID[plyid]
-				GAMEMODE.GameData.Imposters[ply] = true
+				playerTable = GAMEMODE.GameData.Lookup_PlayerByID[net.ReadUInt 8]
+				if playerTable
+					GAMEMODE.GameData.Imposters[playerTable] = true
 
+		-- Read dead people.
+		-- Most of the time this is useless, and is only ever necessary
+		-- to let the new players (spectators) know about dead people.
 		count = net.ReadUInt 8
 		for i = 1, count
 			id = net.ReadUInt 8
 			if playerTable = GAMEMODE.GameData.Lookup_PlayerByID[id]
 				GAMEMODE.GameData.DeadPlayers[playerTable] = true
-
+				
+		-- Reset the HUD and display the splash.
 		GAMEMODE\HUDReset!
-		GAMEMODE.Hud.Splash = with vgui.CreateFromTable VGUI_SPLASH, GAMEMODE.Hud
-			\DisplayShush!
+		GAMEMODE\HUD_DisplayShush!
 
+	--
+	-- Display a countdown.
+	--
 	when GAMEMODE.FlowTypes.Countdown
 		if IsValid GAMEMODE.Hud
 			GAMEMODE.Hud\Countdown net.ReadDouble!
 
-	when GAMEMODE.FlowTypes.SetDead
+	--
+	-- Read dead people. This gets sent before the meeting.
+	-- I'm honestly not sure why this isn't a mart of the
+	-- meeting net message.
+	--
+	when GAMEMODE.FlowTypes.BroadcastDead
 		if GAMEMODE.GameData.Lookup_PlayerByID
 			count = net.ReadUInt 8
 			for i = 1, count
@@ -76,12 +90,28 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 				if playerTable = GAMEMODE.GameData.Lookup_PlayerByID[id]
 					GAMEMODE.GameData.DeadPlayers[playerTable] = true
 
+	--
+	-- Blink whenever we've made a successful kill.
+	-- Reuses "Kill Request" since it doesn't make sense
+	-- to add a new flow type just for this.
+	--
 	when GAMEMODE.FlowTypes.KillRequest
 		surface.PlaySound "au/impostor_kill.wav"
 		GAMEMODE\Blink 0.1, 0, 0
 
+	--
+	-- Pretty self-descriptive.
+	--
+	when GAMEMODE.FlowTypes.KillCooldown
+		GAMEMODE.KillCooldown = net.ReadDouble!
+
+	--
+	-- Display a countdown.
+	--
 	when GAMEMODE.FlowTypes.NotifyVent
 		reason = net.ReadUInt 4
+
+		-- Play a contextual sound.
 		switch reason
 			when GAMEMODE.VentNotifyReason.Vent
 				surface.PlaySound "au/vent_open.wav"
@@ -94,6 +124,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 			when GAMEMODE.VentNotifyReason.Move
 				surface.PlaySound table.Random moveSounds
 
+		-- Fetch what is known about connected vents.
 		hasLinks = net.ReadBool!
 		if hasLinks
 			links = {}
@@ -105,9 +136,9 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 
 		GAMEMODE\Blink 0.35, nil, 0
 
-	when GAMEMODE.FlowTypes.KillCooldown
-		GAMEMODE.KillCooldown = net.ReadDouble!
-
+	--
+	-- Play a fake player venting animation.
+	--
 	when GAMEMODE.FlowTypes.VentAnim
 		ent = net.ReadEntity!
 		pos = net.ReadVector!
@@ -116,34 +147,43 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		if ent ~= LocalPlayer!
 			GAMEMODE\CreateVentAnim ent, pos, appearing
 
+	--
+	-- Meeting 1/4.
+	-- Display the splash and the screen itself, after a short delay.
+	--
 	when GAMEMODE.FlowTypes.Meeting
-		plyid = net.ReadUInt 8
-		ply = GAMEMODE.GameData.Lookup_PlayerByID[plyid]
-
 		if IsValid GAMEMODE.Hud.Meeting
 			GAMEMODE.Hud.Meeting\Remove!
 
-		isBody = net.ReadBool!
-		bodyColor = isBody and net.ReadColor!
+		caller = GAMEMODE.GameData.Lookup_PlayerByID[net.ReadUInt 8]
 
-		GAMEMODE.Hud.Meeting = with vgui.CreateFromTable VGUI_MEETING, GAMEMODE.Hud
-			\StartEmergency ply, bodyColor
+		-- Is this a body report?
+		bodyColor = net.ReadBool! and net.ReadColor!
+		GAMEMODE\HUD_DisplayMeeting caller, bodyColor
 
+	--
+	-- Meeting 2/4.
+	-- Unlocks voting.
+	-- Reading the caller is kind of redundant, but whatever. 
+	-- 
 	when GAMEMODE.FlowTypes.OpenDiscuss
-		plyid = net.ReadUInt 8
-		ply = GAMEMODE.GameData.Lookup_PlayerByID[plyid]
+		caller = GAMEMODE.GameData.Lookup_PlayerByID[net.ReadUInt 8]
+		GAMEMODE.Hud.Meeting\OpenDiscuss caller
 
-		if IsValid GAMEMODE.Hud.Meeting
-			GAMEMODE.Hud.Meeting\OpenDiscuss ply
-
-	when GAMEMODE.FlowTypes.Vote
-		plyid = net.ReadUInt 8
-		ply = GAMEMODE.GameData.Lookup_PlayerByID[plyid]
-
-		if IsValid GAMEMODE.Hud.Meeting
-			GAMEMODE.Hud.Meeting\ApplyVote ply
+	--
+	-- Meeting 2/4.
+	-- Makes an "I Voted" icon pop up above the voter.
+	--
+	when GAMEMODE.FlowTypes.MeetingVote
+		voter = GAMEMODE.GameData.Lookup_PlayerByID[net.ReadUInt 8]
+		GAMEMODE.Hud.Meeting\ApplyVote voter
 	
-	when GAMEMODE.FlowTypes.VoteEnd
+	--
+	-- Meeting 3/4.
+	-- Disables voting.
+	-- Shows the results.
+	--
+	when GAMEMODE.FlowTypes.MeetingEnd
 		if IsValid GAMEMODE.Hud.Meeting
 			results = {}
 			resultsLength = net.ReadUInt 8
@@ -161,6 +201,11 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 							
 			GAMEMODE.Hud.Meeting\End results
 
+	--
+	-- Meeting 4/4.
+	-- Eject animation.
+	-- Prints the reason.
+	--
 	when GAMEMODE.FlowTypes.Eject
 		if IsValid GAMEMODE.Hud.Meeting
 			GAMEMODE.Hud.Meeting\Close!
@@ -172,32 +217,41 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		ply = if net.ReadBool!
 			GAMEMODE.GameData.Lookup_PlayerByID[net.ReadUInt 8]
 
+		-- Are confirms enabled?
+		-- If so, read the role and how many imposters remain
 		confirm = net.ReadBool!
-		imposter, remaining = if confirm
-			net.ReadBool!, net.ReadUInt 8
+		imposter, remaining, total = if confirm
+			net.ReadBool!, net.ReadUInt(8), net.ReadUInt(8)
 
-		GAMEMODE.Hud.Eject = with vgui.CreateFromTable VGUI_EJECT, GAMEMODE.Hud
-			\Eject reason, ply, confirm, imposter, remaining
+		GAMEMODE\HUD_DisplayEject reason, ply, confirm, imposter, remaining, total
 
+	--
+	-- React to game states.
+	-- I honestly don't like this.
+	--
 	when GAMEMODE.FlowTypes.GameState
 		state = net.ReadUInt 4
 
-		if state == GAMEMODE.GameState.Preparing
-			GAMEMODE\PurgeGameData!
-			GAMEMODE\HUDReset!
+		switch state
+			when GAMEMODE.GameState.Preparing
+				GAMEMODE\PurgeGameData!
+				GAMEMODE\HUDReset!
 
-			GAMEMODE.Hud\SetupButtons state
-		else
-			GAMEMODE.Hud\SetupButtons state, GAMEMODE.IGameData.mposters[GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]]
+				GAMEMODE.Hud\SetupButtons state
+			else
+				GAMEMODE.Hud\SetupButtons state, GAMEMODE.GameData.Imposters[GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]]
 
+	--
+	-- Display the game over screen when the game is over.
+	-- Reveal the imposters.
+	--
 	when GAMEMODE.FlowTypes.GameOver
 		reason = net.ReadUInt 4
 
-		GAMEMODE.Hud.Splash = with vgui.CreateFromTable VGUI_SPLASH, GAMEMODE.Hud
-			GAMEMODE.ImposterCount = net.ReadUInt 8
-			for i = 1, GAMEMODE.ImposterCount
-				plyid = net.ReadUInt 8
-				ply = GAMEMODE.GameData.Lookup_PlayerByID[plyid]
-				GAMEMODE.GameData.Imposters[ply] = true
+		GAMEMODE.ImposterCount = net.ReadUInt 8
+		for i = 1, GAMEMODE.ImposterCount
+			plyid = net.ReadUInt 8
+			ply = GAMEMODE.GameData.Lookup_PlayerByID[plyid]
+			GAMEMODE.GameData.Imposters[ply] = true
 
-			\DisplayGameOver reason
+		GAMEMODE\HUD_DisplayGameOver reason

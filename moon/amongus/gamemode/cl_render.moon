@@ -37,6 +37,7 @@ hook.Add "HUDShouldDraw", "HideHUD", (element) ->
 
 color_kill = Color 255, 0, 0
 color_use = Color 255, 255, 255
+
 hook.Add "PreDrawHalos", "NMW AU Highlight", ->
 	if IsValid GAMEMODE.KillHighlight
 		halo.Add { GAMEMODE.KillHighlight }, color_kill, 6, 6, 2, true, true
@@ -45,17 +46,6 @@ hook.Add "PreDrawHalos", "NMW AU Highlight", ->
 		halo.Add { GAMEMODE.UseHighlight }, color_use, 6, 6, 2, true, true
 
 GM.Render = {}
---
--- Sigmoid curve. [0 .. 1]
---
-pow = math.pow
-GM.Render.SigmoidCurve = (x, p = 0.5, s = 0.75) ->
-    c = (2 / (1 - s)) - 1
-
-	if (x <= p)
-		pow(x, c) / pow(p, c - 1)
-    else
-		1 - (pow(1 - x, c) / pow(1 - p, c - 1))
 
 fitImage = (material, w, h) ->
 	if texture = material\GetTexture "$basetexture"

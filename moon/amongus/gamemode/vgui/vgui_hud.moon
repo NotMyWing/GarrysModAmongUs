@@ -14,11 +14,14 @@ surface.CreateFont "NMW AU Cooldown", {
 
 hud = {}
 
-BUTTONS = {
+MAT_BUTTONS = {
 	kill: Material "au/gui/kill.png"
 	use: Material "au/gui/use.png"
 	report: Material "au/gui/report.png"
 }
+
+COLOR_BTN_DISABLED = Color 255, 255, 255, 32
+COLOR_BTN = Color 255, 255, 255
 
 hud.Init = =>
 	@SetSize ScrW!, ScrH!
@@ -32,8 +35,9 @@ hud.Init = =>
 		margin = ScreenScale 5
 		\DockMargin margin, margin, margin, margin
 		\Dock BOTTOM
-		.Paint = ->
 		\SetZPos -1
+
+		.Paint = ->
 
 hud.SetupButtons = (state, impostor) =>
 	for _, v in ipairs @buttons\GetChildren!
@@ -45,6 +49,7 @@ hud.SetupButtons = (state, impostor) =>
 	if state == GAMEMODE.GameState.Preparing
 		return
 
+	-- Kill button for imposerts. Content-aware.
 	if impostor
 		with @kill = vgui.Create "DPanel", @buttons
 			\SetWide @buttons\GetTall!
@@ -52,14 +57,16 @@ hud.SetupButtons = (state, impostor) =>
 			\Dock RIGHT
 			.Paint = (_, w, h) ->
 				color = if GAMEMODE.KillCooldown >= CurTime!
-					Color 255, 255, 255, 32
+					COLOR_BTN_DISABLED
 				elseif IsValid(GAMEMODE.KillHighlight) and not GAMEMODE.GameData.Imposters[GAMEMODE.KillHighlight]
-					Color 255, 255, 255
+					COLOR_BTN
 				else
-					Color 255, 255, 255, 32
+					COLOR_BTN_DISABLED
 
-				surface.SetDrawColor color				
-				surface.SetMaterial BUTTONS.kill
+				-- Honestly I wish I had a wrapper for this kind of monstrosities.
+				surface.SetDrawColor color
+				surface.SetMaterial MAT_BUTTONS.kill
+
 				render.PushFilterMag TEXFILTER.ANISOTROPIC
 				render.PushFilterMin TEXFILTER.ANISOTROPIC
 				surface.DrawTexturedRect 0, 0, w, h
@@ -67,43 +74,54 @@ hud.SetupButtons = (state, impostor) =>
 				render.PopFilterMin!
 
 				if GAMEMODE.KillCooldown and GAMEMODE.KillCooldown >= CurTime!
-					draw.DrawText string.format("%d", math.ceil(math.max(0, GAMEMODE.KillCooldown - CurTime!))), "NMW AU Cooldown", w * 0.5, h * 0.15, Color(255,255,255,255), TEXT_ALIGN_CENTER
+					draw.DrawText string.format("%d", math.ceil(math.max(0, GAMEMODE.KillCooldown - CurTime!))),
+						"NMW AU Cooldown", w * 0.5, h * 0.15, Color(255,255,255,255), TEXT_ALIGN_CENTER
 
+	-- Use/report button. Content-aware.
 	with @use = vgui.Create "DPanel", @buttons
 		\SetWide @buttons\GetTall!
 		\DockMargin 0, 0, ScreenScale(5), 0
 		\Dock RIGHT
 		.Paint = (_, w, h) ->
 			color = if IsValid GAMEMODE.UseHighlight
-				Color 255, 255, 255
+				COLOR_BTN
 			else
-				Color 255, 255, 255, 32
+				COLOR_BTN_DISABLED
 
-			mat = if IsValid(GAMEMODE.UseHighlight) and 0 ~= GAMEMODE.UseHighlight\GetNW2Int "NMW AU PlayerID" 
-				BUTTONS.report
+			mat = if IsValid(GAMEMODE.UseHighlight) and 0 ~= GAMEMODE.UseHighlight\GetNW2Int "NMW AU PlayerID"
+				MAT_BUTTONS.report
 			else
-				BUTTONS.use
+				MAT_BUTTONS.use
 
-			surface.SetDrawColor color		
+			-- Like, jesus christ man.
+			surface.SetDrawColor color
 			surface.SetMaterial mat
+
 			render.PushFilterMag TEXFILTER.ANISOTROPIC
 			render.PushFilterMin TEXFILTER.ANISOTROPIC
 			surface.DrawTexturedRect 0, 0, w, h
 			render.PopFilterMag!
 			render.PopFilterMin!
 
-hud.Countdown = (target) =>
-	@__countdownTarget = target
+--- Displays a countdown.
+-- @param time Target time.
+hud.Countdown = (time) =>
+	@countdownTime = time
 
-	if IsValid @__countdown
-		@__countdown\Remove!
+	if IsValid @countdown
+		@countdown\Remove!
 
-	with @__countdown = vgui.Create "DPanel", @
+	with @countdown = vgui.Create "DPanel", @
 		\SetSize @GetWide!, @GetTall! * 0.1
 		\SetPos 0, @GetTall! * 0.7
+
+		color = Color 255, 255, 255
 		.Paint = (_, w, h) ->
-			draw.DrawText string.format("Starting in %d", math.floor math.max(0, @__countdownTarget - CurTime!)), "NMW AU Countdown", w * 0.5, h * 0.25, Color(255,255,255,255), TEXT_ALIGN_CENTER
-			if @__countdownTarget - CurTime! <= 0
+			draw.DrawText string.format("Starting in %d", math.floor math.max(0, @countdownTime - CurTime!)),
+				"NMW AU Countdown",
+				w * 0.5, h * 0.25, color, TEXT_ALIGN_CENTER
+
+			if @countdownTime - CurTime! <= 0
 				_\Remove!
 
 hud.Paint = ->

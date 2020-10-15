@@ -1,4 +1,5 @@
 AddCSLuaFile()
+include "sh_gamedata.lua"
 
 GM.Name 		= "Among Us"
 GM.Author 		= "NotMyWing with assets by InnerSloth"
@@ -92,15 +93,15 @@ GM.FlowTypes = {
 	GameStart: 1
 	Countdown: 2
 	KillRequest: 3
-	SetDead: 4
+	BroadcastDead: 4
 	KillCooldown: 5
 	GameState: 6
 	GameOver: 7
 	Meeting: 8
 	OpenDiscuss: 9
 	Eject: 10
-	Vote: 11
-	VoteEnd: 12
+	MeetingVote: 11
+	MeetingEnd: 12
 	NotifyVent: 13
 	VentAnim: 14
 	VentRequest: 15
@@ -194,7 +195,7 @@ GM.TracePlayer = (ply) =>
 	usable = {}
 	killable = {}
 
-	lply = GAMEMODE.GameData.Lookup_PlayerByEntity and GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
+	lply = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
 	if not lply or (SERVER and @GameData.Vented[lply]) or (CLIENT and @GameData.Vented)
 		return
 

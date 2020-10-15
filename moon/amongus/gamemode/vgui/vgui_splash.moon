@@ -308,7 +308,7 @@ splash.DisplayPlayers = (reason) =>
 
 							width_mod *= 0.75
 
-				if localPlayerTable and not reason or (reason and victory)
+				if localPlayerTable and (not reason or (reason and victory))
 					with @middle_player = vgui.Create "DPanel", @player_bar
 						\Dock FILL
 						.Paint = ->

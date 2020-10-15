@@ -1,12 +1,13 @@
 blink = {}
 
 blink.Init = => with @
-	\SetSize ScrW!, ScrH!
 	\SetAlpha 0
+	\SetSize ScrW!, ScrH!
 	\SetZPos 30001
-	.Paint = (w, h) =>
-		surface.SetDrawColor 0, 0, 0
-		surface.DrawRect 0, 0, w, h
+
+blink.Paint = (w, h) =>
+	surface.SetDrawColor 0, 0, 0
+	surface.DrawRect 0, 0, w, h
 
 blink.Blink = (duration, delay = 0.25, pre = 0.1) => with @
 	\AlphaTo 255, pre, nil, ->
