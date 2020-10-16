@@ -12,7 +12,7 @@ GM.GameStates =
 	MEETING: 3
 
 flags = bit.bor(FCVAR_ARCHIVE, FCVAR_REPLICATED)
-GM.ConVars = 
+GM.ConVars =
 	ImposterCount: CreateConVar "au_imposter_count", 1, flags, "", 1, 4
 	KillCooldown: CreateConVar "au_kill_cooldown", 5, flags, "", 1, 60
 	VotePreTime: CreateConVar "au_vote_pre_time", 5, flags, "", 1, 60
@@ -187,26 +187,26 @@ export distSort = (a, b) ->
 GM.TracePlayer = (ply) =>
 	size = 60
 	dir = ply\GetAimVector!
-	angle = math.cos math.rad 45 
+	angle = math.cos math.rad 45
 	startPos = ply\GetPos! + Vector 0, 0, 20
 
 	entities = ents.FindInCone startPos, dir, size, angle
-	
+
 	usable = {}
 	killable = {}
 
-	lply = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
-	if not lply or (SERVER and @GameData.Vented[lply]) or (CLIENT and @GameData.Vented)
+	localPlayerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
+	if not localPlayerTable or (SERVER and @GameData.Vented[localPlayerTable]) or (CLIENT and @GameData.Vented)
 		return
 
 	for _, ent in ipairs entities
 		if SERVER and not ply\TestPVS ent
 			continue
-	
+
 		if whitelist[ent\GetClass!]
 			aply = GAMEMODE.GameData.Lookup_PlayerByEntity and GAMEMODE.GameData.Lookup_PlayerByEntity[ent]
 
-			isKillable = aply and ent\IsPlayer! and GAMEMODE.GameData.Imposters[lply] and 
+			isKillable = aply and ent\IsPlayer! and GAMEMODE.GameData.Imposters[localPlayerTable] and
 				not GAMEMODE.GameData.Imposters[aply] and not GAMEMODE.GameData.DeadPlayers[aply]
 
 			isUsable = not isKillable and not ent\IsPlayer!
@@ -222,12 +222,9 @@ GM.TracePlayer = (ply) =>
 
 	return killable[#killable], usable[#usable]
 
+GM.IsGameInProgress = => GetGlobalBool "NMW AU GameInProgress"
+
 hook.Add "PlayerFootstep", "NMW AU Footsteps", (ply) ->
 	aply = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
-	if GAMEMODE.GameData.DeadPlayers and GAMEMODE.GameData.DeadPlayers[aply] 
+	if GAMEMODE.GameData.DeadPlayers and GAMEMODE.GameData.DeadPlayers[aply]
 		return true
-
-GM.PlayerSwitchWeapon = (ply, oldWeapon, newWeapon) =>
-	return true
-
-GM.IsGameInProgress = => GetGlobalBool "NMW AU GameInProgress"

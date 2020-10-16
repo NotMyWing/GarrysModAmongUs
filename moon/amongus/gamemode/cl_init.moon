@@ -15,9 +15,9 @@ keyBinds = {
 	[KEY_Q]: ->
 		with GAMEMODE
 			if .GameData.Lookup_PlayerByEntity
-				lply = .GameData.Lookup_PlayerByEntity[LocalPlayer!]
+				playerTable = .GameData.Lookup_PlayerByEntity[LocalPlayer!]
 
-				if .GameData.Imposters[lply] and IsValid(GAMEMODE.KillHighlight) and GAMEMODE.KillHighlight\IsPlayer!
+				if .GameData.Imposters[playerTable] and IsValid(GAMEMODE.KillHighlight) and GAMEMODE.KillHighlight\IsPlayer!
 					\KillRequest .KillHighlight
 
 	[KEY_1]: key_num
@@ -42,11 +42,17 @@ hook.Add "Tick", "NMW AU KeyBinds", ->
 
 		keyMemo[key] = new
 
+	-- screw implicit returns man
+	return
+
 hook.Add "Tick", "NMW AU Highlight", ->
 	if IsValid LocalPlayer!
 		killable, usable = GAMEMODE\TracePlayer LocalPlayer!
 		GAMEMODE.KillHighlight = killable
 		GAMEMODE.UseHighlight = usable
+
+	-- screw implicit returns man
+	return
 
 GM.HUDDrawTargetID = ->
 hook.Add "EntityEmitSound", "TimeWarpSounds", (t) ->
@@ -68,10 +74,10 @@ hook.Add "PostDrawOpaqueRenderables", "NMW AU Nicknames", ->
 
 	aply = GAMEMODE.GameData.Lookup_PlayerByEntity and GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
 	for _, ply in ipairs players
-		lply = aply and GAMEMODE.GameData.Lookup_PlayerByEntity[ply]				
+		lply = aply and GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
 		if ply\IsDormant! or ply == LocalPlayer!
 			continue
-			
+
 		pos = ply\GetPos!
 		pos = pos + Vector 0, 0, 70
 
@@ -90,7 +96,7 @@ hook.Add "PostDrawOpaqueRenderables", "NMW AU Nicknames", ->
 				color_imposter
 			else
 				color_crew
-				
+
 			draw.SimpleText ply\Nick!, "NMW AU Meeting Button", -tW / 2, -tH/2, color
 		cam.End3D2D()
 

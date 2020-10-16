@@ -38,7 +38,7 @@ GM.HUD_DisplayEject = (reason, ply, confirm, imposter, remaining, total) =>
 
 		@Hud.Eject = with vgui.CreateFromTable VGUI_EJECT, @Hud
 			\Eject reason, ply, confirm, imposter, remaining, total
-	
+
 GM.HUD_DisplayGameOver = (reason) =>
 	if IsValid @Hud
 		@Hud.Splash = with vgui.CreateFromTable VGUI_SPLASH, @Hud
@@ -60,7 +60,7 @@ hook.Add "HUDPaintBackground", "NMW AU Hud", ->
 		cam.Start2D!
 		GAMEMODE.Hud\PaintManual!
 		cam.End2D!
-	
+
 concommand.Add "au_debug_eject_test", ->
 	if IsValid GAMEMODE.Hud.Eject
 		GAMEMODE.Hud.Eject\Remove!

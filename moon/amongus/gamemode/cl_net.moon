@@ -65,7 +65,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 			id = net.ReadUInt 8
 			if playerTable = GAMEMODE.GameData.Lookup_PlayerByID[id]
 				GAMEMODE.GameData.DeadPlayers[playerTable] = true
-				
+
 		-- Reset the HUD and display the splash.
 		GAMEMODE\HUDReset!
 		GAMEMODE\HUD_DisplayShush!
@@ -164,8 +164,8 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	--
 	-- Meeting 2/4.
 	-- Unlocks voting.
-	-- Reading the caller is kind of redundant, but whatever. 
-	-- 
+	-- Reading the caller is kind of redundant, but whatever.
+	--
 	when GAMEMODE.FlowTypes.OpenDiscuss
 		caller = GAMEMODE.GameData.Lookup_PlayerByID[net.ReadUInt 8]
 		GAMEMODE.Hud.Meeting\OpenDiscuss caller
@@ -177,7 +177,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	when GAMEMODE.FlowTypes.MeetingVote
 		voter = GAMEMODE.GameData.Lookup_PlayerByID[net.ReadUInt 8]
 		GAMEMODE.Hud.Meeting\ApplyVote voter
-	
+
 	--
 	-- Meeting 3/4.
 	-- Disables voting.
@@ -198,7 +198,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 					table.insert t.votes, net.ReadUInt 8
 
 				table.insert results, t
-							
+
 			GAMEMODE.Hud.Meeting\End results
 
 	--

@@ -4,7 +4,7 @@ with GM
 	with .GameData
 		.Lookup_PlayerByID     or= {}
 		.Lookup_PlayerByEntity or= {}
-		
+
 		.PlayerTables or= {}
 		.DeadPlayers  or= {}
 		.Imposters    or= {}

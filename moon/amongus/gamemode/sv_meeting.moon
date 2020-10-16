@@ -2,10 +2,13 @@
 skipPlaceholder = { id: 0 }
 
 GM.Meeting_Start = (ply, bodyColor) =>
+	if not @IsGameInProgress!
+		return
+
 	aply = @GameData.Lookup_PlayerByEntity[ply]
 
 	handle = "meeting"
-	if @GameData.DeadPlayers[aply] 
+	if @GameData.DeadPlayers[aply]
 		return
 
 	if timer.Exists handle
@@ -34,7 +37,7 @@ GM.Meeting_Start = (ply, bodyColor) =>
 						\SetPos point\GetPos!
 						\SetAngles point\GetAngles!
 						\SetEyeAngles point\GetAngles!
-	
+
 			@Net_BroadcastDiscuss aply
 
 			timer.Create handle, @ConVars.VotePreTime\GetInt! + 3, 1, ->
@@ -110,14 +113,17 @@ GM.Meeting_End = =>
 		@Net_BroadcastEject reason, ejected
 
 		if ejected
-			@Player_Kill ejected, nil, true
+			@Player_SetDead ejected
 
+		timer.Pause "NMW AU CheckWin"
 		timer.Create handle, 8, 1, ->
 			for index, ply in ipairs player.GetAll!
 				ply\Freeze false
 
 			if not @CheckWin!
 				@StartRound!
+
+			timer.UnPause "NMW AU CheckWin"
 
 GM.Meeting_ResetCooldown = =>
 	SetGlobalFloat "NMW AU NextMeeting", CurTime! + @ConVars.MeetingCooldown\GetFloat!

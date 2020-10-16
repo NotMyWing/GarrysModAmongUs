@@ -1,3 +1,5 @@
+resource.AddWorkshop "2227901495"
+
 add = (cur) ->
 	files, folders = file.Find(cur .. "/*", "GAME")
 	if not files and not folders
@@ -12,4 +14,4 @@ add = (cur) ->
 		add folder
 
 add "materials/au"
-add "sound/au" 
+add "sound/au"

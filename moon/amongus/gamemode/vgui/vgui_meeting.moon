@@ -17,7 +17,7 @@ surface.CreateFont "NMW AU Meeting Time", {
 }
 
 
-VGUI_EMERGENCY_LAYERS = {
+MAT_EMERGENCY_LAYERS = {
 	Material "au/gui/meeting/emergency/layer1.png"
 	Material "au/gui/meeting/emergency/layer2.png"
 	Material "au/gui/meeting/emergency/layer3.png"
@@ -25,7 +25,7 @@ VGUI_EMERGENCY_LAYERS = {
 	Material "au/gui/meeting/emergency/text.png"
 }
 
-VGUI_BODY_LAYERS = {
+MAT_BODY_LAYERS = {
 	Material "au/gui/meeting/body/layer1.png"
 	Material "au/gui/meeting/body/layer2.png"
 	Material "au/gui/meeting/body/layer3.png"
@@ -42,8 +42,8 @@ MAT_DISCUSS = {
 }
 
 MAT_MEETING_TABLET = {
-	shatter: Material "au/gui/meeting/shatter.png"
-	background: Material "au/gui/meeting/bg.png"
+	shatter: Material "au/gui/meeting/shatter.png", "smooth"
+	background: Material "au/gui/meeting/bg.png", "smooth"
 	tablet: Material "au/gui/meeting/voting_screen.png", "smooth"
 	skip: Material "au/gui/meeting/discuss/skip.png", "smooth"
 	dead: Material "au/gui/meeting/kil.png", "smooth"
@@ -57,14 +57,10 @@ COLOR_BLACK = Color 0, 0, 0
 
 meeting = {}
 
-meeting.Init = =>
-	@SetSize ScrW!, ScrH!
+DISCUSS_SPLASH_TIME = 3
 
-meeting.Paint = =>
-
-discuss_splash_time = 3
-post_vote_time = 5
-
+--- Creates the famous pre-vote popup.
+-- I had fun coming up with this one.
 meeting.PlayBackground = (callback) =>
 	with bg = vgui.Create "DPanel", @
 		\SetSize @GetWide!, @GetTall!
@@ -112,6 +108,8 @@ meeting.PlayBackground = (callback) =>
 				surface.DisableClipping false
 			cam.PopModelMatrix!
 
+--- Creates a circle polygon.
+-- Straight from the GMod wiki because I'm lazy.
 circle = ( x, y, radius, seg ) ->
 	cir = {}
 
@@ -120,7 +118,7 @@ circle = ( x, y, radius, seg ) ->
 		a = math.rad( ( i / seg ) * -360 )
 		table.insert( cir, { x: x + math.sin( a ) * radius, y: y + math.cos( a ) * radius, u: math.sin( a ) / 2 + 0.5, v: math.cos( a ) / 2 + 0.5 } )
 
-	a = math.rad( 0 ) -- This is needed for non absolute segment counts
+	a = math.rad( 0 )
 	table.insert( cir, { x: x + math.sin( a ) * radius, y: y + math.cos( a ) * radius, u: math.sin( a ) / 2 + 0.5, v: math.cos( a ) / 2 + 0.5 } )
 
 	return cir
@@ -135,8 +133,10 @@ CREW_MINI_LAYERS = {
 	Material "au/gui/meeting/crewmate_mini2.png", "smooth"
 }
 
+--- Removes all confirm popups.
+-- Kind of redundant, honestly.
 meeting.PurgeConfirms = =>
-	for _, btn in ipairs @buttons
+	for _, btn in pairs @buttons
 		btn\SetEnabled true
 
 		if IsValid btn.confirm
@@ -145,17 +145,23 @@ meeting.PurgeConfirms = =>
 		if IsValid btn.buttonOverlay
 			btn.buttonOverlay\SetEnabled true
 
+--- Disables all buttons. Duh.
 meeting.DisableAllButtons = =>
-	for _, btn in ipairs @buttons
-		if IsValid btn.confirm
-			btn.confirm\Remove!
-
+	for _, btn in pairs @buttons
 		if IsValid btn.buttonOverlay
-			btn.buttonOverlay\Remove!
+			with btn.buttonOverlay
+				\SetEnabled false
+				\AlphaTo 0, 0.05, 0, ->
+					\Remove!
+					if IsValid btn.confirm
+						btn.confirm\Remove!
 
 meeting.CanIVote = =>
 	GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!] and not GAMEMODE.GameData.DeadPlayers[LocalPlayer!]
 
+--- Creates a confirm popup.
+-- @param height Height.
+-- @param id Player ID.
 meeting.CreateConfirm = (height, id) =>
 	return with confirm = vgui.Create "DPanel"
 		\SetZPos 40
@@ -201,12 +207,12 @@ meeting.OpenDiscuss = (caller) =>
 		\SetAlpha 0
 		\AlphaTo 255, 0.1, 0
 
-		time = discuss_splash_time + GAMEMODE.ConVars.VotePreTime\GetInt! + GAMEMODE.ConVars.VoteTime\GetInt! + 0.5
+		time = DISCUSS_SPLASH_TIME + GAMEMODE.ConVars.VotePreTime\GetInt! + GAMEMODE.ConVars.VoteTime\GetInt! + 0.5
 		voteEndTime = SysTime! + time
 
 		beginAnim = {
-			StartTime: SysTime! + discuss_splash_time
-			EndTime: SysTime! + discuss_splash_time + GAMEMODE.ConVars.VotePreTime\GetInt!
+			StartTime: SysTime! + DISCUSS_SPLASH_TIME
+			EndTime: SysTime! + DISCUSS_SPLASH_TIME + GAMEMODE.ConVars.VotePreTime\GetInt!
 		}
 
 		.Image = MAT_MEETING_TABLET.tablet
@@ -221,7 +227,6 @@ meeting.OpenDiscuss = (caller) =>
 				.Paint = GAMEMODE.Render.DermaFitImage
 
 		@buttons = {}
-		@buttonsMapId = {}
 
 		-- Create the inner panel using the raw pixel offsets.
 		with innerPanel = vgui.Create "DPanel", @discussWindow
@@ -281,7 +286,7 @@ meeting.OpenDiscuss = (caller) =>
 						.Paint = ->
 
 				-- Create the skip button, again, using the raw pixel offsets.
-				table.insert @buttons, with @skipButton = innerLower\Add "DButton"
+				@buttons[0] = with skipButton = innerLower\Add "DButton"
 					aspect = 27/112
 					skipWidth = newWidth * 0.125
 					skipHeight = aspect * skipWidth
@@ -289,7 +294,7 @@ meeting.OpenDiscuss = (caller) =>
 					\SetPos skipWidth * 0.1, (sh * 0.6)/2 - skipHeight/2
 
 					\SetEnabled false
-					\NewAnimation 0, discuss_splash_time + GAMEMODE.ConVars.VotePreTime\GetInt!, 0, ->
+					\NewAnimation 0, DISCUSS_SPLASH_TIME + GAMEMODE.ConVars.VotePreTime\GetInt!, 0, ->
 						\SetEnabled true
 
 					\SetText ""
@@ -304,9 +309,12 @@ meeting.OpenDiscuss = (caller) =>
 						surface.PlaySound "au/votescreen_avote.wav"
 						\SetEnabled false
 
-						@skipButton.confirm = with @CreateConfirm sh * 0.6
+						skipButton.confirm = with @CreateConfirm sh * 0.6
 							\SetParent innerLower
 							\SetPos skipWidth * 0.2 + skipWidth, 0
+
+					-- A workaround to make this button removable.
+					skipButton.buttonOverlay = skipButton					
 
 			-- Create the scroll panel that's going to contain all necessary voting stuff.
 			with scroll = innerPanel\Add "DScrollPanel"
@@ -365,9 +373,7 @@ meeting.OpenDiscuss = (caller) =>
 										draw.RoundedBox 16, 0, 0, w, h, color
 
 								-- The player panel itself.
-								table.insert @buttons, with playerItem = \Add "DPanel"
-									@buttonsMapId[ply.id] = playerItem
-									playerItem.ply = ply
+								@buttons[ply.id] = with playerItem = \Add "DPanel"
 									\SetSize innerItemSizeW, innerItemSizeH
 
 									.Paint = (_, w, h) ->
@@ -495,7 +501,7 @@ meeting.OpenDiscuss = (caller) =>
 										\SetSize playerItem\GetWide!, playerItem\GetTall!
 										\SetAlpha 100
 										if alive
-											\AlphaTo 0, 0.25, discuss_splash_time + GAMEMODE.ConVars.VotePreTime\GetInt!, ->
+											\AlphaTo 0, 0.25, DISCUSS_SPLASH_TIME + GAMEMODE.ConVars.VotePreTime\GetInt!, ->
 												\SetZPos 20
 
 										\SetZPos 40
@@ -519,7 +525,7 @@ meeting.OpenDiscuss = (caller) =>
 											.Paint = ->
 
 											if alive
-												\NewAnimation 0, discuss_splash_time + GAMEMODE.ConVars.VotePreTime\GetInt!, 0, ->
+												\NewAnimation 0, DISCUSS_SPLASH_TIME + GAMEMODE.ConVars.VotePreTime\GetInt!, 0, ->
 													\SetEnabled true
 
 												.DoClick = ->
@@ -628,6 +634,7 @@ meeting.OpenDiscuss = (caller) =>
 				surface.DrawTexturedRect 0, 0, w, h
 
 	-- And finally, something simple.
+	-- The "Discuss!" text.
 	with discussText = vgui.Create "DPanel", @
 		size = 0.8 * math.min @GetTall!, @GetWide!
 		\SetSize size, size * 0.3
@@ -642,69 +649,58 @@ meeting.OpenDiscuss = (caller) =>
 		.Image = MAT_DISCUSS.text
 		.Paint = GAMEMODE.Render.DermaFitImage
 
-meeting.ApplyVote = (ply) =>
-	if @buttonsMapId and @buttonsMapId[ply.id]
-		if ply.entity ~= LocalPlayer!
+--- Apply the player vote, and make his "I Voted" badge pop up.
+-- @param playerTable The player table.
+meeting.ApplyVote = (playerTable) =>
+	if btn = @buttons[playerTable.id]
+		if playerTable.entity ~= LocalPlayer!
 			surface.PlaySound "au/notification.wav"
 
-		@buttonsMapId[ply.id].voted\AlphaTo 255, 0.05
-		return
+		btn.voted\AlphaTo 255, 0.1
 
-meeting.End = (results) =>
+--- Ends the vote.
+-- @param results The table of results.
+meeting.End = (results = {}) =>
 	@proceeding = {
 		StartTime: SysTime!
 		EndTime: SysTime! + GAMEMODE.ConVars.VotePostTime\GetInt!
 	}
 
-	if IsValid @skipButton
-		@skipButton\Remove!
-		if IsValid @skipButton.confirm
-			@skipButton.confirm\Remove!
+	@DisableAllButtons!
 
-	if @buttons and GAMEMODE.GameData.Lookup_PlayerByEntity
-		@skipArea\AlphaTo 255, 0.25, 0, ->
-			for _, btn in ipairs @buttons
-				if IsValid btn.confirm
-					btn.confirm\Remove!
+	@skipArea\AlphaTo 255, 0.25, 0, ->
+		for _, result in pairs results
+			outputPanel = @buttons[result.targetid].output
 
-				if IsValid btn.buttonOverlay
-					btn.buttonOverlay\Remove!
+			if not outputPanel
+				continue
 
-			for _, result in pairs results
-				outputPanel = if result.targetid == 0
-					@skipArea.output
-				else
-					@buttonsMapId[result.targetid].output
+			-- Display a mini-crewmate icon for each player that voted against this person.
+			for i, voter in ipairs result.votes
+				with outputPanel\Add "DPanel"
+					\SetWide outputPanel\GetTall!
+					\Dock LEFT
+					\SetAlpha 0
+					\AlphaTo 255, 0.1, i * 0.5 - .35
 
-				if IsValid outputPanel
-					with outputPanel
-						for i, voter in ipairs result.votes
-							with miniCrew = outputPanel\Add "DPanel"
-								\SetWide outputPanel\GetTall!
-								\Dock LEFT
-								\SetAlpha 0
-								\AlphaTo 255, 0.1, i * 0.5 - .35
-								.Paint = ->
-								layers = {}
-								for i = 1, 2
-									with layers[i] = vgui.Create "DPanel", miniCrew
-										\SetSize outputPanel\GetTall! * 0.8, outputPanel\GetTall! * 0.8
-										\SetPos outputPanel\GetTall! * 0.1, outputPanel\GetTall! * 0.1
-										.Image = CREW_MINI_LAYERS[i]
-										.Paint = GAMEMODE.Render.DermaFitImage
+					layers = {}
+					for i = 1, 2
+						with layers[i] = \Add "DPanel"
+							\SetSize outputPanel\GetTall! * 0.8, outputPanel\GetTall! * 0.8
+							\SetPos outputPanel\GetTall! * 0.1, outputPanel\GetTall! * 0.1
+							.Image = CREW_MINI_LAYERS[i]
+							.Paint = GAMEMODE.Render.DermaFitImage
 
-								aply = GAMEMODE.GameData.Lookup_PlayerByID[voter]
-								if aply
-									layers[1].Color = aply.color
+					aply = GAMEMODE.GameData.Lookup_PlayerByID[voter]
+					if aply
+						layers[1].Color = aply.color
 
-meeting.Close = => with @
-	@AlphaTo 0, 0.25, 0, ->
-		@Remove!
+					.Paint = ->
 
-meeting.OnRemove = =>
-	gui.EnableScreenClicker false
-
-meeting.StartEmergency = (ply, bodyColor) =>
+--- Starts the emergency.
+-- @param playerTable The player who called the vote.
+-- @param bodyColor In case this is a body report, the color of the body. Optional.
+meeting.StartEmergency = (playerTable, bodyColor) =>
 	if bodyColor
 		surface.PlaySound "au/report_body.wav"
 	else
@@ -728,9 +724,9 @@ meeting.StartEmergency = (ply, bodyColor) =>
 				\NewAnimation 0, 0, -1, ->
 					layers = {}
 					pics = if bodyColor
-						VGUI_BODY_LAYERS
+						MAT_BODY_LAYERS
 					else
-						VGUI_EMERGENCY_LAYERS
+						MAT_EMERGENCY_LAYERS
 
 					for i = 4, 1, -1
 						with layers[i] = vgui.Create "DPanel", upper
@@ -743,17 +739,30 @@ meeting.StartEmergency = (ply, bodyColor) =>
 					if bodyColor
 						layers[3].Color = bodyColor
 					else
-						layers[2].Color = ply.color
-						layers[4].Color = ply.color
+						layers[2].Color = playerTable.color
+						layers[4].Color = playerTable.color
 
 			with lower = vgui.Create "DPanel", emergency_caller
 				\SetTall size/2
 				\Dock BOTTOM
 				.Image = if bodyColor
-					VGUI_BODY_LAYERS[5]
+					MAT_BODY_LAYERS[5]
 				else
-					VGUI_EMERGENCY_LAYERS[5]
+					MAT_EMERGENCY_LAYERS[5]
 
 				.Paint = GAMEMODE.Render.DermaFitImage
+
+-- zzz stuff
+meeting.Init = =>
+	@SetSize ScrW!, ScrH!
+
+meeting.Close = => with @
+	@AlphaTo 0, 0.25, 0, ->
+		@Remove!
+
+meeting.OnRemove = =>
+	gui.EnableScreenClicker false
+
+meeting.Paint = =>
 
 return vgui.RegisterTable meeting, "DPanel"
