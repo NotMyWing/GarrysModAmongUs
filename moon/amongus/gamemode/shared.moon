@@ -26,6 +26,8 @@ GM.ConVars =
 	TasksCommon: CreateConVar "au_tasks_common", 1, flags, "", 0, 5
 	TasksVisual: CreateConVar "au_tasks_enable_visual", 1, flags, "", 0, 1
 
+	KillDistanceMod: CreateConVar "au_killdistance_mod", 1, flags, "", 1, 3
+
 GM.Colors = {
 	Color 0, 0, 0
 	Color 0, 0, 255
@@ -205,7 +207,7 @@ GM.Util.FindEntsByTaskName = (taskname, first = false) ->
 
 GM.TracePlayer = (ply) =>
 	startPos = ply\GetPos! + Vector 0, 0, 20
-	entities = ents.FindInSphere startPos, 96
+	entities = ents.FindInSphere startPos, 80 * @ConVars.KillDistanceMod\GetFloat!
 
 	usable = {}
 	killable = {}
@@ -254,7 +256,7 @@ GM.TracePlayer = (ply) =>
 			isUsable = not isKillable and not ent\IsPlayer!
 			if isKillable
 				table.insert killable, ent
-			if isUsable
+			if isUsable and ent\GetPos!\Distance(ply\GetPos!) <= 80
 				table.insert usable, ent
 
 	distSort_memo = {}
