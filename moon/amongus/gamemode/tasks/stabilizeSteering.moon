@@ -1,5 +1,5 @@
 taskTable = {
-	Type: GM.TaskType.Common
+	Type: GM.TaskType.Short
 	Time: 3
 }
 
