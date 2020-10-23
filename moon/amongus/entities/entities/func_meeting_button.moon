@@ -57,7 +57,7 @@ ENT.DrawTranslucent = =>
 	pos = pos + Vector( 0, 0, math.cos( CurTime() / 2 ) + 30 )
 
 	angle = (pos - LocalPlayer!\EyePos!)\Angle!
-	angle = Angle( angle.p * 0.25, angle.y, 0 )
+	angle = Angle( 0, angle.y, 0 )
 	angle.y = angle.y + math.sin( CurTime() ) * 10
 
 	angle\RotateAroundAxis( angle\Up(), -90 )
