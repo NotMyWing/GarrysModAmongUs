@@ -120,8 +120,8 @@ GM.StartGame = =>
 	-- Count players.
 	playerMemo = player.GetAll!
 
-	@Net_BroadcastCountdown CurTime! + 1 + 0.5
-	timer.Create handle, 1 + 0.5, 1, ->
+	@Net_BroadcastCountdown CurTime! + 5.5
+	timer.Create handle, 5.5, 1, ->
 
 		-- Don't start in case somebody has left.
 		for _, ply in ipairs playerMemo

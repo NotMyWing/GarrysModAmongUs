@@ -352,9 +352,7 @@ net.Receive "NMW AU Flow", (len, ply) ->
 		--
 		when GAMEMODE.FlowTypes.TasksCloseVGUI
 			if playerTable
-				name = net.ReadString!
-
-				GAMEMODE\Player_CloseTask playerTable, name
+				GAMEMODE\Player_CloseTask playerTable
 
 		--
 		-- Player has submitted a task.

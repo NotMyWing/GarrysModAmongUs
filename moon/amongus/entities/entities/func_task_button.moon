@@ -33,6 +33,8 @@ ENT.KeyValue = (key, value) =>
 		@SetCustomData value
 	if key == "taskname"
 		@SetTaskName value
+	if "On" == string.sub key, 1, 2
+		@StoreOutput key, value
 
 ENT.Draw = =>
 	@DrawModel!

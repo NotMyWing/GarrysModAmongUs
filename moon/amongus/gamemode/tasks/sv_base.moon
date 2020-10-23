@@ -34,7 +34,7 @@ taskBase = {
 	--- Sets the internal state.
 	-- This can be useful to tell VGUIs what they should be displaying
 	-- depending on the current state of the task.
-	-- 
+	--
 	-- While it's very similar to the current step, this value isn't
 	-- displayed anywhere on the player's screen.
 	SetCurrentState: (value) => @__state = value
@@ -100,6 +100,54 @@ taskBase = {
 		else
 			@Complete!
 
+	--- Can we visualize?
+	CanVisual: =>
+		return GAMEMODE.ConVars.TasksVisual\GetBool!
+
+	--- Triggers the "OnTaskUse" output of the current button.
+	-- This doesn't get called if the user couldn't actually use the task for some reason.
+	-- Does nothing if "au_tasks_enable_visual" is set to 0.
+	UseVisual: =>
+		if not @CanVisual!
+			return
+
+		btn = @GetActivationButton!
+		if IsValid btn
+			btn\Fire "OnTaskUse"
+
+	--- Triggers the "OnTaskCancel" output of the current button.
+	-- This gets called strictly when the player cancels the task prematurely.
+	-- This includes meetings.
+	-- Does nothing if "au_tasks_enable_visual" is set to 0.
+	CancelVisual: (btn = @GetActivationButton!) =>
+		if not @CanVisual!
+			return
+
+		if IsValid btn
+			btn\Fire "OnTaskCancel"
+
+	--- Triggers the "OnTaskAdvance" output of the current button.
+	-- This gets called whenever the task is submitted but not completed.
+	-- Does nothing if "au_tasks_enable_visual" is set to 0.
+	AdvanceVisual: (btn = @GetActivationButton!) =>
+		if not @CanVisual!
+			return
+
+		btn = @GetActivationButton!
+		if IsValid btn
+			btn\Fire "OnTaskAdvance"
+
+	--- Triggers the "OnTaskComplete" output of the current button.
+	-- This gets called strictly when the task is completed.
+	-- Does nothing if "au_tasks_enable_visual" is set to 0.
+	CompleteVisual: (btn = @GetActivationButton!) =>
+		if not @CanVisual!
+			return
+
+		btn = @GetActivationButton!
+		if IsValid btn
+			btn\Fire "OnTaskComplete"
+
 	--
 	-- OVERRIDE THESE FUNCTIONS.
 	--
@@ -108,7 +156,7 @@ taskBase = {
 	-- This is the function you need to override if you want custom logic.
 	-- Make sure to call @NetworkTaskData! if you need to, well, network
 	-- the data to the assigned player.
-	Advance: =>
+	Advance: (btn = @GetActivationButton!) =>
 		@AdvanceInternal!
 		@NetworkTaskData!
 

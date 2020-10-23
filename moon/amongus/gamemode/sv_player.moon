@@ -205,6 +205,7 @@ GM.Player_StartTask = (playerTable, name) =>
 			return
 
 		@GameData.CurrentTask[playerTable] = task
+		task\UseVisual!
 
 		if IsValid playerTable.entity
 			@Net_OpenTaskVGUI playerTable, name
@@ -212,7 +213,11 @@ GM.Player_StartTask = (playerTable, name) =>
 --- Closes the current task for the player.
 -- @table playerTable The tasked crewmate.
 GM.Player_CloseTask = (playerTable) =>
-	if @GameData.CurrentTask[playerTable]
+	currentTask = @GameData.CurrentTask[playerTable]
+
+	if currentTask
+		currentTask\CancelVisual!
+
 		@GameData.CurrentTask[playerTable] = nil
 
 --- Submits the current task. This function will fail
@@ -230,10 +235,14 @@ GM.Player_SubmitTask = (playerTable, name) =>
 			if not playerTable.entity\TestPVS ent
 				return
 
+		btn = task\GetActivationButton!
 		task\Advance!
 
 		if task\IsCompleted!
+			task\CompleteVisual!
 			@CheckWin!
+		else
+			task\AdvanceVisual btn
 
 --- Closes the current task for everybody.
 GM.Player_CloseTasksForEveryone = =>
