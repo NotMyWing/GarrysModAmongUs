@@ -75,30 +75,36 @@ if CLIENT
 									lv = Vector(lx - .__pressX, ly - .__pressY, 0)
 									lv\Normalize!
 
-									velocity += lv * 3 * FrameTime!
+									velocity += lv * 0.1
 
 							if (velocity.x < 0 and (.__x + leafMin/2 < w * 0.20) and
-								(.__y < h*0.18 or .__y > h*0.82)) or
+								(.__y < h*0.18 or .__y > h*0.5)) or
 								(velocity.x > 0 and .__x + leafMin * 2 > w)
 									velocity.x *= -1
 									rotVel = math.Clamp -100 * rotVel, -2, 2
+
 							if (velocity.y < 0 and .__y + leafMin/2 < 0) or
 								(velocity.y > 0 and .__y + leafMin * 2 > h)
 									velocity.y *= -1
 									rotVel = math.Clamp -100 * rotVel, -2, 2
 
 							if (.__x + leafMin/2 < w * 0.15)
-								velocity.x -= 0.02
+								if (velocity.y < 0 and .__y < h*0.23) or
+									(velocity.y > 0 and .__y > h*0.5)
+										velocity.y *= -1
+										rotVel = math.Clamp -100 * rotVel, -2, 2
 
-							.__x += velocity.x
-							.__y += velocity.y
+								velocity.x -= 0.35
+
+							.__x += velocity.x * FrameTime! * 100
+							.__y += velocity.y * FrameTime! * 100
 
 							if .__x < -w * 0.1
 								surface.PlaySound table.Random SOUNDS.suck
 								\Remove!
 								base\Submit task.currentState == taskTable.Count
 							else
-								velocity *= 0.997
+								velocity *= 0.99
 
 								if 0.1 < math.abs rotVel
 									rotVel *= 0.998
