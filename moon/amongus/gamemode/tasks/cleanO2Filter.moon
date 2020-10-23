@@ -60,7 +60,7 @@ if CLIENT
 						fitMaterial = GAMEMODE.Render.FitMaterial
 						leafW, leafH = fitMaterial mat, \GetSize!
 						leafMin = math.min leafW, leafH
-						rotVel = 0.01 * math.random -200, 200
+						rotVel = 0.01 * math.random -50, 50
 						.__x, .__y = \GetPos!
 
 						.Velocity = velocity
@@ -106,8 +106,8 @@ if CLIENT
 							else
 								velocity *= 0.99
 
-								if 0.1 < math.abs rotVel
-									rotVel *= 0.998
+								if 0.02 < math.abs rotVel
+									rotVel *= 0.99
 
 								rot += rotVel * 100 * FrameTime!
 
