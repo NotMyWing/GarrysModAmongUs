@@ -64,6 +64,8 @@ if CLIENT
 					ringStatus = [false for i = 1, 3]
 					ringSubmit = [false for i = 1, 3]
 
+					rings[1] = true
+
 				reset!
 
 				for i = 1, 3
