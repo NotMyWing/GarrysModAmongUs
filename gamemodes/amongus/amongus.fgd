@@ -1,0 +1,34 @@
+@include "base.fgd"
+
+@PointClass base(PlayerClass, Angles) studio("models/editor/playerstart.mdl") = info_player_start_meeting :
+	"Optional spawn point for the meeting area, as seen in Mira HQ and Polus."
+[
+]
+
+@SolidClass base(Origin, RenderFields, Targetname) = func_meeting_button :
+	"Meeting button, the button that may start many meetings."
+[
+]
+
+@SolidClass base(Origin, RenderFields, Targetname) = func_task_button :
+	"Task button yo."
+[
+	taskname(string) : "The task this button is associated with"
+	areaname(string) : "Button area"
+	customdata(string) : "Custom task data"
+
+	output OnTaskUse(void) : "Called when a player starts doing the task using this button"
+	output OnTaskCancel(void) : "Called when a player cancels the task using this button"
+	output OnTaskAdvance(void) : "Called when a player submits the task using this button"
+	output OnTaskComplete(void) : "Called when a player completes the tank using this button"
+]
+
+@SolidClass base(Origin, RenderFields, Targetname) = func_vent :
+	"Vent."
+[
+	viewangle(angle) : "View angle"
+	viewpoint(vector) : "Optional camera point"
+
+	input Link(void) : "here be connection"
+	output Link(void) : "A different vent this vent is connected to."
+]
