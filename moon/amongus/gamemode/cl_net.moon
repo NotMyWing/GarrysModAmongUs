@@ -19,6 +19,18 @@ GM.SendVote = (plyid) =>
 
 	net.SendToServer!
 
+GM.Net_SendSubmitTask = (name) =>
+	net.Start "NMW AU Flow"
+	net.WriteUInt @FlowTypes.TasksSubmit, @FlowSize
+	net.WriteString name
+	net.SendToServer!
+
+GM.Net_SendCloseTask = (name) =>
+	net.Start "NMW AU Flow"
+	net.WriteUInt @FlowTypes.TasksCloseVGUI, @FlowSize
+	net.WriteString name
+	net.SendToServer!
+
 moveSounds = {
 	"au/vent_move1.wav"
 	"au/vent_move2.wav"
@@ -65,6 +77,41 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 			id = net.ReadUInt 8
 			if playerTable = GAMEMODE.GameData.Lookup_PlayerByID[id]
 				GAMEMODE.GameData.DeadPlayers[playerTable] = true
+
+
+		-- Read the current and total amounts of tasks.
+		GAMEMODE.GameData.CompletedTasks = net.ReadUInt 8
+		GAMEMODE.GameData.TotalTasks = net.ReadUInt 8
+
+		-- Read our tasks.
+		if GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
+			GAMEMODE.GameData.MyTasks = {}
+
+			count = net.ReadUInt 8
+			for i = 1, count
+				task = {}
+
+				name = net.ReadString name
+				task.entity    = net.ReadEntity!
+				task.important = net.ReadBool!
+				task.multiStep = net.ReadBool!
+				task.maxSteps    = net.ReadUInt 16
+				task.currentStep = net.ReadUInt 16
+				task.currentState = net.ReadUInt 16
+				task.timeout      = net.ReadDouble!
+				task.customName   = net.ReadString!
+				task.customArea   = net.ReadString!
+
+				-- pensive
+				task.Complete = ->
+					GAMEMODE\Net_SendSubmitTask name
+
+				if task.customName == ""
+					task.customName = nil
+				if task.customArea == ""
+					task.customArea = nil
+
+				GAMEMODE.GameData.MyTasks[name] = task
 
 		-- Reset the HUD and display the splash.
 		GAMEMODE\HUDReset!
@@ -255,3 +302,58 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 			GAMEMODE.GameData.Imposters[ply] = true
 
 		GAMEMODE\HUD_DisplayGameOver reason
+
+	--
+	-- Display the game over screen when the game is over.
+	-- Reveal the imposters.
+	--
+	when GAMEMODE.FlowTypes.TasksOpenVGUI
+		name = net.ReadString!
+
+		data = GAMEMODE.GameData.MyTasks[name]
+
+		GAMEMODE\Task_OpenTaskVGUI name, data or {}
+
+	--
+	-- Update the task data.
+	-- Show the message if the task is complete.
+	--
+	when GAMEMODE.FlowTypes.TasksUpdateData
+		name = net.ReadString!
+
+		task = GAMEMODE.GameData.MyTasks[name]
+
+		if task
+			task.completed = net.ReadBool!
+
+			if not task.completed
+				task.entity       = net.ReadEntity!
+				task.important    = net.ReadBool!
+				task.currentStep  = net.ReadUInt 16
+				task.currentState = net.ReadUInt 16
+				task.timeout      = net.ReadDouble!
+				task.customName   = net.ReadString!
+				task.customArea   = net.ReadString!
+
+				if task.customName == ""
+					task.customName = nil
+				if task.customArea == ""
+					task.customArea = nil
+
+				surface.PlaySound "au/task_Inprogress.wav"
+			else
+				surface.PlaySound "au/task_Complete.wav"
+
+	--
+	-- Someone has completed a task.
+	--
+	when GAMEMODE.FlowTypes.TasksUpdateCount
+		GAMEMODE.GameData.CompletedTasks = net.ReadUInt 8
+
+		GAMEMODE\HUD_UpdateTaskAmount!
+
+	--
+	-- The server wants us to close the task screen.
+	--
+	when GAMEMODE.FlowTypes.TasksCloseVGUI
+		GAMEMODE\HUD_HideTaskScreen!

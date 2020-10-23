@@ -18,6 +18,11 @@ with GM
 			.KillCooldownRemainders or= {}
 			.KillCooldowns          or= {}
 			.KillCooldownPause      or= {}
+			.CurrentTask            or= {}
+			.CurrentTaskSubmitted   or= {}
+
+		else
+			.MyTasks or= {}
 
 	.PurgeGameData = =>
 		for key, dataTable in pairs @GameData

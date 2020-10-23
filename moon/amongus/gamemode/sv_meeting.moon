@@ -17,6 +17,8 @@ GM.Meeting_Start = (ply, bodyColor) =>
 	for index, ply in ipairs player.GetAll!
 		ply\Freeze true
 
+	@Player_CloseTasksForEveryone!
+
 	@GameData.Timers[handle] = true
 	timer.Create handle, 0.2, 1, ->
 		@Net_BroadcastDead!

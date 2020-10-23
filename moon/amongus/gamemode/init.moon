@@ -1,13 +1,21 @@
 -- Obligatory includes
 include "shared.lua"
+include "sh_gamedata.lua"
+
 include "sv_net.lua"
 include "sv_spectate.lua"
 include "sv_resources.lua"
 include "sv_player.lua"
 include "sv_meeting.lua"
 
+include "sh_hooks.lua"
+include "sh_tasks.lua"
+include "tasks/shared.lua"
+
 -- Obligatory client stuff
 AddCSLuaFile "sh_gamedata.lua"
+AddCSLuaFile "sh_tasks.lua"
+AddCSLuaFile "sh_hooks.lua"
 AddCSLuaFile "vgui/vgui_shutup.lua"
 AddCSLuaFile "vgui/vgui_splash.lua"
 AddCSLuaFile "vgui/vgui_hud.lua"
@@ -15,6 +23,8 @@ AddCSLuaFile "vgui/vgui_meeting.lua"
 AddCSLuaFile "vgui/vgui_eject.lua"
 AddCSLuaFile "vgui/vgui_blink.lua"
 AddCSLuaFile "vgui/vgui_vent.lua"
+AddCSLuaFile "vgui/vgui_task_base.lua"
+AddCSLuaFile "vgui/vgui_task_placeholder.lua"
 AddCSLuaFile "cl_hud.lua"
 AddCSLuaFile "cl_net.lua"
 AddCSLuaFile "cl_render.lua"
@@ -24,6 +34,7 @@ GM.GameOver = (reason) =>
 		ply\Freeze true
 
 	@SetGameInProgress false
+	@Player_CloseTasksForEveryone!
 	@Net_BroadcastDead!
 	@Net_BroadcastGameOver reason
 
@@ -37,21 +48,24 @@ GM.CheckWin = =>
 	if not @IsGameInProgress!
 		return
 
-	numImposters = 0
-	numPlayers = 0
-
-	-- Count imposters and players and decide whether the game is over.
-	for _, ply in pairs @GameData.PlayerTables
-		if IsValid(ply.entity) and not @GameData.DeadPlayers[ply]
-			if @GameData.Imposters[ply]
-				numImposters += 1
-			else
-				numPlayers += 1
-
-	reason = if numImposters == 0
+	reason = if @GameData.CompletedTasks >= @GameData.TotalTasks
 		@GameOverReason.Crewmate
-	elseif numImposters >= numPlayers
-		@GameOverReason.Imposter
+	else
+		numImposters = 0
+		numPlayers = 0
+
+		-- Count imposters and players and decide whether the game is over.
+		for _, ply in pairs @GameData.PlayerTables
+			if IsValid(ply.entity) and not @GameData.DeadPlayers[ply]
+				if @GameData.Imposters[ply]
+					numImposters += 1
+				else
+					numPlayers += 1
+
+		if numImposters == 0
+			@GameOverReason.Crewmate
+		elseif numImposters >= numPlayers
+			@GameOverReason.Imposter
 
 	if reason
 		@GameOver reason
@@ -106,8 +120,9 @@ GM.StartGame = =>
 	-- Count players.
 	playerMemo = player.GetAll!
 
-	@Net_BroadcastCountdown CurTime! + 5.5
-	timer.Create handle, 5.5, 1, ->
+	@Net_BroadcastCountdown CurTime! + 1 + 0.5
+	timer.Create handle, 1 + 0.5, 1, ->
+
 		-- Don't start in case somebody has left.
 		for _, ply in ipairs playerMemo
 			if not IsValid ply
@@ -165,6 +180,9 @@ GM.StartGame = =>
 			memo[a] = memo[a] or math.random!
 			memo[b] = memo[b] or math.random!
 			memo[a] > memo[b]
+
+		-- Assign the tasks to players.
+		@Task_AssignToPlayers!
 
 		-- Broadcast the important stuff that players must know about the game.
 		@SetGameInProgress true

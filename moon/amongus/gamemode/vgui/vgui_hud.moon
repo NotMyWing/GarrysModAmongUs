@@ -12,6 +12,13 @@ surface.CreateFont "NMW AU Cooldown", {
 	outline: true
 }
 
+surface.CreateFont "NMW AU Taskbar", {
+	font: "Roboto"
+	size: ScrH! * 0.025
+	weight: 600
+	outline: true
+}
+
 hud = {}
 
 MAT_BUTTONS = {
@@ -39,6 +46,12 @@ hud.Init = =>
 
 		.Paint = ->
 
+hud.SetTaskbarValue = (value) =>
+	if IsValid @taskbar
+		refW, refH = @taskbar\GetParent!\GetSize!
+
+		@taskbar\SizeTo refW * value, refH, 2, 0.1
+
 hud.SetupButtons = (state, impostor) =>
 	for _, v in ipairs @buttons\GetChildren!
 		v\Remove!
@@ -48,6 +61,133 @@ hud.SetupButtons = (state, impostor) =>
 
 	if state == GAMEMODE.GameState.Preparing
 		return
+
+	-- The task bar. A clustertruck of panels.
+	with @Add "DPanel"
+		\SetTall ScrH! * 0.09
+		\Dock TOP
+		pad = ScrH! * 0.015
+		\DockPadding pad, pad, pad, pad
+		.Paint = ->
+
+		with \Add "DPanel"
+			\SetWide ScrW! * 0.35
+			\Dock LEFT
+
+			pad = ScrH! * 0.003
+			\DockPadding pad, pad, pad, pad
+
+			outerColor = Color 0, 0, 0
+			.Paint = (_, w, h) ->
+				draw.RoundedBox 6, 0, 0, w, h, outerColor
+
+			with \Add "DPanel"
+				\Dock FILL
+
+				pad = ScrH! * 0.008
+				\DockPadding pad, pad, pad, pad
+
+				innerColor = Color 170, 188, 188
+				taskBarOuterColor = Color 51, 51, 51
+
+				pad = ScrH! * 0.005
+				.Paint = (_, w, h) ->
+					draw.RoundedBox 4, 0, 0, w, h, innerColor
+
+					draw.RoundedBox 4, pad, pad, w - pad*2, h - pad*2, taskBarOuterColor						
+				
+				with \Add "DPanel"
+					\Dock FILL
+					.Paint = ->
+
+					label = with \Add "DLabel"
+						\SetColor Color 255, 255, 255
+						\SetZPos 1
+						\SetFont "NMW AU Taskbar"
+						\SetText "  TOTAL TASKS COMPLETED"
+
+					with @taskbar = \Add "DPanel"
+						taskBarInnerColor = Color 68, 216, 68
+
+						.Paint = (_, w, h) ->
+							surface.SetDrawColor taskBarInnerColor
+							surface.DrawRect 0, 0, w, h
+
+						\NewAnimation 0, 0, 0, ->
+							refW, refH = @taskbar\GetParent!\GetSize!
+							@taskbar\SetSize 0, refH
+
+							label\SetSize refW, refH
+
+	-- The task list.
+	@tasks = {}
+	with taskBox = @Add "DPanel"
+		margin = ScrH! * 0.015
+		\DockMargin margin, 0, 0, 0
+		\SetWide ScrW! * 0.35
+		\Dock LEFT
+		.Paint = ->
+
+		with \Add "DPanel"
+			\SetTall ScrH! * 0.05
+			margin = ScrH! * 0.02
+			\Dock TOP
+
+			text = if impostor
+				"Fake tasks:"
+			else
+				"Tasks:"
+
+			text = "  #{text}  "
+
+			.Paint = (_, w, h) ->
+				surface.SetFont "NMW AU Taskbar"
+				tW = surface.GetTextSize text
+
+				surface.SetDrawColor 255, 255, 255, 16
+				surface.DrawRect 0, 0, tW, h
+
+				draw.SimpleTextOutlined text, "NMW AU Taskbar",	
+					0, h/2, Color(255, 255, 255), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, Color(0, 0, 0, 64)
+
+		container = with \Add "DPanel"
+			\Dock FILL
+			.Paint = ->
+
+			for taskName, task in pairs GAMEMODE.GameData.MyTasks
+				with \Add "DPanel"
+					\SetTall ScrH! * 0.04
+					\Dock TOP
+
+					neutral = Color 255, 255, 255
+					completed = Color 0, 221, 0
+					progress = Color 255, 255, 0
+
+					.Paint = (_, w, h) ->
+						surface.SetDrawColor 255, 255, 255, 16
+						surface.DrawRect 0, 0, w, h
+
+						if IsValid task.entity
+							timeout = (task.timeout or 0) - CurTime!
+							timeoutText = if timeout > 0
+								string.format " (%ds)", math.floor timeout
+							else
+								""
+
+							text = "  #{task.customArea or task.entity\GetArea!}: #{task.customName or taskName}"
+							if task.multiStep and not task.completed
+								text ..= " (#{(task.currentStep or 1) - 1}/#{task.maxSteps})"
+
+							color = if task.completed
+								completed
+							elseif task.currentStep > 1 or task.currentState > 1
+								progress
+							else
+								neutral
+
+							draw.SimpleTextOutlined text .. timeoutText, "NMW AU Taskbar",	
+								0, h/2, color, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, Color(0, 0, 0, 64)
+
 
 	-- Kill button for imposerts. Content-aware.
 	if impostor

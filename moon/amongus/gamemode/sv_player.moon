@@ -40,16 +40,19 @@ GM.Player_SetDead = (playerTable) =>
 -- @param attackerTable Attacker player table.
 GM.Player_Kill = (victimTable, attackerTable) =>
 	-- ho boy
-	if not ((@GameData.DeadPlayers[attackerTable]) or (@GameData.DeadPlayers[victimTable])) or
-		(@GameData.Imposters[attackerTable]) or (@GameData.Imposters[victimTable]) or
+	if not ((@GameData.DeadPlayers[attackerTable]) or (@GameData.DeadPlayers[victimTable])) and
+		(@GameData.Imposters[attackerTable] and not @GameData.Imposters[victimTable]) and
 		(@GameData.KillCooldowns[attackerTable] >= CurTime!) or
 		(@GameData.KillCooldownRemainders[attackerTable])
 			return
 
 	if attackerTable
-		@Player_UpdateKillCooldown attackerTable
+		@Player_RefreshKillCooldown attackerTable
 
 	if IsValid victimTable.entity
+		@Player_CloseTask victimTable
+		@Net_SendTaskClose victimTable
+
 		with corpse = ents.Create "prop_ragdoll"
 			\SetPos victimTable.entity\GetPos!
 			\SetAngles victimTable.entity\GetAngles!
@@ -182,6 +185,63 @@ GM.Player_UnVent = (playerTable) =>
 				@Player_Unhide playerTable.entity
 				playerTable.entity\SetPos vent\GetPos! + Vector 0, 0, 5
 
+--- Forces the player into doing the task.
+-- This will fail if the player is too far from the activation button.
+-- This will also fail if the player isn't tasked with the provided task.
+-- This will also fail if the button did not consent.
+-- Yes.
+-- @table playerTable The tasked crewmate.
+-- @string name Name of the task.
+GM.Player_StartTask = (playerTable, name) =>
+	task = (@GameData.Tasks[playerTable] or {})[name]
+
+	if task and not @GameData.CurrentTask[playerTable]
+		ent = task\GetActivationButton!
+
+		if playerTable.entity\GetPos!\Distance(ent\GetPos!) > 128
+			return
+
+		if not task\Use!
+			return
+
+		@GameData.CurrentTask[playerTable] = task
+
+		if IsValid playerTable.entity
+			@Net_OpenTaskVGUI playerTable, name
+
+--- Closes the current task for the player.
+-- @table playerTable The tasked crewmate.
+GM.Player_CloseTask = (playerTable) =>
+	if @GameData.CurrentTask[playerTable]
+		@GameData.CurrentTask[playerTable] = nil
+
+--- Submits the current task. This function will fail
+-- if the player isn't actually doing any tasks at this moment,
+-- or if the current task doesn't math the provided one.
+-- @table playerTable The tasked crewmate.
+-- @string name Name of the task.
+GM.Player_SubmitTask = (playerTable, name) =>
+	task = (@GameData.Tasks[playerTable] or {})[name]
+
+	if task and (@GameData.CurrentTask[playerTable] == task)
+		if IsValid playerTable.entity
+			ent = task\GetActivationButton!
+
+			if not playerTable.entity\TestPVS ent
+				return
+
+		task\Advance!
+
+		if task\IsCompleted!
+			@CheckWin!
+
+--- Closes the current task for everybody.
+GM.Player_CloseTasksForEveryone = =>
+	for _, playerTable in pairs @GameData.PlayerTables
+		@Player_CloseTask playerTable
+
+	@Net_BroadcastTaskClose!
+
 GM.PlayerSpawn = (ply) =>
 	ply\SetModel "models/kaesar/amongus/amongus.mdl"
 	with defaultSpeed = 200
@@ -214,7 +274,8 @@ hook.Add "PlayerUse", "NMW AU Use", (activator, ent) ->
 
 hook.Add "FindUseEntity", "NMW AU FindUse", (ply, default) ->
 	_, usable = GAMEMODE\TracePlayer ply
-	return usable
+
+	return usable or false
 
 -- Handle unvent requests.
 hook.Add "KeyPress", "NMW AU UnVent", (ply, key) ->

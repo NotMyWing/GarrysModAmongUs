@@ -130,6 +130,8 @@ GM.Net_BroadcastVent = (ply, where, appearing = false) =>
 -- You shouldn't, really. Unless you know what you're doing.
 -- @param ply Player entity.
 GM.Net_UpdateGameData = (ply) =>
+	playerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
+
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.GameStart, @FlowSize
 
@@ -142,7 +144,7 @@ GM.Net_UpdateGameData = (ply) =>
 		net.WriteUInt aply.id, 8
 
 	net.WriteUInt table.Count(@GameData.Imposters), 8
-	if @GameData.Imposters[GAMEMODE.GameData.Lookup_PlayerByEntity[ply]]
+	if @GameData.Imposters[playerTable]
 		net.WriteBool true
 		for imposter in pairs @GameData.Imposters
 			net.WriteUInt imposter.id, 8
@@ -156,6 +158,28 @@ GM.Net_UpdateGameData = (ply) =>
 	net.WriteUInt #dead, 8
 	for _, id in ipairs dead
 		net.WriteUInt id, 8
+
+	net.WriteUInt @GameData.CompletedTasks, 8
+	net.WriteUInt @GameData.TotalTasks, 8
+	if playerTable
+		-- Send each task and the info the player should be aware of.
+		playerTasks = @GameData.Tasks[playerTable]
+
+		net.WriteUInt table.Count(playerTasks), 8
+		for name, taskInstance in pairs playerTasks
+			net.WriteString name
+			net.WriteEntity taskInstance\GetActivationButton!
+			net.WriteBool   taskInstance.__isPositionImportant or false
+
+			net.WriteBool taskInstance\IsMultiStep!
+			net.WriteUInt taskInstance\GetMaxSteps!, 16
+			net.WriteUInt taskInstance\GetCurrentStep!, 16
+
+			net.WriteUInt taskInstance\GetCurrentState!, 16
+			net.WriteDouble taskInstance\GetTimeout!
+
+			net.WriteString taskInstance\GetCustomName! or ""
+			net.WriteString taskInstance\GetCustomArea! or ""
 
 	net.Send ply
 
@@ -225,6 +249,57 @@ GM.Net_NotifyVent = (playerTable, reason, links) =>
 
 	net.Send playerTable.entity
 
+--- Notifies the player that he's tasked with a task and should open the VGUI.
+-- @table playerTable The tasked crewmate.
+-- @string name Name of the task.
+GM.Net_OpenTaskVGUI = (playerTable, name) =>
+	net.Start "NMW AU Flow"
+	net.WriteUInt @FlowTypes.TasksOpenVGUI, @FlowSize
+	net.WriteString name
+	net.Send playerTable.entity
+
+--- Updates the player with the new task data.
+-- Even if nothing has been visually changed, this creates a "beep" sound.
+-- The implementation of this method is currently atrocious.
+-- @table playerTable The tasked crewmate.
+-- @table taskInstance The task instance.
+GM.Net_UpdateTaskData = (playerTable, taskInstance) =>
+	net.Start "NMW AU Flow"
+	net.WriteUInt @FlowTypes.TasksUpdateData, @FlowSize
+
+	net.WriteString taskInstance.Name
+	net.WriteBool taskInstance\IsCompleted!
+	if not taskInstance\IsCompleted!
+		net.WriteEntity taskInstance\GetActivationButton!
+		net.WriteBool taskInstance.__isPositionImportant or false
+		net.WriteUInt taskInstance\GetCurrentStep!, 16
+		net.WriteUInt taskInstance\GetCurrentState!, 16
+		net.WriteDouble taskInstance\GetTimeout!
+		net.WriteString taskInstance\GetCustomName! or ""
+		net.WriteString taskInstance\GetCustomArea! or ""
+
+	net.Send playerTable.entity
+
+--- Broadcasts the new task count.
+-- @param count New task count.
+GM.Net_BroadcastTaskCount = (count) =>
+	net.Start "NMW AU Flow"
+	net.WriteUInt @FlowTypes.TasksUpdateCount, @FlowSize
+	net.WriteUInt count, 8
+	net.Broadcast!
+
+--- Notifies the players that it's time to close their tasks.
+GM.Net_BroadcastTaskClose = =>
+	net.Start "NMW AU Flow"
+	net.WriteUInt @FlowTypes.TasksCloseVGUI, @FlowSize
+	net.Broadcast!
+
+--- Notifies the player that it's time to close their tasks.
+GM.Net_SendTaskClose = (playerTable) =>
+	net.Start "NMW AU Flow"
+	net.WriteUInt @FlowTypes.TasksCloseVGUI, @FlowSize
+	net.Send playerTable.entity
+
 net.Receive "NMW AU Flow", (len, ply) ->
 	playerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
 
@@ -271,5 +346,23 @@ net.Receive "NMW AU Flow", (len, ply) ->
 
 				if GAMEMODE.IsGameInProgress!
 					GAMEMODE\Net_UpdateGameData ply
+
+		--
+		-- Player has closed the task window.
+		--
+		when GAMEMODE.FlowTypes.TasksCloseVGUI
+			if playerTable
+				name = net.ReadString!
+
+				GAMEMODE\Player_CloseTask playerTable, name
+
+		--
+		-- Player has submitted a task.
+		--
+		when GAMEMODE.FlowTypes.TasksSubmit
+			if playerTable
+				name = net.ReadString!
+
+				GAMEMODE\Player_SubmitTask playerTable, name
 
 GM.SetGameInProgress = (state) => SetGlobalBool "NMW AU GameInProgress", state

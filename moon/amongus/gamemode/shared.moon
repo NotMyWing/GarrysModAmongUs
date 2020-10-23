@@ -1,5 +1,4 @@
 AddCSLuaFile()
-include "sh_gamedata.lua"
 
 GM.Name 		= "Among Us"
 GM.Author 		= "NotMyWing with assets by InnerSloth"
@@ -21,6 +20,11 @@ GM.ConVars =
 	MeetingCooldown: CreateConVar "au_meeting_cooldown", 10, flags, "", 1, 60
 	MeetingsPerPlayer: CreateConVar "au_meeting_available", 2, flags, "", 1, 5
 	ConfirmEjects: CreateConVar "au_vote_confirm_ejects", 1, flags, "", 0, 1
+
+	TasksShort: CreateConVar "au_tasks_short", 2, flags, "", 0, 5
+	TasksLong: CreateConVar "au_tasks_long", 1, flags, "", 0, 5
+	TasksCommon: CreateConVar "au_tasks_common", 1, flags, "", 0, 5
+	TasksVisual: CreateConVar "au_tasks_enable_visual", 1, flags, "", 0, 1
 
 GM.Colors = {
 	Color 0, 0, 0
@@ -106,6 +110,12 @@ GM.FlowTypes = {
 	VentAnim: 14
 	VentRequest: 15
 	RequestUpdate: 16
+
+	TasksUpdateData: 17
+	TasksSubmit: 18
+	TasksOpenVGUI: 19
+	TasksCloseVGUI: 20
+	TasksUpdateCount: 21
 }
 
 GM.GameState = {
@@ -132,26 +142,6 @@ GM.VentNotifyReason = {
 
 GM.FlowSize = math.ceil math.log table.Count(GM.FlowTypes) + 1, 2
 
-GM.Move = (ply, mvd) =>
-	if mvd\KeyDown IN_DUCK
-		mvd\SetButtons bit.band mvd\GetButtons!, bit.bnot IN_DUCK
-
-	if mvd\KeyDown IN_JUMP
-		mvd\SetButtons bit.band mvd\GetButtons!, bit.bnot IN_JUMP
-
-	if mvd\KeyDown IN_SPEED
-		mvd\SetButtons bit.band mvd\GetButtons!, bit.bnot IN_SPEED
-
-	if mvd\KeyDown IN_WALK
-		mvd\SetButtons bit.band mvd\GetButtons!, bit.bnot IN_WALK
-
-	if @GameData.Lookup_PlayerByEntity
-		playerTable = @GameData.Lookup_PlayerByEntity[ply]
-
-		if (CLIENT and @GameData.Vented) or (SERVER and @GameData.Vented[playerTable])
-			mvd\SetVelocity Vector 0, 0, 0
-			return true
-
 GM.SplashScreenTime = 8
 
 GM.GetAlivePlayers = =>
@@ -165,6 +155,31 @@ GM.GetAlivePlayers = =>
 
 	return players
 
+export distSort_memo = {}
+export distSort_player = nil
+export distSort = (a, b) ->
+	distSort_memo[a] or= (a\GetPos! - distSort_player\GetPos!)\Length!
+	distSort_memo[b] or= (b\GetPos! - distSort_player\GetPos!)\Length!
+
+	return distSort_memo[a] > distSort_memo[b]
+
+GM.Util = {}
+
+--- Shuffles the table.
+-- While this function returns a table, it mutates
+-- the input table as well. It only returns it back
+-- for the sake of your convenience.
+-- @table t The table you need to shuffle.
+-- @return The shuffled table.
+GM.Util.Shuffle = (t) ->
+	memo = {}
+	table.sort t, (a, b) ->
+		memo[a] = memo[a] or math.random!
+		memo[b] = memo[b] or math.random!
+		memo[a] > memo[b]
+
+	return t
+
 whitelist = {
 	"func_button": true
 	"func_door": true
@@ -174,15 +189,19 @@ whitelist = {
 	"prop_ragdoll": true
 	"prop_physics": true
 	"func_vent": true
+	"func_task_button": true
 }
 
-export distSort_memo = {}
-export distSort_player = nil
-export distSort = (a, b) ->
-	distSort_memo[a] or= (a\GetPos! - distSort_player\GetPos!)\Length!
-	distSort_memo[b] or= (b\GetPos! - distSort_player\GetPos!)\Length!
-
-	return distSort_memo[a] > distSort_memo[b]
+--- Finds all entities with the matching task name field.
+-- @string taskname You guessed it.
+-- @boolean first Should this function only return the first found entity?
+GM.Util.FindEntsByTaskName = (taskname, first = false) ->
+	with t = {}
+		for _, ent in ipairs ents.GetAll!
+			if ent.GetTaskName and ent\GetTaskName! == taskname
+				table.insert t, ent
+				if first
+					return t
 
 GM.TracePlayer = (ply) =>
 	size = 60
@@ -195,19 +214,43 @@ GM.TracePlayer = (ply) =>
 	usable = {}
 	killable = {}
 
-	localPlayerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
-	if not localPlayerTable or (SERVER and @GameData.Vented[localPlayerTable]) or (CLIENT and @GameData.Vented)
+	playerTable = @GameData.Lookup_PlayerByEntity[ply]
+	if not playerTable or (SERVER and @GameData.Vented[playerTable]) or (CLIENT and @GameData.Vented)
 		return
 
 	for _, ent in ipairs entities
-		if SERVER and not ply\TestPVS ent
-			continue
-
 		if whitelist[ent\GetClass!]
-			aply = GAMEMODE.GameData.Lookup_PlayerByEntity and GAMEMODE.GameData.Lookup_PlayerByEntity[ent]
+			if SERVER and not ply\TestPVS ent
+				continue
 
-			isKillable = aply and ent\IsPlayer! and GAMEMODE.GameData.Imposters[localPlayerTable] and
-				not GAMEMODE.GameData.Imposters[aply] and not GAMEMODE.GameData.DeadPlayers[aply]
+			-- Task buttons.
+			if ent\GetClass! == "func_task_button"
+				name = ent\GetTaskName!
+
+				-- Quite simply just bail out if the player is an imposter.
+				if @GameData.Imposters[playerTable]
+					continue
+
+				if SERVER
+					-- Bail out if the player doesn't have this task, or if it's not the current button.
+					if not (@GameData.Tasks[playerTable] and @GameData.Tasks[playerTable][name]) or
+						ent ~= @GameData.Tasks[playerTable][name]\GetActivationButton!
+							continue
+
+				if CLIENT
+					-- Bail out if the local player doesn't have this task, or if he's completed it already.
+					if not @GameData.MyTasks[name] or
+						@GameData.MyTasks[name].completed or ent ~= @GameData.MyTasks[name].entity
+							continue
+
+			-- Prevent regular players from using vents.
+			if ent\GetClass! == "func_vent" and not @GameData.Imposters[playerTable]
+				continue
+
+			otherPlayerTable = @GameData.Lookup_PlayerByEntity[ent]
+
+			isKillable = otherPlayerTable and ent\IsPlayer! and @GameData.Imposters[playerTable] and
+				not @GameData.Imposters[otherPlayerTable] and not @GameData.DeadPlayers[otherPlayerTable]
 
 			isUsable = not isKillable and not ent\IsPlayer!
 			if isKillable
@@ -223,8 +266,3 @@ GM.TracePlayer = (ply) =>
 	return killable[#killable], usable[#usable]
 
 GM.IsGameInProgress = => GetGlobalBool "NMW AU GameInProgress"
-
-hook.Add "PlayerFootstep", "NMW AU Footsteps", (ply) ->
-	aply = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
-	if GAMEMODE.GameData.DeadPlayers and GAMEMODE.GameData.DeadPlayers[aply]
-		return true

@@ -5,6 +5,9 @@ VGUI_SPLASH = include "vgui/vgui_splash.lua"
 VGUI_BLINK = include "vgui/vgui_blink.lua"
 VGUI_VENT = include "vgui/vgui_vent.lua"
 
+include "vgui/vgui_task_base.lua"
+include "vgui/vgui_task_placeholder.lua"
+
 GM.Blink = (duration = 1, delay, pre) =>
 	vgui.CreateFromTable(VGUI_BLINK)\Blink duration, delay, pre
 
@@ -17,11 +20,22 @@ GM.HUDShowVents = (vents) =>
 			\ShowVents vents
 
 GM.HUDReset = =>
+	if IsValid(@Hud) and IsValid(@Hud.TaskScreen)
+		@Hud.TaskScreen\Close!
+
 	if IsValid @Hud
 		@Hud\Remove!
 
 	@Hud = vgui.CreateFromTable VGUI_HUD
 	@Hud\SetPaintedManually true
+
+GM.HUD_UpdateTaskAmount = =>
+	if IsValid @Hud
+		@Hud\SetTaskbarValue GAMEMODE.GameData.CompletedTasks / GAMEMODE.GameData.TotalTasks
+
+GM.HUD_HideTaskScreen = =>
+	if IsValid(@Hud) and IsValid(@Hud.TaskScreen)
+		@Hud.TaskScreen\Close!
 
 GM.HUD_DisplayMeeting = (caller, bodyColor) =>
 	if IsValid @Hud
@@ -48,9 +62,6 @@ GM.HUD_DisplayShush = (reason) =>
 	if IsValid @Hud
 		@Hud.Splash = with vgui.CreateFromTable VGUI_SPLASH, @Hud
 			\DisplayShush!
-
-if GAMEMODE and IsValid GAMEMODE.Hud
-	GAMEMODE\HUDReset!
 
 hook.Add "Initialize", "Init Hud", ->
 	GAMEMODE\HUDReset!

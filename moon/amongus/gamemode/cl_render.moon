@@ -72,9 +72,15 @@ hook.Add "CalcView", "NMW AU CalcView", ( ply, pos, angles, fov ) ->
 	}
 
 color_kill = Color 255, 0, 0
-color_use = Color 255, 255, 255
+color_use   = Color 255, 255, 255
+color_task  = Color 255, 255, 255, 32
 
 hook.Add "PreDrawHalos", "NMW AU Highlight", ->
+	-- Highlight our current tasks.
+	for _, task in pairs GAMEMODE.GameData.MyTasks
+		if not task.completed and IsValid(task.entity) and task.entity ~= GAMEMODE.UseHighlight and task.entity\GetPos!\Distance(LocalPlayer!\GetPos!) < 200
+			halo.Add { task.entity }, color_task, 6, 6, 2, true, true
+
 	if IsValid GAMEMODE.KillHighlight
 		halo.Add { GAMEMODE.KillHighlight }, color_kill, 6, 6, 2, true, true
 
