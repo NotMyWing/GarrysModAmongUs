@@ -151,10 +151,11 @@ meeting.DisableAllButtons = =>
 		if IsValid btn.buttonOverlay
 			with btn.buttonOverlay
 				\SetEnabled false
-				\AlphaTo 0, 0.05, 0, ->
-					\Remove!
-					if IsValid btn.confirm
-						btn.confirm\Remove!
+				\SetMouseInputEnabled false
+				\AlphaTo 0, 0.05, 0
+
+			if IsValid btn.confirm
+				btn.confirm\Remove!
 
 meeting.CanIVote = =>
 	GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!] and not GAMEMODE.GameData.DeadPlayers[LocalPlayer!]
@@ -164,6 +165,7 @@ meeting.CanIVote = =>
 -- @param id Player ID.
 meeting.CreateConfirm = (height, id) =>
 	return with confirm = vgui.Create "DPanel"
+		\SetAlpha 0
 		\SetZPos 40
 		\SetTall height
 		.Paint = ->
@@ -196,6 +198,7 @@ meeting.CreateConfirm = (height, id) =>
 			\NewAnimation 0, 0, 0, ->
 				\SizeToChildren true
 				\InvalidateLayout!
+				\AlphaTo 255, 0.1, 0
 
 meeting.OpenDiscuss = (caller) =>
 	with @discussWindow = vgui.Create "DPanel", @
@@ -314,7 +317,8 @@ meeting.OpenDiscuss = (caller) =>
 							\SetPos skipWidth * 0.2 + skipWidth, 0
 
 					-- A workaround to make this button removable.
-					skipButton.buttonOverlay = skipButton					
+					skipButton.buttonOverlay = skipButton	
+					skipButton.output = @skipArea.output				
 
 			-- Create the scroll panel that's going to contain all necessary voting stuff.
 			with scroll = innerPanel\Add "DScrollPanel"
