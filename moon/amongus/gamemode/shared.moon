@@ -204,12 +204,8 @@ GM.Util.FindEntsByTaskName = (taskname, first = false) ->
 					return t
 
 GM.TracePlayer = (ply) =>
-	size = 60
-	dir = ply\GetAimVector!
-	angle = math.cos math.rad 45
 	startPos = ply\GetPos! + Vector 0, 0, 20
-
-	entities = ents.FindInCone startPos, dir, size, angle
+	entities = ents.FindInSphere startPos, 96
 
 	usable = {}
 	killable = {}
@@ -219,6 +215,9 @@ GM.TracePlayer = (ply) =>
 		return
 
 	for _, ent in ipairs entities
+		if ent == ply
+			continue
+
 		if whitelist[ent\GetClass!]
 			if SERVER and not ply\TestPVS ent
 				continue
