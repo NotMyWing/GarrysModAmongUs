@@ -22,6 +22,7 @@ taskTable = {
 
 		if @GetCurrentStep! == 2
 			@SetActivationButton @destination
+			@SetCustomName nil
 
 		@NetworkTaskData!
 }
