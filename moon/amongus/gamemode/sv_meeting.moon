@@ -28,7 +28,7 @@ GM.Meeting_Start = (ply, bodyColor) =>
 			for imposter, _ in pairs @GameData.Imposters
 				if @GameData.Vented[imposter]
 					@GameData.Vented[imposter] = false
-					if IsValid playerTable.entity
+					if IsValid imposter.entity
 						@Net_NotifyVent imposter, @VentNotifyReason.UnVent
 
 			spawns = ents.FindByClass "info_player_start"
