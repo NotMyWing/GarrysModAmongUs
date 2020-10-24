@@ -251,7 +251,7 @@ GM.TracePlayer = (ply) =>
 
 			otherPlayerTable = @GameData.Lookup_PlayerByEntity[ent]
 
-			isKillable = otherPlayerTable and ent\IsPlayer! and @GameData.Imposters[playerTable] and
+			isKillable = otherPlayerTable and ent\IsPlayer! and not ent\IsDormant! and @GameData.Imposters[playerTable] and
 				not @GameData.Imposters[otherPlayerTable] and not @GameData.DeadPlayers[otherPlayerTable]
 
 			isUsable = not isKillable and not ent\IsPlayer!
