@@ -10,7 +10,8 @@ GM.GameStates =
 	PLAYING: 2
 	MEETING: 3
 
-flags = bit.bor(FCVAR_ARCHIVE, FCVAR_REPLICATED)
+flags = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY
+
 GM.ConVars =
 	ImposterCount: CreateConVar "au_imposter_count", 1, flags, "", 1, 4
 	KillCooldown: CreateConVar "au_kill_cooldown", 5, flags, "", 1, 60
@@ -207,7 +208,7 @@ GM.Util.FindEntsByTaskName = (taskname, first = false) ->
 
 GM.TracePlayer = (ply) =>
 	startPos = ply\GetPos! + Vector 0, 0, 20
-	entities = ents.FindInSphere startPos, 80 * @ConVars.KillDistanceMod\GetFloat!
+	entities = ents.FindInSphere startPos, 96 * @ConVars.KillDistanceMod\GetFloat!
 
 	usable = {}
 	killable = {}
@@ -256,7 +257,7 @@ GM.TracePlayer = (ply) =>
 			isUsable = not isKillable and not ent\IsPlayer!
 			if isKillable
 				table.insert killable, ent
-			if isUsable and ent\GetPos!\Distance(ply\GetPos!) <= 80
+			if isUsable and ent\GetPos!\Distance(ply\GetPos!) <= 96
 				table.insert usable, ent
 
 	distSort_memo = {}
