@@ -27,6 +27,9 @@ GM.Spectate_CycleMode = (ply) =>
 		when OBS_MODE_IN_EYE
 			ply\Spectate OBS_MODE_ROAMING
 
+		else
+			ply\Spectate OBS_MODE_ROAMING
+
 hook.Add "KeyPress", "NMW AU Spectate Cycle", (ply, key) ->
 	if ply\GetObserverMode! > 0
 		switch key
@@ -39,6 +42,9 @@ hook.Add "KeyPress", "NMW AU Spectate Cycle", (ply, key) ->
 			when IN_DUCK
 				ply\Spectate OBS_MODE_ROAMING
 
-hook.Add "PlayerInitialSpawn", "NMW AU Spec", (ply) ->
-	if GAMEMODE\IsGameInProgress!
-		GAMEMODE\Spectate_CycleEntity ply
+initialized = {}
+hook.Add "PlayerSpawn", "NMW AU Spec", (ply) ->
+	if not initialized[ply]
+		initialized[ply] = true
+		if GAMEMODE\IsGameInProgress!
+			GAMEMODE\Spectate_CycleMode ply
