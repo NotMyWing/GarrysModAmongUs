@@ -4,6 +4,7 @@ VGUI_EJECT = include "vgui/vgui_eject.lua"
 VGUI_SPLASH = include "vgui/vgui_splash.lua"
 VGUI_BLINK = include "vgui/vgui_blink.lua"
 VGUI_VENT = include "vgui/vgui_vent.lua"
+VGUI_KILL = include "vgui/vgui_kill.lua"
 
 include "vgui/vgui_task_base.lua"
 include "vgui/vgui_task_placeholder.lua"
@@ -63,6 +64,14 @@ GM.HUD_DisplayShush = (reason) =>
 		@Hud.Splash = with vgui.CreateFromTable VGUI_SPLASH, @Hud
 			\DisplayShush!
 
+GM.HUD_PlayKill = (killer, victim) =>
+	if IsValid @Hud
+		if IsValid @Hud.Kill
+			@Hud.Kill\Remove!
+
+		@Hud.Kill = with vgui.CreateFromTable VGUI_KILL, @Hud
+			\Kill killer, victim
+
 hook.Add "Initialize", "Init Hud", ->
 	GAMEMODE\HUDReset!
 
@@ -78,3 +87,8 @@ concommand.Add "au_debug_eject_test", ->
 
 	ply = table.Random GAMEMODE.GameData.PlayerTables
 	GAMEMODE\HUD_DisplayEject GAMEMODE.EjectReason.Vote, ply, true, true, 2, 2
+
+concommand.Add "au_debug_kill_test", ->
+	killer = table.Random GAMEMODE.GameData.PlayerTables
+	victim = table.Random GAMEMODE.GameData.PlayerTables
+	GAMEMODE\HUD_PlayKill killer, victim
