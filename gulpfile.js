@@ -54,7 +54,7 @@ const _moveLuaFiles = () => through2.obj((file, _, cb) => {
 });
 
 function rmrf(cb) {
-	del(['gamemodes/**/*.lua', 'gamemodes/**/*.moon']).then(() => {
+	del(['gamemodes/**/*.lua']).then(() => {
 		cb();
 	});
 }
@@ -82,7 +82,8 @@ function _watch() {
 
 function watch() {
 	return gulp.series(
-		build
+		rmrf
+		, build
 		, _watch
 	)()
 }
