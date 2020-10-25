@@ -9,12 +9,12 @@ if CLIENT
 	}
 
 	ASSETS = {
-		bg: Material "au/gui/tasks/swipeCard/base.png", "smooth"
-		card: Material "au/gui/tasks/swipeCard/card.png", "smooth"
-		sliderTop: Material "au/gui/tasks/swipeCard/sliderTop.png", "smooth"
-		sliderTopGreen: Material "au/gui/tasks/swipeCard/sliderTopGreen.png", "smooth"
-		sliderTopRed: Material "au/gui/tasks/swipeCard/sliderTopRed.png", "smooth"
-		wallet: Material "au/gui/tasks/swipeCard/wallet.png", "smooth"
+		bg: Material "au/gui/tasks/swipecard/base.png", "smooth"
+		card: Material "au/gui/tasks/swipecard/card.png", "smooth"
+		sliderTop: Material "au/gui/tasks/swipecard/slidertop.png", "smooth"
+		sliderTopGreen: Material "au/gui/tasks/swipecard/slidertopgreen.png", "smooth"
+		sliderTopRed: Material "au/gui/tasks/swipecard/slidertopred.png", "smooth"
+		wallet: Material "au/gui/tasks/swipecard/wallet.png", "smooth"
 	}
 
 	SOUNDS = {

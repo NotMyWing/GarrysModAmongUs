@@ -340,9 +340,9 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 				if task.customArea == ""
 					task.customArea = nil
 
-				surface.PlaySound "au/task_Inprogress.wav"
+				surface.PlaySound "au/task_inprogress.wav"
 			else
-				surface.PlaySound "au/task_Complete.wav"
+				surface.PlaySound "au/task_complete.wav"
 
 	--
 	-- Someone has completed a task.

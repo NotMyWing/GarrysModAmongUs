@@ -11,14 +11,14 @@ taskTable = {
 }
 
 ASSETS = {
-	base: Material "au/gui/tasks/cleanO2Filter/o2_bgBase.png", "smooth"
-	foreground: Material "au/gui/tasks/cleanO2Filter/o2_bgTop.png", "smooth"
-	leaves: [Material("au/gui/tasks/cleanO2Filter/o2_leaf#{i}.png", "smooth") for i = 1, 7]
+	base: Material "au/gui/tasks/cleano2filter/o2_bgBase.png", "smooth"
+	foreground: Material "au/gui/tasks/cleano2filter/o2_bgTop.png", "smooth"
+	leaves: [Material("au/gui/tasks/cleano2filter/o2_leaf#{i}.png", "smooth") for i = 1, 7]
 }
 
 SOUNDS = {
-	leaf: ["au/panel_O2_leaf#{i}.wav" for i = 1, 4]
-	suck: ["au/panel_O2_suck#{i}.wav" for i = 1, 3]
+	leaf: ["au/panel_o2_leaf#{i}.wav" for i = 1, 4]
+	suck: ["au/panel_o2_suck#{i}.wav" for i = 1, 3]
 }
 
 if CLIENT

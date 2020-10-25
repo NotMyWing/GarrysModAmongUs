@@ -5,7 +5,7 @@ base.Init = =>
 	@SetSize ScrW!, ScrH!
 
 MAT_ASSETS = {
-	close: Material "au/gui/closeButton.png", "smooth"
+	close: Material "au/gui/closebutton.png", "smooth"
 }
 
 base.Setup = (content) =>
@@ -45,7 +45,7 @@ base.Popup = =>
 	@SetAlpha 0
 	@AlphaTo 255, 0.1, 0.01
 
-	surface.PlaySound @__appearSound or "au/Panel_GenericAppear.wav"
+	surface.PlaySound @__appearSound or "au/panel_genericappear.wav"
 
 base.Submit = (autoClose = true) =>
 	if (@__taskName)
@@ -61,7 +61,7 @@ base.Close = =>
 
 	@AlphaTo 0, 0.1
 	@MoveTo 0, ScrH!, 0.1, 0, -1, ->
-		surface.PlaySound @__disappearSound or "au/Panel_GenericDisappear.wav"
+		surface.PlaySound @__disappearSound or "au/panel_genericdisappear.wav"
 		@Remove!
 
 base.SetAppearSound = (value) => @__appearSound = value

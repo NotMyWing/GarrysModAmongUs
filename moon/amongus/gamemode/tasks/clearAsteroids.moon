@@ -15,12 +15,12 @@ if CLIENT
 
 	ASSETS = {
 		meteors: [{
-			Material "au/gui/tasks/clearAsteroids/weapons_asteroid#{i}.png" , "smooth"
-			Material "au/gui/tasks/clearAsteroids/weapons_asteroid#{i}X.png", "smooth"
+			Material "au/gui/tasks/clearasteroids/weapons_asteroid#{i}.png" , "smooth"
+			Material "au/gui/tasks/clearasteroids/weapons_asteroid#{i}x.png", "smooth"
 		} for i = 1, 5 ]
 
-		bg: Material "au/gui/tasks/clearAsteroids/base.png", "smooth"
-		kil: Material "au/gui/tasks/clearAsteroids/weapons_explosion.png", "smooth"
+		bg: Material "au/gui/tasks/clearasteroids/base.png", "smooth"
+		kil: Material "au/gui/tasks/clearasteroids/weapons_explosion.png", "smooth"
 	}
 
 	taskTable.CreateVGUI = (task) =>

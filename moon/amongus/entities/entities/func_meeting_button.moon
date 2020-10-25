@@ -34,7 +34,7 @@ ENT.Use = (ply) =>
 			return
 
 		if GAMEMODE\Meeting_Start ply
-			@EmitSound "au/panel_emergencyButton.wav", 60
+			@EmitSound "au/panel_emergencybutton.wav", 60
 			ply\SetNW2Int "NMW AU Meetings", ply\GetNW2Int("NMW AU Meetings") - 1
 
 ENT.KeyValue = (key, value) =>

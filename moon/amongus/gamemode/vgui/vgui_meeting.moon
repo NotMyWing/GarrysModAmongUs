@@ -38,8 +38,8 @@ MAT_BODY_LAYERS = {
 MAT_DISCUSS = {
 	bg: Material "au/gui/meeting/discuss/yes_bg.png", "smooth"
 	border: Material "au/gui/meeting/discuss/yes_border.png", "smooth"
-	yes_crewLeft: Material "au/gui/meeting/discuss/yes_crewLeft.png", "smooth"
-	yes_crewRight: Material "au/gui/meeting/discuss/yes_crewRight.png", "smooth"
+	yes_crewLeft: Material "au/gui/meeting/discuss/yes_crewleft.png", "smooth"
+	yes_crewRight: Material "au/gui/meeting/discuss/yes_crewright.png", "smooth"
 	text: Material "au/gui/meeting/discuss/yes_discuss.png", "smooth"
 }
 
