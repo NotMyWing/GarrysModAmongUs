@@ -5,7 +5,6 @@ tasks = {
 	"fixWiring"
 	"fuelEngines"
 	"emptyGarbage"
-	"emptyChute"
 	"chartCourse"
 	"calibrateDistributor"
 	"alignEngineOutput"
