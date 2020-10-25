@@ -23,3 +23,7 @@ hook.Add "PlayerFootstep", "NMW AU Footsteps", (ply) ->
 	aply = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
 	if GAMEMODE.GameData.DeadPlayers and GAMEMODE.GameData.DeadPlayers[aply]
 		return true
+
+hook.Add "EntityEmitSound", "NMW AU Ragdoll Sounds", (t) ->
+	if IsValid(t.Entity) and t.Entity\GetClass! == "prop_ragdoll"
+		return false
