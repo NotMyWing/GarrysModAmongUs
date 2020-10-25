@@ -87,8 +87,9 @@ else
 		-- Pick N random common tasks from the pool.
 		commonTaskPool = mapToPool @TaskCollection.Common
 		commonTasks = {}
-		for id, task in ipairs shuffle commonTaskPool
-			if id <= @ConVars.TasksCommon\GetInt!
+
+		for _, task in ipairs shuffle commonTaskPool
+			if #commonTasks < @ConVars.TasksCommon\GetInt!
 				table.insert commonTasks, task
 			else
 				break
@@ -128,9 +129,10 @@ else
 					totalTasks += 1
 
 			-- Now, pick N random tasks from each pool.
-			for pool, count in pairs pools
-				for id, task in ipairs shuffle pool
-					if id <= count
+			for pool, maxCount in pairs pools
+				count = 0
+				for _, task in ipairs shuffle pool
+					if count < maxCount
 						taskInstance = instantiateTask task
 						taskInstance.__assignedPlayer = playerTable
 
@@ -144,6 +146,8 @@ else
 							else
 								print "Task #{task.Name} has NO suitable buttons on the map. Ignoring."
 								continue
+
+						count += 1
 
 						@GameData.Tasks[playerTable][taskInstance.Name] = taskInstance
 						if not @GameData.Imposters[playerTable]
