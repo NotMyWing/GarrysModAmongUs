@@ -1,3 +1,5 @@
+TRANSLATE = GM.Lang.GetEntryFunc
+
 surface.CreateFont "NMW AU Eject Text", {
 	font: "Arial"
 	size: ScreenScale 20
@@ -34,6 +36,12 @@ eject.Init = => with @
 -- @param text The text to write.
 -- @param subtext Subtext. Optional.
 eject.WriteText = (text, subtext) =>
+	-- tostringify inputs
+	-- TRANSLATE returns metatables which confuse things.
+	text = tostring text
+	if subtext ~= nil
+		subtext = tostring subtext
+
 	if IsValid @ejectTextLabel
 		@ejectTextLabel\Remove!
 
@@ -86,21 +94,18 @@ eject.WriteText = (text, subtext) =>
 -- @param total How many imposters are there in the game? Optional.
 eject.Eject = (reason, ply, confirm = false, imposter = false, remaining = 0, total = 0) => with @
 	subtext = if confirm and total ~= 0
-		if remaining == 1
-			string.format "1 Imposter remains."
-		else
-			string.format "%d Imposters remain.", remaining
+		TRANSLATE("eject.remaining") remaining
 
 	if not ply
 		-- If we're not ejecting anyone, print that nobody was ejected.
 		\NewAnimation 2, 0, -1, ->
-			switch reason
+			@WriteText switch reason
 				when GAMEMODE.EjectReason.Tie
-					@WriteText "Nobody was ejected. (Tie)", subtext
+					TRANSLATE("eject.reason.tie"), subtext
 				when GAMEMODE.EjectReason.Skipped
-					@WriteText "Nobody was ejected. (Skipped)", subtext
+					TRANSLATE("eject.reason.skipped"), subtext
 				else
-					@WriteText "Nobody was ejected.", subtext
+					TRANSLATE("eject.reason.generic"), subtext
 	else
 		-- However if we are, print the name and optionally the role of the ejected person.
 		-- Create and animate a crewmate sprite flying across the screen.
@@ -115,21 +120,9 @@ eject.Eject = (reason, ply, confirm = false, imposter = false, remaining = 0, to
 			\MoveTo @GetWide! / 2 - size / 2, @GetTall!/2 - size/2, 2, 1, 1, ->
 				\MoveTo @GetWide!, @GetTall!/2 - size/2, 3, 0, 1
 
-				text = if confirm
-					if imposter
-						if total == 1
-							"%s was The Imposter."
-						else
-							"%s was An Imposter."
-					else
-						if total == 1
-							"%s was not The Imposter."
-						else
-							"%s was not An Imposter."
-				else
-					"%s was ejected."
+				text = TRANSLATE("eject.text") ply.nickname, confirm, imposter, total
 
-				@WriteText (string.format text, ply.nickname), subtext
+				@WriteText text, subtext
 
 			.accumulator = 0
 			starttime = SysTime!
@@ -139,7 +132,7 @@ eject.Eject = (reason, ply, confirm = false, imposter = false, remaining = 0, to
 			-- Just a tiny bit.
 			.Paint = (_, w, h) ->
 				curtime = math.max 0.1, (endtime - SysTime!) / (endtime - starttime)
-				.accumulator += curtime * 1.5
+				.accumulator += curtime * 2.5
 
 				ltsx, ltsy = _\LocalToScreen 0, 0
 				ltsv = Vector ltsx, ltsy, 0

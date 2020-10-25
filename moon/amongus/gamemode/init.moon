@@ -1,6 +1,7 @@
 -- Obligatory includes
 include "shared.lua"
 include "sh_gamedata.lua"
+include "sh_lang.lua"
 
 include "sv_net.lua"
 include "sv_spectate.lua"
@@ -13,6 +14,7 @@ include "sh_tasks.lua"
 include "tasks/shared.lua"
 
 -- Obligatory client stuff
+AddCSLuaFile "sh_lang.lua"
 AddCSLuaFile "sh_gamedata.lua"
 AddCSLuaFile "sh_tasks.lua"
 AddCSLuaFile "sh_hooks.lua"

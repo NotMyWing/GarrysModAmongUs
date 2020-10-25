@@ -1,5 +1,6 @@
 include "shared.lua"
 include "sh_gamedata.lua"
+include "sh_lang.lua"
 include "cl_hud.lua"
 include "cl_net.lua"
 include "cl_render.lua"

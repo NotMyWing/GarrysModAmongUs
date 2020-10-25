@@ -6,6 +6,8 @@ taskTable = {
 }
 
 if CLIENT
+	TRANSLATE = GM.Lang.GetEntryFunc
+
 	SOUNDS = {
 		hit: ["au/panel_weaponhit#{i}.wav" for i = 1, 3]
 		fire: "au/panel_weaponfire.wav"
@@ -53,7 +55,7 @@ if CLIENT
 						if asteroidCount < 3 and CurTime! > nextSpawn
 							nextSpawn = CurTime! + math.random!
 							asteroidCount += 1
-							
+
 							with\Add "DPanel"
 								hit = false
 								pos = max_size * 0.01 * math.random 0, 100
@@ -135,7 +137,7 @@ if CLIENT
 						\Dock BOTTOM
 						\SizeToContents!
 						.Think = ->
-							\SetText "Destroyed: #{destroyed}"
+							\SetText TRANSLATE("task.clearAsteroids.destroyed") destroyed
 			\Popup!
 
 		return base

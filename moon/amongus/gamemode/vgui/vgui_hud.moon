@@ -1,3 +1,5 @@
+TRANSLATE = GM.Lang.GetEntryFunc
+
 surface.CreateFont "NMW AU Countdown", {
 	font: "Arial"
 	size: ScreenScale 20
@@ -94,8 +96,8 @@ hud.SetupButtons = (state, impostor) =>
 				.Paint = (_, w, h) ->
 					draw.RoundedBox 4, 0, 0, w, h, innerColor
 
-					draw.RoundedBox 4, pad, pad, w - pad*2, h - pad*2, taskBarOuterColor						
-				
+					draw.RoundedBox 4, pad, pad, w - pad*2, h - pad*2, taskBarOuterColor
+
 				with \Add "DPanel"
 					\Dock FILL
 					.Paint = ->
@@ -104,7 +106,7 @@ hud.SetupButtons = (state, impostor) =>
 						\SetColor Color 255, 255, 255
 						\SetZPos 1
 						\SetFont "NMW AU Taskbar"
-						\SetText "  TOTAL TASKS COMPLETED"
+						\SetText "  " .. TRANSLATE "tasks.total_completed"
 
 					with @taskbar = \Add "DPanel"
 						taskBarInnerColor = Color 68, 216, 68
@@ -133,10 +135,10 @@ hud.SetupButtons = (state, impostor) =>
 			margin = ScrH! * 0.02
 			\Dock TOP
 
-			text = if impostor
-				"Fake tasks:"
+			text = tostring TRANSLATE if impostor
+				"hud.fakeTasks"
 			else
-				"Tasks:"
+				"hud.tasks"
 
 			text = "  #{text}  "
 
@@ -147,7 +149,7 @@ hud.SetupButtons = (state, impostor) =>
 				surface.SetDrawColor 255, 255, 255, 16
 				surface.DrawRect 0, 0, tW, h
 
-				draw.SimpleTextOutlined text, "NMW AU Taskbar",	
+				draw.SimpleTextOutlined text, "NMW AU Taskbar",
 					0, h/2, Color(255, 255, 255), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, Color(0, 0, 0, 64)
 
 		container = with \Add "DPanel"
@@ -174,7 +176,10 @@ hud.SetupButtons = (state, impostor) =>
 							else
 								""
 
-							text = "  #{task.customArea or task.entity\GetArea!}: #{task.customName or taskName}"
+							area = TRANSLATE task.customArea or task.entity\GetArea!
+							name = TRANSLATE "task." .. ((task.customName or taskName) or "undefined")
+
+							text = "  #{area}: #{name}"
 							if task.multiStep and not task.completed
 								text ..= " (#{(task.currentStep or 1) - 1}/#{task.maxSteps})"
 
@@ -185,7 +190,7 @@ hud.SetupButtons = (state, impostor) =>
 							else
 								neutral
 
-							draw.SimpleTextOutlined text .. timeoutText, "NMW AU Taskbar",	
+							draw.SimpleTextOutlined text .. timeoutText, "NMW AU Taskbar",
 								0, h/2, color, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, Color(0, 0, 0, 64)
 
 
@@ -257,7 +262,7 @@ hud.Countdown = (time) =>
 
 		color = Color 255, 255, 255
 		.Paint = (_, w, h) ->
-			draw.DrawText string.format("Starting in %d", math.floor math.max(0, @countdownTime - CurTime!)),
+			draw.DrawText TRANSLATE("hud.countdown")(math.floor math.max 0, @countdownTime - CurTime!),
 				"NMW AU Countdown",
 				w * 0.5, h * 0.25, color, TEXT_ALIGN_CENTER
 

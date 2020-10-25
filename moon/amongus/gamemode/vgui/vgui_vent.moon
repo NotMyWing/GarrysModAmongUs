@@ -1,3 +1,5 @@
+TRANSLATE = GM.Lang.GetEntryFunc
+
 surface.CreateFont "NMW AU Vent Text", {
 	font: "Arial"
 	size: ScrH! * 0.03
@@ -46,7 +48,7 @@ vent.ShowVents = (vents) =>
 				\SetColor Color 255, 255, 255
 				\SetSize size * labelAspect, size
 				\DockMargin size * 0.1, 0, 0, 0
-				\SetText vent
+				\SetText tostring TRANSLATE vent
 				\SetContentAlignment 5
 				\Dock LEFT
 				.Image = ASSETS.label

@@ -1,3 +1,5 @@
+TRANSLATE = GM.Lang.GetEntryFunc
+
 surface.CreateFont "NMW AU Meeting Nickname", {
 	font: "Arial"
 	size: ScreenScale 15
@@ -247,7 +249,7 @@ meeting.OpenDiscuss = (caller) =>
 				\Dock TOP
 				\SetTall sh * 0.6
 				.Paint = (_, w, h) ->
-					draw.SimpleTextOutlined "Who Is The Imposter?", "NMW AU Meeting Title",
+					draw.SimpleTextOutlined tostring(TRANSLATE("meeting.header")), "NMW AU Meeting Title",
 						w/2, h/2, COLOR_WHITE, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 4, Color(0, 0, 0)
 
 			-- Add the footer.
@@ -265,11 +267,11 @@ meeting.OpenDiscuss = (caller) =>
 					begin = beginAnim.EndTime - SysTime!
 
 					paintText w, h, if begin > 0
-						string.format "Voting Begins In: %ds ", math.max 0, math.floor beginAnim.EndTime - SysTime!
+						TRANSLATE("meeting.timer.begins") math.max 0, math.floor beginAnim.EndTime - SysTime!
 					elseif @proceeding
-						string.format "Proceeding In: %ds ", math.max 0, math.floor @proceeding.EndTime - SysTime!
+						TRANSLATE("meeting.timer.proceeding") math.max 0, math.floor @proceeding.EndTime - SysTime!
 					else
-						string.format "Voting Ends In: %ds ", math.max 0, math.floor voteEndTime - SysTime!
+						TRANSLATE("meeting.timer.ends") math.max 0, math.floor voteEndTime - SysTime!
 
 				-- Prepare the post-vote are that we can add voter icons to.
 				@skipArea = with skipArea = innerLower\Add "DPanel"
@@ -317,8 +319,8 @@ meeting.OpenDiscuss = (caller) =>
 							\SetPos skipWidth * 0.2 + skipWidth, 0
 
 					-- A workaround to make this button removable.
-					skipButton.buttonOverlay = skipButton	
-					skipButton.output = @skipArea.output				
+					skipButton.buttonOverlay = skipButton
+					skipButton.output = @skipArea.output
 
 			-- Create the scroll panel that's going to contain all necessary voting stuff.
 			with scroll = innerPanel\Add "DScrollPanel"

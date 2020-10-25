@@ -21,7 +21,7 @@ taskTable = {
 		@AdvanceInternal!
 
 		if @GetCurrentStep! == 2
-			@SetCustomName "upload.2"
+			@SetCustomName "uploadData.2"
 			@SetActivationButton @destination
 
 		@NetworkTaskData!

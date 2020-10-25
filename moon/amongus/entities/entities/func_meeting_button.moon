@@ -23,9 +23,6 @@ ENT.Initialize = =>
 	else
 		@SetRenderBounds @OBBMins!, @OBBMaxs!
 
-ENT.Draw = =>
-	@DrawModel!
-
 ENT.Use = (ply) =>
 	if SERVER
 		if ply\GetNW2Int("NMW AU Meetings") <= 0
@@ -44,58 +41,44 @@ ENT.KeyValue = (key, value) =>
 	if key == "model"
 		self.Model = value
 
-ENT.Draw = =>
-	@DrawModel!
+if CLIENT
+	TRANSLATE = GAMEMODE.Lang.GetEntryFunc
 
-ENT.DrawTranslucent = =>
-	@DrawModel!
+	ENT.Draw = =>
+		@DrawModel!
 
-	if not GAMEMODE\IsGameInProgress!
-		return
+	ENT.DrawTranslucent = =>
+		@DrawModel!
 
-	pos = @GetPos!
-	pos = pos + Vector( 0, 0, math.cos( CurTime() / 2 ) + 30 )
+		if not GAMEMODE\IsGameInProgress!
+			return
 
-	angle = (pos - LocalPlayer!\EyePos!)\Angle!
-	angle = Angle( 0, angle.y, 0 )
-	angle.y = angle.y + math.sin( CurTime() ) * 10
+		pos = @GetPos!
+		pos = pos + Vector( 0, 0, math.cos( CurTime() / 2 ) + 30 )
 
-	angle\RotateAroundAxis( angle\Up(), -90 )
-	angle\RotateAroundAxis( angle\Forward(), 90 )
+		angle = (pos - LocalPlayer!\EyePos!)\Angle!
+		angle = Angle( 0, angle.y, 0 )
+		angle.y = angle.y + math.sin( CurTime() ) * 10
 
-	time = GetGlobalFloat("NMW AU NextMeeting") - CurTime!
-	lines = if time > 0
-		{
-			{
-				text: "Crewmates Must Wait"
-			}, {
-				text: string.format "%ds", math.floor time
-				color: Color 255, 0, 0
-			}, {
-				text: "Before The Emergency"
-			}
-		}
-	else {
-		{
-			text: string.format "Crewmember %s Has", LocalPlayer!\Nick!
-		}, {
-			text: string.format "%d", LocalPlayer!\GetNW2Int "NMW AU Meetings"
-			color: Color 255, 0, 0
-		}, {
-			text: "Emergency Meetings Left"
-		}
-	}
+		angle\RotateAroundAxis( angle\Up(), -90 )
+		angle\RotateAroundAxis( angle\Forward(), 90 )
 
-	surface.SetFont( "NMW AU Meeting Button" )
-	_, tH = surface.GetTextSize "A"
+		time = GetGlobalFloat("NMW AU NextMeeting") - CurTime!
+		lines = if time > 0
+			TRANSLATE("meeting_button.cooldown") math.floor time
+		else
+			TRANSLATE("meeting_button.default") LocalPlayer!\Nick!, LocalPlayer!\GetNW2Int "NMW AU Meetings"
 
-	spacing = tH * 0
-	totalH = #lines * tH + (#lines - 1) * spacing
+		surface.SetFont( "NMW AU Meeting Button" )
+		_, tH = surface.GetTextSize "A"
 
-	cam.Start3D2D( pos, angle, 0.075 )
-	do
-		for i, line in ipairs lines
-			tW = surface.GetTextSize line.text
+		spacing = tH * 0
+		totalH = #lines * tH + (#lines - 1) * spacing
 
-			draw.SimpleText line.text, "NMW AU Meeting Button", -tW / 2, -totalH/2 + ((i - 1) * tH) + math.max(0, (i - 2) * spacing), line.color or Color(255, 255, 255)
-	cam.End3D2D()
+		cam.Start3D2D( pos, angle, 0.075 )
+		do
+			for i, line in ipairs lines
+				tW = surface.GetTextSize line.text
+
+				draw.SimpleText line.text, "NMW AU Meeting Button", -tW / 2, -totalH/2 + ((i - 1) * tH) + math.max(0, (i - 2) * spacing), line.color or Color(255, 255, 255)
+		cam.End3D2D()

@@ -1,3 +1,5 @@
+TRANSLATE = GM.Lang.GetEntryFunc
+
 surface.CreateFont "NMW AU Role", {
 	font: "Arial"
 	size: ScreenScale 80
@@ -185,10 +187,10 @@ splash.DisplayPlayers = (reason) =>
 				\SetContentAlignment 5
 				\SetFont "NMW AU Role"
 				\SetColor theme_color
-				\SetText if reason
-					victory and "Victory" or "Defeat"
+				\SetText tostring TRANSLATE if reason
+					victory and "splash.victory" or "splash.defeat"
 				else
-					localPlayerTable and (imposter and "Imposter" or "Crewmate") or "Spectator"
+					localPlayerTable and (imposter and "splash.imposter" or "splash.crewmate") or "splash.spectator"
 
 				\SetAlpha 0
 				\AlphaTo 255, displayTime / 1.5
@@ -197,12 +199,7 @@ splash.DisplayPlayers = (reason) =>
 
 			-- Create the "N imposers among us" text if necessary.
 			if not reason and not imposter
-				amongSubtext = localPlayerTable and "us" or "them"
-
-				text = if GAMEMODE.ImposterCount == 1
-					"There is %s Imposter among " .. amongSubtext
-				else
-					"There are %s Imposters among " .. amongSubtext
+				text = tostring TRANSLATE("splash.text") not not localPlayerTable, GAMEMODE.ImposterCount
 
 				with \Add "DLabel"
 					\SetSize @GetWide!, @GetTall! * 0.3
