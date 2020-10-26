@@ -29,7 +29,6 @@ MAT_BUTTONS = {
 	report: Material "au/gui/report.png"
 }
 
-COLOR_BTN_DISABLED = Color 255, 255, 255, 32
 COLOR_BTN = Color 255, 255, 255
 
 hud.Init = =>
@@ -200,16 +199,19 @@ hud.SetupButtons = (state, impostor) =>
 			\SetWide @buttons\GetTall!
 			\DockMargin 0, 0, ScreenScale(5), 0
 			\Dock RIGHT
-			.Paint = (_, w, h) ->
-				color = if GAMEMODE.KillCooldown >= CurTime!
-					COLOR_BTN_DISABLED
-				elseif IsValid(GAMEMODE.KillHighlight) and not GAMEMODE.GameData.Imposters[GAMEMODE.KillHighlight]
-					COLOR_BTN
-				else
-					COLOR_BTN_DISABLED
 
+			.Think = =>
+				color = if GAMEMODE.KillCooldown >= CurTime!
+					\SetAlpha 32
+				elseif IsValid(GAMEMODE.KillHighlight) and not GAMEMODE.GameData.Imposters[GAMEMODE.KillHighlight]
+					\SetAlpha 255
+				else
+					\SetAlpha 32
+
+
+			.Paint = (_, w, h) ->
 				-- Honestly I wish I had a wrapper for this kind of monstrosities.
-				surface.SetDrawColor color
+				surface.SetDrawColor COLOR_BTN
 				surface.SetMaterial MAT_BUTTONS.kill
 
 				render.PushFilterMag TEXFILTER.ANISOTROPIC
@@ -227,19 +229,21 @@ hud.SetupButtons = (state, impostor) =>
 		\SetWide @buttons\GetTall!
 		\DockMargin 0, 0, ScreenScale(5), 0
 		\Dock RIGHT
-		.Paint = (_, w, h) ->
-			color = if IsValid GAMEMODE.UseHighlight
-				COLOR_BTN
-			else
-				COLOR_BTN_DISABLED
 
+		.Think = =>
+			if IsValid GAMEMODE.UseHighlight
+				\SetAlpha 255
+			else
+				\SetAlpha 32
+
+		.Paint = (_, w, h) ->
 			mat = if IsValid(GAMEMODE.UseHighlight) and 0 ~= GAMEMODE.UseHighlight\GetNW2Int "NMW AU PlayerID"
 				MAT_BUTTONS.report
 			else
 				MAT_BUTTONS.use
 
 			-- Like, jesus christ man.
-			surface.SetDrawColor color
+			surface.SetDrawColor COLOR_BTN
 			surface.SetMaterial mat
 
 			render.PushFilterMag TEXFILTER.ANISOTROPIC
