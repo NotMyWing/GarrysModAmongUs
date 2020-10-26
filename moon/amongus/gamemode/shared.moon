@@ -119,6 +119,8 @@ GM.FlowTypes = {
 	TasksOpenVGUI: 19
 	TasksCloseVGUI: 20
 	TasksUpdateCount: 21
+
+	NotifyKilled: 22
 }
 
 GM.GameState = {
@@ -244,6 +246,10 @@ GM.TracePlayer = (ply) =>
 					if not @GameData.MyTasks[name] or
 						@GameData.MyTasks[name].completed or ent ~= @GameData.MyTasks[name].entity
 							continue
+
+			-- Prevent dead players from being able to target corpses.
+			if ent\GetClass! == "prop_ragdoll" and @GameData.DeadPlayers[playerTable]
+				continue
 
 			-- Prevent regular players from using vents.
 			if ent\GetClass! == "func_vent" and not @GameData.Imposters[playerTable]
