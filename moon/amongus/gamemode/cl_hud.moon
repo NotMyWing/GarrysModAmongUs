@@ -9,6 +9,13 @@ VGUI_KILL = include "vgui/vgui_kill.lua"
 include "vgui/vgui_task_base.lua"
 include "vgui/vgui_task_placeholder.lua"
 
+surface.CreateFont "NMW AU Button Tooltip", {
+	font: "Arial"
+	size: ScreenScale 35
+	weight: 500
+	outline: true
+}
+
 GM.Blink = (duration = 1, delay, pre) =>
 	vgui.CreateFromTable(VGUI_BLINK)\Blink duration, delay, pre
 
@@ -75,11 +82,60 @@ GM.HUD_PlayKill = (killer, victim) =>
 hook.Add "Initialize", "Init Hud", ->
 	GAMEMODE\HUDReset!
 
+ASSETS = {
+	btn: Material "au/gui/button.png", "smooth"
+	map: Material "au/gui/mapa.png", "smooth"
+}
+
 hook.Add "HUDPaintBackground", "NMW AU Hud", ->
+	-- Iterate through the two possible entity types we can interact with.
+	for highlight in *{
+		{
+			button: input.LookupBinding "use"
+			entity: GAMEMODE.UseHighlight
+		}
+		-- TO-DO: Make this keybind not hardcoded.
+		{
+			button: "Q"
+			entity: GAMEMODE.KillHighlight
+		}
+	}
+		if IsValid highlight.entity
+			pos = highlight.entity\GetPos!\ToScreen!
+
+			value = 1.25 * (1 - math.max 0, math.min 1, 1/90 * highlight.entity\GetPos!\Distance LocalPlayer!\GetPos!)
+			size = 0.2 * math.min ScrH!, ScrW!
+
+			-- Since Garry's Mod doesn't allow scaling fonts on the go,
+			-- we'll have to scale the ENTIRE rendering sequence.
+			m = with Matrix!
+				\Translate Vector pos.x, pos.y, 0
+				\Scale math.Clamp(value, 0.25, 1) * Vector 1, 1, 1
+				\Translate -Vector pos.x, pos.y, 0
+
+			cam.PushModelMatrix m, true
+			do
+				color = Color 255, 255, 255, math.Clamp 255 * value * 2, 0, 255
+				shadowColor = Color 0, 0, 0, math.Clamp 64 * value * 2, 0, 255
+
+				-- The button sprite.
+				surface.SetMaterial ASSETS.btn
+				surface.SetDrawColor color
+
+				render.PushFilterMag TEXFILTER.ANISOTROPIC
+				render.PushFilterMin TEXFILTER.ANISOTROPIC
+				surface.DrawTexturedRect pos.x - size/2, pos.y - size/2, size, size
+				render.PopFilterMag!
+				render.PopFilterMin!
+
+				-- The tooltip.
+				draw.SimpleTextOutlined string.upper(highlight.button or "?"), "NMW AU Button Tooltip",
+					pos.x, pos.y - size * 0.15, color,
+					TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 4, shadowColor
+			cam.PopModelMatrix!
+
 	if IsValid GAMEMODE.Hud
-		cam.Start2D!
 		GAMEMODE.Hud\PaintManual!
-		cam.End2D!
 
 concommand.Add "au_debug_eject_test", ->
 	if IsValid GAMEMODE.Hud.Eject
