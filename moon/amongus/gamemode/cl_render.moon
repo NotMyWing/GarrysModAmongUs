@@ -86,3 +86,41 @@ hook.Add "PreDrawHalos", "NMW AU Highlight", ->
 
 	if IsValid GAMEMODE.UseHighlight
 		halo.Add { GAMEMODE.UseHighlight }, color_use, 6, 6, 2, true, true
+
+color_crew = Color(255, 255, 255)
+color_imposter = Color(255, 0, 0)
+
+hook.Add "PostDrawOpaqueRenderables", "NMW AU Nicknames", ->
+	players = player.GetAll!
+
+	export distSort_memo = {}
+	export distSort_player = LocalPlayer!
+	table.sort players, distSort
+
+	aply = GAMEMODE.GameData.Lookup_PlayerByEntity and GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
+	for _, ply in ipairs players
+		lply = aply and GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
+		if ply\IsDormant! or ply == LocalPlayer!
+			continue
+
+		pos = ply\GetPos!
+		pos = pos + Vector 0, 0, 70
+
+		angle = (pos - LocalPlayer!\GetPos!)\Angle!
+		angle = Angle( 0, angle.y, 0 )
+		angle.y = angle.y + math.sin( CurTime() ) * 10
+
+		angle\RotateAroundAxis( angle\Up(), -90 )
+		angle\RotateAroundAxis( angle\Forward(), 90 )
+
+		cam.Start3D2D( pos, angle, 0.075 )
+		do
+			tW, tH = surface.GetTextSize ply\Nick!
+
+			color = if lply and GAMEMODE.GameData.Imposters[lply]
+				color_imposter
+			else
+				color_crew
+
+			draw.SimpleText ply\Nick!, "NMW AU Meeting Button", -tW / 2, -tH/2, color
+		cam.End3D2D()
