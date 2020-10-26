@@ -118,3 +118,11 @@ hook.Add "InitPostEntity", "NWM AU RequestUpdate", ->
 	net.Start "NMW AU Flow"
 	net.WriteUInt GAMEMODE.FlowTypes.RequestUpdate, GAMEMODE.FlowSize
 	net.SendToServer!
+
+hook.Add "CreateMove", "NMW AU KillScreenMove", (cmd) ->
+	if IsValid(GAMEMODE.Hud) and IsValid(GAMEMODE.Hud.Kill)
+		cmd\ClearButtons!
+		cmd\ClearMovement!
+		cmd\SetMouseX 0
+		cmd\SetMouseY 0
+		return true

@@ -65,7 +65,7 @@ return vgui.RegisterTable {
 		surface.PlaySound "au/impostor_killmusic.wav"
 		@PlayBackground ->
 			with vgui.CreateFromTable table.Random(KILLS), @
-				\SetWide ScrW! * 0.4
+				\SetWide ScrW! * 0.5
 				\SetTall \GetWide! * 0.7
 				\Center!
 				if .Play

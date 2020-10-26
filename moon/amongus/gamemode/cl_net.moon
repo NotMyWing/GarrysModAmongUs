@@ -357,3 +357,16 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	--
 	when GAMEMODE.FlowTypes.TasksCloseVGUI
 		GAMEMODE\HUD_HideTaskScreen!
+
+	--
+	-- The server wants us to close the task screen.
+	--
+	when GAMEMODE.FlowTypes.NotifyKilled
+		killer = net.ReadUInt 8
+
+		killerPlayerTable = GAMEMODE.GameData.Lookup_PlayerByID[killer]
+		localPlayerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
+
+		if killerPlayerTable and localPlayerTable
+			GAMEMODE\HUD_PlayKill killerPlayerTable, localPlayerTable
+			GAMEMODE.GameData.DeadPlayers[localPlayerTable] = true

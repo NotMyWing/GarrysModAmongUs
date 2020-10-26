@@ -300,6 +300,13 @@ GM.Net_SendTaskClose = (playerTable) =>
 	net.WriteUInt @FlowTypes.TasksCloseVGUI, @FlowSize
 	net.Send playerTable.entity
 
+--- Notifies the player that he's dead.
+GM.Net_SendNotifyKilled = (playerTable, killerTable) =>
+	net.Start "NMW AU Flow"
+	net.WriteUInt @FlowTypes.NotifyKilled, @FlowSize
+	net.WriteUInt killerTable.id, 8
+	net.Send playerTable.entity
+
 net.Receive "NMW AU Flow", (len, ply) ->
 	playerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
 

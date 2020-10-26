@@ -76,6 +76,8 @@ GM.Player_Kill = (victimTable, attackerTable) =>
 	@Player_SetDead victimTable
 	if IsValid attackerTable.entity
 		@Net_KillNotify attackerTable
+		if IsValid victimTable.entity
+			@Net_SendNotifyKilled victimTable, attackerTable
 
 	@CheckWin!
 
