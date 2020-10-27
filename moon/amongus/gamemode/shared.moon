@@ -10,7 +10,7 @@ GM.GameStates =
 	PLAYING: 2
 	MEETING: 3
 
-flags = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY
+flags = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY, FCVAR_GAMEDLL
 
 GM.ConVars =
 	ImposterCount: CreateConVar "au_imposter_count", 1, flags, "", 1, 4

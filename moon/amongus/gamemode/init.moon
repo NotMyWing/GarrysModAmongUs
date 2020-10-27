@@ -256,3 +256,16 @@ concommand.Add "au_debug_start", ->
 
 concommand.Add "au_debug_restart", ->
 	GAMEMODE\Restart!
+
+-- Disable changing important ConVars during the game.
+for _, convar in pairs GM.ConVars
+	-- Prevent the game from dying.
+	changing = false
+
+	cvars.AddChangeCallback convar\GetName!, ((cvar, old, new) ->
+		if not changing
+			changing = true
+			if GAMEMODE\IsGameInProgress!
+				convar\SetString old
+			changing = false
+	), "NMW AU Protect"
