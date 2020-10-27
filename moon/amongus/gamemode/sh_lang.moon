@@ -1,7 +1,11 @@
 entryMeta = {
 	__call: (...) => @.__entry ...
 	__tostring: =>
-		str = tostring @.__entry!
+		result = @.__entry and @__entry!
+		if result == nil
+			return "Unknown"
+
+		str = tostring result
 		return if "string" == type str
 			str
 		else
@@ -9,6 +13,9 @@ entryMeta = {
 
 	__concat: (a, b) -> tostring(a) .. tostring(b)
 }
+
+NIL = { __entry: -> }
+setmetatable NIL, entryMeta
 
 GM.Lang or= {
 	Get: (lang) =>
@@ -18,11 +25,14 @@ GM.Lang or= {
 	GetEntryFunc: (entry, lang = "en") ->
 		@ = GAMEMODE.Lang
 
+		if entry == nil or entry == ""
+			return NIL
+
 		if @__entryCache[lang] and @__entryCache[lang][entry]
 			return @__entryCache[lang][entry]
 
-		entry = (@__database[lang] and @__database[lang][entry]) or
-			(lang ~= "en" and @__database["en"] and @__database["en"][entry]) or entry
+		entry = entry and ((@__database[lang] and @__database[lang][entry]) or
+			(lang ~= "en" and @__database["en"] and @__database["en"][entry])) or entry
 
 		result = switch type entry
 			when "function"
