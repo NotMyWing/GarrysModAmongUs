@@ -2,8 +2,6 @@ remover = {}
 
 ASSETS = {
 	crewmate: [Material("au/gui/kills/remover/crewmate#{i}.png", "smooth") for i = 1, 2]
-	corpseSwayA: [Material("au/gui/kills/remover/corpse_sway_a#{i}.png", "smooth") for i = 1, 2]
-	corpseSwayB: [Material("au/gui/kills/remover/corpse_sway_b#{i}.png", "smooth") for i = 1, 2]
 	corpseSquish: [Material("au/gui/kills/remover/corpse_squish#{i}.png", "smooth") for i = 1, 2]
 	corpseStand: [Material("au/gui/kills/remover/corpse_stand#{i}.png", "smooth") for i = 1, 2]
 	corpseFall: [Material("au/gui/kills/remover/corpse_fall.png", "smooth") for i = 1, 1]
