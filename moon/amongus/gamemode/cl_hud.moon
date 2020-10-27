@@ -193,10 +193,10 @@ hook.Add "HUDPaintBackground", "NMW AU Hud", ->
 		}
 	}
 		if IsValid highlight.entity
-			pos = highlight.entity\GetPos!\ToScreen!
+			pos = highlight.entity\WorldSpaceCenter!\ToScreen!
 
-			nearestPoint = highlight.entity\NearestPoint LocalPlayer!\GetPos!
-			value = 1 * (1 - math.max 0, math.min 1, 1/90 * nearestPoint\Distance LocalPlayer!\GetPos!)
+			nearestPoint = highlight.entity\NearestPoint LocalPlayer!\WorldSpaceCenter!
+			value = 1 * (1 - math.max 0, math.min 1, 1/90 * nearestPoint\Distance LocalPlayer!\WorldSpaceCenter!)
 			size = 0.125 * math.min ScrH!, ScrW!
 
 			-- Since Garry's Mod doesn't allow scaling fonts on the go,
