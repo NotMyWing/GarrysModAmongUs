@@ -42,6 +42,7 @@ with GM.Lang\Get "en"
 		"unlockManifolds": "Unlock Manifolds"
 		"uploadData": "Download Data"
 		"uploadData.2": "Upload Data"
+		"fuelEngines": "Fuel Engines"
 	}
 
 	for task, taskName in pairs taskNames
