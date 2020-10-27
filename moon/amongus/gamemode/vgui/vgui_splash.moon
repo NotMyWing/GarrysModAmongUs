@@ -1,21 +1,21 @@
 TRANSLATE = GM.Lang.GetEntryFunc
 
 surface.CreateFont "NMW AU Role", {
-	font: "Arial"
+	font: "Roboto"
 	size: ScreenScale 80
 	weight: 500
 }
 
 surface.CreateFont "NMW AU Role Subtext", {
-	font: "Arial"
+	font: "Roboto"
 	size: ScreenScale 20
 	weight: 500
 }
 
 surface.CreateFont "NMW AU Splash Nickname", {
-	font: "Arial"
-	size: ScreenScale 12
-	weight: 500
+	font: "Roboto"
+	size: ScreenScale 80
+	weight: 1000
 }
 
 splash = {}
@@ -267,8 +267,31 @@ splash.DisplayPlayers = (reason) =>
 						.Paint = (_, w, h) ->
 							oldPaint _, w, h
 
-							draw.SimpleTextOutlined .Nickname or "", "NMW AU Splash Nickname",
-								w/2, h/2 + w * 0.875, clr, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 2, Color 0, 0, 0
+							ltsx, ltsy = _\LocalToScreen 0, 0
+							ltsv = Vector ltsx, ltsy, 0
+							v = Vector w / 2, h / 2 + w * 0.875, 0
+
+							m = Matrix!
+							m\Translate ltsv
+							m\Translate v
+							m\Scale (\GetWide! / mdl_size) * 0.25 * Vector 1, 1, 1
+							m\Translate -v
+							m\Translate -ltsv
+
+							cam.PushModelMatrix m, true
+							surface.DisableClipping true
+							do
+								render.PushFilterMag TEXFILTER.ANISOTROPIC
+								render.PushFilterMin TEXFILTER.ANISOTROPIC
+
+								draw.SimpleTextOutlined .Nickname or "", "NMW AU Splash Nickname",
+									w/2, h/2 + w * 0.875, clr, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 2, Color 0, 0, 0
+
+								render.PopFilterMag!
+								render.PopFilterMin!
+
+							surface.DisableClipping false
+							cam.PopModelMatrix!
 
 				-- Now, add players to the table.
 				-- In case it's a start splash screen, display our team
@@ -317,7 +340,7 @@ splash.DisplayPlayers = (reason) =>
 							.Think = ->
 								\SetAlpha @GetAlpha!
 
-						width_mod *= 0.7
+						width_mod *= 0.75
 
 				-- Right side of the screen. Contains the other half of players.
 				with rightBar = \Add "DPanel"
@@ -343,7 +366,7 @@ splash.DisplayPlayers = (reason) =>
 								.Think = ->
 									\SetAlpha @GetAlpha!
 
-							width_mod *= 0.7
+							width_mod *= 0.75
 
 				-- Now, if we're relevant, put us in the midle.
 				if localPlayerTable and (not reason or (reason and victory))
