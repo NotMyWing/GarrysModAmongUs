@@ -44,7 +44,7 @@ taskBase = {
 
 	--- Sets the activation button.
 	-- Activation button is the entity the player needs to press in order to
-	-- activate the task. The entity MUST be func_task_button and MUST have
+	-- activate the task. The entity MUST be func_ or prop_task_button and MUST have
 	-- the same targetname as the task.
 	SetActivationButton: (entity, important) =>
 		@__button = entity

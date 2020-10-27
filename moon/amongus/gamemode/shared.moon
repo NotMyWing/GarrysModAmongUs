@@ -195,6 +195,7 @@ whitelist = {
 	"prop_physics": true
 	"func_vent": true
 	"func_task_button": true
+	"prop_task_button": true
 }
 
 --- Finds all entities with the matching task name field.
@@ -228,7 +229,7 @@ GM.TracePlayer = (ply) =>
 				continue
 
 			-- Task buttons.
-			if ent\GetClass! == "func_task_button"
+			if ent\GetClass! == "func_task_button" or ent\GetClass! == "prop_task_button"
 				name = ent\GetTaskName!
 
 				-- Quite simply just bail out if the player is an imposter.

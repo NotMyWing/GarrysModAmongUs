@@ -23,6 +23,11 @@
 	output OnTaskComplete(void) : "Called when a player completes the tank using this button"
 ]
 
+@PointClass base(func_task_button, prop_static_base) studioprop() = prop_task_button :
+	"Task button 2: static prop boogaloo"
+[
+]
+
 @SolidClass base(Origin, RenderFields, Targetname) = func_vent :
 	"Vent."
 [
