@@ -28,6 +28,7 @@ GM.ConVars =
 	TasksVisual: CreateConVar "au_tasks_enable_visual", 1, flags, "", 0, 1
 
 	KillDistanceMod: CreateConVar "au_killdistance_mod", 1, flags, "", 1, 3
+	DistributeTasksToBots: CreateConVar "au_debug_bot_tasks", 0, flags, "", 0, 1
 
 GM.Colors = {
 	Color 0, 0, 0

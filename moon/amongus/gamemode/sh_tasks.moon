@@ -115,7 +115,7 @@ else
 
 			-- Don't assign tasks to bots, but create their table to prevent
 			-- the logic from dying horribly.
-			if IsValid(playerTable.entity) and playerTable.entity\IsBot!
+			if IsValid(playerTable.entity) and playerTable.entity\IsBot! and not @ConVars.DistributeTasksToBots\GetBool!
 				continue
 
 			-- Assign the picked common tasks.
