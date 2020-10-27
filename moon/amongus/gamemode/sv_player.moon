@@ -264,9 +264,22 @@ GM.PlayerSpawn = (ply) =>
 	ply\SetTeam 1
 	ply\SetNoCollideWithTeammates true
 
-hook.Add "PlayerDisconnected", "NMW AU CheckWin", ->
-	if GAMEMODE.GameData.PlayerTables
-		GAMEMODE\CheckWin!
+hook.Add "PlayerDisconnected", "NMW AU CheckWin", (ply) -> with GAMEMODE
+	if \IsGameInProgress!
+		if playerTable = .GameData.Lookup_PlayerByEntity[ply]
+			\Player_SetDead playerTable
+
+			-- If the player was a crewmate and he had tasks,
+			-- "complete" his tasks and broadcast the new count.
+			if not .GameData.Imposters[playerTable]
+				count = table.Count .GameData.Tasks[playerTable]
+				if count > 0
+					.GameData.CompletedTasks += table.Count .GameData.Tasks[playerTable]
+					table.Empty .GameData.Tasks[playerTable]
+
+					\Net_BroadcastTaskCount .GameData.CompletedTasks
+
+			\CheckWin!
 
 hook.Add "CanPlayerSuicide", "NMW AU Suicide", ->
 	return false
