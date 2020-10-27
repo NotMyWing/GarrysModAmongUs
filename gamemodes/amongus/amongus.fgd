@@ -10,6 +10,11 @@
 [
 ]
 
+@PointClass base(func_meeting_button, prop_static_base) studioprop() = prop_meeting_button :
+	"Meeting button, the button that may start many meetings. Now in a prop form."
+[
+]
+
 @SolidClass base(Origin, RenderFields, Targetname) = func_task_button :
 	"Task button yo."
 [

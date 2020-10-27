@@ -190,6 +190,7 @@ whitelist = {
 	"func_door": true
 	"func_door_rotating": true
 	"func_meeting_button": true
+	"prop_meeting_button": true
 	"player": true
 	"prop_ragdoll": true
 	"prop_physics": true
