@@ -265,8 +265,10 @@ GM.TracePlayer = (ply) =>
 			isUsable = not isKillable and not ent\IsPlayer!
 			if isKillable
 				table.insert killable, ent
-			if isUsable and ent\GetPos!\Distance(ply\GetPos!) <= 96
-				table.insert usable, ent
+			elseif isUsable
+				nearestPoint = ent\NearestPoint startPos
+				if nearestPoint\Distance(ply\GetPos!) <= 96
+					table.insert usable, ent
 
 	distSort_memo = {}
 	distSort_player = ply

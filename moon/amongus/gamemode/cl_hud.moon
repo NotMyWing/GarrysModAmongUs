@@ -12,7 +12,7 @@ include "vgui/vgui_task_placeholder.lua"
 
 surface.CreateFont "NMW AU Button Tooltip", {
 	font: "Arial"
-	size: ScreenScale 35
+	size: ScreenScale 22
 	weight: 500
 	outline: true
 }
@@ -195,8 +195,9 @@ hook.Add "HUDPaintBackground", "NMW AU Hud", ->
 		if IsValid highlight.entity
 			pos = highlight.entity\GetPos!\ToScreen!
 
-			value = 1.25 * (1 - math.max 0, math.min 1, 1/90 * highlight.entity\GetPos!\Distance LocalPlayer!\GetPos!)
-			size = 0.2 * math.min ScrH!, ScrW!
+			nearestPoint = highlight.entity\NearestPoint LocalPlayer!\GetPos!
+			value = 1 * (1 - math.max 0, math.min 1, 1/90 * nearestPoint\Distance LocalPlayer!\GetPos!)
+			size = 0.125 * math.min ScrH!, ScrW!
 
 			-- Since Garry's Mod doesn't allow scaling fonts on the go,
 			-- we'll have to scale the ENTIRE rendering sequence.
