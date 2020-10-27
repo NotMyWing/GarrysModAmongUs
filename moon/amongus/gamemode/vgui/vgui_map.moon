@@ -17,12 +17,18 @@ return vgui.RegisterTable {
 	__scale: 1
 	__tracking: {}
 	__labels: {}
+	__baseMatWidth: 1024
+	__baseMatHeight: 1024
 
 	Init: =>
 		@SetZPos 30000
 		@SetSize ScrW!, ScrH!
 
 		@__innerPanel = with @Add "DPanel"
+			size = 0.8 * math.min ScrH!, ScrW!
+			\SetSize size, size
+			\Center!
+
 			.Paint = (_, w, h) ->
 				surface.SetAlphaMultiplier 0.85
 
@@ -91,8 +97,7 @@ return vgui.RegisterTable {
 		else
 			1, 1
 
-		size = 0.8 * math.max ScrH!, ScrW!
-		w, h = GAMEMODE.Render.FitMaterial value, size, size
+		w, h = GAMEMODE.Render.FitMaterial value, 0.8 * ScrH!, 0.8 * ScrW!
 		with @__innerPanel
 			\SetSize w, h
 			\Center!

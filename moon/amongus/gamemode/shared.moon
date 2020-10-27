@@ -276,6 +276,9 @@ GM.TracePlayer = (ply) =>
 GM.IsGameInProgress = => GetGlobalBool "NMW AU GameInProgress"
 
 GM.LoadManifest = =>
+	-- Default to an empty table so that things don't die horribly.
+	@MapManifest = {}
+
 	dir = @FolderName or "amongus"
 	fileName = "#{dir}/gamemode/manifest/#{game.GetMap!}.lua"
 

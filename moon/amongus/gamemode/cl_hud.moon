@@ -147,7 +147,9 @@ CREW_LAYERS = {
 
 GM.HUD_InitializeMap = =>
 	@Hud.Map = with @Hud\Add VGUI_MAP
-		\SetupFromManifestEntry @MapManifest.Map.UI
+		if @MapManifest and @MapManifest.Map and @MapManifest.Map.UI
+			\SetupFromManifestEntry @MapManifest.Map.UI
+
 		\SetColor Color 32, 32, 220
 		\SetPos 0, ScrH!
 
