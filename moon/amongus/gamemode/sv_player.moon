@@ -139,7 +139,8 @@ GM.Player_VentTo = (playerTable, targetVentId) =>
 
 		if IsValid playerTable.entity
 			playerTable.entity\SetPos targetVent\GetPos!
-			playerTable.entity\SetEyeAngles targetVent.ViewAngle
+			if targetVent.ViewAngle
+				playerTable.entity\SetEyeAngles targetVent.ViewAngle
 
 --- Puts a non-vented person into a vent.
 -- @param playerTable Player table.
@@ -156,7 +157,8 @@ GM.Player_Vent = (playerTable, vent) =>
 
 		if IsValid playerTable.entity
 			playerTable.entity\SetPos vent\GetPos!
-			playerTable.entity\SetEyeAngles vent.ViewAngle
+			if vent.ViewAngle
+				playerTable.entity\SetEyeAngles vent.ViewAngle
 
 			@Net_BroadcastVent playerTable.entity, vent\GetPos!
 			@Player_Hide playerTable.entity
@@ -177,7 +179,8 @@ GM.Player_UnVent = (playerTable) =>
 		if IsValid playerTable.entity
 			@Net_NotifyVent playerTable, @VentNotifyReason.UnVent
 
-		playerTable.entity\SetPos vent\GetPos!
+		outPoint = Vector(0, 0, 1) + vent\NearestPoint vent\GetPos! + Vector 0, 0, 1024
+		playerTable.entity\SetPos outPoint
 
 		handle = "vent" .. playerTable.nickname
 		@Net_BroadcastVent playerTable.entity, vent\GetPos!, true
@@ -185,7 +188,6 @@ GM.Player_UnVent = (playerTable) =>
 			@GameData.Vented[playerTable] = nil
 			if IsValid playerTable.entity
 				@Player_Unhide playerTable.entity
-				playerTable.entity\SetPos vent\GetPos! + Vector 0, 0, 5
 
 --- Forces the player into doing the task.
 -- This will fail if the player is too far from the activation button.
