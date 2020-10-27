@@ -42,3 +42,8 @@
 	input Link(void) : "here be connection"
 	output Link(void) : "A different vent this vent is connected to."
 ]
+
+@PointClass base(func_vent, prop_static_base) studioprop() = prop_vent :
+	"Vent. Prop Vent."
+[
+]

@@ -195,6 +195,7 @@ whitelist = {
 	"prop_ragdoll": true
 	"prop_physics": true
 	"func_vent": true
+	"prop_vent": true
 	"func_task_button": true
 	"prop_task_button": true
 }
@@ -254,7 +255,7 @@ GM.TracePlayer = (ply) =>
 				continue
 
 			-- Prevent regular players from using vents.
-			if ent\GetClass! == "func_vent" and not @GameData.Imposters[playerTable]
+			if (ent\GetClass! == "func_vent" or ent\GetClass! == "prop_vent") and not @GameData.Imposters[playerTable]
 				continue
 
 			otherPlayerTable = @GameData.Lookup_PlayerByEntity[ent]
