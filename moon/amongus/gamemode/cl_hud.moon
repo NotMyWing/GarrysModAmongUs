@@ -5,6 +5,7 @@ VGUI_SPLASH = include "vgui/vgui_splash.lua"
 VGUI_BLINK = include "vgui/vgui_blink.lua"
 VGUI_VENT = include "vgui/vgui_vent.lua"
 VGUI_KILL = include "vgui/vgui_kill.lua"
+VGUI_MAP = include "vgui/vgui_map.lua"
 
 include "vgui/vgui_task_base.lua"
 include "vgui/vgui_task_placeholder.lua"
@@ -37,6 +38,9 @@ GM.HUDReset = =>
 	@Hud = vgui.CreateFromTable VGUI_HUD
 	@Hud\SetPaintedManually true
 
+	if @MapManifest
+		@HUD_InitializeMap!
+
 GM.HUD_UpdateTaskAmount = =>
 	if IsValid @Hud
 		@Hud\SetTaskbarValue GAMEMODE.GameData.CompletedTasks / GAMEMODE.GameData.TotalTasks
@@ -50,6 +54,8 @@ GM.HUD_DisplayMeeting = (caller, bodyColor) =>
 		if IsValid @Hud.Meeting
 			@Hud.Meeting\Remove!
 
+		@HUD_CloseMap!
+
 		@Hud.Meeting = with vgui.CreateFromTable VGUI_MEETING, @Hud
 			\StartEmergency caller, bodyColor
 
@@ -58,16 +64,22 @@ GM.HUD_DisplayEject = (reason, ply, confirm, imposter, remaining, total) =>
 		if IsValid @Hud.Eject
 			@Hud.Meeting\Remove!
 
+		@HUD_CloseMap!
+
 		@Hud.Eject = with vgui.CreateFromTable VGUI_EJECT, @Hud
 			\Eject reason, ply, confirm, imposter, remaining, total
 
 GM.HUD_DisplayGameOver = (reason) =>
 	if IsValid @Hud
+		@HUD_CloseMap!
+
 		@Hud.Splash = with vgui.CreateFromTable VGUI_SPLASH, @Hud
 			\DisplayGameOver reason
 
 GM.HUD_DisplayShush = (reason) =>
 	if IsValid @Hud
+		@HUD_CloseMap!
+
 		@Hud.Splash = with vgui.CreateFromTable VGUI_SPLASH, @Hud
 			\DisplayShush!
 
@@ -76,15 +88,93 @@ GM.HUD_PlayKill = (killer, victim) =>
 		if IsValid @Hud.Kill
 			@Hud.Kill\Remove!
 
+		@HUD_CloseMap!
+
 		@Hud.Kill = with vgui.CreateFromTable VGUI_KILL, @Hud
 			\Kill killer, victim
+
+GM.HUD_OpenMap = =>
+	if IsValid @Hud.Meeting
+		return
+
+	if IsValid @Hud.TaskScreen
+		return
+
+	if IsValid @Hud.Eject
+		return
+
+	if IsValid @Hud.Splash
+		return
+
+	if GAMEMODE\IsGameInProgress! and IsValid(GAMEMODE.Hud) and IsValid(GAMEMODE.Hud.Map)
+		GAMEMODE.Hud.Map\Popup!
+
+		return true
+
+GM.HUD_CloseMap = =>
+	if IsValid(GAMEMODE.Hud) and IsValid(GAMEMODE.Hud.Map)
+		GAMEMODE.Hud.Map\Close!
+
+MAT_TASK = Material "au/gui/maps/task.png", "smooth"
+
+GM.HUD_TrackTaskOnMap = (entity, track = true) =>
+	if IsValid(@Hud) and IsValid(@Hud.Map)
+		with @Hud.Map
+			if track
+				size = \GetInnerSize!
+
+				\Track entity, with vgui.Create "DPanel"
+					\SetSize size * 0.1, size * 0.1
+					.Paint = (_, w, h) ->
+						surface.DisableClipping true
+						surface.SetDrawColor 255, 230, 0
+						surface.SetMaterial MAT_TASK
+
+						render.PushFilterMag TEXFILTER.ANISOTROPIC
+						render.PushFilterMin TEXFILTER.ANISOTROPIC
+						surface.DrawTexturedRect 0, 0, w, h
+						render.PopFilterMag!
+						render.PopFilterMin!
+
+						surface.DisableClipping false
+			else
+				\UnTrack entity
+
+CREW_LAYERS = {
+	Material "au/gui/meeting/crewmate1.png", "smooth"
+	Material "au/gui/meeting/crewmate2.png", "smooth"
+}
+
+GM.HUD_InitializeMap = =>
+	@Hud.Map = with @Hud\Add VGUI_MAP
+		\SetupFromManifestEntry @MapManifest.Map.UI
+		\SetColor Color 32, 32, 220
+		\SetPos 0, ScrH!
+
+		localPlayerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
+		if localPlayerTable
+			size = 0.05 * \GetInnerSize!
+			player = with \Add "DPanel"
+				\SetSize size, size
+				.Paint = ->
+
+				-- A slightly unreadable chunk of garbage code
+				-- responsible for layering the crewmate sprite.
+				layers = {}
+				for i = 1, 2
+					with layers[i] = \Add "DPanel"
+						\SetSize size, size
+						.Image = CREW_LAYERS[i]
+						.Paint = GAMEMODE.Render.DermaFitImage
+				layers[1].Color = localPlayerTable.color
+
+			\Track LocalPlayer!, player
 
 hook.Add "Initialize", "Init Hud", ->
 	GAMEMODE\HUDReset!
 
 ASSETS = {
 	btn: Material "au/gui/button.png", "smooth"
-	map: Material "au/gui/mapa.png", "smooth"
 }
 
 hook.Add "HUDPaintBackground", "NMW AU Hud", ->
@@ -136,6 +226,13 @@ hook.Add "HUDPaintBackground", "NMW AU Hud", ->
 
 	if IsValid GAMEMODE.Hud
 		GAMEMODE.Hud\PaintManual!
+
+hook.Add "ScoreboardShow", "NMW AU Map", ->
+	if GAMEMODE\HUD_OpenMap!
+		return true
+
+hook.Add "ScoreboardHide", "NMW AU Map", ->
+	GAMEMODE\HUD_CloseMap!
 
 concommand.Add "au_debug_eject_test", ->
 	if IsValid GAMEMODE.Hud.Eject

@@ -274,3 +274,20 @@ GM.TracePlayer = (ply) =>
 	return killable[#killable], usable[#usable]
 
 GM.IsGameInProgress = => GetGlobalBool "NMW AU GameInProgress"
+
+GM.LoadManifest = =>
+	dir = @FolderName or "amongus"
+	fileName = "#{dir}/gamemode/manifest/#{game.GetMap!}.lua"
+
+	if file.Exists fileName, "LUA"
+		if SERVER
+			AddCSLuaFile fileName
+
+		@MapManifest = include fileName
+
+		print "Found the manifest file for #{game.GetMap!}"
+	else
+		print "Couldn't find the manifest file for #{game.GetMap!}! The game mode will not work properly."
+
+hook.Add "Initialize", "NMW AU LoadManifest", ->
+	GAMEMODE\LoadManifest!

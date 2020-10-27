@@ -83,6 +83,10 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		GAMEMODE.GameData.CompletedTasks = net.ReadUInt 8
 		GAMEMODE.GameData.TotalTasks = net.ReadUInt 8
 
+		-- Reset the HUD and display the splash.
+		GAMEMODE\HUDReset!
+		GAMEMODE\HUD_DisplayShush!
+
 		-- Read our tasks.
 		if GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
 			GAMEMODE.GameData.MyTasks = {}
@@ -113,9 +117,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 
 				GAMEMODE.GameData.MyTasks[name] = task
 
-		-- Reset the HUD and display the splash.
-		GAMEMODE\HUDReset!
-		GAMEMODE\HUD_DisplayShush!
+				GAMEMODE\HUD_TrackTaskOnMap task.entity
 
 	--
 	-- Display a countdown.
@@ -327,6 +329,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 			task.completed = net.ReadBool!
 
 			if not task.completed
+				oldEntity = task.entity
 				task.entity       = net.ReadEntity!
 				task.important    = net.ReadBool!
 				task.currentStep  = net.ReadUInt 16
@@ -340,8 +343,13 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 				if task.customArea == ""
 					task.customArea = nil
 
+				if task.entity ~= oldEntity
+					GAMEMODE\HUD_TrackTaskOnMap oldEntity, false
+					GAMEMODE\HUD_TrackTaskOnMap task.entity
+
 				surface.PlaySound "au/task_inprogress.wav"
 			else
+				GAMEMODE\HUD_TrackTaskOnMap task.entity, false
 				surface.PlaySound "au/task_complete.wav"
 
 	--

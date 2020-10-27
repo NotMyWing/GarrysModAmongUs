@@ -48,6 +48,8 @@ if CLIENT
 		taskClass = @TaskCollection.All[name]
 
 		if taskClass and taskClass.CreateVGUI
+			@HUD_CloseMap!
+
 			@Hud.TaskScreen = with taskClass\CreateVGUI data
 				\SetTaskName name
 else
@@ -66,10 +68,13 @@ else
 
 		return taskInstance
 
-	mapToPool = (map) ->
+	taskMapToPool = (map, allowed = {}) ->
 		pool = {}
 		for _, element in pairs map
-			table.insert pool, element
+			if allowed[element.Name]
+				table.insert pool, element
+			else
+				print "Skipping task #{element.Name}: not allowed by the map."
 
 		return pool
 
@@ -77,18 +82,23 @@ else
 	-- This assumes that the gamedata table is properly filled.
 	-- Yes, this implies that you shouldn't call this.
 	GM.Task_AssignToPlayers = =>
+		allowedTasks = {task, true for task in *@MapManifest.Tasks}
+
 		shuffle = @Util.Shuffle
 
 		pools = {
-			[mapToPool @TaskCollection.Short]: @ConVars.TasksShort\GetInt!
-			[mapToPool @TaskCollection.Long]:  @ConVars.TasksLong\GetInt!
+			[taskMapToPool @TaskCollection.Short, allowedTasks]: @ConVars.TasksShort\GetInt!
+			[taskMapToPool @TaskCollection.Long, allowedTasks]:  @ConVars.TasksLong\GetInt!
 		}
 
 		-- Pick N random common tasks from the pool.
-		commonTaskPool = mapToPool @TaskCollection.Common
 		commonTasks = {}
 
-		for _, task in ipairs shuffle commonTaskPool
+		for _, task in ipairs shuffle taskMapToPool @TaskCollection.Common, allowedTasks
+			-- Skip the task if it's not allowed by the map.
+			if not allowedTasks[task.Name]
+				continue
+
 			if #commonTasks < @ConVars.TasksCommon\GetInt!
 				table.insert commonTasks, task
 			else
