@@ -72,8 +72,8 @@ hook.Add "CalcView", "NMW AU CalcView", ( ply, pos, angles, fov ) ->
 	}
 
 color_kill = Color 255, 0, 0
-color_use   = Color 255, 255, 255
-color_task  = Color 255, 255, 255, 32
+color_use   = Color 255, 230, 0
+color_task  = Color 255, 230, 0, 32
 
 hook.Add "PreDrawHalos", "NMW AU Highlight", ->
 	-- Highlight our current tasks.
@@ -82,10 +82,16 @@ hook.Add "PreDrawHalos", "NMW AU Highlight", ->
 			halo.Add { task.entity }, color_task, 6, 6, 2, true, true
 
 	if IsValid GAMEMODE.KillHighlight
-		halo.Add { GAMEMODE.KillHighlight }, color_kill, 6, 6, 2, true, true
+		halo.Add { GAMEMODE.KillHighlight }, color_kill, 4, 4, 5, true, true
 
 	if IsValid GAMEMODE.UseHighlight
-		halo.Add { GAMEMODE.UseHighlight }, color_use, 6, 6, 2, true, true
+		entClass = GAMEMODE.UseHighlight\GetClass!
+		color = if entClass == "prop_vent" or entClass == "func_vent"
+			color_kill
+		else
+			color_use
+
+		halo.Add { GAMEMODE.UseHighlight }, color, 4, 4, 5, true, true
 
 color_crew = Color(255, 255, 255)
 color_imposter = Color(255, 0, 0)
