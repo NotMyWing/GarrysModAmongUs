@@ -5,11 +5,6 @@ GM.Author 		= "NotMyWing with assets by InnerSloth"
 GM.Email 		= ""
 GM.Website 		= ""
 
-GM.GameStates =
-	LOBBY: 1
-	PLAYING: 2
-	MEETING: 3
-
 flags = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY, FCVAR_GAMEDLL
 
 GM.ConVars =
@@ -215,7 +210,7 @@ GM.Util.FindEntsByTaskName = (taskname, first = false) ->
 
 GM.TracePlayer = (ply) =>
 	startPos = ply\GetPos! + Vector 0, 0, 20
-	entities = ents.FindInSphere startPos, 96 * @ConVars.KillDistanceMod\GetFloat!
+	entities = ents.FindInSphere startPos, @BaseUseRadius * @ConVars.KillDistanceMod\GetFloat!
 
 	usable = {}
 	killable = {}
