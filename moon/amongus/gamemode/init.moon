@@ -111,7 +111,7 @@ GM.Restart = =>
 			ply\SetAngles point\GetAngles!
 			ply\SetEyeAngles point\GetAngles!
 
-		@Net_SendGameState ply, @GameState.Preparing
+	@SetGameState @GameState.Preparing
 
 GM.StartGame = =>
 	if #player.GetAll! - @ConVars.ImposterCount\GetInt! * 2 < 1
@@ -239,12 +239,12 @@ GM.StartGame = =>
 				-- Unfreeze everyone and broadcast buttons.
 				for index, ply in ipairs @GameData.PlayerTables
 					if IsValid ply.entity
-						ply.entity\Freeze false
-
-					@Net_SendGameState ply.entity, @GameState.Playing
+						ply.entity\Freeze fal
 
 					if @GameData.Imposters[ply]
 						@Player_RefreshKillCooldown ply
+
+				@SetGameState @GameState.Playing
 
 				@Meeting_ResetCooldown!
 
@@ -271,6 +271,10 @@ GM.StartRound = =>
 
 	@Meeting_ResetCooldown!
 
+GM.SetGameState = (newState) =>
+	@GameData.State = newState
+	@Net_BroadcastGameState newState
+
 concommand.Add "au_debug_start", ->
 	GAMEMODE\Restart!
 
@@ -291,3 +295,9 @@ for _, convar in pairs GM.ConVars
 				convar\SetString old
 			changing = false
 	), "NMW AU Protect"
+
+hook.Add "Initialize", "NMW AU Initialize", ->
+	GAMEMODE\Restart!
+
+	-- screw implicit returns man
+	return

@@ -5,15 +5,19 @@
 util.AddNetworkString "NMW AU Flow"
 
 --- Sends the game state update.
--- IMPORTANT! This function accepts ENTITIES, not PLAYER TABLES.
--- If, for some reason, you want to call this.
 -- @param ply Player entity.
--- @param state New state. See shared.moon.
-GM.Net_SendGameState = (ply, state) =>
+GM.Net_UpdateGameState = (ply) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.GameState, @FlowSize
-	net.WriteUInt state, 4
+	net.WriteUInt @GameData.State, 4
 	net.Send ply
+
+--- Sends the game state update to everyone.
+GM.Net_BroadcastGameState = =>
+	net.Start "NMW AU Flow"
+	net.WriteUInt @FlowTypes.GameState, @FlowSize
+	net.WriteUInt @GameData.State, 4
+	net.Broadcast!
 
 --- Broadcasts a countdown.
 -- @param time Absolute time based on CurTime().
@@ -357,6 +361,8 @@ net.Receive "NMW AU Flow", (len, ply) ->
 
 				if GAMEMODE.IsGameInProgress!
 					GAMEMODE\Net_UpdateGameData ply
+
+				GAMEMODE\Net_UpdateGameState ply
 
 		--
 		-- Player has closed the task window.

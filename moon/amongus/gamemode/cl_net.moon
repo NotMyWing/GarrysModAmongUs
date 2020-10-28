@@ -308,9 +308,8 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 
 		switch state
 			when GAMEMODE.GameState.Preparing
-				GAMEMODE\PurgeGameData!
 				GAMEMODE\HUD_Reset!
-
+				GAMEMODE\PurgeGameData!
 				GAMEMODE.Hud\SetupButtons state
 			else
 				GAMEMODE.Hud\SetupButtons state, GAMEMODE.GameData.Imposters[GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]]
