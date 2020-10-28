@@ -13,22 +13,23 @@ GM.GameStates =
 flags = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY, FCVAR_GAMEDLL
 
 GM.ConVars =
-	ImposterCount: CreateConVar "au_imposter_count", 1, flags, "", 1, 4
-	KillCooldown: CreateConVar "au_kill_cooldown", 20, flags, "", 1, 60
-	VotePreTime: CreateConVar "au_vote_pre_time", 15, flags, "", 1, 60
-	VoteTime: CreateConVar "au_vote_time", 30, flags, "", 1, 60
-	VotePostTime: CreateConVar "au_vote_post_time", 5, flags, "", 1, 60
-	MeetingCooldown: CreateConVar "au_meeting_cooldown", 20, flags, "", 1, 60
-	MeetingsPerPlayer: CreateConVar "au_meeting_available", 2, flags, "", 1, 5
-	ConfirmEjects: CreateConVar "au_vote_confirm_ejects", 1, flags, "", 0, 1
+	ImposterCount:   CreateConVar "au_imposter_count"  , 1 , flags, "", 1, 4
+	KillCooldown:    CreateConVar "au_kill_cooldown"   , 20, flags, "", 1, 60
+	KillDistanceMod: CreateConVar "au_killdistance_mod", 1 , flags, "", 1, 3
+	ConfirmEjects:   CreateConVar "au_confirm_ejects"  , 1 , flags, "", 0, 1
 
-	TasksShort: CreateConVar "au_tasks_short", 2, flags, "", 0, 5
-	TasksLong: CreateConVar "au_tasks_long", 1, flags, "", 0, 5
-	TasksCommon: CreateConVar "au_tasks_common", 1, flags, "", 0, 5
+	MeetingCooldown:   CreateConVar "au_meeting_cooldown"      , 20, flags, "", 1, 60
+	MeetingsPerPlayer: CreateConVar "au_meeting_available"     , 2 , flags, "", 1, 5
+	VoteTime:          CreateConVar "au_meeting_vote_time"     , 30, flags, "", 1, 90
+	VotePreTime:       CreateConVar "au_meeting_vote_pre_time" , 15, flags, "", 1, 60
+	VotePostTime:      CreateConVar "au_meeting_vote_post_time", 5 , flags, "", 1, 20
+
+	TasksShort:  CreateConVar "au_tasks_short"        , 2, flags, "", 0, 5
+	TasksLong:   CreateConVar "au_tasks_long"         , 1, flags, "", 0, 5
+	TasksCommon: CreateConVar "au_tasks_common"       , 1, flags, "", 0, 5
 	TasksVisual: CreateConVar "au_tasks_enable_visual", 0, flags, "", 0, 1
 
-	KillDistanceMod: CreateConVar "au_killdistance_mod", 1, flags, "", 1, 3
-	DistributeTasksToBots: CreateConVar "au_debug_bot_tasks", 0, flags, "", 0, 1
+	DistributeTasksToBots: CreateConVar "au_debug_bot_tasks" , 0, flags, "", 0, 1
 
 GM.Colors = {
 	Color 0, 0, 0
