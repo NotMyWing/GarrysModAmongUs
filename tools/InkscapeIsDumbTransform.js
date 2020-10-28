@@ -6,15 +6,15 @@ const PNG_END_SIGNATURE = Buffer.from([73, 69, 78, 68, 239, 191, 189, 66, 96, 23
 /**
  * Filters out things that aren't a PNG because inkscape is dumb.
  */
-exports.InkscapeIsDumbTransform = class extends Transform {
+class InkscapeIsDumbTransform extends Transform {
 
 	constructor() {
-        super();
-        // If the PNG has started
+		super();
+		// If the PNG has started
 		this.started = false;
-        // If the PNG has ended
+		// If the PNG has ended
 		this.ended = false;
-        // The current search byte index
+		// The current search byte index
 		this.signatureConsumedIndex = 0;
 	}
 
@@ -66,7 +66,7 @@ exports.InkscapeIsDumbTransform = class extends Transform {
 		if (!this.started) {
 			// Look for the start
 			const foundIndex = this._searchChunk(chunk, 0, PNG_START_SIGNATURE);
-			if(foundIndex !== -1) {
+			if (foundIndex !== -1) {
 				// Mark as started
 				this.started = true;
 				// Mark the start index
@@ -81,7 +81,7 @@ exports.InkscapeIsDumbTransform = class extends Transform {
 
 			// Look for the end
 			const foundIndex = this._searchChunk(chunk, startIndex, PNG_END_SIGNATURE);
-			if(foundIndex !== -1) {
+			if (foundIndex !== -1) {
 				// Mark as ended
 				this.ended = true;
 				// Mark the end index
@@ -89,7 +89,7 @@ exports.InkscapeIsDumbTransform = class extends Transform {
 			}
 
 			// Write everything from <start> to <end>
-			if(startIndex !== 0 || endIndex !== chunk.length) {
+			if (startIndex !== 0 || endIndex !== chunk.length) {
 				this.push(chunk.slice(startIndex, endIndex));
 			}
 			else {
@@ -105,3 +105,5 @@ exports.InkscapeIsDumbTransform = class extends Transform {
 		next();
 	}
 }
+
+exports.InkscapeIsDumbTransform = InkscapeIsDumbTransform;
