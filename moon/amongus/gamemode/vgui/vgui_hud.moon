@@ -54,6 +54,8 @@ hud.SetTaskbarValue = (value) =>
 		@taskbar\SizeTo refW * value, refH, 2, 0.1
 
 hud.SetupButtons = (state, impostor) =>
+	localPlayerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
+
 	for _, v in ipairs @buttons\GetChildren!
 		v\Remove!
 
@@ -137,7 +139,7 @@ hud.SetupButtons = (state, impostor) =>
 				-- If there's a time limit, dock the timer to the right side.
 				if GAMEMODE\GetTimeLimit! > 0
 					with \Add "DLabel"
-						\SetWide ScrW! * 0.05
+						\SetWide ScrW! * 0.08
 						\Dock RIGHT
 						\SetText "..."
 						\SetContentAlignment 6
@@ -176,126 +178,100 @@ hud.SetupButtons = (state, impostor) =>
 
 							label\SetSize refW, refH
 
-	-- The task list.
-	@tasks = {}
-	with taskBox = @Add "DPanel"
-		margin = ScrH! * 0.015
-		\DockMargin margin, 0, 0, 0
-		\SetWide ScrW! * 0.35
-		\Dock LEFT
-		.Paint = ->
-
-		with \Add "DPanel"
-			\SetTall ScrH! * 0.05
-			margin = ScrH! * 0.02
-			\Dock TOP
-
-			text = tostring TRANSLATE if impostor
-				"hud.fakeTasks"
-			else
-				"hud.tasks"
-
-			text = "  #{text}  "
-
-			.Paint = (_, w, h) ->
-				surface.SetFont "NMW AU Taskbar"
-				tW = surface.GetTextSize text
-
-				surface.SetDrawColor 255, 255, 255, 16
-				surface.DrawRect 0, 0, tW, h
-
-				draw.SimpleTextOutlined text, "NMW AU Taskbar",
-					0, h/2, Color(255, 255, 255), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, Color(0, 0, 0, 64)
-
-		container = with \Add "DPanel"
-			\Dock FILL
+	if localPlayerTable
+		-- The task list.
+		@tasks = {}
+		with taskBox = @Add "DPanel"
+			margin = ScrH! * 0.015
+			\DockMargin margin, 0, 0, 0
+			\SetWide ScrW! * 0.35
+			\Dock LEFT
 			.Paint = ->
 
-			for taskName, task in pairs GAMEMODE.GameData.MyTasks
-				with \Add "DPanel"
-					\SetTall ScrH! * 0.04
-					\Dock TOP
+			with \Add "DPanel"
+				\SetTall ScrH! * 0.05
+				margin = ScrH! * 0.02
+				\Dock TOP
 
-					neutral = Color 255, 255, 255
-					completed = Color 0, 221, 0
-					progress = Color 255, 255, 0
+				text = tostring TRANSLATE if impostor
+					"hud.fakeTasks"
+				else
+					"hud.tasks"
 
-					.Paint = (_, w, h) ->
-						surface.SetDrawColor 255, 255, 255, 16
-						surface.DrawRect 0, 0, w, h
+				text = "  #{text}  "
 
-						if IsValid task.entity
-							timeout = (task.timeout or 0) - CurTime!
-							timeoutText = if timeout > 0
-								string.format " (%ds)", math.floor timeout
-							else
-								""
+				.Paint = (_, w, h) ->
+					surface.SetFont "NMW AU Taskbar"
+					tW = surface.GetTextSize text
 
-							area = TRANSLATE task.customArea or task.entity\GetArea!
-							name = TRANSLATE "task." .. ((task.customName or taskName) or "undefined")
+					surface.SetDrawColor 255, 255, 255, 16
+					surface.DrawRect 0, 0, tW, h
 
-							text = "  #{area}: #{name}"
-							if task.multiStep and not task.completed
-								text ..= " (#{(task.currentStep or 1) - 1}/#{task.maxSteps})"
+					draw.SimpleTextOutlined text, "NMW AU Taskbar",
+						0, h/2, Color(255, 255, 255), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, Color(0, 0, 0, 64)
 
-							color = if task.completed
-								completed
-							elseif task.currentStep > 1 or task.currentState > 1
-								progress
-							else
-								neutral
+			container = with \Add "DPanel"
+				\Dock FILL
+				.Paint = ->
 
-							draw.SimpleTextOutlined text .. timeoutText, "NMW AU Taskbar",
-								0, h/2, color, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, Color(0, 0, 0, 64)
+				for taskName, task in pairs GAMEMODE.GameData.MyTasks
+					with \Add "DPanel"
+						\SetTall ScrH! * 0.04
+						\Dock TOP
 
-	-- Use/report button. Content-aware.
-	with @use = vgui.Create "DPanel", @buttons
-		\SetWide @buttons\GetTall!
-		\DockMargin 0, 0, ScreenScale(5), 0
-		\Dock RIGHT
+						neutral = Color 255, 255, 255
+						completed = Color 0, 221, 0
+						progress = Color 255, 255, 0
 
-		.Think = =>
-			if IsValid GAMEMODE.UseHighlight
-				\SetAlpha 255
-			else
-				\SetAlpha 32
+						.Paint = (_, w, h) ->
+							surface.SetDrawColor 255, 255, 255, 16
+							surface.DrawRect 0, 0, w, h
 
-		.Paint = (_, w, h) ->
-			mat = if IsValid(GAMEMODE.UseHighlight) and 0 ~= GAMEMODE.UseHighlight\GetNW2Int "NMW AU PlayerID"
-				MAT_BUTTONS.report
-			else
-				MAT_BUTTONS.use
+							if IsValid task.entity
+								timeout = (task.timeout or 0) - CurTime!
+								timeoutText = if timeout > 0
+									string.format " (%ds)", math.floor timeout
+								else
+									""
 
-			-- Like, jesus christ man.
-			surface.SetDrawColor COLOR_BTN
-			surface.SetMaterial mat
+								area = TRANSLATE task.customArea or task.entity\GetArea!
+								name = TRANSLATE "task." .. ((task.customName or taskName) or "undefined")
 
-			render.PushFilterMag TEXFILTER.ANISOTROPIC
-			render.PushFilterMin TEXFILTER.ANISOTROPIC
-			surface.DrawTexturedRect 0, 0, w, h
-			render.PopFilterMag!
-			render.PopFilterMin!
+								text = "  #{area}: #{name}"
+								if task.multiStep and not task.completed
+									text ..= " (#{(task.currentStep or 1) - 1}/#{task.maxSteps})"
 
-	-- Kill button for imposerts. Content-aware.
-	if impostor
-		with @kill = vgui.Create "DPanel", @buttons
+								color = if task.completed
+									completed
+								elseif task.currentStep > 1 or task.currentState > 1
+									progress
+								else
+									neutral
+
+								draw.SimpleTextOutlined text .. timeoutText, "NMW AU Taskbar",
+									0, h/2, color, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, Color(0, 0, 0, 64)
+
+		-- Use/report button. Content-aware.
+		with @use = vgui.Create "DPanel", @buttons
 			\SetWide @buttons\GetTall!
 			\DockMargin 0, 0, ScreenScale(5), 0
 			\Dock RIGHT
 
 			.Think = =>
-				color = if GAMEMODE.GameData.KillCooldown >= CurTime!
-					\SetAlpha 32
-				elseif IsValid(GAMEMODE.KillHighlight) and not GAMEMODE.GameData.Imposters[GAMEMODE.KillHighlight]
+				if IsValid GAMEMODE.UseHighlight
 					\SetAlpha 255
 				else
 					\SetAlpha 32
 
-
 			.Paint = (_, w, h) ->
-				-- Honestly I wish I had a wrapper for this kind of monstrosities.
+				mat = if IsValid(GAMEMODE.UseHighlight) and 0 ~= GAMEMODE.UseHighlight\GetNW2Int "NMW AU PlayerID"
+					MAT_BUTTONS.report
+				else
+					MAT_BUTTONS.use
+
+				-- Like, jesus christ man.
 				surface.SetDrawColor COLOR_BTN
-				surface.SetMaterial MAT_BUTTONS.kill
+				surface.SetMaterial mat
 
 				render.PushFilterMag TEXFILTER.ANISOTROPIC
 				render.PushFilterMin TEXFILTER.ANISOTROPIC
@@ -303,25 +279,50 @@ hud.SetupButtons = (state, impostor) =>
 				render.PopFilterMag!
 				render.PopFilterMin!
 
-				if GAMEMODE.GameData.KillCooldownOverride or (GAMEMODE.GameData.KillCooldown and GAMEMODE.GameData.KillCooldown >= CurTime!)
-					text = if GAMEMODE.GameData.KillCooldownOverride
-						GAMEMODE.GameData.KillCooldownOverride
+		-- Kill button for imposerts. Content-aware.
+		if impostor
+			with @kill = vgui.Create "DPanel", @buttons
+				\SetWide @buttons\GetTall!
+				\DockMargin 0, 0, ScreenScale(5), 0
+				\Dock RIGHT
+
+				.Think = =>
+					color = if GAMEMODE.GameData.KillCooldown >= CurTime!
+						\SetAlpha 32
+					elseif IsValid(GAMEMODE.KillHighlight) and not GAMEMODE.GameData.Imposters[GAMEMODE.KillHighlight]
+						\SetAlpha 255
 					else
-						math.ceil(math.max(0, GAMEMODE.GameData.KillCooldown - CurTime!))
+						\SetAlpha 32
 
-					draw.DrawText string.format("%d", text),
-						"NMW AU Cooldown", w * 0.5, h * 0.15, Color(255,255,255,255), TEXT_ALIGN_CENTER
 
-	-- The player icon!
-	with @playerIcon = @buttons\Add "DPanel"
-		\SetWide @buttons\GetTall!
-		\Dock LEFT
+				.Paint = (_, w, h) ->
+					-- Honestly I wish I had a wrapper for this kind of monstrosities.
+					surface.SetDrawColor COLOR_BTN
+					surface.SetMaterial MAT_BUTTONS.kill
 
-		size = \GetWide!
-		circle = GAMEMODE.Render.CreateCircle size/2, size/2, size/2, 90
+					render.PushFilterMag TEXFILTER.ANISOTROPIC
+					render.PushFilterMin TEXFILTER.ANISOTROPIC
+					surface.DrawTexturedRect 0, 0, w, h
+					render.PopFilterMag!
+					render.PopFilterMin!
 
-		localPlayerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
-		if localPlayerTable
+					if GAMEMODE.GameData.KillCooldownOverride or (GAMEMODE.GameData.KillCooldown and GAMEMODE.GameData.KillCooldown >= CurTime!)
+						text = if GAMEMODE.GameData.KillCooldownOverride
+							GAMEMODE.GameData.KillCooldownOverride
+						else
+							math.ceil(math.max(0, GAMEMODE.GameData.KillCooldown - CurTime!))
+
+						draw.DrawText string.format("%d", text),
+							"NMW AU Cooldown", w * 0.5, h * 0.15, Color(255,255,255,255), TEXT_ALIGN_CENTER
+
+		-- The player icon!
+		with @playerIcon = @buttons\Add "DPanel"
+			\SetWide @buttons\GetTall!
+			\Dock LEFT
+
+			size = \GetWide!
+			circle = GAMEMODE.Render.CreateCircle size/2, size/2, size/2, 90
+
 			.Paint = ->
 				surface.SetAlphaMultiplier 0.8
 				surface.SetDrawColor localPlayerTable.color
@@ -366,14 +367,12 @@ hud.SetupButtons = (state, impostor) =>
 						.SetStencilFailOperation STENCIL_KEEP
 						.SetStencilZFailOperation STENCIL_KEEP
 
-					render.SetBlend if GAMEMODE.GameData.DeadPlayers[localPlayerTable]
-						blend = 0.5
+					\SetAlpha 255 * if GAMEMODE.GameData.DeadPlayers[localPlayerTable]
+						0.35
 					else
 						1
 
 					oldPaint _, w, h
-
-					render.SetBlend 1
 
 					render.SetStencilEnable false
 
