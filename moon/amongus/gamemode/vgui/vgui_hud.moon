@@ -192,38 +192,6 @@ hud.SetupButtons = (state, impostor) =>
 							draw.SimpleTextOutlined text .. timeoutText, "NMW AU Taskbar",
 								0, h/2, color, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, Color(0, 0, 0, 64)
 
-
-	-- Kill button for imposerts. Content-aware.
-	if impostor
-		with @kill = vgui.Create "DPanel", @buttons
-			\SetWide @buttons\GetTall!
-			\DockMargin 0, 0, ScreenScale(5), 0
-			\Dock RIGHT
-
-			.Think = =>
-				color = if GAMEMODE.KillCooldown >= CurTime!
-					\SetAlpha 32
-				elseif IsValid(GAMEMODE.KillHighlight) and not GAMEMODE.GameData.Imposters[GAMEMODE.KillHighlight]
-					\SetAlpha 255
-				else
-					\SetAlpha 32
-
-
-			.Paint = (_, w, h) ->
-				-- Honestly I wish I had a wrapper for this kind of monstrosities.
-				surface.SetDrawColor COLOR_BTN
-				surface.SetMaterial MAT_BUTTONS.kill
-
-				render.PushFilterMag TEXFILTER.ANISOTROPIC
-				render.PushFilterMin TEXFILTER.ANISOTROPIC
-				surface.DrawTexturedRect 0, 0, w, h
-				render.PopFilterMag!
-				render.PopFilterMin!
-
-				if GAMEMODE.KillCooldown and GAMEMODE.KillCooldown >= CurTime!
-					draw.DrawText string.format("%d", math.ceil(math.max(0, GAMEMODE.KillCooldown - CurTime!))),
-						"NMW AU Cooldown", w * 0.5, h * 0.15, Color(255,255,255,255), TEXT_ALIGN_CENTER
-
 	-- Use/report button. Content-aware.
 	with @use = vgui.Create "DPanel", @buttons
 		\SetWide @buttons\GetTall!
@@ -252,11 +220,47 @@ hud.SetupButtons = (state, impostor) =>
 			render.PopFilterMag!
 			render.PopFilterMin!
 
+	-- Kill button for imposerts. Content-aware.
+	if impostor
+		with @kill = vgui.Create "DPanel", @buttons
+			\SetWide @buttons\GetTall!
+			\DockMargin 0, 0, ScreenScale(5), 0
+			\Dock RIGHT
+
+			.Think = =>
+				color = if GAMEMODE.GameData.KillCooldown >= CurTime!
+					\SetAlpha 32
+				elseif IsValid(GAMEMODE.KillHighlight) and not GAMEMODE.GameData.Imposters[GAMEMODE.KillHighlight]
+					\SetAlpha 255
+				else
+					\SetAlpha 32
+
+
+			.Paint = (_, w, h) ->
+				-- Honestly I wish I had a wrapper for this kind of monstrosities.
+				surface.SetDrawColor COLOR_BTN
+				surface.SetMaterial MAT_BUTTONS.kill
+
+				render.PushFilterMag TEXFILTER.ANISOTROPIC
+				render.PushFilterMin TEXFILTER.ANISOTROPIC
+				surface.DrawTexturedRect 0, 0, w, h
+				render.PopFilterMag!
+				render.PopFilterMin!
+
+				if GAMEMODE.GameData.KillCooldownOverride or (GAMEMODE.GameData.KillCooldown and GAMEMODE.GameData.KillCooldown >= CurTime!)
+					text = if GAMEMODE.GameData.KillCooldownOverride
+						GAMEMODE.GameData.KillCooldownOverride
+					else
+						math.ceil(math.max(0, GAMEMODE.GameData.KillCooldown - CurTime!))
+
+					draw.DrawText string.format("%d", text),
+						"NMW AU Cooldown", w * 0.5, h * 0.15, Color(255,255,255,255), TEXT_ALIGN_CENTER
+
 	-- The player icon!
 	with @playerIcon = @buttons\Add "DPanel"
 		\SetWide @buttons\GetTall!
 		\Dock LEFT
-		
+
 		size = \GetWide!
 		circle = GAMEMODE.Render.CreateCircle size/2, size/2, size/2, 90
 
@@ -318,7 +322,7 @@ hud.SetupButtons = (state, impostor) =>
 					render.SetStencilEnable false
 
 					surface.DisableClipping true
-					draw.SimpleTextOutlined localPlayerTable.nickname or "", "NMW AU Taskbar", 
+					draw.SimpleTextOutlined localPlayerTable.nickname or "", "NMW AU Taskbar",
 						w/2, -size * 0.1, textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color 0, 0, 0, 220
 					surface.DisableClipping false
 
