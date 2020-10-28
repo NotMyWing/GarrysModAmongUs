@@ -49,45 +49,58 @@ GM.Player_SetDead = (playerTable) =>
 -- @param victimTable Victim player table.
 -- @param attackerTable Attacker player table.
 GM.Player_Kill = (victimTable, attackerTable) =>
-	-- ho boy
-	if not ((@GameData.DeadPlayers[attackerTable]) or (@GameData.DeadPlayers[victimTable])) and
-		(@GameData.Imposters[attackerTable] and not @GameData.Imposters[victimTable]) and
-		(@GameData.KillCooldowns[attackerTable] >= CurTime!) or
-		(@GameData.KillCooldownRemainders[attackerTable])
-			return
+	-- Bail if one of the players is invalid. The game mode will handle the killing internally.
+	if not (IsValid(victimTable.entity) and IsValid(victimTable.entity))
+		return
 
-	if attackerTable
-		@Player_RefreshKillCooldown attackerTable
+	-- Bail if one of the players is dead.
+	if @GameData.DeadPlayers[attackerTable] or @GameData.DeadPlayers[victimTable]
+		return
 
-	if IsValid victimTable.entity
-		@Player_CloseTask victimTable
-		@Net_SendTaskClose victimTable
+	-- Bail if the attacker is not an imposter, or if the target is an imposter.
+	if not @GameData.Imposters[attackerTable] or @GameData.Imposters[victimTable]
+		return
 
-		with corpse = ents.Create "prop_ragdoll"
-			\SetPos victimTable.entity\GetPos!
-			\SetAngles victimTable.entity\GetAngles!
-			\SetModel victimTable.entity\GetModel!
-			\SetColor victimTable.entity\GetColor!
-			\SetCollisionGroup COLLISION_GROUP_DEBRIS_TRIGGER
-			\SetNW2Int "NMW AU PlayerID", victimTable.id
-			\SetUseType SIMPLE_USE
-			\Spawn!
-			\Activate!
-			\PhysWake!
-			if bone = \TranslatePhysBoneToBone 5
-				\ManipulateBoneScale bone, Vector 0, 0, 0
+	-- Bail if player has a cooldown.
+	if @GameData.KillCooldowns[attackerTable] > CurTime!
+		return
 
-			if IsValid attackerTable.entity
-				if phys = \GetPhysicsObject!
-					phys\SetVelocity (victimTable.entity\GetPos! - attackerTable.entity\GetPos!)\GetNormalized! * 250
+	-- Bail if the kill cooldown is paused
+	if @GameData.KillCooldownRemainders[attackerTable]
+		return
 
-				attackerTable.entity\SetPos victimTable.entity\GetPos!
+	-- Bail if the attacker is too far.
+	if (@BaseUseRadius * @ConVars.KillDistanceMod\GetFloat!) <
+		victimTable.entity\GetPos!\Distance attackerTable.entity\GetPos!
+		return
+
+	with corpse = ents.Create "prop_ragdoll"
+		\SetPos victimTable.entity\GetPos!
+		\SetAngles victimTable.entity\GetAngles!
+		\SetModel victimTable.entity\GetModel!
+		\SetColor victimTable.entity\GetColor!
+		\SetCollisionGroup COLLISION_GROUP_DEBRIS_TRIGGER
+		\SetNW2Int "NMW AU PlayerID", victimTable.id
+		\SetUseType SIMPLE_USE
+		\Spawn!
+		\Activate!
+		\PhysWake!
+		if bone = \TranslatePhysBoneToBone 5
+			\ManipulateBoneScale bone, Vector 0, 0, 0
+
+		if IsValid attackerTable.entity
+			if phys = \GetPhysicsObject!
+				phys\SetVelocity (victimTable.entity\GetPos! - attackerTable.entity\GetPos!)\GetNormalized! * 250
+
+			attackerTable.entity\SetPos victimTable.entity\GetPos!
 
 	@Player_SetDead victimTable
-	if IsValid attackerTable.entity
-		@Net_KillNotify attackerTable
-		if IsValid victimTable.entity
-			@Net_SendNotifyKilled victimTable, attackerTable
+	@Net_KillNotify attackerTable
+	@Player_RefreshKillCooldown attackerTable
+
+	@Net_SendNotifyKilled victimTable, attackerTable
+	@Player_CloseTask victimTable
+	@Net_SendTaskClose victimTable
 
 	@CheckWin!
 

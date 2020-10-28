@@ -146,6 +146,8 @@ GM.FlowSize = math.ceil math.log table.Count(GM.FlowTypes) + 1, 2
 
 GM.SplashScreenTime = 8
 
+GM.BaseUseRadius = 96
+
 GM.GetAlivePlayers = =>
 	players = {}
 
@@ -265,7 +267,7 @@ GM.TracePlayer = (ply) =>
 				table.insert killable, ent
 			elseif isUsable
 				nearestPoint = ent\NearestPoint startPos
-				if nearestPoint\Distance(ply\GetPos!) <= 96
+				if nearestPoint\Distance(ply\GetPos!) <= @BaseUseRadius
 					table.insert usable, ent
 
 	distSort_memo = {}
