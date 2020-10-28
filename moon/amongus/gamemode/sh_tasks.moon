@@ -51,6 +51,7 @@ if CLIENT
 			@HUD_CloseMap!
 
 			@Hud.TaskScreen = with taskClass\CreateVGUI data
+				\SetParent @Hud
 				\SetTaskName name
 else
 	taskBase = include "tasks/sv_base.lua"

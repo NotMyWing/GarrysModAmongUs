@@ -350,6 +350,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 				surface.PlaySound "au/task_inprogress.wav"
 			else
 				GAMEMODE\HUD_TrackTaskOnMap task.entity, false
+				GAMEMODE\HUD_CreateTaskCompletePopup!
 				surface.PlaySound "au/task_complete.wav"
 
 	--

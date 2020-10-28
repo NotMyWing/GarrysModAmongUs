@@ -140,6 +140,35 @@ GM.HUD_TrackTaskOnMap = (entity, track = true) =>
 			else
 				\UnTrack entity
 
+surface.CreateFont "NMW AU Task Complete", {
+	font: "Roboto"
+	size: ScrH! * 0.06
+	weight: 400
+	outline: true
+}
+
+GM.HUD_CreateTaskCompletePopup = =>
+	with @Hud\Add "DLabel"
+		\SetSize ScrW!, ScrH! * 0.08
+		\SetZPos 32000
+
+		\SetContentAlignment 5
+		\SetText tostring @Lang.GetEntryFunc "hud.taskComplete"
+		\SetFont "NMW AU Task Complete"
+		\SetColor Color 255, 255, 255
+
+		-- This is mandatory.
+		-- Otherwise the panel will get buried behind everything.
+		\MakePopup!
+		\SetMouseInputEnabled false
+		\SetKeyboardInputEnabled false
+
+		-- Animayshuns baby.
+		\SetPos 0, ScrH!
+		\MoveTo 0, ScrH! / 2 - \GetTall! / 2, 0.25, nil, nil, ->
+			\MoveTo 0, -\GetTall!, 0.25, 0.75, nil, ->
+				\Remove!
+
 CREW_LAYERS = {
 	Material "au/gui/meeting/crewmate1.png", "smooth"
 	Material "au/gui/meeting/crewmate2.png", "smooth"
