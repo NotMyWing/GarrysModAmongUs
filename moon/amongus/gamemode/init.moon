@@ -112,8 +112,7 @@ GM.Restart = =>
 		@Net_SendGameState ply, @GameState.Preparing
 
 GM.StartGame = =>
-	-- Don't start if not enough players.
-	if #player.GetAll! <= @ConVars.ImposterCount\GetInt! + 1
+	if #player.GetAll! - @ConVars.ImposterCount\GetInt! * 2 < 1
 		return
 
 	@CleanUp!
