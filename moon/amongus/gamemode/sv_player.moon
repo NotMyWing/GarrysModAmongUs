@@ -24,12 +24,22 @@ GM.Player_UnhideEveryone = =>
 -- @param playerTable Player table.
 GM.Player_SetDead = (playerTable) =>
 	if IsValid playerTable.entity
-		@Player_Hide playerTable.entity
-
 		color = playerTable.entity\GetColor!
 		color.a = 32
 		playerTable.entity\SetColor color
 		playerTable.entity\SetRenderMode RENDERMODE_TRANSCOLOR
+
+		-- Hide the player for alive players.
+		-- Unhide the player for dead players, and the other way around.
+		for _, otherPlayerTable in pairs @GameData.PlayerTables
+			if otherPlayerTable == playerTable or not IsValid(otherPlayerTable.entity)
+				continue
+
+			if @GameData.DeadPlayers[otherPlayerTable]
+				playerTable.entity\SetPreventTransmit otherPlayerTable.entity, false
+				otherPlayerTable.entity\SetPreventTransmit playerTable.entity, false
+			else
+				playerTable.entity\SetPreventTransmit otherPlayerTable.entity, true
 
 	@GameData.DeadPlayers[playerTable] = true
 
