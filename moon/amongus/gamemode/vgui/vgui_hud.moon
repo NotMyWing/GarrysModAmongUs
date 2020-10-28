@@ -61,6 +61,43 @@ hud.SetupButtons = (state, impostor) =>
 	@buttons\AlphaTo 255, 2
 
 	if state == GAMEMODE.GameState.Preparing
+		-- The convar list.
+		with @Add "DPanel"
+			m = ScrW! * 0.01
+			\DockMargin m, m, m, m
+			\SetWide ScrW! * 0.35
+			\Dock LEFT
+
+			white = Color 255, 255, 255
+			.Paint = ->
+				surface.SetFont "NMW AU Taskbar"
+				_, tH = surface.GetTextSize "A"
+
+				i = 0
+				for categoryId, category in ipairs GAMEMODE.ConVarsDisplay
+					for _, conVarTable in ipairs category.ConVars
+						type   = conVarTable[1]
+						conVar = conVarTable[2]
+						conVarName = conVar\GetName!
+
+						value = switch type
+							when "Int"
+								conVar\GetInt!
+							when "Time"
+								TRANSLATE("hud.cvar.time") conVar\GetInt!
+							when "String"
+								conVar\GetString!
+							when "Bool"
+								conVar\GetBool! and TRANSLATE("hud.cvar.enabled") or TRANSLATE("hud.cvar.disabled")
+							when "Mod"
+								"#{conVar\GetFloat!}x"
+						
+						if value
+							i += 1
+
+							draw.SimpleText "#{TRANSLATE("cvar." .. conVarName)}: #{value}", "NMW AU Taskbar",
+								0, (i - 1) * tH * 1.05 + (categoryId - 1) * tH * 1.05, white
+
 		return
 
 	-- The task bar. A clustertruck of panels.

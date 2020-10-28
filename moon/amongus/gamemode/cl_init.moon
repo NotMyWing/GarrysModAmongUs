@@ -8,6 +8,40 @@ include "sh_hooks.lua"
 include "sh_tasks.lua"
 include "tasks/shared.lua"
 
+cv = GM.ConVars
+
+GM.ConVarsDisplay = {
+	{
+		Name: "General"
+		ConVars: {
+			{ "Int"  , cv.ImposterCount   }
+			{ "Time" , cv.KillCooldown    }
+			{ "Time" , cv.TimeLimit       }
+			{ "Mod"  , cv.KillDistanceMod }
+		}
+	}
+	{
+		Name: "Meeting"
+		ConVars: {
+			{ "Int"  , cv.MeetingsPerPlayer }
+			{ "Time" , cv.MeetingCooldown   }
+			{ "Time" , cv.VoteTime          }
+			{ "Time" , cv.VotePreTime       }
+			{ "Time" , cv.VotePostTime      }
+			{ "Bool" , cv.ConfirmEjects     }
+		}
+	}
+	{
+		Name: "Tasks"
+		ConVars: {
+			{ "Int"  , cv.TasksShort  }
+			{ "Int"  , cv.TasksLong   }
+			{ "Int"  , cv.TasksCommon }
+			{ "Bool" , cv.TasksVisual }
+		}
+	}
+}
+
 hook.Add "InitPostEntity", "NMW AU Flash", ->
 	if not system.HasFocus!
 		system.FlashWindow!

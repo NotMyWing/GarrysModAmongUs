@@ -119,3 +119,28 @@ with GM.Lang\Get "en"
 	["hud.tasks"] = "Tasks:"
 	["hud.fakeTasks"] = "Fake Tasks:"
 	["hud.taskComplete"] = "Task Complete!"
+	["hud.cvar.disabled"] = "Disabled"
+	["hud.cvar.enabled"] = "Enabled"
+	["hud.cvar.time"] = "%d s."
+
+	cvars = {
+		au_imposter_count:   "Imposters"
+		au_kill_cooldown:    "Kill Cooldown"
+		au_time_limit:       "Time Limit"
+		au_killdistance_mod: "Kill Distance"
+
+		au_meeting_available: "Meetings per Player"
+		au_meeting_cooldown:  "Meeting Button Cooldown"
+		au_meeting_vote_time: "Voting Time"
+		au_meeting_vote_pre_time:  "Pre-Voting Time"
+		au_meeting_vote_post_time: "Post-Voting Time"
+		au_confirm_ejects:         "Confirm Ejects"
+
+		au_tasks_short:  "Short Tasks"
+		au_tasks_long:   "Long Tasks"
+		au_tasks_common: "Common Tasks"
+		au_tasks_enable_visual: "Visual Tasks"
+	}
+
+	for name, value in pairs cvars
+		["cvar.#{name}"] = value

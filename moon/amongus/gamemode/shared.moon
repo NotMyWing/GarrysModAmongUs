@@ -9,7 +9,7 @@ GM.Author 		= "NotMyWing and contributors, with assets by InnerSloth"
 GM.Email 		= "winwyv@gmail.com"
 GM.Website 		= "https://github.com/NotMyWing/GarrysModAmongUs"
 
-flags = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY, FCVAR_GAMEDLL
+flags = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_GAMEDLL
 
 --- Table of all ConVars the game mode is using.
 -- These are tracked and cannot be changed during the round.
