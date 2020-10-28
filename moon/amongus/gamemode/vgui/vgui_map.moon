@@ -9,7 +9,7 @@ MAT_ASSETS = {
 	close: Material "au/gui/closebutton.png", "smooth"
 }
 
-TRANSLATE = GM.Lang.GetEntryFunc
+TRANSLATE = GM.Lang.GetEntry
 
 return vgui.RegisterTable {
 	__color: Color 255, 255, 255
@@ -64,7 +64,7 @@ return vgui.RegisterTable {
 
 			.Think = ->
 				size = math.max \GetSize!
-			
+
 				for entity, element in pairs @__tracking
 					if IsValid(entity) and IsValid(element)
 						pos = entity\GetPos!
@@ -112,7 +112,7 @@ return vgui.RegisterTable {
 
 		if .BackgroundMaterial
 			@SetBackgroundMaterial .BackgroundMaterial
-		
+
 		if .Scale
 			@SetScale .Scale
 
@@ -151,7 +151,7 @@ return vgui.RegisterTable {
 		@SetPos 0, ScrH!
 		@MoveTo 0, 0, 0.2, nil, nil, ->
 			@__opening = false
-		
+
 		@SetAlpha 0
 		@AlphaTo 255, 0.1, 0.01
 

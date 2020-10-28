@@ -1,3 +1,7 @@
+--- All things netcode.
+-- Handles pretty much everything related to networking stuff between the server and clients.
+-- @module sv_net
+
 util.AddNetworkString "NMW AU Flow"
 
 --- Sends the game state update.
@@ -250,7 +254,7 @@ GM.Net_NotifyVent = (playerTable, reason, links) =>
 	net.Send playerTable.entity
 
 --- Notifies the player that he's tasked with a task and should open the VGUI.
--- @table playerTable The tasked crewmate.
+-- @param playerTable The tasked crewmate.
 -- @string name Name of the task.
 GM.Net_OpenTaskVGUI = (playerTable, name) =>
 	net.Start "NMW AU Flow"
@@ -261,8 +265,8 @@ GM.Net_OpenTaskVGUI = (playerTable, name) =>
 --- Updates the player with the new task data.
 -- Even if nothing has been visually changed, this creates a "beep" sound.
 -- The implementation of this method is currently atrocious.
--- @table playerTable The tasked crewmate.
--- @table taskInstance The task instance.
+-- @param playerTable The tasked crewmate.
+-- @param taskInstance The task instance.
 GM.Net_UpdateTaskData = (playerTable, taskInstance) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.TasksUpdateData, @FlowSize
@@ -295,12 +299,15 @@ GM.Net_BroadcastTaskClose = =>
 	net.Broadcast!
 
 --- Notifies the player that it's time to close their tasks.
+-- @param playerTable The tasked crewmate.
 GM.Net_SendTaskClose = (playerTable) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.TasksCloseVGUI, @FlowSize
 	net.Send playerTable.entity
 
 --- Notifies the player that he's dead.
+-- @param playerTable The killed.
+-- @param killerTable The killer.
 GM.Net_SendNotifyKilled = (playerTable, killerTable) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.NotifyKilled, @FlowSize
@@ -370,4 +377,6 @@ net.Receive "NMW AU Flow", (len, ply) ->
 
 				GAMEMODE\Player_SubmitTask playerTable, name
 
+--- Sets whether the game is in progress.
+-- @bool state You guessed it again.
 GM.SetGameInProgress = (state) => SetGlobalBool "NMW AU GameInProgress", state

@@ -1,4 +1,4 @@
-TRANSLATE = GM.Lang.GetEntryFunc
+TRANSLATE = GM.Lang.GetEntry
 
 surface.CreateFont "NMW AU Meeting Nickname", {
 	font: "Arial"
@@ -182,7 +182,7 @@ meeting.CreateConfirm = (height, id) =>
 			.DoClick = ->
 				surface.PlaySound "au/votescreen_lockin.wav"
 				@DisableAllButtons!
-				GAMEMODE\SendVote id
+				GAMEMODE\Net_SendVote id
 
 		-- No
 		with \Add "DImageButton"

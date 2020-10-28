@@ -3,3 +3,5 @@ moon/itc/
 gamemodes/**/*.lua
 downloaded/
 lua/
+
+doc

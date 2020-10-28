@@ -1,3 +1,7 @@
+--- All things player.
+-- Handles everything related to players, from hiding to killing and venting.
+-- @module sv_player
+
 --- Hides or unhides the player in question.
 -- This does in fact HIDE the player, preventing the server from
 -- transmitting his data to others completely.
@@ -217,7 +221,7 @@ GM.Player_UnVent = (playerTable) =>
 -- This will also fail if the player isn't tasked with the provided task.
 -- This will also fail if the button did not consent.
 -- Yes.
--- @table playerTable The tasked crewmate.
+-- @param playerTable The tasked crewmate.
 -- @string name Name of the task.
 GM.Player_StartTask = (playerTable, name) =>
 	task = (@GameData.Tasks[playerTable] or {})[name]
@@ -238,7 +242,7 @@ GM.Player_StartTask = (playerTable, name) =>
 			@Net_OpenTaskVGUI playerTable, name
 
 --- Closes the current task for the player.
--- @table playerTable The tasked crewmate.
+-- @param playerTable The tasked crewmate.
 GM.Player_CloseTask = (playerTable) =>
 	currentTask = @GameData.CurrentTask[playerTable]
 
@@ -250,7 +254,7 @@ GM.Player_CloseTask = (playerTable) =>
 --- Submits the current task. This function will fail
 -- if the player isn't actually doing any tasks at this moment,
 -- or if the current task doesn't math the provided one.
--- @table playerTable The tasked crewmate.
+-- @param playerTable The tasked crewmate.
 -- @string name Name of the task.
 GM.Player_SubmitTask = (playerTable, name) =>
 	task = (@GameData.Tasks[playerTable] or {})[name]

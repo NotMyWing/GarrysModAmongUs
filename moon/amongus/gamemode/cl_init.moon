@@ -14,7 +14,7 @@ hook.Add "InitPostEntity", "NMW AU Flash", ->
 
 key_num = (key) ->
 	if GAMEMODE.GameData.Vented
-		GAMEMODE\VentRequest key - 1
+		GAMEMODE\Net_VentRequest key - 1
 
 keyBinds = {
 	[KEY_Q]: ->
@@ -23,7 +23,7 @@ keyBinds = {
 				playerTable = .GameData.Lookup_PlayerByEntity[LocalPlayer!]
 
 				if .GameData.Imposters[playerTable] and IsValid(GAMEMODE.KillHighlight) and GAMEMODE.KillHighlight\IsPlayer!
-					\KillRequest .KillHighlight
+					\Net_KillRequest .KillHighlight
 
 	[KEY_1]: key_num
 	[KEY_2]: key_num

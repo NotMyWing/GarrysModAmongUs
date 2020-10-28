@@ -1,30 +1,50 @@
-GM.VentRequest = (vent) =>
+--- All things network.
+-- Responsible for sending and receiving information to/from the server.
+-- @module cl_net
+
+--- Tell the server that we want to hop to a different vent.
+-- This will do absolutely nothing if the player is not vented, or
+-- if he's not an imposter to begin with.
+-- The list of vents is provided by the server via the NotifyVent flow type.
+-- @int vent Target vent ID.
+GM.Net_VentRequest = (vent) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.VentRequest, @FlowSize
 	net.WriteUInt vent, 8
 	net.SendToServer!
 
-GM.KillRequest = (ply) =>
+--- Tell the server that we want to kill a person.
+-- @param ply The person to be killed.
+GM.Net_KillRequest = (ply) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.KillRequest, @FlowSize
 	net.WriteEntity ply
 	net.SendToServer!
 
-GM.SendVote = (plyid) =>
+--- Sends a vote to the server.
+-- This will fail horribly if there isn't a vote in progress.
+-- @param id ID. Zero to skip.
+GM.Net_SendVote = (id) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.MeetingVote, @FlowSize
-	net.WriteBool not plyid
-	if plyid
-		net.WriteUInt plyid, 8
+	net.WriteBool not id
+	if id
+		net.WriteUInt id, 8
 
 	net.SendToServer!
 
+--- Notifies the server that the task has been completed.
+-- This will fail horribly if the player isn't doing the task.
+-- @param name Task name.
 GM.Net_SendSubmitTask = (name) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.TasksSubmit, @FlowSize
 	net.WriteString name
 	net.SendToServer!
 
+--- Notifies the server that the task window has been closed.
+-- This will fail horribly if the player isn't doing the task.
+-- @param name Task name.
 GM.Net_SendCloseTask = (name) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.TasksCloseVGUI, @FlowSize
@@ -84,7 +104,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		GAMEMODE.GameData.TotalTasks = net.ReadUInt 8
 
 		-- Reset the HUD and display the splash.
-		GAMEMODE\HUDReset!
+		GAMEMODE\HUD_Reset!
 		GAMEMODE\HUD_DisplayShush!
 
 		-- Read our tasks.
@@ -146,7 +166,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	--
 	when GAMEMODE.FlowTypes.KillRequest
 		surface.PlaySound "au/impostor_kill.wav"
-		GAMEMODE\Blink 0.1, 0, 0
+		GAMEMODE\HUD_Blink 0.1, 0, 0
 
 	--
 	-- Pretty self-descriptive.
@@ -155,7 +175,8 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		GAMEMODE.KillCooldown = net.ReadDouble!
 
 	--
-	-- Display a countdown.
+	-- Notifies us that we've vented.
+	-- This includes getting into, out or hopping between the vents.
 	--
 	when GAMEMODE.FlowTypes.NotifyVent
 		reason = net.ReadUInt 4
@@ -181,9 +202,9 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 			for i = 1, count
 				table.insert links, net.ReadString!
 
-			GAMEMODE\HUDShowVents links
+			GAMEMODE\HUD_ShowVents links
 
-		GAMEMODE\Blink 0.35, nil, 0
+		GAMEMODE\HUD_Blink 0.35, nil, 0
 
 	--
 	-- Play a fake player venting animation.
@@ -284,7 +305,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		switch state
 			when GAMEMODE.GameState.Preparing
 				GAMEMODE\PurgeGameData!
-				GAMEMODE\HUDReset!
+				GAMEMODE\HUD_Reset!
 
 				GAMEMODE.Hud\SetupButtons state
 			else
@@ -359,7 +380,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	when GAMEMODE.FlowTypes.TasksUpdateCount
 		GAMEMODE.GameData.CompletedTasks = net.ReadUInt 8
 
-		GAMEMODE\HUD_UpdateTaskAmount!
+		GAMEMODE\HUD_UpdateTaskAmount GAMEMODE.GameData.CompletedTasks / GAMEMODE.GameData.TotalTasks
 
 	--
 	-- The server wants us to close the task screen.

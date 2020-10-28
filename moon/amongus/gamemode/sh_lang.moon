@@ -1,3 +1,6 @@
+--- Shared module using for localizing strings.
+-- @module sh_lang
+
 entryMeta = {
 	__call: (...) => @.__entry ...
 	__tostring: =>
@@ -17,13 +20,40 @@ entryMeta = {
 NIL = { __entry: -> }
 setmetatable NIL, entryMeta
 
+GMOD_LANGUAGE = GetConVar "gmod_language"
+
 GM.Lang or= {
+	--- Returns the database specific to the language in question.
+	-- This is used for defining i18n entries.
+	--
+	-- @param lang Language.
 	Get: (lang) =>
 		@__database[lang] or= {}
 		return @__database[lang]
 
-	GetEntryFunc: (entry, lang = "en") ->
+	--- Fetches a translation entry.
+	-- An entry is a metatable wrapper around the actual entry in the database.
+	--
+	-- A returned entry is callable. However, you can also just pass it to `tostring`.
+	-- This is useful for quick localizations if the entry doesn't expect any inputs.
+	--
+	-- If the internal entry is a string, this function creates a wrapper around it,
+	-- automatically calling `string.format` so you don't have to.
+	--
+	-- If the input is nil or an empty string, the wrapped entry will return "Unknown".
+	--
+	-- The result of this function is lazily cached.
+	--
+	-- @param entry Database entry.
+	-- @param lang Optional language. Defaults to `gmod_language` on the client realm, and to "en" on the server realm.
+	GetEntry: (entry, lang) ->
 		@ = GAMEMODE.Lang
+
+		if lang == nil
+			if SERVER
+				lang = "en"
+			else
+				lang = GMOD_LANGUAGE\GetString!
 
 		if entry == nil or entry == ""
 			return NIL

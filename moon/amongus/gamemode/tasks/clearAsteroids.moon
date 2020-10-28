@@ -6,7 +6,7 @@ taskTable = {
 }
 
 if CLIENT
-	TRANSLATE = GM.Lang.GetEntryFunc
+	TRANSLATE = GM.Lang.GetEntry
 
 	SOUNDS = {
 		hit: ["au/panel_weaponhit#{i}.wav" for i = 1, 3]

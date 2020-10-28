@@ -1,4 +1,4 @@
-TRANSLATE = GM.Lang.GetEntryFunc
+TRANSLATE = GM.Lang.GetEntry
 
 surface.CreateFont "NMW AU Vent Text", {
 	font: "Arial"

@@ -1,4 +1,3 @@
-
 skipPlaceholder = { id: 0 }
 
 GM.Meeting_Start = (ply, bodyColor) =>

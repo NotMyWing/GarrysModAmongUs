@@ -1,3 +1,9 @@
+--- All things render.
+-- Handles the rendering of default Source UI elements.
+-- Draws halos and nicknames.
+-- Exposes helpful functions.
+-- @module cl_render
+
 GM.Render = {}
 
 fitImage = (material, w, h) ->
@@ -15,6 +21,12 @@ fitImage = (material, w, h) ->
 
 	return w, h
 
+--- Helper function that attemps to fit the specified material into given bounds.
+--
+-- Makes it possible not to hard-code aspect ratios everywhere.
+-- @param material The material to fit.
+-- @param width Container width.
+-- @param height Container height.
 GM.Render.FitMaterial = fitImage
 
 GM.Render.DermaFitImage = (w, h) =>
@@ -100,11 +112,7 @@ hook.Add "PostDrawTranslucentRenderables", "NMW AU Nicknames", (depth, skybox) -
 	if skybox
 		return
 
-	players = player.GetAll!
-
-	export distSort_memo = {}
-	export distSort_player = LocalPlayer!
-	table.sort players, distSort
+	players = GAMEMODE.Util.SortByDistance player.GetAll!, LocalPlayer!
 
 	aply = GAMEMODE.GameData.Lookup_PlayerByEntity and GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
 	for _, ply in ipairs players

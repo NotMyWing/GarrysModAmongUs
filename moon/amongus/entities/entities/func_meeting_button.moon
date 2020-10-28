@@ -42,7 +42,7 @@ ENT.KeyValue = (key, value) =>
 		self.Model = value
 
 if CLIENT
-	TRANSLATE = GAMEMODE.Lang.GetEntryFunc
+	TRANSLATE = GAMEMODE.Lang.GetEntry
 
 	ENT.Draw = =>
 		@DrawModel!

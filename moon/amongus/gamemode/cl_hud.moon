@@ -1,3 +1,7 @@
+--- Player HUD module.
+-- Interfaces the HUD things. Responsible for everything Derma-related.
+-- @module cl_hud
+
 VGUI_HUD = include "vgui/vgui_hud.lua"
 VGUI_MEETING = include "vgui/vgui_meeting.lua"
 VGUI_EJECT = include "vgui/vgui_eject.lua"
@@ -17,10 +21,14 @@ surface.CreateFont "NMW AU Button Tooltip", {
 	outline: true
 }
 
-GM.Blink = (duration = 1, delay, pre) =>
+--- Makes the player's screen fade in and out.
+-- @param duration Duration. One second by default.
+GM.HUD_Blink = (duration = 1, delay, pre) =>
 	vgui.CreateFromTable(VGUI_BLINK)\Blink duration, delay, pre
 
-GM.HUDShowVents = (vents) =>
+--- Displays a small vent UI for the vented player.
+-- @param vents A table of vents.
+GM.HUD_ShowVents = (vents) =>
 	if IsValid @Hud
 		if IsValid @Hud.Vents
 			@Hud.Vents\Remove!
@@ -28,7 +36,10 @@ GM.HUDShowVents = (vents) =>
 		@Hud.Vents = with vgui.CreateFromTable(VGUI_VENT)
 			\ShowVents vents
 
-GM.HUDReset = =>
+--- Resets and re-creates the HUD.
+-- You should NOT call this, this WILL break everything horribly.
+-- This is used by the game mode for resetting the HUD between the rounds.
+GM.HUD_Reset = =>
 	if IsValid(@Hud) and IsValid(@Hud.TaskScreen)
 		@Hud.TaskScreen\Close!
 
@@ -41,14 +52,22 @@ GM.HUDReset = =>
 	if @MapManifest
 		@HUD_InitializeMap!
 
-GM.HUD_UpdateTaskAmount = =>
+--- Updates the task bar value.
+-- @param value Value. [0..1]
+GM.HUD_UpdateTaskAmount = (value) =>
 	if IsValid @Hud
-		@Hud\SetTaskbarValue GAMEMODE.GameData.CompletedTasks / GAMEMODE.GameData.TotalTasks
+		@Hud\SetTaskbarValue value
 
+--- Hides the current task screen.
+-- Does absolutely nothing if there are no task screens shown.
 GM.HUD_HideTaskScreen = =>
 	if IsValid(@Hud) and IsValid(@Hud.TaskScreen)
 		@Hud.TaskScreen\Close!
 
+--- Opens the meeting screen.
+-- Plays the emergency meeting/body report animation.
+-- @param caller The vote caller.
+-- @param bodyColor Optional body color.
 GM.HUD_DisplayMeeting = (caller, bodyColor) =>
 	if IsValid @Hud
 		if IsValid @Hud.Meeting
@@ -59,7 +78,16 @@ GM.HUD_DisplayMeeting = (caller, bodyColor) =>
 		@Hud.Meeting = with vgui.CreateFromTable VGUI_MEETING, @Hud
 			\StartEmergency caller, bodyColor
 
-GM.HUD_DisplayEject = (reason, ply, confirm, imposter, remaining, total) =>
+--- Ejects the person.
+-- damn that's a lot of inputs
+-- @see shared.EjectReason
+-- @param reason Eject reason.
+-- @param playerTable Ejected player. PlayerTable.
+-- @param confirm Are confirms enabled?
+-- @param imposter If confirms are enabled, was this person an imposter?
+-- @param remaining If confirms are enabled, how many imposters left?
+-- @param total If confirms are enabled, how many imposters there are total?
+GM.HUD_DisplayEject = (reason, playerTable, confirm, imposter, remaining, total) =>
 	if IsValid @Hud
 		if IsValid @Hud.Eject
 			@Hud.Meeting\Remove!
@@ -67,8 +95,11 @@ GM.HUD_DisplayEject = (reason, ply, confirm, imposter, remaining, total) =>
 		@HUD_CloseMap!
 
 		@Hud.Eject = with vgui.CreateFromTable VGUI_EJECT, @Hud
-			\Eject reason, ply, confirm, imposter, remaining, total
+			\Eject reason, playerTable, confirm, imposter, remaining, total
 
+--- Displays the game over screen.
+-- @see shared.GameOverReason
+-- @param reason Game over reason.
 GM.HUD_DisplayGameOver = (reason) =>
 	if IsValid @Hud
 		@HUD_CloseMap!
@@ -76,13 +107,17 @@ GM.HUD_DisplayGameOver = (reason) =>
 		@Hud.Splash = with vgui.CreateFromTable VGUI_SPLASH, @Hud
 			\DisplayGameOver reason
 
-GM.HUD_DisplayShush = (reason) =>
+--- Displays the shush screen.
+GM.HUD_DisplayShush = =>
 	if IsValid @Hud
 		@HUD_CloseMap!
 
 		@Hud.Splash = with vgui.CreateFromTable VGUI_SPLASH, @Hud
 			\DisplayShush!
 
+--- Displays the death animation.
+-- @param killer The killer.
+-- @param victim The killed.
 GM.HUD_PlayKill = (killer, victim) =>
 	if IsValid @Hud
 		if IsValid @Hud.Kill
@@ -93,6 +128,9 @@ GM.HUD_PlayKill = (killer, victim) =>
 		@Hud.Kill = with vgui.CreateFromTable VGUI_KILL, @Hud
 			\Kill killer, victim
 
+--- Opens the map. Simple as that.
+-- Doesn't open anything if something else is on the screen.
+-- @return Has the map been opened?
 GM.HUD_OpenMap = =>
 	if IsValid @Hud.Meeting
 		return
@@ -111,12 +149,16 @@ GM.HUD_OpenMap = =>
 
 		return true
 
+--- Closes the map. Simple as that.
 GM.HUD_CloseMap = =>
 	if IsValid(GAMEMODE.Hud) and IsValid(GAMEMODE.Hud.Map)
 		GAMEMODE.Hud.Map\Close!
 
 MAT_TASK = Material "au/gui/maps/task.png", "smooth"
 
+--- Starts or stops tracking a task button on the map.
+-- @param entity Task button to track.
+-- @param track Optional. Pass `false` to stop tracking.
 GM.HUD_TrackTaskOnMap = (entity, track = true) =>
 	if IsValid(@Hud) and IsValid(@Hud.Map)
 		with @Hud.Map
@@ -147,13 +189,15 @@ surface.CreateFont "NMW AU Task Complete", {
 	outline: true
 }
 
+--- Creates a "Task Complete!" popup.
+-- Animates it going from the bottom of the screen all the way to the top.
 GM.HUD_CreateTaskCompletePopup = =>
 	with @Hud\Add "DLabel"
 		\SetSize ScrW!, ScrH! * 0.08
 		\SetZPos 32000
 
 		\SetContentAlignment 5
-		\SetText tostring @Lang.GetEntryFunc "hud.taskComplete"
+		\SetText tostring @Lang.GetEntry "hud.taskComplete"
 		\SetFont "NMW AU Task Complete"
 		\SetColor Color 255, 255, 255
 
@@ -202,7 +246,7 @@ GM.HUD_InitializeMap = =>
 			\Track LocalPlayer!, player
 
 hook.Add "Initialize", "Init Hud", ->
-	GAMEMODE\HUDReset!
+	GAMEMODE\HUD_Reset!
 
 ASSETS = {
 	btn: Material "au/gui/button.png", "smooth"

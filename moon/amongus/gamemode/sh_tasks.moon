@@ -1,3 +1,7 @@
+--- Shared module using for localizing strings.
+-- @module sh_tasks
+
+--- Enum of all task types available in the game mode.
 GM.TaskType = {
 	Short: 1
 	Long: 2
@@ -14,7 +18,7 @@ GM.TaskCollection.Common or= {}
 GM.TaskCollection.All    or= {}
 
 --- Registers a task.
--- @table taskTable Task table. See default tasks for examples.
+-- @param taskTable Task table. See default tasks for examples.
 GM.Task_Register = (taskTable = {}) =>
 	with taskTable
 		if not .Name
@@ -43,7 +47,7 @@ GM.Task_Register = (taskTable = {}) =>
 if CLIENT
 	--- Opens the task VGUI.
 	-- @string name Task name.
-	-- @table data Task data. Normally this should be GAMEMODE.GameData.MyTasks[name].
+	-- @param data Task data. Normally this should be GAMEMODE.GameData.MyTasks[name].
 	GM.Task_OpenTaskVGUI = (name, data) =>
 		taskClass = @TaskCollection.All[name]
 
