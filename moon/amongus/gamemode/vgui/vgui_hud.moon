@@ -252,6 +252,76 @@ hud.SetupButtons = (state, impostor) =>
 			render.PopFilterMag!
 			render.PopFilterMin!
 
+	-- The player icon!
+	with @playerIcon = @buttons\Add "DPanel"
+		\SetWide @buttons\GetTall!
+		\Dock LEFT
+		
+		size = \GetWide!
+		circle = GAMEMODE.Render.CreateCircle size/2, size/2, size/2, 90
+
+		localPlayerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
+		if localPlayerTable
+			.Paint = ->
+				surface.SetAlphaMultiplier 0.8
+				surface.SetDrawColor localPlayerTable.color
+				draw.NoTexture!
+				surface.DrawPoly circle
+				surface.SetAlphaMultiplier 1
+
+			with \Add "DModelPanel"
+				\Dock FILL
+				\SetModel LocalPlayer!\GetModel!
+				\SetColor localPlayerTable.color
+				\SetFOV 36
+				\SetCamPos \GetCamPos! - Vector 0, 0, 18
+				with \GetEntity!
+					\SetAngles Angle 0, 45, 0
+					\SetPos \GetPos! - Vector 0, 0, 4
+				.LayoutEntity = ->
+
+				textColor = if GAMEMODE.GameData.Imposters[localPlayerTable]
+					Color 255, 32, 32
+				else
+					Color 255, 255, 255
+
+				oldPaint = .Paint
+				.Paint = (_, w, h) ->
+					-- le old huge chunk of stencil code. shall we?
+					with render
+						.ClearStencil!
+
+						.SetStencilEnable true
+						.SetStencilTestMask 0xFF
+						.SetStencilWriteMask 0xFF
+						.SetStencilReferenceValue 0x01
+
+						.SetStencilCompareFunction STENCIL_NEVER
+						.SetStencilFailOperation STENCIL_REPLACE
+						.SetStencilZFailOperation STENCIL_REPLACE
+
+						surface.DrawPoly circle
+
+						.SetStencilCompareFunction STENCIL_LESSEQUAL
+						.SetStencilFailOperation STENCIL_KEEP
+						.SetStencilZFailOperation STENCIL_KEEP
+
+					render.SetBlend if GAMEMODE.GameData.DeadPlayers[localPlayerTable]
+						blend = 0.5
+					else
+						1
+
+					oldPaint _, w, h
+
+					render.SetBlend 1
+
+					render.SetStencilEnable false
+
+					surface.DisableClipping true
+					draw.SimpleTextOutlined localPlayerTable.nickname or "", "NMW AU Taskbar", 
+						w/2, -size * 0.1, textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color 0, 0, 0, 220
+					surface.DisableClipping false
+
 --- Displays a countdown.
 -- @param time Target time.
 hud.Countdown = (time) =>
