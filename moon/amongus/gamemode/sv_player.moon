@@ -29,7 +29,7 @@ GM.Player_UnhideEveryone = =>
 GM.Player_SetDead = (playerTable) =>
 	if IsValid playerTable.entity
 		color = playerTable.entity\GetColor!
-		color.a = 32
+		color.a = 90
 		playerTable.entity\SetColor color
 		playerTable.entity\SetRenderMode RENDERMODE_TRANSCOLOR
 
