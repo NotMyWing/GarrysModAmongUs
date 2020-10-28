@@ -6,18 +6,7 @@ if CLIENT
 	--- Creates a circle polygon.
 	-- Straight from the GMod wiki because I'm lazy.
 	-- And... copied from elsewhere.
-	circle = ( x, y, radius, seg ) ->
-		cir = {}
-
-		table.insert( cir, { :x, :y, u: 0.5, u: 0.5 } )
-		for i = 0, seg
-			a = math.rad( ( i / seg ) * -360 )
-			table.insert( cir, { x: x + math.sin( a ) * radius, y: y + math.cos( a ) * radius, u: math.sin( a ) / 2 + 0.5, v: math.cos( a ) / 2 + 0.5 } )
-
-		a = math.rad( 0 )
-		table.insert( cir, { x: x + math.sin( a ) * radius, y: y + math.cos( a ) * radius, u: math.sin( a ) / 2 + 0.5, v: math.cos( a ) / 2 + 0.5 } )
-
-		return cir
+	circle = GM.Render.CreateCircle
 
 	taskTable.CreateVGUI = (task) =>
 		state = task.currentState

@@ -110,20 +110,6 @@ meeting.PlayBackground = (callback) =>
 				surface.DisableClipping false
 			cam.PopModelMatrix!
 
---- Creates a circle polygon.
--- Straight from the GMod wiki because I'm lazy.
-circle = ( x, y, radius, seg ) ->
-	cir = {}
-
-	table.insert( cir, { :x, :y, u: 0.5, u: 0.5 } )
-	for i = 0, seg
-		a = math.rad( ( i / seg ) * -360 )
-		table.insert( cir, { x: x + math.sin( a ) * radius, y: y + math.cos( a ) * radius, u: math.sin( a ) / 2 + 0.5, v: math.cos( a ) / 2 + 0.5 } )
-
-	a = math.rad( 0 )
-	table.insert( cir, { x: x + math.sin( a ) * radius, y: y + math.cos( a ) * radius, u: math.sin( a ) / 2 + 0.5, v: math.cos( a ) / 2 + 0.5 } )
-
-	return cir
 
 CREW_LAYERS = {
 	Material "au/gui/meeting/crewmate1.png", "smooth"
@@ -564,7 +550,7 @@ meeting.OpenDiscuss = (caller) =>
 
 		.Paint = (_, w, h) ->
 			if not _.circle
-				_.circle = circle w/2, w/2, w*0.498, 64
+				_.circle = GAMEMODE.Render.CreateCircle w/2, w/2, w*0.498, 64
 
 			surface.SetMaterial MAT_DISCUSS.bg
 			surface.SetDrawColor Color 255, 255, 255
