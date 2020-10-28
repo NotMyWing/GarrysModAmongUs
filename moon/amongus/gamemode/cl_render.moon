@@ -96,7 +96,10 @@ hook.Add "PreDrawHalos", "NMW AU Highlight", ->
 color_crew = Color(255, 255, 255)
 color_imposter = Color(255, 0, 0)
 
-hook.Add "PostDrawOpaqueRenderables", "NMW AU Nicknames", ->
+hook.Add "PostDrawTranslucentRenderables", "NMW AU Nicknames", (depth, skybox) ->
+	if skybox
+		return
+
 	players = player.GetAll!
 
 	export distSort_memo = {}
