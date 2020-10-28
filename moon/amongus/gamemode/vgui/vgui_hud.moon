@@ -105,7 +105,7 @@ hud.SetupButtons = (state, impostor) =>
 						\SetColor Color 255, 255, 255
 						\SetZPos 1
 						\SetFont "NMW AU Taskbar"
-						\SetText "  " .. TRANSLATE "tasks.total_completed"
+						\SetText "  " .. TRANSLATE "tasks.totalCompleted"
 
 					with @taskbar = \Add "DPanel"
 						taskBarInnerColor = Color 68, 216, 68

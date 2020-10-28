@@ -1,11 +1,11 @@
 with GM.Lang\Get "en"
-	["tasks.total_completed"] = "TOTAL TASKS COMPLETED"
+	["tasks.totalCompleted"] = "TOTAL TASKS COMPLETED"
 
 	areas = {
 		["cafeteria"]:      "Cafeteria"
-		["upper_engine"]:   "Upper Engine"
+		["upperEngine"]:   "Upper Engine"
 		["reactor"]:        "Reactor"
-		["lower_engine"]:   "Lower Engine"
+		["lowerEngine"]:   "Lower Engine"
 		["security"]:       "Security"
 		["electrical"]:     "Electrical"
 		["medbay"]:         "Medbay"
@@ -48,7 +48,7 @@ with GM.Lang\Get "en"
 	for task, taskName in pairs taskNames
 		["task.#{task}"] = taskName
 
-	["meeting_button.cooldown"] = (time) -> {
+	["meetingButton.cooldown"] = (time) -> {
 		{
 			text: "Crewmates Must Wait"
 		}, {
@@ -59,7 +59,7 @@ with GM.Lang\Get "en"
 		}
 	}
 
-	["meeting_button.default"] = (nickname, uses) -> {
+	["meetingButton.default"] = (nickname, uses) -> {
 		{
 			text: string.format "Crewmember %s Has", nickname
 		}, {

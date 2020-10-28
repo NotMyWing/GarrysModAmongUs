@@ -65,9 +65,9 @@ if CLIENT
 
 		time = GetGlobalFloat("NMW AU NextMeeting") - CurTime!
 		lines = if time > 0
-			TRANSLATE("meeting_button.cooldown") math.floor time
+			TRANSLATE("meetingButton.cooldown") math.floor time
 		else
-			TRANSLATE("meeting_button.default") LocalPlayer!\Nick!, LocalPlayer!\GetNW2Int "NMW AU Meetings"
+			TRANSLATE("meetingButton.default") LocalPlayer!\Nick!, LocalPlayer!\GetNW2Int "NMW AU Meetings"
 
 		surface.SetFont( "NMW AU Meeting Button" )
 		_, tH = surface.GetTextSize "A"

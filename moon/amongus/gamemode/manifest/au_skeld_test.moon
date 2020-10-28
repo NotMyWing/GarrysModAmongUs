@@ -37,11 +37,11 @@
 					}
 					{
 						Position: Vector 150/1024, 90/1024, 0
-						Text: "area.upper_engine"
+						Text: "area.upperEngine"
 					}
 					{
 						Position: Vector 150/1024, 375/1024, 0
-						Text: "area.lower_engine"
+						Text: "area.lowerEngine"
 					}
 					{
 						Position: Vector 730/1024, 90/1024, 0
