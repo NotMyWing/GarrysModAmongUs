@@ -149,6 +149,7 @@ GM.Colors = {
 -- @field TasksCloseVGUI 20
 -- @field TasksUpdateCount 21
 -- @field NotifyKilled 22
+-- @field KillCooldownPause 23
 GM.FlowTypes = {
 	GameStart: 1
 	Countdown: 2
@@ -172,6 +173,7 @@ GM.FlowTypes = {
 	TasksCloseVGUI: 20
 	TasksUpdateCount: 21
 	NotifyKilled: 22
+	KillCooldownPause: 23
 }
 
 GM.FlowSize = math.ceil math.log table.Count(GM.FlowTypes) + 1, 2

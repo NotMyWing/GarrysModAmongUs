@@ -207,15 +207,12 @@ GM.Net_UpdateKillCooldown = (playerTable, cd) =>
 -- @param playerTable An imposter.
 -- @param pause Has the cooldown been paused?
 -- @param remainder If the cooldown has been paused, send the remaining time.
-GM.Net_PauseKillCooldown = (playerTable, pause, remainder) =>
+GM.Net_PauseKillCooldown = (playerTable, remainder) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.KillCooldownPause, @FlowSize
-	net.WriteBool pause
+	net.WriteDouble remainder
 
-	if not pause
-		net.WriteDouble remainder
-
-	net.Send ply.entity
+	net.Send playerTable.entity
 
 --- Updates all players with the new dead players table.
 GM.Net_BroadcastDead = =>

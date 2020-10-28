@@ -24,12 +24,6 @@ GM.Meeting_Start = (ply, bodyColor) =>
 		@Net_BroadcastMeeting aply, bodyColor
 
 		timer.Create handle, 3, 1, ->
-			for imposter, _ in pairs @GameData.Imposters
-				if @GameData.Vented[imposter]
-					@GameData.Vented[imposter] = false
-					if IsValid imposter.entity
-						@Net_NotifyVent imposter, @VentNotifyReason.UnVent
-
 			spawns = ents.FindByClass "info_player_start"
 			for index, ply in ipairs @GameData.PlayerTables
 				if IsValid ply.entity
@@ -38,6 +32,12 @@ GM.Meeting_Start = (ply, bodyColor) =>
 						\SetPos point\GetPos!
 						\SetAngles point\GetAngles!
 						\SetEyeAngles point\GetAngles!
+
+						if @GameData.Vented[ply] and not @GameData.DeadPlayers[ply]
+							@Player_Unhide playerTable.entity
+							@Player_UnPauseKillCooldown playerTable
+							@Net_NotifyVent ply, @VentNotifyReason.UnVent
+							@GameData.Vented[ply] = false
 
 			@Net_BroadcastDiscuss aply
 

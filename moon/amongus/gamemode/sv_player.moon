@@ -121,17 +121,18 @@ GM.Player_RefreshKillCooldown = (playerTable) =>
 -- @param playerTable Player table.
 GM.Player_PauseKillCooldown = (playerTable, pause = true) =>
 	if @GameData.KillCooldowns[playerTable]
-		remainder = if pause
-			CurTime! - @GameData.KillCooldowns[playerTable]
+		if pause
+			remainder = math.max 0, @GameData.KillCooldowns[playerTable] - CurTime!
 
-		if remainder
 			@GameData.KillCooldownRemainders[playerTable] = remainder
-		else
-			@GameData.KillCooldowns[playerTable] = CurTime! + @GameData.KillCooldownPauses[playerTable]
-			@GameData.KillCooldownRemainders[playerTable] = nil
+			@Net_PauseKillCooldown playerTable, remainder
 
-		if IsValid playerTable.entity
-			@Net_PauseKillCooldown playerTable, pause, remainder
+		else
+			newCooldown = CurTime! + (@GameData.KillCooldownRemainders[playerTable] or 0)
+
+			@GameData.KillCooldowns[playerTable] = newCooldown
+			@GameData.KillCooldownRemainders[playerTable] = nil
+			@Net_UpdateKillCooldown playerTable, newCooldown
 
 --- Pauses the kill cooldown of a player.
 -- Convenience wrapper.
@@ -189,6 +190,7 @@ GM.Player_Vent = (playerTable, vent) =>
 
 			@Net_BroadcastVent playerTable.entity, vent\GetPos!
 			@Player_Hide playerTable.entity
+			@Player_PauseKillCooldown playerTable
 
 		timer.Create handle, 0.125, 1, ->
 			if IsValid playerTable.entity
@@ -199,8 +201,9 @@ GM.Player_Vent = (playerTable, vent) =>
 --- Unvents a vented person.
 -- You don't have to check.
 -- @param playerTable Player table.
-GM.Player_UnVent = (playerTable) =>
+GM.Player_UnVent = (playerTable, instant) =>
 	if vent = @GameData.Vented[playerTable]
+		@Player_UnPauseKillCooldown playerTable
 		@GameData.VentCooldown[playerTable] = CurTime! + 1.5
 
 		if IsValid playerTable.entity

@@ -172,7 +172,8 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	-- Pretty self-descriptive.
 	--
 	when GAMEMODE.FlowTypes.KillCooldown
-		GAMEMODE.KillCooldown = net.ReadDouble!
+		GAMEMODE.GameData.KillCooldownOverride = nil
+		GAMEMODE.GameData.KillCooldown = net.ReadDouble!
 
 	--
 	-- Notifies us that we've vented.
@@ -400,3 +401,9 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		if killerPlayerTable and localPlayerTable
 			GAMEMODE\HUD_PlayKill killerPlayerTable, localPlayerTable
 			GAMEMODE.GameData.DeadPlayers[localPlayerTable] = true
+
+	--
+	-- The server has paused our kill cooldown.
+	--
+	when GAMEMODE.FlowTypes.KillCooldownPause
+		GAMEMODE.GameData.KillCooldownOverride = net.ReadDouble!
