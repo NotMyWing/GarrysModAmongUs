@@ -52,7 +52,9 @@ GM.CheckWin = =>
 	if not @IsGameInProgress!
 		return
 
-	reason = if @GameData.CompletedTasks >= @GameData.TotalTasks
+	reason = if @GetTimeLimit! == 0
+		@GameOverReason.Crewmate	
+	elseif @GameData.CompletedTasks >= @GameData.TotalTasks
 		@GameOverReason.Crewmate
 	else
 		numImposters = 0
@@ -125,11 +127,28 @@ GM.StartGame = =>
 
 	@Net_BroadcastCountdown CurTime! + 5.5
 	timer.Create handle, 5.5, 1, ->
-
 		-- Don't start in case somebody has left.
 		for _, ply in ipairs playerMemo
 			if not IsValid ply
 				return
+
+		-- Create the time limit timer if the cvar is set.
+		-- That's quite an interesting sentence.
+		timelimit = @ConVars.TimeLimit\GetInt!
+		timelimitHandle = "timelimitHandle"
+		if timelimit > 0
+			@GameData.Timers[timelimitHandle] = true
+
+			@SetTimeLimit timelimit
+			timer.Create timelimitHandle, 1, timelimit, ->
+				remainder = timer.RepsLeft timelimitHandle
+				@SetTimeLimit remainder
+				if remainder == 0
+					@CheckWin!
+			
+			timer.Pause timelimitHandle
+		else
+			@SetTimeLimit -1
 
 		-- Create player "accounts" that we're going
 		-- to use during the entire game.
@@ -205,6 +224,10 @@ GM.StartGame = =>
 				-- Check if suddenly something went extremely wrong during the windup time.
 				if @CheckWin!
 					return
+
+				-- Set off the timeout timer.
+				if timer.Exists timelimitHandle
+					timer.UnPause timelimitHandle
 
 				-- Otherwise start the game and fire up the background check timer.
 				timer.Create "NMW AU CheckWin", 5, 0, ->

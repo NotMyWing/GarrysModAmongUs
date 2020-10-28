@@ -377,3 +377,10 @@ net.Receive "NMW AU Flow", (len, ply) ->
 --- Sets whether the game is in progress.
 -- @bool state You guessed it again.
 GM.SetGameInProgress = (state) => SetGlobalBool "NMW AU GameInProgress", state
+
+--- Sets the current time limit.
+-- You pretty much don't ever need to call this manually.
+-- This is used internally by the timeout timer.
+-- Setting this would just cause the value to get overwritten back.
+-- @param value You guessed it again.
+GM.SetTimeLimit = (value) => SetGlobalInt "NMW AU TimeLimit", value

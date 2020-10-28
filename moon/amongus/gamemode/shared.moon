@@ -28,6 +28,7 @@ flags = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY, FCVAR_GAMEDLL
 -- @field TasksCommon (Integer) Max common tasks crewmates can get.
 -- @field TasksVisual (Bool) Should the visual parts of tasks be enabled?
 -- @field DistributeTasksToBots (Bool) Should bot get any tasks?
+-- @field TimeLimit (Integer) Round time limit.
 GM.ConVars =
 	ImposterCount:   CreateConVar "au_imposter_count"  , 1 , flags, "", 1, 4
 	KillCooldown:    CreateConVar "au_kill_cooldown"   , 20, flags, "", 1, 60
@@ -46,6 +47,8 @@ GM.ConVars =
 	TasksVisual: CreateConVar "au_tasks_enable_visual", 0, flags, "", 0, 1
 
 	DistributeTasksToBots: CreateConVar "au_debug_bot_tasks" , 0, flags, "", 0, 1
+
+	TimeLimit: CreateConVar "au_time_limit", 600, flags, "", 0, 1200
 
 --- Enum of all colors players can get.
 -- @warning This isn't the best approach. Needs fixing.
@@ -370,6 +373,11 @@ GM.TracePlayer = (ply) =>
 --- Returns whether the game is progress.
 -- @return You guessed it.
 GM.IsGameInProgress = => GetGlobalBool "NMW AU GameInProgress"
+
+--- Returns the time limit.
+-- If there's no time limit, this will return -1.
+-- @return You guessed it.
+GM.GetTimeLimit = => GetGlobalInt "NMW AU TimeLimit"
 
 GM.LoadManifest = =>
 	-- Default to an empty table so that things don't die horribly.

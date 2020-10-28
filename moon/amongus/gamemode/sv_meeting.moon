@@ -13,6 +13,9 @@ GM.Meeting_Start = (ply, bodyColor) =>
 	if timer.Exists handle
 		return
 
+	if timer.Exists "timelimit"
+		timer.Pause "timelimit"
+
 	for index, ply in ipairs player.GetAll!
 		ply\Freeze true
 
@@ -125,6 +128,8 @@ GM.Meeting_End = =>
 				@StartRound!
 
 			timer.UnPause "NMW AU CheckWin"
+			if timer.Exists "timelimit"
+				timer.UnPause "timelimit"
 
 GM.Meeting_ResetCooldown = =>
 	SetGlobalFloat "NMW AU NextMeeting", CurTime! + @ConVars.MeetingCooldown\GetFloat!
