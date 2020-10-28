@@ -288,6 +288,9 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		ply = if net.ReadBool!
 			GAMEMODE.GameData.Lookup_PlayerByID[net.ReadUInt 8]
 
+		if ply
+			GAMEMODE.GameData.DeadPlayers[ply] = true
+
 		-- Are confirms enabled?
 		-- If so, read the role and how many imposters remain
 		confirm = net.ReadBool!
