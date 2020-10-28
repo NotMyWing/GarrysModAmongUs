@@ -4,7 +4,7 @@ taskTable = {
 
 if CLIENT
 	surface.CreateFont "NMW AU Swipe", {
-		font: "Courier New"
+		font: "Roboto"
 		size: 0.05 * math.min ScrH! * 0.8, ScrW! * 0.8
 	}
 
@@ -33,7 +33,7 @@ if CLIENT
 				local ledRed
 				local label
 
-				max_size = math.min ScrH! * 0.8, ScrW! * 0.8
+				max_size = 0.7 * math.min ScrH!, ScrW!
 
 				\SetSize max_size + max_size * (190 * 2 / 900), max_size
 				.Paint = ->
