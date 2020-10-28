@@ -1,93 +1,79 @@
-const { src, dest, task, series } = require('gulp');
-const { spawn } = require('child_process');
-const through2 = require('through2');
-const luamin = require('luamin');
-const del = require('del');
 const gulp = require('gulp');
+const del = require('del');
 
-const _compileMoonScript = () => through2.obj((file, _, cb) => {
-	if (file.isBuffer()) {
-		const moonc = spawn('moonc', ['--']);
+const renderSvg = require('./tools/inkscape');
+const minifyLua = require('./tools/luamin');
+const compileMoonscript = require('./tools/moonscript');
 
-		let stdout = '';
-		let stderr = '';
-
-		const code = file.contents.toString();
-		const lines = code.split(/\r?\n/);
-		let header = '';
-		for (const line of lines) {
-			if (line != '' && !line.startsWith('--')) break;
-			header += line + '\n';
-		}
-
-		moonc.stdin.write(code);
-		moonc.stdin.end();
-
-		moonc.stdout.on('data', data => { stdout += data; });
-		moonc.stderr.on('data', data => { stderr += data; });
-		moonc.on('close', () => {
-			if (stderr) cb(stderr);
-			else {
-				file.path = file.path.substr(0, file.path.lastIndexOf('.')) + '.lua';
-				// file.contents = Buffer.from(header + luamin.minify(stdout));
-				file.contents = Buffer.from(header + stdout);
-				cb(null, file);
-			}
-		});
-	}
-});
-
-const _moveLuaFiles = () => through2.obj((file, _, cb) => {
-	if (file.isBuffer()) {
-		const code = file.contents.toString();
-		const lines = code.split(/\r?\n/);
-		let header = '';
-		for (const line of lines) {
-			if (line != '' && !line.startsWith('--')) break;
-			header += line + '\n';
-		}
-
-		file.contents = Buffer.from(header + luamin.minify(file.contents.toString()));
-		file.path = file.path.substr(0, file.path.lastIndexOf('.')) + '.lua';
-		cb(null, file);
-	}
-});
-
-function rmrf(cb) {
-	del(['gamemodes/**/*.lua']).then(() => {
-		cb();
-	});
+/**
+ * Cleans the build directories.
+ */
+function clean() {
+	return del(['gamemodes/**/*.lua']);
 }
+clean.description = "Cleans the build directories.";
 
+
+/**
+ * Minifies lua files and moves them into the gamemodes folder.
+ */
 function lua() {
-	return src('moon/**/*.lua')
-		.pipe(_moveLuaFiles())
-		.pipe(dest('gamemodes'));
+	return gulp.src('moon/**/*.lua', { since: gulp.lastRun(lua) })
+		.pipe(minifyLua())
+		.pipe(gulp.dest('gamemodes'));
 }
+lua.description = "Minifies lua files and moves them into the gamemodes folder.";
 
+
+/**
+ * Compiles moonscript files and moves them into the gamemodes folder.
+ */
 function moon() {
-	return src('moon/**/*.moon')
-		.pipe(_compileMoonScript())
-		.pipe(dest('gamemodes'));
+	return gulp.src('moon/**/*.moon', { since: gulp.lastRun(moon) })
+		.pipe(compileMoonscript())
+		// .pipe(minifyLua())
+		.pipe(gulp.dest('gamemodes'));
 }
+moon.description = "Compiles moonscript files and moves them into the gamemodes folder.";
 
-const build = gulp.series(lua, moon);
 
-function _watch() {
+/**
+ * Renders SVG assets using inkscape.
+ */
+function svg() {
+	return gulp.src('svg/**/*.svg')
+		.pipe(renderSvg())
+		.pipe(gulp.dest('gamemodes'));
+}
+svg.description = "Renders SVG assets using Inkscape.";
+
+
+/**
+ * Builds the gamemode scripts.
+ */
+const build = gulp.parallel(lua, moon);
+build.description = "Builds the gamemode scripts.";
+
+
+/**
+ * Watches lua files and compiles changes.
+ */
+function watchLua() {
 	return gulp.watch(
 		['moon/**/*.lua', 'moon/**/*.moon']
 		, build
 	)
 }
+build.description = "Watches lua files and compiles changes.";
 
-function watch() {
-	return gulp.series(
-		rmrf
-		, build
-		, _watch
-	)()
-}
+/**
+ * Cleans and builds the project, and then watches files for changes.
+ */
+const watch = gulp.series(clean, build, watchLua);
+watch.description = "Cleans and builds the project, and then watches files for changes.";
 
+exports.clean = clean;
 exports.build = build;
 exports.watch = watch;
+exports.svg = svg;
 exports.default = watch;

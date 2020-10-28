@@ -2,22 +2,28 @@
   "name": "amongus",
   "version": "1.0.0",
   "description": "Among Us",
-  "main": "index.js",
+  "homepage": "https://github.com/NotMyWing/GarrysModAmongUs#readme",
+  "bugs": {
+    "url": "https://github.com/NotMyWing/GarrysModAmongUs/issues"
+  },
+  "license": "ARR",
+  "author": "NotMyWing (https://github.com/NotMyWing)",
+  "contributors": [
+    "Tyler Schrock <tschrock123@gmail.com> (https://github.com/Tschrock)",
+    "Bytewave (https://github.com/BytewaveMLP)",
+    "Caramel Sweet (https://github.com/CaramelSweet)"
+  ],
+  "repository": "github:NotMyWing/GarrysModAmongUs",
   "scripts": {
+    "build": "gulp build",
+    "watch": "gulp watch",
+    "clean": "gulp clean",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Notmywing",
-  "license": "ARR",
+  "dependencies": {},
   "devDependencies": {
-    "child_process": "^1.0.2",
+    "del": "^6.0.0",
     "gulp": "^4.0.2",
-    "luamin": "^1.0.4",
-    "del": "^4.1.1",
-    "through2": "^3.0.1"
-  },
-  "dependencies": {
-    "prompts": "^2.1.0",
-    "protobufjs": "^6.8.8",
-    "sanitize-filename": "^1.6.1"
+    "luamin": "^1.0.4"
   }
 }
