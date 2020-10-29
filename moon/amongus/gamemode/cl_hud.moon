@@ -155,7 +155,7 @@ GM.HUD_CloseMap = =>
 	if IsValid(GAMEMODE.Hud) and IsValid(GAMEMODE.Hud.Map)
 		GAMEMODE.Hud.Map\Close!
 
-MAT_TASK = Material "au/gui/maps/task.png", "smooth"
+MAT_TASK = Material "au/gui/map/task.png", "smooth"
 
 --- Starts or stops tracking a task button on the map.
 -- @param entity Task button to track.
