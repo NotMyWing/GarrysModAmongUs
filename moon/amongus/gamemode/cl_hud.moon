@@ -22,6 +22,7 @@ surface.CreateFont "NMW AU Button Tooltip", {
 }
 
 --- Makes the player's screen fade in and out.
+-- In-built screenfades are impractical to use.
 -- @param duration Duration. One second by default.
 GM.HUD_Blink = (duration = 1, delay, pre) =>
 	vgui.CreateFromTable(VGUI_BLINK)\Blink duration, delay, pre
@@ -33,7 +34,7 @@ GM.HUD_ShowVents = (vents) =>
 		if IsValid @Hud.Vents
 			@Hud.Vents\Remove!
 
-		@Hud.Vents = with vgui.CreateFromTable(VGUI_VENT)
+		@Hud.Vents = with @Hud\Add VGUI_VENT
 			\ShowVents vents
 
 --- Resets and re-creates the HUD.
@@ -75,7 +76,7 @@ GM.HUD_DisplayMeeting = (caller, bodyColor) =>
 
 		@HUD_CloseMap!
 
-		@Hud.Meeting = with vgui.CreateFromTable VGUI_MEETING, @Hud
+		@Hud.Meeting = with @Hud\Add VGUI_MEETING
 			\StartEmergency caller, bodyColor
 
 --- Ejects the person.
@@ -94,7 +95,7 @@ GM.HUD_DisplayEject = (reason, playerTable, confirm, imposter, remaining, total)
 
 		@HUD_CloseMap!
 
-		@Hud.Eject = with vgui.CreateFromTable VGUI_EJECT, @Hud
+		@Hud.Eject = with @Hud\Add VGUI_EJECT
 			\Eject reason, playerTable, confirm, imposter, remaining, total
 
 --- Displays the game over screen.
@@ -104,7 +105,7 @@ GM.HUD_DisplayGameOver = (reason) =>
 	if IsValid @Hud
 		@HUD_CloseMap!
 
-		@Hud.Splash = with vgui.CreateFromTable VGUI_SPLASH, @Hud
+		@Hud.Splash = with @Hud\Add VGUI_SPLASH
 			\DisplayGameOver reason
 
 --- Displays the shush screen.
@@ -112,7 +113,7 @@ GM.HUD_DisplayShush = =>
 	if IsValid @Hud
 		@HUD_CloseMap!
 
-		@Hud.Splash = with vgui.CreateFromTable VGUI_SPLASH, @Hud
+		@Hud.Splash = with @Hud\Add VGUI_SPLASH
 			\DisplayShush!
 
 --- Displays the death animation.
@@ -125,7 +126,7 @@ GM.HUD_PlayKill = (killer, victim) =>
 
 		@HUD_CloseMap!
 
-		@Hud.Kill = with vgui.CreateFromTable VGUI_KILL, @Hud
+		@Hud.Kill = with @Hud\Add VGUI_KILL
 			\Kill killer, victim
 
 --- Opens the map. Simple as that.

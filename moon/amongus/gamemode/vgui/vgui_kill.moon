@@ -8,7 +8,7 @@ ASSETS = {
 
 return vgui.RegisterTable {
 	PlayBackground: (callback) =>
-		with bg = vgui.Create "DPanel", @
+		with bg = @Add "DPanel"
 			\SetSize @GetWide!, @GetTall!
 			\SetPos 0, 0
 
@@ -64,7 +64,7 @@ return vgui.RegisterTable {
 	Kill: (killer, victim) =>
 		surface.PlaySound "au/impostor_killmusic.wav"
 		@PlayBackground ->
-			with vgui.CreateFromTable table.Random(KILLS), @
+			with @Add table.Random KILLS
 				\SetWide ScrW! * 0.5
 				\SetTall \GetWide! * 0.7
 				\Center!

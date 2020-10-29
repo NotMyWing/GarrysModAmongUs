@@ -64,7 +64,7 @@ DISCUSS_SPLASH_TIME = 3
 --- Creates the famous pre-vote popup.
 -- I had fun coming up with this one.
 meeting.PlayBackground = (callback) =>
-	with bg = vgui.Create "DPanel", @
+	with bg = @Add "DPanel"
 		\SetSize @GetWide!, @GetTall!
 		\SetPos 0, 0
 
@@ -189,7 +189,7 @@ meeting.CreateConfirm = (height, id) =>
 				\AlphaTo 255, 0.1, 0
 
 meeting.OpenDiscuss = (caller) =>
-	with @discussWindow = vgui.Create "DPanel", @
+	with @discussWindow = @Add "DPanel"
 		newWidth, newHeight = GAMEMODE.Render.FitMaterial MAT_MEETING_TABLET.tablet,
 			@GetWide!, 0.95 * math.min @GetTall!, @GetWide!
 
@@ -220,7 +220,7 @@ meeting.OpenDiscuss = (caller) =>
 		@buttons = {}
 
 		-- Create the inner panel using the raw pixel offsets.
-		with innerPanel = vgui.Create "DPanel", @discussWindow
+		with innerPanel = @discussWindow\Add "DPanel"
 			\SetSize (733/856) * newWidth, (506/590) * newHeight
 			\SetPos newWidth * (37/856), newWidth * (37/856)
 			.Paint = ->
@@ -319,7 +319,7 @@ meeting.OpenDiscuss = (caller) =>
 				-- Yeah.
 				-- At least this is better than timer.Simple 0.
 				\NewAnimation 0, 0, 0, ->
-					with list = vgui.Create "DIconLayout", scroll
+					with list = scroll\Add "DIconLayout"
 						\Dock( FILL )
 						\SetSpaceY scroll\GetWide! * 0.0125
 						\SetSpaceX scroll\GetTall! * 0.02
@@ -423,7 +423,7 @@ meeting.OpenDiscuss = (caller) =>
 										-- responsible for layering the crewmate sprite.
 										layers = {}
 										for i = 1, 2
-											with layers[i] = vgui.Create "DPanel", crew
+											with layers[i] = crew\Add "DPanel"
 												\SetSize crew\GetTall! * 0.8, crew\GetTall! * 0.8
 												\SetPos crew\GetWide! / 2 - \GetWide! / 2, crew\GetTall! / 2 - \GetTall! / 2
 												.Image = CREW_LAYERS[i]
@@ -534,7 +534,7 @@ meeting.OpenDiscuss = (caller) =>
 														\Dock RIGHT
 
 	-- The two crewmates talking animation you see before the meeting screen appears.
-	with discussAnim = vgui.Create "DPanel", @
+	with discussAnim = @Add "DPanel"
 		size = 0.8 * math.min @GetTall!, @GetWide!
 		\SetSize size, size
 		\SetPos @GetWide!/2 - size/2, @GetTall!/2 - size/2
@@ -627,7 +627,7 @@ meeting.OpenDiscuss = (caller) =>
 
 	-- And finally, something simple.
 	-- The "Discuss!" text.
-	with discussText = vgui.Create "DPanel", @
+	with discussText = @Add "DPanel"
 		size = 0.8 * math.min @GetTall!, @GetWide!
 		\SetSize size, size * 0.3
 		\SetPos @GetWide!/2 - size/2, -size * 0.2
@@ -699,7 +699,7 @@ meeting.StartEmergency = (playerTable, bodyColor) =>
 		surface.PlaySound "au/alarm_emergencymeeting.wav"
 
 	@PlayBackground ->
-		with emergency_caller = vgui.Create "DPanel", @
+		with emergency_caller = @Add "DPanel"
 			size = 0.7 * math.min @GetTall!, @GetWide!
 
 			\SetSize size, size
@@ -708,7 +708,7 @@ meeting.StartEmergency = (playerTable, bodyColor) =>
 				\Remove!
 			.Paint = ->
 
-			with upper = vgui.Create "DPanel", emergency_caller
+			with upper = emergency_caller\Add "DPanel"
 				\SetTall size/2
 				\Dock TOP
 				.Paint = ->
@@ -721,7 +721,7 @@ meeting.StartEmergency = (playerTable, bodyColor) =>
 						MAT_EMERGENCY_LAYERS
 
 					for i = 4, 1, -1
-						with layers[i] = vgui.Create "DPanel", upper
+						with layers[i] = upper\Add "DPanel"
 							\SetSize size / 2, size / 2
 							\CenterHorizontal!
 							\SetZPos 5 - i
@@ -734,7 +734,7 @@ meeting.StartEmergency = (playerTable, bodyColor) =>
 						layers[2].Color = playerTable.color
 						layers[4].Color = playerTable.color
 
-			with lower = vgui.Create "DPanel", emergency_caller
+			with lower = emergency_caller\Add "DPanel"
 				\SetTall size/2
 				\Dock BOTTOM
 				.Image = if bodyColor

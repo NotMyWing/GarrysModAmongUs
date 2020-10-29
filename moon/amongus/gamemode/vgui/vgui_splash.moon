@@ -155,7 +155,7 @@ splash.DisplayPlayers = (reason) =>
 	@AlphaTo 0, 0.25, displayTime, ->
 		@Remove!
 
-	with @crewmate_screen = vgui.Create "DPanel", @
+	with @crewmate_screen = @Add "DPanel"
 		\SetSize @GetWide!, @GetTall!
 		\SetAlpha 0
 		.Paint = ->

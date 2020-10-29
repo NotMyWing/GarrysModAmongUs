@@ -37,7 +37,7 @@ hud.Init = =>
 	hook.Add "OnScreenSizeChanged", "NMW AU Hud Size", ->
 		@SetSize ScrW!, ScrH!
 
-	with @buttons = vgui.Create "DPanel", @
+	with @buttons = @Add "DPanel"
 		\SetTall ScrH! * 0.20
 
 		margin = ScreenScale 5
@@ -93,7 +93,7 @@ hud.SetupButtons = (state, impostor) =>
 								conVar\GetBool! and TRANSLATE("hud.cvar.enabled") or TRANSLATE("hud.cvar.disabled")
 							when "Mod"
 								"#{conVar\GetFloat!}x"
-						
+
 						if value
 							i += 1
 
@@ -252,7 +252,7 @@ hud.SetupButtons = (state, impostor) =>
 									0, h/2, color, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, Color(0, 0, 0, 64)
 
 		-- Use/report button. Content-aware.
-		with @use = vgui.Create "DPanel", @buttons
+		with @use = @buttons\Add "DPanel"
 			\SetWide @buttons\GetTall!
 			\DockMargin 0, 0, ScreenScale(5), 0
 			\Dock RIGHT
@@ -281,7 +281,7 @@ hud.SetupButtons = (state, impostor) =>
 
 		-- Kill button for imposerts. Content-aware.
 		if impostor
-			with @kill = vgui.Create "DPanel", @buttons
+			with @kill = @buttons\Add "DPanel"
 				\SetWide @buttons\GetTall!
 				\DockMargin 0, 0, ScreenScale(5), 0
 				\Dock RIGHT
@@ -389,7 +389,7 @@ hud.Countdown = (time) =>
 	if IsValid @countdown
 		@countdown\Remove!
 
-	with @countdown = vgui.Create "DPanel", @
+	with @countdown = @Add "DPanel"
 		\SetSize @GetWide!, @GetTall! * 0.1
 		\SetPos 0, @GetTall! * 0.7
 
