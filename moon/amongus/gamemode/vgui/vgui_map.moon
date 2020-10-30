@@ -106,21 +106,23 @@ return vgui.RegisterTable {
 	SetScale: (value) => @__scale = value
 	SetLabels: (value) => @__labels = value
 
-	SetupFromManifestEntry: (entry) => with entry
-		if .OverlayMaterial
-			@SetOverlayMaterial .OverlayMaterial
+	SetupFromManifest: (manifest) =>
+		if manifest.Map and manifest.Map.UI
+			with manifest.Map.UI
+				if .OverlayMaterial
+					@SetOverlayMaterial .OverlayMaterial
 
-		if .BackgroundMaterial
-			@SetBackgroundMaterial .BackgroundMaterial
+				if .BackgroundMaterial
+					@SetBackgroundMaterial .BackgroundMaterial
 
-		if .Scale
-			@SetScale .Scale
+				if .Scale
+					@SetScale .Scale
 
-		if .Position
-			@SetPosition .Position
+				if .Position
+					@SetPosition .Position
 
-		if .Labels
-			@SetLabels .Labels
+				if .Labels
+					@SetLabels .Labels
 
 	Track: (entity, element, track = true) =>
 		if IsValid entity

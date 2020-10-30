@@ -15,4 +15,13 @@
 				Scale: 1
 			}
 	}
+	Sabotages: {
+		"comms": {
+			UI: if CLIENT
+				{
+					Icon: Material "au/gui/sabotage_comms.png", "smooth"
+					Position: Vector 0.5, 0.5, 0
+				}
+		}
+	}
 }
