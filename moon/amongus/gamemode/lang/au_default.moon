@@ -1,5 +1,8 @@
 with GM.Lang\Get "en"
 	["tasks.totalCompleted"] = "TOTAL TASKS COMPLETED"
+	["tasks.totalCompleted.sabotaged"] = "COMMS SABOTAGED"
+
+	["tasks.commsSabotaged"] = "Comms Sabotaged"
 
 	areas = {
 		["cafeteria"]:      "Cafeteria"

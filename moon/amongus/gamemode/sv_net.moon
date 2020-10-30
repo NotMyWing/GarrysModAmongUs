@@ -288,6 +288,10 @@ GM.Net_UpdateTaskData = (playerTable, taskInstance) =>
 --- Broadcasts the new task count.
 -- @param count New task count.
 GM.Net_BroadcastTaskCount = (count) =>
+	-- Don't broadcast if comms are sabotaged.
+	if @GetCommunicationsDisabled!
+		return
+
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.TasksUpdateCount, @FlowSize
 	net.WriteUInt count, 8
@@ -390,3 +394,13 @@ GM.SetGameInProgress = (state) => SetGlobalBool "NMW AU GameInProgress", state
 -- Setting this would just cause the value to get overwritten back.
 -- @param value You guessed it again.
 GM.SetTimeLimit = (value) => SetGlobalInt "NMW AU TimeLimit", value
+
+--- Sets whether the communications are sabotaged.
+-- This hides the task bar, task list and map icons for crewmates.
+-- Can potentially affect objects on the map.
+-- @bool state You guessed it again.
+GM.SetCommunicationsDisabled = (value) =>
+	SetGlobalBool "NMW AU CommsDisabled", value
+
+	if not value and @GameData.CompletedTasks
+		@Net_BroadcastTaskCount @GameData.CompletedTasks

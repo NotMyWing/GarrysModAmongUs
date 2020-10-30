@@ -84,6 +84,8 @@ GM.CleanUp = =>
 	GAMEMODE\PurgeGameData!
 
 	@SetGameInProgress false
+	@SetCommunicationsDisabled false
+
 	@Player_UnhideEveryone!
 	timer.Remove "NMW AU CheckWin"
 

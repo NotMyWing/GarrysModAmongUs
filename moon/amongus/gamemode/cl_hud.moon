@@ -169,6 +169,9 @@ GM.HUD_TrackTaskOnMap = (entity, track = true) =>
 				\Track entity, with vgui.Create "DPanel"
 					\SetSize size * 0.1, size * 0.1
 					.Paint = (_, w, h) ->
+						if GAMEMODE\GetCommunicationsDisabled!
+							return
+
 						surface.DisableClipping true
 						surface.SetDrawColor 255, 230, 0
 						surface.SetMaterial MAT_TASK

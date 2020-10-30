@@ -32,6 +32,8 @@ MAT_BUTTONS = {
 COLOR_BTN = Color 255, 255, 255
 
 hud.Init = =>
+	@__oldCommsSabotaged = false
+
 	@SetSize ScrW!, ScrH!
 
 	hook.Add "OnScreenSizeChanged", "NMW AU Hud Size", ->
@@ -159,7 +161,7 @@ hud.SetupButtons = (state, impostor) =>
 					\Dock FILL
 					.Paint = ->
 
-					label = with \Add "DLabel"
+					@taskBarLabel = with \Add "DLabel"
 						\SetColor Color 255, 255, 255
 						\SetZPos 1
 						\SetFont "NMW AU Taskbar"
@@ -176,11 +178,10 @@ hud.SetupButtons = (state, impostor) =>
 							refW, refH = @taskbar\GetParent!\GetSize!
 							@taskbar\SetSize 0, refH
 
-							label\SetSize refW, refH
+							@taskBarLabel\SetSize refW, refH
 
 	if localPlayerTable
 		-- The task list.
-		@tasks = {}
 		with taskBox = @Add "DPanel"
 			margin = ScrH! * 0.015
 			\DockMargin margin, 0, 0, 0
@@ -190,7 +191,7 @@ hud.SetupButtons = (state, impostor) =>
 
 			with \Add "DPanel"
 				\SetTall ScrH! * 0.05
-				margin = ScrH! * 0.02
+				margin = ScrH! * 0.0075
 				\Dock TOP
 
 				text = tostring TRANSLATE if impostor
@@ -210,12 +211,13 @@ hud.SetupButtons = (state, impostor) =>
 					draw.SimpleTextOutlined text, "NMW AU Taskbar",
 						0, h/2, Color(255, 255, 255), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, Color(0, 0, 0, 64)
 
-			container = with \Add "DPanel"
+			@tasks = {}
+			@taskBox = with \Add "DPanel"
 				\Dock FILL
 				.Paint = ->
 
 				for taskName, task in pairs GAMEMODE.GameData.MyTasks
-					with \Add "DPanel"
+					table.insert @tasks, with \Add "DPanel"
 						\SetTall ScrH! * 0.04
 						\Dock TOP
 
@@ -237,7 +239,7 @@ hud.SetupButtons = (state, impostor) =>
 								area = TRANSLATE task.customArea or task.entity\GetArea!
 								name = TRANSLATE "task." .. ((task.customName or taskName) or "undefined")
 
-								text = "  #{area}: #{name}"
+								text = "#{area}: #{name}"
 								if task.multiStep and not task.completed
 									text ..= " (#{(task.currentStep or 1) - 1}/#{task.maxSteps})"
 
@@ -249,7 +251,7 @@ hud.SetupButtons = (state, impostor) =>
 									neutral
 
 								draw.SimpleTextOutlined text .. timeoutText, "NMW AU Taskbar",
-									0, h/2, color, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, Color(0, 0, 0, 64)
+									ScrW! * 0.0075, h/2, color, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, Color(0, 0, 0, 64)
 
 		-- Use/report button. Content-aware.
 		with @use = @buttons\Add "DPanel"
@@ -401,6 +403,76 @@ hud.Countdown = (time) =>
 
 			if @countdownTime - CurTime! <= 0
 				_\Remove!
+
+hud.AddTaskEntry = =>
+	return with @taskBox\Add "DPanel"
+		\SetTall ScrH! * 0.04
+		\Dock TOP
+
+		color = Color 255, 255, 255
+		.SetColor = (value) =>
+			color = value
+
+		blink = false
+		colorBlink = Color 255, 64, 64
+		.SetBlink = (value) =>
+			blink = value
+
+		text = ""
+		.SetText = (value) =>
+			text = value
+
+		.Paint = (_, w, h) ->
+			surface.SetDrawColor 255, 255, 255, 16
+			surface.DrawRect 0, 0, w, h
+
+			clr = if blink and math.floor((SysTime! * 4) % 2) == 0
+				colorBlink
+			else
+				color				
+
+			draw.SimpleTextOutlined text, "NMW AU Taskbar",
+				ScrW! * 0.0075, h/2, clr, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, Color(0, 0, 0, 64)
+
+hud.Think = =>
+	if @taskBarLabel
+		commsSabotaged = GAMEMODE\GetCommunicationsDisabled!
+
+		-- Repeatedly check if the communications have been sabotaged.
+		-- A better way would be sending a net message, but for now it's like that.
+		if @__oldCommsSabotaged ~= commsSabotaged
+			with @taskBarLabel
+				-- Comms have been sabotaged.
+				-- Wipe the task list and add a blinker.
+				-- Mess with the taskbar text.
+				if commsSabotaged
+					@__commsBlinker = with @AddTaskEntry!
+						\SetColor Color 255, 230, 0
+						\SetText TRANSLATE "tasks.commsSabotaged"
+						\SetBlink true
+
+					for task in *@tasks
+						task\Hide!
+
+					\SetText "  " .. TRANSLATE "tasks.totalCompleted.sabotaged"
+					\SetColor Color 255, 64, 64
+
+					@SetTaskbarValue 0
+
+				-- Comms have been fixed.
+				-- Restore the task list and remove the blinker.
+				-- Fix the taskbar text.
+				else
+					if IsValid @__commsBlinker
+						@__commsBlinker\Remove!
+
+					for task in *@tasks
+						task\Show!
+
+					\SetText "  " .. TRANSLATE "tasks.totalCompleted"
+					\SetColor Color 255, 255, 255
+
+			@__oldCommsSabotaged = commsSabotaged
 
 hud.Paint = ->
 

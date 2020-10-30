@@ -379,6 +379,10 @@ GM.IsGameInProgress = => GetGlobalBool "NMW AU GameInProgress"
 -- @return You guessed it.
 GM.GetTimeLimit = => GetGlobalInt "NMW AU TimeLimit"
 
+--- Returns whether the communications are disabled (sabotaged).
+-- @return You guessed it.
+GM.GetCommunicationsDisabled = => GetGlobalInt "NMW AU CommsDisabled"
+
 GM.LoadManifest = =>
 	-- Default to an empty table so that things don't die horribly.
 	@MapManifest = {}
