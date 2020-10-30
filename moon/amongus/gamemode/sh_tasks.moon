@@ -1,13 +1,6 @@
 --- Shared module using for localizing strings.
 -- @module sh_tasks
 
---- Enum of all task types available in the game mode.
-GM.TaskType = {
-	Short: 1
-	Long: 2
-	Common: 3
-}
-
 -- Various task collections.
 -- Pretty much none of these aside from All
 -- are needed on the client, but whatever.
@@ -39,7 +32,6 @@ GM.Task_Register = (taskTable = {}) =>
 		if collection
 			print "Registered task #{.Name}"
 
-			taskTable.__index = taskTable
 			collection[.Name] = taskTable
 
 			@TaskCollection.All[.Name] = taskTable
@@ -87,6 +79,10 @@ else
 	-- This assumes that the gamedata table is properly filled.
 	-- Yes, this implies that you shouldn't call this.
 	GM.Task_AssignToPlayers = =>
+		if not @MapManifest.Tasks
+			-- What in the world is happening there?
+			return
+
 		allowedTasks = {task, true for task in *@MapManifest.Tasks}
 
 		shuffle = @Util.Shuffle

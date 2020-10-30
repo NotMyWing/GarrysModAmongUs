@@ -181,6 +181,17 @@ GM.FlowTypes = {
 
 GM.FlowSize = math.ceil math.log table.Count(GM.FlowTypes) + 1, 2
 
+
+--- Enum of all task types available in the game mode.
+-- @field Short 1
+-- @field Long 2
+-- @field Common 3
+GM.TaskType = {
+	Short: 1
+	Long: 2
+	Common: 3
+}
+
 --- Enum of game states.
 -- @warning This is probably redundant?
 -- @field Preparing 1
@@ -382,23 +393,3 @@ GM.GetTimeLimit = => GetGlobalInt "NMW AU TimeLimit"
 --- Returns whether the communications are disabled (sabotaged).
 -- @return You guessed it.
 GM.GetCommunicationsDisabled = => GetGlobalInt "NMW AU CommsDisabled"
-
-GM.LoadManifest = =>
-	-- Default to an empty table so that things don't die horribly.
-	@MapManifest = {}
-
-	dir = @FolderName or "amongus"
-	fileName = "#{dir}/gamemode/manifest/#{game.GetMap!}.lua"
-
-	if file.Exists fileName, "LUA"
-		if SERVER
-			AddCSLuaFile fileName
-
-		@MapManifest = include fileName
-
-		print "Found the manifest file for #{game.GetMap!}"
-	else
-		print "Couldn't find the manifest file for #{game.GetMap!}! The game mode will not work properly."
-
-hook.Add "Initialize", "NMW AU LoadManifest", ->
-	GAMEMODE\LoadManifest!

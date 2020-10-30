@@ -11,7 +11,7 @@ include "sv_meeting.lua"
 
 include "sh_hooks.lua"
 include "sh_tasks.lua"
-include "tasks/shared.lua"
+include "sh_manifest.lua"
 
 -- Obligatory client stuff
 AddCSLuaFile "sh_lang.lua"
@@ -32,6 +32,7 @@ AddCSLuaFile "vgui/kills/remover.lua"
 AddCSLuaFile "cl_hud.lua"
 AddCSLuaFile "cl_net.lua"
 AddCSLuaFile "cl_render.lua"
+AddCSLuaFile "sh_manifest.lua"
 
 GM.GameOver = (reason) =>
 	for index, ply in ipairs player.GetAll!
@@ -116,6 +117,12 @@ GM.Restart = =>
 	@SetGameState @GameState.Preparing
 
 GM.StartGame = =>
+	-- Bail if the manifest is missing or malformed.
+	if not @MapManifest or not @MapManifest.Tasks
+		return
+
+	-- Bail if we don't have enough players.
+	-- TO-DO: print chat message.
 	if #player.GetAll! - @ConVars.ImposterCount\GetInt! * 2 < 1
 		return
 
