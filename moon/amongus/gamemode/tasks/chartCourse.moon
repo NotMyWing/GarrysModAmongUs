@@ -76,8 +76,8 @@ if CLIENT
 									if i == 1 or activated[i - 1]
 										activated[i] = true
 
-									if i == #positions
-										base\Submit!
+										if i == #positions
+											base\Submit!
 
 					setPos max_size * position
 
