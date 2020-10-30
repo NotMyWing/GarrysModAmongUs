@@ -97,7 +97,7 @@ return vgui.RegisterTable {
 		else
 			1, 1
 
-		w, h = GAMEMODE.Render.FitMaterial value, 0.8 * ScrH!, 0.8 * ScrW!
+		w, h = GAMEMODE.Render.FitMaterial value, 0.8 * ScrW!, 0.8 * ScrH!
 		with @__innerPanel
 			\SetSize w, h
 			\Center!
@@ -123,7 +123,7 @@ return vgui.RegisterTable {
 			@SetLabels .Labels
 
 	Track: (entity, element, track = true) =>
-		if IsValid(entity)
+		if IsValid entity
 			if track
 				@__tracking[entity] = element
 				element\SetParent @__innerPanel
@@ -132,6 +132,8 @@ return vgui.RegisterTable {
 					@__tracking[entity]\Remove!
 
 				@__tracking[entity] = nil
+		elseif IsValid element
+			element\Remove!
 
 	UnTrack: (entity) =>
 		@Track entity, nil, false
