@@ -65,13 +65,10 @@ else
 
 		return taskInstance
 
-	taskMapToPool = (map, allowed = {}) ->
+	taskMapToPool = (map) ->
 		pool = {}
 		for _, element in pairs map
-			if allowed[element.Name]
-				table.insert pool, element
-			else
-				print "Skipping task #{element.Name}: not allowed by the map."
+			table.insert pool, element
 
 		return pool
 
@@ -83,23 +80,17 @@ else
 			-- What in the world is happening there?
 			return
 
-		allowedTasks = {task, true for task in *@MapManifest.Tasks}
-
 		shuffle = @Util.Shuffle
 
 		pools = {
-			[taskMapToPool @TaskCollection.Short, allowedTasks]: @ConVars.TasksShort\GetInt!
-			[taskMapToPool @TaskCollection.Long, allowedTasks]:  @ConVars.TasksLong\GetInt!
+			[taskMapToPool @TaskCollection.Short]: @ConVars.TasksShort\GetInt!
+			[taskMapToPool @TaskCollection.Long]:  @ConVars.TasksLong\GetInt!
 		}
 
 		-- Pick N random common tasks from the pool.
 		commonTasks = {}
 
-		for _, task in ipairs shuffle taskMapToPool @TaskCollection.Common, allowedTasks
-			-- Skip the task if it's not allowed by the map.
-			if not allowedTasks[task.Name]
-				continue
-
+		for _, task in ipairs shuffle taskMapToPool @TaskCollection.Common
 			if #commonTasks < @ConVars.TasksCommon\GetInt!
 				table.insert commonTasks, task
 			else
