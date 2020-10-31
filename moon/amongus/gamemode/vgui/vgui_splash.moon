@@ -25,7 +25,7 @@ ASSETS = {
 	no_crew: Material "au/gui/no/no_crew.png", "smooth"
 	no_hand: Material "au/gui/no/no_hand.png", "smooth"
 	no_shh: Material "au/gui/no/no_shh.png", "smooth"
-	circle: Material "au/gui/circle2.png", "smooth"
+	circle: Material "au/gui/circle.png", "smooth"
 }
 
 SHUT_TIME = 3

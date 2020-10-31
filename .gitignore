@@ -1,6 +1,7 @@
 node_modules/
 moon/itc/
 gamemodes/**/*.lua
+gamemodes/content
 downloaded/
 lua/
 
