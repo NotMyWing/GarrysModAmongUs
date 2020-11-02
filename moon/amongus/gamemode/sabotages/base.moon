@@ -54,7 +54,7 @@ sabotageBase = {
 			@SetDirty!
 
 	--- Gets the sabotage cooldown.
-	GetCooldown: => @__cooldown or 5
+	GetCooldown: => @__cooldown or 30
 
 	--- Sets when the sabotage can be activated.
 	SetNextUse: (value) =>
