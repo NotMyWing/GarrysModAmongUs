@@ -1,5 +1,6 @@
 const { spawn } = require('child_process');
 const { Transform } = require('stream');
+const path = require('path').posix;
 
 const { InkscapeIsDumbTransform } = require('./InkscapeIsDumbTransform');
 const { streamToBuffer } = require('./util');
@@ -64,7 +65,7 @@ class InkscapeTransform extends Transform {
 		const inkscape = spawn(
 			this.inkscapePath,
 			['--pipe', '--export-type=png', '--export-filename=-'],
-			{ cwd: file.cwd, windowsHide: true }
+			{ cwd: path.dirname(file.path), windowsHide: true }
 		);
 
 		// Connect ChildProcess errors
