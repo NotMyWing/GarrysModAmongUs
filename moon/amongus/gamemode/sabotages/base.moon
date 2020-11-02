@@ -209,13 +209,13 @@ sabotageBase = {
 					lastActive = false
 
 			if lastActive
-				-- Re-enable all major sabotages.
+				-- Re-enable all sabotages.
 				for sabotage in *GAMEMODE.GameData.Sabotages
-					if sabotage\GetMajor!
-						sabotage\SetDisabled false
-						-- If we're major, refresh all other major sabotages.
-						if @GetMajor!
-							sabotage\RefreshCooldown!
+					sabotage\SetDisabled false
+
+					-- If we're major, refresh all other major sabotages.
+					if sabotage\GetMajor! and @GetMajor!
+						sabotage\RefreshCooldown!
 }
 
 if SERVER
