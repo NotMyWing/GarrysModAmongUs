@@ -550,7 +550,7 @@ meeting.OpenDiscuss = (caller) =>
 
 		.Paint = (_, w, h) ->
 			if not _.circle
-				_.circle = GAMEMODE.Render.CreateCircle w/2, w/2, w*0.498, 64
+				_.circle = GAMEMODE.Render.CreateCircle w/2, w/2, w*0.49, 64
 
 			surface.SetMaterial MAT_DISCUSS.bg
 			surface.SetDrawColor Color 255, 255, 255
@@ -588,7 +588,7 @@ meeting.OpenDiscuss = (caller) =>
 				do
 					ltsx, ltsy = _\LocalToScreen 0, 0
 					ltsv = Vector ltsx, ltsy, 0
-					v = Vector  w/4, h / 2 + h/3, 0
+					v = Vector w/3, h / 1.5, 0
 
 					m = Matrix!
 					m\Translate ltsv
@@ -599,7 +599,7 @@ meeting.OpenDiscuss = (caller) =>
 
 					cam.PushModelMatrix m, true
 					surface.SetMaterial MAT_DISCUSS.yes_crewLeft
-					surface.DrawTexturedRect -w*0.1, h/2-h*0.1, w/2 + w*0.15, h/2+h*0.2
+					surface.DrawTexturedRect -w*0.15, h/2-h*0.125, w/2 + w*0.1, h/2+h*0.2
 					cam.PopModelMatrix!
 
 				-- Let's enter the abyss one more time.
