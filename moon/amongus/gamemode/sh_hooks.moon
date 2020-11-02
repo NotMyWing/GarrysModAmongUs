@@ -15,8 +15,8 @@ hook.Add "Move", "NMW AU Move", (ply, mvd) ->
 
 	playerTable = @GameData.Lookup_PlayerByEntity[ply]
 
-	if (CLIENT and (@GameData.Vented or IsValid(@Hud.TaskScreen) or IsValid(@Hud.Kill))) or
-		(SERVER and (@GameData.CurrentTask[playerTable] or @GameData.Vented[playerTable]))
+	if (CLIENT and (@GameData.Vented or IsValid(@Hud.CurrentVGUI) or IsValid(@Hud.Kill))) or
+		(SERVER and (@GameData.CurrentVGUI[playerTable] or @GameData.Vented[playerTable]))
 			mvd\SetVelocity Vector 0, 0, 0
 			return true
 

@@ -12,6 +12,7 @@ VGUI_KILL = include "vgui/vgui_kill.lua"
 VGUI_MAP = include "vgui/vgui_map.lua"
 
 include "vgui/vgui_task_base.lua"
+include "vgui/vgui_sabotage_base.lua"
 include "vgui/vgui_task_placeholder.lua"
 
 surface.CreateFont "NMW AU Button Tooltip", {
@@ -186,6 +187,9 @@ GM.HUD_TrackTaskOnMap = (entity, track = true) =>
 			else
 				\UnTrack entity
 
+GM.HUD_AddTaskEntry = =>
+	return @Hud\AddTaskEntry!
+
 surface.CreateFont "NMW AU Task Complete", {
 	font: "Roboto"
 	size: ScrH! * 0.06
@@ -222,6 +226,22 @@ CREW_LAYERS = {
 	Material "au/gui/meeting/crewmate2.png", "smooth"
 }
 
+GM.HUD_CloseVGUI = =>
+	if IsValid @Hud.CurrentVGUI
+		if @Hud.CurrentVGUI.Close
+			@Hud.CurrentVGUI\Close!
+		else
+			@Hud.CurrentVGUI\Remove!
+
+		@Net_SendCloseVGUI!
+
+GM.HUD_OpenVGUI = (panel) =>
+	if IsValid panel
+		@HUD_CloseVGUI!
+
+		panel\SetParent @Hud
+		@Hud.CurrentVGUI = panel
+
 GM.HUD_InitializeMap = =>
 	@Hud.Map = with @Hud\Add VGUI_MAP
 		\SetupFromManifest @MapManifest
@@ -246,6 +266,11 @@ GM.HUD_InitializeMap = =>
 				layers[1].Color = localPlayerTable.color
 
 			\Track LocalPlayer!, player
+
+GM.HUD_InitializeImposterMap = =>
+	if IsValid @Hud.Map
+		@Hud.Map\SetColor Color 200, 20, 20
+		@Hud.Map\EnableSabotageOverlay!
 
 hook.Add "Initialize", "Init Hud", ->
 	GAMEMODE\HUD_Reset!

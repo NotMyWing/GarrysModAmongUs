@@ -8,6 +8,9 @@ with GM
 		.PlayerTables or= {}
 		.DeadPlayers  or= {}
 		.Imposters    or= {}
+		.Sabotages    or= {}
+
+		.SabotageButtons or= {}
 
 		if SERVER
 			.Timers                 or= {}
@@ -18,8 +21,10 @@ with GM
 			.KillCooldownRemainders or= {}
 			.KillCooldowns          or= {}
 			.KillCooldownPause      or= {}
-			.CurrentTask            or= {}
-			.CurrentTaskSubmitted   or= {}
+			.CurrentVGUI            or= {}
+			.VGUICallback           or= {}
+
+			.Lookup_SabotageByVGUIID or= {}
 
 		else
 			.MyTasks or= {}

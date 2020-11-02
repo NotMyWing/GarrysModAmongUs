@@ -149,10 +149,15 @@ GM.Colors = {
 -- @field TasksUpdateData 17
 -- @field TasksSubmit 18
 -- @field TasksOpenVGUI 19
--- @field TasksCloseVGUI 20
+-- @field CloseVGUI 20
 -- @field TasksUpdateCount 21
 -- @field NotifyKilled 22
 -- @field KillCooldownPause 23
+-- @field OpenVGUI 24
+-- @field SabotageData 25
+-- @field SabotageRequest 26
+-- @field SabotageSubmit 27
+-- @field SabotageOpenVGUI 28
 GM.FlowTypes = {
 	GameStart: 1
 	Countdown: 2
@@ -173,14 +178,18 @@ GM.FlowTypes = {
 	TasksUpdateData: 17
 	TasksSubmit: 18
 	TasksOpenVGUI: 19
-	TasksCloseVGUI: 20
+	CloseVGUI: 20
 	TasksUpdateCount: 21
 	NotifyKilled: 22
 	KillCooldownPause: 23
+	OpenVGUI: 24
+	SabotageData: 25
+	SabotageRequest: 26
+	SabotageSubmit: 27
+	SabotageOpenVGUI: 28
 }
 
 GM.FlowSize = math.ceil math.log table.Count(GM.FlowTypes) + 1, 2
-
 
 --- Enum of all task types available in the game mode.
 -- @field Short 1
@@ -277,11 +286,9 @@ GM.Util.SortByDistance = (tbl, entity) ->
 -- @param t The table you need to shuffle.
 -- @return The shuffled table.
 GM.Util.Shuffle = (t) ->
-	memo = {}
-	table.sort t, (a, b) ->
-		memo[a] = memo[a] or math.random!
-		memo[b] = memo[b] or math.random!
-		memo[a] > memo[b]
+	for i = #t, 2, -1
+		j = math.random i
+		t[i], t[j] = t[j], t[i]
 
 	return t
 
@@ -298,6 +305,8 @@ whitelist = {
 	"prop_vent": true
 	"func_task_button": true
 	"prop_task_button": true
+	"prop_sabotage_button": true
+	"func_sabotage_button": true
 }
 
 --- Finds all entities with the matching task name field.
@@ -335,6 +344,18 @@ GM.TracePlayer = (ply) =>
 			if SERVER and not ply\TestPVS ent
 				continue
 
+			-- Plain old trace first.
+			-- The visibility can be occluded with doors, which don't contribute
+			-- towards PVS. Jank, but gets the job done so people can't report bodies
+			-- through closed doors.
+			with tr = util.TraceLine {
+				start: ply\WorldSpaceCenter!
+				endpos: ent\WorldSpaceCenter!
+				filter: (trEnt) -> trEnt == ent or not trEnt\IsPlayer!
+			}
+				if tr.Entity ~= ent
+					continue
+
 			-- Task buttons.
 			if ent\GetClass! == "func_task_button" or ent\GetClass! == "prop_task_button"
 				name = ent\GetTaskName!
@@ -362,6 +383,28 @@ GM.TracePlayer = (ply) =>
 			-- Prevent regular players from using vents.
 			if (ent\GetClass! == "func_vent" or ent\GetClass! == "prop_vent") and not @GameData.Imposters[playerTable]
 				continue
+
+			-- Only highlight sabotage buttons when they're active, and the player isn't dead.
+			if (ent\GetClass! == "func_sabotage_button" or ent\GetClass! == "prop_sabotage_button")
+				if @GameData.DeadPlayers[ply] or not @GameData.SabotageButtons[ent]
+					continue
+
+			-- Only highlight doors when requested by sabotages.
+			if (ent\GetClass! == "func_door" or ent\GetClass! == "func_door_rotating")
+				if @GameData.DeadPlayers[ply] or not @GameData.SabotageButtons[ent]
+					continue
+
+			if (ent\GetClass! == "func_meeting_button" or ent\GetClass! == "prop_meeting_button")
+				if @IsMeetingDisabled!
+					continue
+
+				if 0 >= ply\GetNW2Int "NMW AU Meetings"
+					continue
+
+				time = GetGlobalFloat("NMW AU NextMeeting") - CurTime!
+
+				if time > 0
+					continue
 
 			otherPlayerTable = @GameData.Lookup_PlayerByEntity[ent]
 
@@ -393,3 +436,7 @@ GM.GetTimeLimit = => GetGlobalInt "NMW AU TimeLimit"
 --- Returns whether the communications are disabled (sabotaged).
 -- @return You guessed it.
 GM.GetCommunicationsDisabled = => GetGlobalInt "NMW AU CommsDisabled"
+
+--- Returns whether calling the meeting button is impossible (sabotaged).
+-- @return You guessed it.
+GM.IsMeetingDisabled = => GetGlobalBool "NMW AU MeetingDisabled"

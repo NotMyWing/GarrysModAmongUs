@@ -26,6 +26,11 @@ GM.LoadManifest = =>
 					@Task_Register taskTable
 				else
 					print "Task #{taskName} returned invalid table."
+
+		if @MapManifest.Sabotages and type(@MapManifest.Sabotages) == "table"
+			print "Found #{#@MapManifest.Sabotages} sabotages for #{game.GetMap!}"
+			for sabotage in *@MapManifest.Sabotages
+				@Sabotage_Register sabotage
 	else
 		print "Couldn't find the manifest file for #{game.GetMap!}! The game mode will not work properly."
 

@@ -45,12 +45,21 @@ base.Popup = =>
 
 	surface.PlaySound @__appearSound or "au/panel_genericappear.wav"
 
-base.Submit = (autoClose = true) =>
-	GAMEMODE\Net_SendSubmitTask!
+base.Submit = (data = 0, autoClose = true) =>
+	GAMEMODE\Net_SendSubmitSabotage data
 
 	if autoClose
 		@NewAnimation 0, 2, 0, ->
 			@Close!
+
+base.Think = =>
+	if @__sabotage
+		if not @__closed and not @__sabotage\GetActive!
+			@__closed = true
+			@Close!
+
+base.SetSabotage = (value) =>
+	@__sabotage = value
 
 base.Close = =>
 	GAMEMODE\Net_SendCloseVGUI!
@@ -65,4 +74,4 @@ base.SetDisappearSound = (value) => @__disappearSound = value
 
 base.Paint = =>
 
-vgui.Register "AmongUsTaskBase", base, "DPanel"
+vgui.Register "AmongUsSabotageBase", base, "DPanel"

@@ -101,6 +101,9 @@ hook.Add "CalcView", "NMW AU CalcView", ( ply, pos, angles, fov ) ->
 		:fov
 	}
 
+color_sabotage = Color 32, 255, 32
+color_sabotageb = Color 255, 32, 32
+
 color_kill = Color 255, 0, 0
 color_use   = Color 255, 230, 0
 color_task  = Color 255, 230, 0, 32
@@ -110,6 +113,10 @@ hook.Add "PreDrawHalos", "NMW AU Highlight", ->
 	for _, task in pairs GAMEMODE.GameData.MyTasks
 		if not task.completed and IsValid(task.entity) and task.entity ~= GAMEMODE.UseHighlight and task.entity\GetPos!\Distance(LocalPlayer!\GetPos!) < 200
 			halo.Add { task.entity }, color_task, 6, 6, 2, true, true
+
+	-- Highlight sabotage buttons.
+	for btn in pairs GAMEMODE.GameData.SabotageButtons
+		halo.Add { btn }, math.floor((SysTime! * 4) % 2) ~= 0 and color_sabotage or color_sabotageb, 1, 1, 10, true, true
 
 	if IsValid GAMEMODE.KillHighlight
 		halo.Add { GAMEMODE.KillHighlight }, color_kill, 4, 4, 5, true, true

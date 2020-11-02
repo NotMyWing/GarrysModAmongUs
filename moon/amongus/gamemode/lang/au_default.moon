@@ -3,6 +3,9 @@ with GM.Lang\Get "en"
 	["tasks.totalCompleted.sabotaged"] = "COMMS SABOTAGED"
 
 	["tasks.commsSabotaged"] = "Comms Sabotaged"
+	["tasks.lightsSabotaged"] = "Fix Lights (%d%%)"
+	["tasks.reactorSabotaged"] = "Reactor Meltdown in %d s. (%d/%d)"
+	["tasks.oxygenSabotaged"] = "Oxygen Depleted in %d s. (%d/%d)"
 
 	areas = {
 		["cafeteria"]:      "Cafeteria"
@@ -70,6 +73,14 @@ with GM.Lang\Get "en"
 			color: Color 255, 0, 0
 		}, {
 			text: "Emergency Meetings Left"
+		}
+	}
+
+	["meetingButton.crisis"] = -> {
+		{
+			text: "EMERGENCY MEETINGS CANNOT"
+		}, {
+			text: "BE CALLED DURING CRISES"
 		}
 	}
 

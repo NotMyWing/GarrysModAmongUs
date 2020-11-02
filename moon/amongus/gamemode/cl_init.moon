@@ -6,6 +6,7 @@ include "cl_net.lua"
 include "cl_render.lua"
 include "sh_hooks.lua"
 include "sh_tasks.lua"
+include "sh_sabotages.lua"
 include "sh_manifest.lua"
 
 cv = GM.ConVars

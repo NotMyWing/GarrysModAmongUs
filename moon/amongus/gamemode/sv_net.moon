@@ -298,16 +298,16 @@ GM.Net_BroadcastTaskCount = (count) =>
 	net.Broadcast!
 
 --- Notifies the players that it's time to close their tasks.
-GM.Net_BroadcastTaskClose = =>
+GM.Net_BroadcastCloseVGUI = =>
 	net.Start "NMW AU Flow"
-	net.WriteUInt @FlowTypes.TasksCloseVGUI, @FlowSize
+	net.WriteUInt @FlowTypes.CloseVGUI, @FlowSize
 	net.Broadcast!
 
 --- Notifies the player that it's time to close their tasks.
 -- @param playerTable The tasked crewmate.
-GM.Net_SendTaskClose = (playerTable) =>
+GM.Net_SendCloseVGUI = (playerTable) =>
 	net.Start "NMW AU Flow"
-	net.WriteUInt @FlowTypes.TasksCloseVGUI, @FlowSize
+	net.WriteUInt @FlowTypes.CloseVGUI, @FlowSize
 	net.Send playerTable.entity
 
 --- Notifies the player that he's dead.
@@ -317,6 +317,45 @@ GM.Net_SendNotifyKilled = (playerTable, killerTable) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.NotifyKilled, @FlowSize
 	net.WriteUInt killerTable.id, 8
+	net.Send playerTable.entity
+
+--- Broadcasts sabotage data to players.
+-- The packet must be a valid accessor table.
+-- @param id Sabotage ID.
+-- @param packet Data table.
+-- @param imposter Optional. Broadcast to imposters only?
+GM.Net_BroadcastSabotageData = (id, packet, imposter = false) =>
+	net.Start "NMW AU Flow"
+	net.WriteUInt @FlowTypes.SabotageData, @FlowSize
+	net.WriteUInt id, 8
+	net.WriteTable packet
+
+	if not imposter
+		net.Broadcast!
+	else
+		players = {}
+		for ply in pairs @GameData.Imposters
+			if IsValid ply.entity
+				table.insert players, ply.entity
+
+		net.Send players
+
+--- Broadcasts imposter-specific sabotage data to the imposters.
+-- The packet must be a valid accessor table.
+-- @param id Sabotage ID.
+-- @param packet Data table.
+GM.Net_BroadcastSabotageDataImposter = (id, packet) =>
+	@Net_BroadcastSabotageData id, packet, true
+
+--- Broadcasts imposter-specific sabotage data to the imposters.
+-- The packet must be a valid accessor table.
+-- @param id Sabotage ID.
+-- @param packet Data table.
+GM.Net_OpenSabotageVGUI = (playerTable, sabotage, button) =>
+	net.Start "NMW AU Flow"
+	net.WriteUInt @FlowTypes.SabotageOpenVGUI, @FlowSize
+	net.WriteUInt sabotage\GetID!, 8
+	net.WriteEntity button
 	net.Send playerTable.entity
 
 net.Receive "NMW AU Flow", (len, ply) ->
@@ -371,18 +410,30 @@ net.Receive "NMW AU Flow", (len, ply) ->
 		--
 		-- Player has closed the task window.
 		--
-		when GAMEMODE.FlowTypes.TasksCloseVGUI
+		when GAMEMODE.FlowTypes.CloseVGUI
 			if playerTable
-				GAMEMODE\Player_CloseTask playerTable
+				GAMEMODE\Player_CloseVGUI playerTable
 
 		--
 		-- Player has submitted a task.
 		--
 		when GAMEMODE.FlowTypes.TasksSubmit
 			if playerTable
-				name = net.ReadString!
+				GAMEMODE\Player_SubmitTask playerTable
 
-				GAMEMODE\Player_SubmitTask playerTable, name
+		--
+		-- Player has requested a sabotage.
+		--
+		when GAMEMODE.FlowTypes.SabotageRequest
+			if playerTable
+				GAMEMODE\Sabotage_Start playerTable, net.ReadUInt 8
+
+		--
+		-- Player has submitted a sabotage.
+		--
+		when GAMEMODE.FlowTypes.SabotageSubmit
+			if playerTable
+				GAMEMODE\Sabotage_Submit playerTable, net.ReadUInt 32
 
 --- Sets whether the game is in progress.
 -- @bool state You guessed it again.
@@ -404,3 +455,9 @@ GM.SetCommunicationsDisabled = (value) =>
 
 	if not value and @GameData.CompletedTasks
 		@Net_BroadcastTaskCount @GameData.CompletedTasks
+
+--- Sets whether the meeting button is disabled.
+-- This is automatically called whenever a major sabotage is (de-)activated.
+-- @bool state You guessed it again.
+GM.SetMeetingDisabled = (value) =>
+	SetGlobalBool "NMW AU MeetingDisabled", value

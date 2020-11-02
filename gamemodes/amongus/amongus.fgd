@@ -47,3 +47,16 @@
 	"Vent. Prop Vent."
 [
 ]
+
+@SolidClass base(Origin, RenderFields, Targetname) = func_sabotage_button :
+	"Sabotage button. Pretty much the same thing as task button, but not quite."
+[
+	sabotagename(string) : "The sabotage this button is associated with"
+	areaname(string) : "Button area"
+	customdata(string) : "Custom task data"
+]
+
+@SolidClass base(func_sabotage_button, prop_static_base) = prop_sabotage_button :
+	"Sabotage button. Pretty much the same thing as task button, but not quite. Prop."
+[
+]

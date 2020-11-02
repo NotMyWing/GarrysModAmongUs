@@ -11,12 +11,14 @@ include "sv_meeting.lua"
 
 include "sh_hooks.lua"
 include "sh_tasks.lua"
+include "sh_sabotages.lua"
 include "sh_manifest.lua"
 
 -- Obligatory client stuff
 AddCSLuaFile "sh_lang.lua"
 AddCSLuaFile "sh_gamedata.lua"
 AddCSLuaFile "sh_tasks.lua"
+AddCSLuaFile "sh_sabotages.lua"
 AddCSLuaFile "sh_hooks.lua"
 AddCSLuaFile "vgui/vgui_splash.lua"
 AddCSLuaFile "vgui/vgui_hud.lua"
@@ -25,6 +27,7 @@ AddCSLuaFile "vgui/vgui_eject.lua"
 AddCSLuaFile "vgui/vgui_blink.lua"
 AddCSLuaFile "vgui/vgui_vent.lua"
 AddCSLuaFile "vgui/vgui_task_base.lua"
+AddCSLuaFile "vgui/vgui_sabotage_base.lua"
 AddCSLuaFile "vgui/vgui_task_placeholder.lua"
 AddCSLuaFile "vgui/vgui_kill.lua"
 AddCSLuaFile "vgui/vgui_map.lua"
@@ -39,7 +42,7 @@ GM.GameOver = (reason) =>
 		ply\Freeze true
 
 	@SetGameInProgress false
-	@Player_CloseTasksForEveryone!
+	@Player_CloseVGUIsForEveryone!
 	@Net_BroadcastDead!
 	@Net_BroadcastGameOver reason
 
@@ -49,40 +52,45 @@ GM.GameOver = (reason) =>
 	timer.Create handle, 9, 1, ->
 		@Restart!
 
-GM.CheckWin = =>
+GM.CheckWin = (reason) =>
 	if not @IsGameInProgress!
 		return
 
-	reason = if @GetTimeLimit! == 0
-		@GameOverReason.Crewmate	
-	elseif @GameData.CompletedTasks >= @GameData.TotalTasks
-		@GameOverReason.Crewmate
-	else
-		numImposters = 0
-		numPlayers = 0
-
-		-- Count imposters and players and decide whether the game is over.
-		for _, ply in pairs @GameData.PlayerTables
-			if IsValid(ply.entity) and not @GameData.DeadPlayers[ply]
-				if @GameData.Imposters[ply]
-					numImposters += 1
-				else
-					numPlayers += 1
-
-		if numImposters == 0
+	if not reason
+		reason = if @GetTimeLimit! == 0
 			@GameOverReason.Crewmate
-		elseif numImposters >= numPlayers
-			@GameOverReason.Imposter
+		elseif @GameData.CompletedTasks >= @GameData.TotalTasks
+			@GameOverReason.Crewmate
+		else
+			numImposters = 0
+			numPlayers = 0
+
+			-- Count imposters and players and decide whether the game is over.
+			for _, ply in pairs @GameData.PlayerTables
+				if IsValid(ply.entity) and not @GameData.DeadPlayers[ply]
+					if @GameData.Imposters[ply]
+						numImposters += 1
+					else
+						numPlayers += 1
+
+			if numImposters == 0
+				@GameOverReason.Crewmate
+			elseif numImposters >= numPlayers
+				@GameOverReason.Imposter
 
 	if reason
 		@GameOver reason
 		return true
 
 GM.CleanUp = =>
+	-- Shut all ongoing sabotages down gracefully.
+	if @GameData.Sabotages
+		@Sabotage_ForceEndAll!
+
 	for handle, _ in pairs @GameData.Timers
 		timer.Remove handle
 
-	GAMEMODE\PurgeGameData!
+	@PurgeGameData!
 
 	@SetGameInProgress false
 	@SetCommunicationsDisabled false
@@ -154,7 +162,7 @@ GM.StartGame = =>
 				@SetTimeLimit remainder
 				if remainder == 0
 					@CheckWin!
-			
+
 			timer.Pause timelimitHandle
 		else
 			@SetTimeLimit -1
@@ -180,10 +188,10 @@ GM.StartGame = =>
 		table.sort @GameData.PlayerTables, (a, b) ->
 			-- I use this for testing.
 			-- Ignore.
-			-- if not a.entity\IsBot!
-			--	memo[a] = 1
-			-- if not b.entity\IsBot!
-			--	memo[b] = 1
+			if not a.entity\IsBot!
+				memo[a] = 1
+			if not b.entity\IsBot!
+				memo[b] = 1
 
 			memo[a] = memo[a] or math.random!
 			memo[b] = memo[b] or math.random!
@@ -253,6 +261,7 @@ GM.StartGame = =>
 					if @GameData.Imposters[ply]
 						@Player_RefreshKillCooldown ply
 
+				@Sabotage_Init!
 				@SetGameState @GameState.Playing
 
 				@Meeting_ResetCooldown!

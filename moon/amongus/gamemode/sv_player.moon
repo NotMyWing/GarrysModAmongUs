@@ -103,8 +103,7 @@ GM.Player_Kill = (victimTable, attackerTable) =>
 	@Player_RefreshKillCooldown attackerTable
 
 	@Net_SendNotifyKilled victimTable, attackerTable
-	@Player_CloseTask victimTable
-	@Net_SendTaskClose victimTable
+	@Player_CloseVGUI victimTable
 
 	@CheckWin!
 
@@ -192,6 +191,7 @@ GM.Player_Vent = (playerTable, vent) =>
 			@Player_Hide playerTable.entity
 			@Player_PauseKillCooldown playerTable
 
+		@Sabotage_PauseAll!
 		timer.Create handle, 0.125, 1, ->
 			if IsValid playerTable.entity
 				playerTable.entity\SetPos vent\GetPos!
@@ -214,8 +214,12 @@ GM.Player_UnVent = (playerTable, instant) =>
 
 		handle = "vent" .. playerTable.nickname
 		@Net_BroadcastVent playerTable.entity, vent\GetPos!, true
+
 		timer.Create handle, 0.5, 1, ->
 			@GameData.Vented[playerTable] = nil
+			if 0 == table.Count @GameData.Vented
+				@Sabotage_UnPauseAll!
+
 			if IsValid playerTable.entity
 				@Player_Unhide playerTable.entity
 
@@ -229,7 +233,7 @@ GM.Player_UnVent = (playerTable, instant) =>
 GM.Player_StartTask = (playerTable, name) =>
 	task = (@GameData.Tasks[playerTable] or {})[name]
 
-	if task and not @GameData.CurrentTask[playerTable]
+	if task and @Player_OpenVGUI playerTable, name, (-> task\CancelVisual!)
 		ent = task\GetActivationButton!
 
 		if playerTable.entity\GetPos!\Distance(ent\GetPos!) > 128
@@ -238,52 +242,87 @@ GM.Player_StartTask = (playerTable, name) =>
 		if not task\Use!
 			return
 
-		@GameData.CurrentTask[playerTable] = task
 		task\UseVisual!
 
 		if IsValid playerTable.entity
 			@Net_OpenTaskVGUI playerTable, name
 
---- Closes the current task for the player.
--- @param playerTable The tasked crewmate.
-GM.Player_CloseTask = (playerTable) =>
-	currentTask = @GameData.CurrentTask[playerTable]
+--- Closes the current VGUI if the player has any opened.
+-- Unlike OpenVGUI, this function DOES send a net message
+-- to tell the player to close his VGUI.
+-- @param playerTable Player table.
+GM.Player_CloseVGUI = (playerTable) =>
+	currentVGUI = @GameData.CurrentVGUI[playerTable]
 
-	if currentTask
-		currentTask\CancelVisual!
+	if currentVGUI
+		@GameData.CurrentVGUI[playerTable] = nil
+		@Player_UnPauseKillCooldown playerTable
+		@Net_SendCloseVGUI playerTable
 
-		@GameData.CurrentTask[playerTable] = nil
+		if @GameData.VGUICallback[playerTable]
+			@GameData.VGUICallback[playerTable]!
+
+--- Opens a VGUI for a player.
+-- This is mostly an internal function that helps keeping track of
+-- people with opened VGUIs, such as tasks, sabotages, security cams or
+-- practically anything else. This also pauses the kill timer.
+--
+-- This function returns whether the GUI has been opened.
+-- If the player is already staring at a VGUI, or if he's vented,
+-- or if his cooldown is paused by something, this will return false.
+--
+-- Other than that, this does nothing else on its own. You must
+-- implement the actual VGUI networking yourself.
+--
+-- @param playerTable Player table.
+-- @param vgui Virtually anything. Preferably a string identifier.
+-- @param callback Optional callback to call when the GUI is closed.
+GM.Player_OpenVGUI = (playerTable, vgui, callback) =>
+	-- Bail if the kill cooldown is paused.
+	-- This is pretty much guarantees that the player is busy.
+	if @GameData.KillCooldownRemainders[playerTable]
+		return false
+
+	-- Bail if there's already a screen.
+	if @GameData.CurrentVGUI[playerTable]
+		return false
+
+	@GameData.CurrentVGUI[playerTable] = vgui
+	@Player_PauseKillCooldown playerTable
+
+	@GameData.VGUICallback[playerTable] = callback
+
+	return true
 
 --- Submits the current task. This function will fail
--- if the player isn't actually doing any tasks at this moment,
--- or if the current task doesn't math the provided one.
+-- if the player isn't actually doing any tasks at this moment.
 -- @param playerTable The tasked crewmate.
--- @string name Name of the task.
-GM.Player_SubmitTask = (playerTable, name) =>
-	task = (@GameData.Tasks[playerTable] or {})[name]
+GM.Player_SubmitTask = (playerTable) =>
+	currentVGUI = @GameData.CurrentVGUI[playerTable]
+	currentTask = (@GameData.Tasks[playerTable] or {})[currentVGUI]
 
-	if task and (@GameData.CurrentTask[playerTable] == task)
+	if currentTask
 		if IsValid playerTable.entity
-			ent = task\GetActivationButton!
+			ent = currentTask\GetActivationButton!
 
 			if not playerTable.entity\TestPVS ent
 				return
 
-		btn = task\GetActivationButton!
-		task\Advance!
+		btn = currentTask\GetActivationButton!
+		currentTask\Advance!
 
-		if task\IsCompleted!
-			task\CompleteVisual!
+		if currentTask\IsCompleted!
+			currentTask\CompleteVisual!
 			@CheckWin!
 		else
-			task\AdvanceVisual btn
+			currentTask\AdvanceVisual btn
 
---- Closes the current task for everybody.
-GM.Player_CloseTasksForEveryone = =>
+--- Closes the current VGUI for everybody.
+GM.Player_CloseVGUIsForEveryone = =>
 	for _, playerTable in pairs @GameData.PlayerTables
-		@Player_CloseTask playerTable
+		@Player_CloseVGUI playerTable
 
-	@Net_BroadcastTaskClose!
+	@Net_BroadcastCloseVGUI!
 
 GM.PlayerSpawn = (ply) =>
 	ply\SetModel "models/kaesar/amongus/amongus.mdl"

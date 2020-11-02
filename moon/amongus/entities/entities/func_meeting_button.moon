@@ -62,9 +62,10 @@ if CLIENT
 
 		angle\RotateAroundAxis( angle\Up(), -90 )
 		angle\RotateAroundAxis( angle\Forward(), 90 )
-
 		time = GetGlobalFloat("NMW AU NextMeeting") - CurTime!
-		lines = if time > 0
+		lines = if GAMEMODE\IsMeetingDisabled!
+			TRANSLATE("meetingButton.crisis")!
+		elseif time > 0
 			TRANSLATE("meetingButton.cooldown") math.floor time
 		else
 			TRANSLATE("meetingButton.default") LocalPlayer!\Nick!, LocalPlayer!\GetNW2Int "NMW AU Meetings"

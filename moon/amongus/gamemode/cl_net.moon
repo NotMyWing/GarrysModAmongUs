@@ -34,21 +34,30 @@ GM.Net_SendVote = (id) =>
 	net.SendToServer!
 
 --- Notifies the server that the task has been completed.
--- This will fail horribly if the player isn't doing the task.
--- @param name Task name.
-GM.Net_SendSubmitTask = (name) =>
+-- This will fail horribly if the player isn't doing any tasks.
+GM.Net_SendSubmitTask = =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.TasksSubmit, @FlowSize
-	net.WriteString name
 	net.SendToServer!
 
 --- Notifies the server that the task window has been closed.
--- This will fail horribly if the player isn't doing the task.
+-- This will fail horribly if the player doesn't have anything open.
 -- @param name Task name.
-GM.Net_SendCloseTask = (name) =>
+GM.Net_SendCloseVGUI = =>
 	net.Start "NMW AU Flow"
-	net.WriteUInt @FlowTypes.TasksCloseVGUI, @FlowSize
-	net.WriteString name
+	net.WriteUInt @FlowTypes.CloseVGUI, @FlowSize
+	net.SendToServer!
+
+GM.Net_SabotageRequest = (id) =>
+	net.Start "NMW AU Flow"
+	net.WriteUInt @FlowTypes.SabotageRequest, @FlowSize
+	net.WriteUInt id, 8
+	net.SendToServer!
+
+GM.Net_SendSubmitSabotage = (data = 0) =>
+	net.Start "NMW AU Flow"
+	net.WriteUInt @FlowTypes.SabotageSubmit, @FlowSize
+	net.WriteUInt data, 32
 	net.SendToServer!
 
 moveSounds = {
@@ -126,10 +135,6 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 				task.customName   = net.ReadString!
 				task.customArea   = net.ReadString!
 
-				-- pensive
-				task.Complete = ->
-					GAMEMODE\Net_SendSubmitTask name
-
 				if task.customName == ""
 					task.customName = nil
 				if task.customArea == ""
@@ -138,6 +143,10 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 				GAMEMODE.GameData.MyTasks[name] = task
 
 				GAMEMODE\HUD_TrackTaskOnMap task.entity
+
+		-- Add evil stuff to the map.
+		if imposter
+			GAMEMODE\HUD_InitializeImposterMap!
 
 	--
 	-- Display a countdown.
@@ -313,6 +322,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 				GAMEMODE.Hud\SetupButtons state
 			else
 				GAMEMODE.Hud\SetupButtons state, GAMEMODE.GameData.Imposters[GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]]
+				GAMEMODE\Sabotage_Init!
 
 	--
 	-- Display the game over screen when the game is over.
@@ -388,8 +398,8 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	--
 	-- The server wants us to close the task screen.
 	--
-	when GAMEMODE.FlowTypes.TasksCloseVGUI
-		GAMEMODE\HUD_HideTaskScreen!
+	when GAMEMODE.FlowTypes.CloseVGUI
+		GAMEMODE\HUD_CloseVGUI!
 
 	--
 	-- The server wants us to close the task screen.
@@ -409,3 +419,25 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	--
 	when GAMEMODE.FlowTypes.KillCooldownPause
 		GAMEMODE.GameData.KillCooldownOverride = net.ReadDouble!
+
+	--
+	-- The server has sabotage data updates for us.
+	--
+	when GAMEMODE.FlowTypes.SabotageData
+		id = net.ReadUInt 8
+		packet = net.ReadTable!
+
+		if instance = GAMEMODE.GameData.Sabotages[id]
+			for accessor, value in pairs packet
+				instance["Set#{accessor}"] instance, value
+
+	--
+	-- The server requested us to open a sabotage UI.
+	--
+	when GAMEMODE.FlowTypes.SabotageOpenVGUI
+		id = net.ReadUInt 8
+		entity = net.ReadEntity!
+
+		if instance = GAMEMODE.GameData.Sabotages[id]
+			instance\ButtonUse GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!], entity
+			GAMEMODE\HUD_OpenVGUI instance\CreateVGUI!

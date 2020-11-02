@@ -124,6 +124,58 @@ return vgui.RegisterTable {
 				if .Labels
 					@SetLabels .Labels
 
+		if manifest.Sabotages
+			with @sabotageOverlay = @__innerPanel\Add "DPanel"
+				w, h = @__innerPanel\GetSize!
+				\SetSize w, h
+				\SetZPos 30000
+				\Hide!
+				.Paint = ->
+
+				buttonSize = 0.075 * math.min w, h
+				for id, sabotage in ipairs manifest.Sabotages
+					if sabotage.UI
+						with \Add "DImageButton"
+							\SetMaterial sabotage.UI.Icon
+							\SetSize buttonSize, buttonSize
+							\SetPos w * sabotage.UI.Position.x - buttonSize/2, h * sabotage.UI.Position.y - buttonSize/2
+							.DoClick = ->
+								GAMEMODE\Net_SabotageRequest id
+
+							.Think = ->
+								instance = GAMEMODE.GameData.Sabotages[id]
+
+								if instance
+									enabled = \IsEnabled!
+									canSetOff = instance\CanStart!
+
+									if enabled and not canSetOff
+										\SetEnabled false
+									elseif not enabled and canSetOff
+										\SetEnabled true
+
+							with \Add "DLabel"
+								\Dock FILL
+								\SetContentAlignment 5
+								\SetText "..."
+								\SetFont "NMW AU Map Labels"
+								\SetColor Color 255, 255, 255
+								.Think = ->
+									instance = GAMEMODE.GameData.Sabotages[id]
+									if instance
+										if instance\GetActive!
+											\SetText "!"
+										else
+											time = if instance\GetCooldownOverride! ~= 0
+												instance\GetCooldownOverride!
+											else
+												instance\GetNextUse! - CurTime!
+
+											if time > 0
+												\SetText math.floor time
+											else
+												\SetText ""
+
 	Track: (entity, element, track = true) =>
 		if IsValid entity
 			if track
@@ -160,6 +212,9 @@ return vgui.RegisterTable {
 		@AlphaTo 255, 0.1, 0.01
 
 		surface.PlaySound "au/panel_genericappear.wav"
+
+	EnableSabotageOverlay: =>
+		@sabotageOverlay\Show!
 
 	Close: =>
 		if not @__opened or @__opening or @__closing
