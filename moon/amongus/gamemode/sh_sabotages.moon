@@ -84,3 +84,14 @@ GM.Sabotage_PauseAll = =>
 GM.Sabotage_UnPauseAll = =>
 	for sabotage in *@GameData.Sabotages
 		sabotage\SetPaused false
+
+GM.Sabotage_EnableAll = (enable = true) =>
+	for sabotage in *@GameData.Sabotages
+		sabotage\SetDisabled not enable
+
+GM.Sabotage_RefreshAllCooldowns = (customCooldown) =>
+	for sabotage in *@GameData.Sabotages
+		if customCooldown
+			sabotage\SetNextUse CurTime! + customCooldown
+		else
+			sabotage\RefreshCooldown!
