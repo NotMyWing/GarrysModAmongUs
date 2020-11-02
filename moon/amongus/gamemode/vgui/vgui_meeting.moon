@@ -31,7 +31,6 @@ MAT_BODY_LAYERS = {
 	Material "au/gui/meeting/body/layer1.png"
 	Material "au/gui/meeting/body/layer2.png"
 	Material "au/gui/meeting/body/layer3.png"
-	Material "au/gui/meeting/body/layer4.png"
 	Material "au/gui/meeting/body/text.png"
 }
 
@@ -720,11 +719,11 @@ meeting.StartEmergency = (playerTable, bodyColor) =>
 					else
 						MAT_EMERGENCY_LAYERS
 
-					for i = 4, 1, -1
+					for i = #pics - 2, 1, -1
 						with layers[i] = upper\Add "DPanel"
 							\SetSize size / 2, size / 2
 							\CenterHorizontal!
-							\SetZPos 5 - i
+							\SetZPos (#pics + 1) - i
 							.Image = pics[i]
 							.Paint = GAMEMODE.Render.DermaFitImage
 
@@ -738,7 +737,7 @@ meeting.StartEmergency = (playerTable, bodyColor) =>
 				\SetTall size/2
 				\Dock BOTTOM
 				.Image = if bodyColor
-					MAT_BODY_LAYERS[5]
+					MAT_BODY_LAYERS[4]
 				else
 					MAT_EMERGENCY_LAYERS[5]
 
