@@ -1,6 +1,9 @@
 comms = {
-	Init: =>
-		@SetMajor true
+	Init: (data) =>
+		@Base.Init @, data
+
+		if SERVER
+			@SetMajor true
 
 	OnStart: =>
 		@Base.OnStart @

@@ -42,10 +42,11 @@ if CLIENT
 				render.SetColorModulation 1, 1, 1
 				render.SuppressEngineLighting false
 comms = {
-	Init: =>
-		@SetMajor true
+	Init: (data) =>
+		@Base.Init @, data
 
 		if SERVER
+			@SetMajor true
 			@SetPersistent true
 			@SetNetworkable "Lights"
 

@@ -1,6 +1,8 @@
 {
 	Duration: 8
 	Init: (data) =>
+		@Base.Init @, data
+
 		@__target = data.Target
 
 		if data.Duration

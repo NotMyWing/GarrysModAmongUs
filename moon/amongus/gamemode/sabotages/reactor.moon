@@ -20,11 +20,13 @@ if CLIENT
 reactor = {
 	Duration: 40
 	Init: (data) =>
-		@SetMajor true
+		@Base.Init @, data
+
 		if data and data.Duration
 			@Duration = data.Duration
 
 		if SERVER
+			@SetMajor true
 			@SetNetworkable "MeltdownTime"
 			@SetNetworkable "Submits"
 

@@ -165,7 +165,10 @@ sabotageBase = {
 
 	--- Called when the sabotage class is created.
 	-- Not to be confused with OnStart.
-	Init: =>
+	Init: (data = {}) =>
+		if SERVER
+			if data.Cooldown
+				@SetCooldown data.Cooldown
 
 	--- Called when the sabotage is started. Shared.
 	OnStart: =>

@@ -60,6 +60,7 @@
 				}
 			CustomData: {
 				Target: "sabotageDoor2"
+				Cooldown: 5
 			}
 		}
 		{
