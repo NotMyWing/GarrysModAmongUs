@@ -27,7 +27,7 @@ class InkscapeTransform extends Transform {
 
 		if (file.isStream()) {
 			// Spawn inkscape
-			const inkscape = this.spawnInkscape();
+			const inkscape = this.spawnInkscape(file);
 
 			// Pipe the input
 			file.contents.pipe(inkscape.stdin);
@@ -40,7 +40,7 @@ class InkscapeTransform extends Transform {
 
 		if (file.isBuffer()) {
 			// Spawn inkscape
-			const inkscape = this.spawnInkscape();
+			const inkscape = this.spawnInkscape(file);
 
 			// Write the input
 			inkscape.stdin.write(file.contents);
@@ -59,7 +59,7 @@ class InkscapeTransform extends Transform {
 		}
 	}
 
-	spawnInkscape() {
+	spawnInkscape(file) {
 		// Spawn inkscape
 		const inkscape = spawn(
 			this.inkscapePath,
@@ -73,7 +73,12 @@ class InkscapeTransform extends Transform {
 		// Connect stderr
 		streamToBuffer(inkscape.stderr, (err, content) => {
 			if (err) this.emit('error', err);
-			if (content.length > 0) this.emit('error', new Error(content.toString()));
+			if (content.length > 0) {
+				const message = content.toString();
+				if(message.toLowerCase().includes("error")) {
+					this.emit('error', new Error());
+				}
+			}
 		});
 
 		return inkscape;
