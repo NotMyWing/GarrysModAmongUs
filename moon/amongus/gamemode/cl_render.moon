@@ -72,23 +72,6 @@ hook.Add "HUDShouldDraw", "NMW AU HideHud", (element) ->
 	if hide[element]
 		false
 
-hook.Add "Tick", "NMW AU Light", ->
-	if not IsValid LocalPlayer!
-		return
-
-	with dlight = DynamicLight LocalPlayer!\EntIndex!
-		.pos = LocalPlayer!\GetShootPos!
-		.r = 127
-		.g = 127
-		.b = 127
-		.brightness = 2
-		.Decay = 0
-		.Size = 200
-		.DieTime = CurTime! + 0.25
-
-	-- screw implicit returns man
-	return
-
 hook.Add "CalcView", "NMW AU CalcView", ( ply, pos, angles, fov ) ->
 	newOrigin = if GAMEMODE.GameData.Vented
 		ply\GetPos! + Vector 0, 0, 10
