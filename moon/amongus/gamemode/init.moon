@@ -12,6 +12,7 @@ include "sv_meeting.lua"
 include "sh_hooks.lua"
 include "sh_tasks.lua"
 include "sh_sabotages.lua"
+include "sh_convarsnapshots.lua"
 include "sh_manifest.lua"
 
 -- Obligatory client stuff
@@ -35,6 +36,7 @@ AddCSLuaFile "vgui/kills/remover.lua"
 AddCSLuaFile "cl_hud.lua"
 AddCSLuaFile "cl_net.lua"
 AddCSLuaFile "cl_render.lua"
+AddCSLuaFile "sh_convarsnapshots.lua"
 AddCSLuaFile "sh_manifest.lua"
 
 GM.GameOver = (reason) =>
@@ -105,6 +107,8 @@ GM.CleanUp = (soft) =>
 	@Player_UnhideEveryone!
 	@Net_BroadcastCountdown 0
 
+	@SetGameCommencing false
+
 	timer.Remove "NMW AU CheckWin"
 
 	if not soft
@@ -139,12 +143,14 @@ GM.StartGame = =>
 	if not @MapManifest or not @MapManifest.Tasks
 		return
 
+	-- Bail if the game is already in progress.
+	if @IsGameInProgress!
+		return
+
 	-- Bail if we don't have enough players.
 	-- TO-DO: print chat message.
 	if #player.GetAll! - @ConVars.ImposterCount\GetInt! * 2 < 1
 		return
-
-	@CleanUp!
 
 	handle = "tryStartGame"
 	@GameData.Timers[handle] = true
@@ -156,7 +162,13 @@ GM.StartGame = =>
 	@Net_BroadcastCountdown CurTime! + time
 	@Logger.Info "Starting in #{time} s."
 
+	@SetGameCommencing true
+	@ConVarSnapshot_Take!
+	@Net_BroadcastConVarSnapshots @ConVarSnapshot_ExportAll!
+
 	timer.Create handle, time, 1, ->
+		@SetGameCommencing false
+
 		-- Don't start in case somebody has left.
 		for _, ply in ipairs playerMemo
 			if not IsValid ply
@@ -165,7 +177,7 @@ GM.StartGame = =>
 
 		-- Create the time limit timer if the cvar is set.
 		-- That's quite an interesting sentence.
-		timelimit = @ConVars.TimeLimit\GetInt!
+		timelimit = @ConVarSnapshots.TimeLimit\GetInt!
 		timelimitHandle = "timelimitHandle"
 		if timelimit > 0
 			@GameData.Timers[timelimitHandle] = true
@@ -217,13 +229,13 @@ GM.StartGame = =>
 			ply.color = @Colors[math.floor(#@Colors / #@GameData.PlayerTables) * index]
 
 			-- Make the first N players imposters.
-			if index <= @ConVars.ImposterCount\GetInt!
+			if index <= @ConVarSnapshots.ImposterCount\GetInt!
 				@GameData.Imposters[ply] = true
 
 			with ply.entity
 				\Freeze true
 				\SetColor ply.color
-				\SetNW2Int "NMW AU Meetings", @ConVars.MeetingsPerPlayer\GetInt!
+				\SetNW2Int "NMW AU Meetings", @ConVarSnapshots.MeetingsPerPlayer\GetInt!
 
 		-- Shuffle the player table one more time.
 		-- We don't want to broadcast the previous table
@@ -256,7 +268,7 @@ GM.StartGame = =>
 			timer.Create handle, @SplashScreenTime - 2, 1, ->
 				-- Check if suddenly something went extremely wrong during the windup time.
 				if @CheckWin!
-					return @CleanUp true
+					return
 
 				@Logger.Info "Game begins! GL & HF"
 
@@ -312,25 +324,14 @@ GM.SetGameState = (newState) =>
 	@Net_BroadcastGameState newState
 
 concommand.Add "au_debug_start", ->
-	GAMEMODE\Restart!
+	if GAMEMODE\IsGameInProgress!
+		GAMEMODE\Restart!
 
-	GAMEMODE\StartGame!
+	timer.Simple 0, ->
+		GAMEMODE\StartGame!
 
 concommand.Add "au_debug_restart", ->
 	GAMEMODE\Restart!
-
--- Disable changing important ConVars during the game.
-for _, convar in pairs GM.ConVars
-	-- Prevent the game from dying.
-	changing = false
-
-	cvars.AddChangeCallback convar\GetName!, ((cvar, old, new) ->
-		if not changing
-			changing = true
-			if GAMEMODE\IsGameInProgress!
-				convar\SetString old
-			changing = false
-	), "NMW AU Protect"
 
 hook.Add "Initialize", "NMW AU Initialize", ->
 	MsgN!

@@ -189,6 +189,7 @@ GM.FlowTypes = {
 	SabotageRequest: 26
 	SabotageSubmit: 27
 	SabotageOpenVGUI: 28
+	ConVarSnapshots: 29
 }
 
 GM.FlowSize = math.ceil math.log table.Count(GM.FlowTypes) + 1, 2
@@ -328,8 +329,11 @@ GM.Util.FindEntsByTaskName = (taskname, first = false) ->
 -- @return The closest killable entity. Nullable.
 -- @return The closest usable entity. Nullable.
 GM.TracePlayer = (ply) =>
+	if not @IsGameInProgress!
+		return
+
 	startPos = ply\WorldSpaceCenter!
-	entities = ents.FindInSphere startPos, @BaseUseRadius * @ConVars.KillDistanceMod\GetFloat!
+	entities = ents.FindInSphere startPos, @BaseUseRadius * @ConVarSnapshots.KillDistanceMod\GetFloat!
 
 	usable = {}
 	killable = {}
@@ -442,6 +446,10 @@ GM.GetCommunicationsDisabled = => GetGlobalInt "NMW AU CommsDisabled"
 --- Returns whether calling the meeting button is impossible (sabotaged).
 -- @return You guessed it.
 GM.IsMeetingDisabled = => GetGlobalBool "NMW AU MeetingDisabled"
+
+--- Returns whether the game is commencing.
+-- @return You guessed it.
+GM.IsGameCommencing = => GetGlobalBool "NMW AU GameCommencing"
 
 local logger
 logger = {

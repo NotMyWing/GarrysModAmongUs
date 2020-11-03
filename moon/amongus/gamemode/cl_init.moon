@@ -7,6 +7,7 @@ include "cl_render.lua"
 include "sh_hooks.lua"
 include "sh_tasks.lua"
 include "sh_sabotages.lua"
+include "sh_convarsnapshots.lua"
 include "sh_manifest.lua"
 
 cv = GM.ConVars
@@ -15,30 +16,30 @@ GM.ConVarsDisplay = {
 	{
 		Name: "General"
 		ConVars: {
-			{ "Int"  , cv.ImposterCount   }
-			{ "Time" , cv.KillCooldown    }
-			{ "Time" , cv.TimeLimit       }
-			{ "Mod"  , cv.KillDistanceMod }
+			{ "Int"  , "ImposterCount"   }
+			{ "Time" , "KillCooldown"    }
+			{ "Time" , "TimeLimit"       }
+			{ "Mod"  , "KillDistanceMod" }
 		}
 	}
 	{
 		Name: "Meeting"
 		ConVars: {
-			{ "Int"  , cv.MeetingsPerPlayer }
-			{ "Time" , cv.MeetingCooldown   }
-			{ "Time" , cv.VoteTime          }
-			{ "Time" , cv.VotePreTime       }
-			{ "Time" , cv.VotePostTime      }
-			{ "Bool" , cv.ConfirmEjects     }
+			{ "Int"  , "MeetingsPerPlayer" }
+			{ "Time" , "MeetingCooldown"   }
+			{ "Time" , "VoteTime"          }
+			{ "Time" , "VotePreTime"       }
+			{ "Time" , "VotePostTime"      }
+			{ "Bool" , "ConfirmEjects"     }
 		}
 	}
 	{
 		Name: "Tasks"
 		ConVars: {
-			{ "Int"  , cv.TasksShort  }
-			{ "Int"  , cv.TasksLong   }
-			{ "Int"  , cv.TasksCommon }
-			{ "Bool" , cv.TasksVisual }
+			{ "Int"  , "TasksShort"  }
+			{ "Int"  , "TasksLong"   }
+			{ "Int"  , "TasksCommon" }
+			{ "Bool" , "TasksVisual" }
 		}
 	}
 }
@@ -86,8 +87,11 @@ hook.Add "Tick", "NMW AU KeyBinds", ->
 	return
 
 hook.Add "Tick", "NMW AU Highlight", ->
-	if IsValid LocalPlayer!
+	if IsValid(LocalPlayer!) and GAMEMODE\IsGameInProgress! and GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
 		killable, usable = GAMEMODE\TracePlayer LocalPlayer!
+		GAMEMODE.KillHighlight = killable
+		GAMEMODE.UseHighlight = usable
+	else
 		GAMEMODE.KillHighlight = killable
 		GAMEMODE.UseHighlight = usable
 

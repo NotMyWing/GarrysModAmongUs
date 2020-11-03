@@ -73,15 +73,17 @@ hud.SetupButtons = (state, impostor) =>
 			\Dock LEFT
 
 			white = Color 255, 255, 255
+			green = Color 32, 255, 32
 			.Paint = ->
 				surface.SetFont "NMW AU Taskbar"
 				_, tH = surface.GetTextSize "A"
 
+				conVars = GAMEMODE\IsGameCommencing! and GAMEMODE.ConVarSnapshots or GAMEMODE.ConVars
 				i = 0
 				for categoryId, category in ipairs GAMEMODE.ConVarsDisplay
 					for _, conVarTable in ipairs category.ConVars
 						type   = conVarTable[1]
-						conVar = conVarTable[2]
+						conVar = conVars[conVarTable[2]]
 						conVarName = conVar\GetName!
 
 						value = switch type
@@ -100,7 +102,7 @@ hud.SetupButtons = (state, impostor) =>
 							i += 1
 
 							draw.SimpleText "#{TRANSLATE("cvar." .. conVarName)}: #{value}", "NMW AU Taskbar",
-								0, (i - 1) * tH * 1.05 + (categoryId - 1) * tH * 1.05, white
+								0, (i - 1) * tH * 1.05 + (categoryId - 1) * tH * 1.05, GAMEMODE\IsGameCommencing! and green or white
 
 		return
 
@@ -429,7 +431,7 @@ hud.AddTaskEntry = =>
 			clr = if blink and math.floor((SysTime! * 4) % 2) == 0
 				colorBlink
 			else
-				color				
+				color
 
 			draw.SimpleTextOutlined text, "NMW AU Taskbar",
 				ScrW! * 0.0075, h/2, clr, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, Color(0, 0, 0, 64)

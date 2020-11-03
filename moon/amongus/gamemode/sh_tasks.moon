@@ -81,15 +81,15 @@ else
 		shuffle = @Util.Shuffle
 
 		pools = {
-			[taskMapToPool @TaskCollection.Short]: @ConVars.TasksShort\GetInt!
-			[taskMapToPool @TaskCollection.Long]:  @ConVars.TasksLong\GetInt!
+			[taskMapToPool @TaskCollection.Short]: @ConVarSnapshots.TasksShort\GetInt!
+			[taskMapToPool @TaskCollection.Long]:  @ConVarSnapshots.TasksLong\GetInt!
 		}
 
 		-- Pick N random common tasks from the pool.
 		commonTasks = {}
 
 		for _, task in ipairs shuffle taskMapToPool @TaskCollection.Common
-			if #commonTasks < @ConVars.TasksCommon\GetInt!
+			if #commonTasks < @ConVarSnapshots.TasksCommon\GetInt!
 				table.insert commonTasks, task
 			else
 				break
@@ -105,7 +105,7 @@ else
 
 			-- Don't assign tasks to bots, but create their table to prevent
 			-- the logic from dying horribly.
-			if IsValid(playerTable.entity) and playerTable.entity\IsBot! and not @ConVars.DistributeTasksToBots\GetBool!
+			if IsValid(playerTable.entity) and playerTable.entity\IsBot! and not @ConVarSnapshots.DistributeTasksToBots\GetBool!
 				continue
 
 			-- Assign the picked common tasks.

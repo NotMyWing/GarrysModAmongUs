@@ -197,12 +197,12 @@ meeting.OpenDiscuss = (caller) =>
 		\SetAlpha 0
 		\AlphaTo 255, 0.1, 0
 
-		time = DISCUSS_SPLASH_TIME + GAMEMODE.ConVars.VotePreTime\GetInt! + GAMEMODE.ConVars.VoteTime\GetInt! + 0.5
+		time = DISCUSS_SPLASH_TIME + GAMEMODE.ConVarSnapshots.VotePreTime\GetInt! + GAMEMODE.ConVarSnapshots.VoteTime\GetInt! + 0.5
 		voteEndTime = SysTime! + time
 
 		beginAnim = {
 			StartTime: SysTime! + DISCUSS_SPLASH_TIME
-			EndTime: SysTime! + DISCUSS_SPLASH_TIME + GAMEMODE.ConVars.VotePreTime\GetInt!
+			EndTime: SysTime! + DISCUSS_SPLASH_TIME + GAMEMODE.ConVarSnapshots.VotePreTime\GetInt!
 		}
 
 		.Image = MAT_MEETING_TABLET.tablet
@@ -284,7 +284,7 @@ meeting.OpenDiscuss = (caller) =>
 					\SetPos skipWidth * 0.1, (sh * 0.6)/2 - skipHeight/2
 
 					\SetEnabled false
-					\NewAnimation 0, DISCUSS_SPLASH_TIME + GAMEMODE.ConVars.VotePreTime\GetInt!, 0, ->
+					\NewAnimation 0, DISCUSS_SPLASH_TIME + GAMEMODE.ConVarSnapshots.VotePreTime\GetInt!, 0, ->
 						\SetEnabled true
 
 					\SetText ""
@@ -492,7 +492,7 @@ meeting.OpenDiscuss = (caller) =>
 										\SetSize playerItem\GetWide!, playerItem\GetTall!
 										\SetAlpha 100
 										if alive
-											\AlphaTo 0, 0.25, DISCUSS_SPLASH_TIME + GAMEMODE.ConVars.VotePreTime\GetInt!, ->
+											\AlphaTo 0, 0.25, DISCUSS_SPLASH_TIME + GAMEMODE.ConVarSnapshots.VotePreTime\GetInt!, ->
 												\SetZPos 20
 
 										\SetZPos 40
@@ -516,7 +516,7 @@ meeting.OpenDiscuss = (caller) =>
 											.Paint = ->
 
 											if alive
-												\NewAnimation 0, DISCUSS_SPLASH_TIME + GAMEMODE.ConVars.VotePreTime\GetInt!, 0, ->
+												\NewAnimation 0, DISCUSS_SPLASH_TIME + GAMEMODE.ConVarSnapshots.VotePreTime\GetInt!, 0, ->
 													\SetEnabled true
 
 												.DoClick = ->
@@ -654,7 +654,7 @@ meeting.ApplyVote = (playerTable) =>
 meeting.End = (results = {}) =>
 	@proceeding = {
 		StartTime: SysTime!
-		EndTime: SysTime! + GAMEMODE.ConVars.VotePostTime\GetInt!
+		EndTime: SysTime! + GAMEMODE.ConVarSnapshots.VotePostTime\GetInt!
 	}
 
 	@DisableAllButtons!

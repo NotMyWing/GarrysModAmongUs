@@ -50,7 +50,7 @@ GM.Meeting_Start = (ply, bodyColor) =>
 
 			@Net_BroadcastDiscuss aply
 
-			timer.Create handle, @ConVars.VotePreTime\GetInt! + 3, 1, ->
+			timer.Create handle, @ConVarSnapshots.VotePreTime\GetInt! + 3, 1, ->
 				@GameData.Voting = true
 				table.Empty @GameData.Votes
 				table.Empty @GameData.VotesMap
@@ -61,7 +61,7 @@ GM.Meeting_Start = (ply, bodyColor) =>
 						rnd = table.Random @GetAlivePlayers!
 						@Meeting_Vote ply, not skip and rnd
 
-				timer.Create handle, @ConVars.VoteTime\GetInt!, 1, ->
+				timer.Create handle, @ConVarSnapshots.VoteTime\GetInt!, 1, ->
 					@Meeting_End!
 
 	return true
@@ -119,7 +119,7 @@ GM.Meeting_End = =>
 	voteTable, reason, ejected = @Meeting_FinalizeVotes!
 	@Net_BroadcastMeetingEnd voteTable
 
-	timer.Create handle, @ConVars.VotePostTime\GetInt!, 1, ->
+	timer.Create handle, @ConVarSnapshots.VotePostTime\GetInt!, 1, ->
 		@Net_BroadcastEject reason, ejected
 
 		if ejected
@@ -144,4 +144,4 @@ GM.Meeting_End = =>
 			@Sabotage_EnableAll!
 
 GM.Meeting_ResetCooldown = =>
-	SetGlobalFloat "NMW AU NextMeeting", CurTime! + @ConVars.MeetingCooldown\GetFloat!
+	SetGlobalFloat "NMW AU NextMeeting", CurTime! + @ConVarSnapshots.MeetingCooldown\GetFloat!

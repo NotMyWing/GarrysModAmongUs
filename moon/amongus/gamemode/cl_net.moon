@@ -73,6 +73,10 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	when GAMEMODE.FlowTypes.GameStart
 		GAMEMODE\PurgeGameData!
 
+		-- Read ConVar snapshots.
+		-- Again.
+		GAMEMODE\ConVarSnapshot_ImportAll net.ReadTable!
+
 		-- Fill player tables.
 		playerCount = net.ReadUInt 8
 		for i = 1, playerCount
@@ -441,3 +445,9 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		if instance = GAMEMODE.GameData.Sabotages[id]
 			instance\ButtonUse GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!], entity
 			GAMEMODE\HUD_OpenVGUI instance\CreateVGUI!
+
+	--
+	-- The server requested us to open a sabotage UI.
+	--
+	when GAMEMODE.FlowTypes.ConVarSnapshots
+		GAMEMODE\ConVarSnapshot_ImportAll net.ReadTable!

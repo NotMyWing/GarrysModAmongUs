@@ -48,7 +48,7 @@ GM.Net_BroadcastEject = (reason, playerTable) =>
 	else
 		net.WriteBool false
 
-	confirm = @ConVars.ConfirmEjects\GetBool!
+	confirm = @ConVarSnapshots.ConfirmEjects\GetBool!
 	net.WriteBool confirm
 	if confirm
 		imposter = playerTable and @GameData.Imposters[playerTable]
@@ -142,6 +142,8 @@ GM.Net_UpdateGameData = (ply) =>
 
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.GameStart, @FlowSize
+
+	net.WriteTable @ConVarSnapshot_ExportAll!
 
 	net.WriteUInt #@GameData.PlayerTables, 8
 	for _, aply in ipairs @GameData.PlayerTables
@@ -347,6 +349,14 @@ GM.Net_BroadcastSabotageData = (id, packet, imposter = false) =>
 GM.Net_BroadcastSabotageDataImposter = (id, packet) =>
 	@Net_BroadcastSabotageData id, packet, true
 
+--- Broadcasts ConVar snapshots.
+-- @param snapshots ConVar snapshots.
+GM.Net_BroadcastConVarSnapshots = (snapshots) =>
+	net.Start "NMW AU Flow"
+	net.WriteUInt @FlowTypes.ConVarSnapshots, @FlowSize
+	net.WriteTable snapshots
+	net.Broadcast!
+
 --- Broadcasts imposter-specific sabotage data to the imposters.
 -- The packet must be a valid accessor table.
 -- @param id Sabotage ID.
@@ -461,3 +471,9 @@ GM.SetCommunicationsDisabled = (value) =>
 -- @bool state You guessed it again.
 GM.SetMeetingDisabled = (value) =>
 	SetGlobalBool "NMW AU MeetingDisabled", value
+
+--- Sets whether the game is commencing.
+-- This is mostly used to lock clientside convar displays.
+-- @bool state You guessed it again.
+GM.SetGameCommencing = (value) =>
+	SetGlobalBool "NMW AU GameCommencing", value

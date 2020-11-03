@@ -102,7 +102,7 @@ taskBase = {
 
 	--- Can we visualize?
 	CanVisual: =>
-		return GAMEMODE.ConVars.TasksVisual\GetBool!
+		return GAMEMODE.ConVarSnapshots.TasksVisual\GetBool!
 
 	--- Triggers the "OnTaskUse" output of the current button.
 	-- This doesn't get called if the user couldn't actually use the task for some reason.

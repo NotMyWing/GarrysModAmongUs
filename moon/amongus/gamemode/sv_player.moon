@@ -74,7 +74,7 @@ GM.Player_Kill = (victimTable, attackerTable) =>
 		return
 
 	-- Bail if the attacker is too far.
-	if (@BaseUseRadius * @ConVars.KillDistanceMod\GetFloat!) <
+	if (@BaseUseRadius * @ConVarSnapshots.KillDistanceMod\GetFloat!) <
 		victimTable.entity\GetPos!\Distance attackerTable.entity\GetPos!
 		return
 
@@ -110,7 +110,7 @@ GM.Player_Kill = (victimTable, attackerTable) =>
 --- Bumps the kill cooldown of a player.
 -- @param playerTable Player table.
 GM.Player_RefreshKillCooldown = (playerTable) =>
-	cd = CurTime! + @ConVars.KillCooldown\GetFloat!
+	cd = CurTime! + @ConVarSnapshots.KillCooldown\GetFloat!
 	@GameData.KillCooldowns[playerTable] = cd
 
 	if IsValid playerTable.entity
