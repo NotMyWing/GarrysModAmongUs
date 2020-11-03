@@ -191,7 +191,7 @@ GM.Player_Vent = (playerTable, vent) =>
 			@Player_Hide playerTable.entity
 			@Player_PauseKillCooldown playerTable
 
-		@Sabotage_PauseAll!
+		-- @Sabotage_PauseAll!
 		timer.Create handle, 0.125, 1, ->
 			if IsValid playerTable.entity
 				playerTable.entity\SetPos vent\GetPos!
@@ -217,8 +217,8 @@ GM.Player_UnVent = (playerTable, instant) =>
 
 		timer.Create handle, 0.5, 1, ->
 			@GameData.Vented[playerTable] = nil
-			if 0 == table.Count @GameData.Vented
-				@Sabotage_UnPauseAll!
+			-- if 0 == table.Count @GameData.Vented
+			--	@Sabotage_UnPauseAll!
 
 			if IsValid playerTable.entity
 				@Player_Unhide playerTable.entity
