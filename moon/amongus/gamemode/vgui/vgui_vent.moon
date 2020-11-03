@@ -1,8 +1,8 @@
 TRANSLATE = GM.Lang.GetEntry
 
 surface.CreateFont "NMW AU Vent Text", {
-	font: "Arial"
-	size: ScrH! * 0.03
+	font: "Roboto"
+	size: ScrW! * 0.017
 	weight: 500
 	outline: true
 }
@@ -13,16 +13,13 @@ vent.Init = =>
 	@SetZPos 30000
 
 	offset = ScrW! * 0.025
-	@DockMargin offset, offset * 4, 0, offset * 4
-	@SetWide ScrW! / 5
-	@Dock LEFT
+	@SetSize ScrW! / 4, ScrH!
+	@SetPos ScrW! - offset - @GetWide!, offset * 4
 
 ASSETS = {
 	button: Material "au/gui/vent/num.png"
 	label: Material "au/gui/vent/label.png"
 }
-
-labelAspect = 6/1
 
 vent.ShowVents = (vents) =>
 	size = ScrW! * 0.025
@@ -39,18 +36,23 @@ vent.ShowVents = (vents) =>
 				\SetText i
 				\SetContentAlignment 5
 				\SetWide size
-				\Dock LEFT
+				\Dock RIGHT
 				.Image = ASSETS.button
 				.Paint = GAMEMODE.Render.DermaFitImage
+
+			labelAspect = if texture = ASSETS.label\GetTexture "$basetexture"
+				texture\GetMappingWidth! / texture\GetMappingHeight!
+			else
+				0
 
 			with label = \Add "DLabel"
 				\SetFont "NMW AU Vent Text"
 				\SetColor Color 255, 255, 255
 				\SetSize size * labelAspect, size
-				\DockMargin size * 0.1, 0, 0, 0
+				\DockMargin 0, 0, size * 0.1, 0
 				\SetText tostring TRANSLATE vent
 				\SetContentAlignment 5
-				\Dock LEFT
+				\Dock RIGHT
 				.Image = ASSETS.label
 				.Paint = GAMEMODE.Render.DermaFitImage
 
