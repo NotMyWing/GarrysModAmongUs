@@ -74,11 +74,13 @@ GM.Sabotage_Submit = (playerTable, data) =>
 
 GM.Sabotage_ForceEndAll = =>
 	for sabotage in *@GameData.Sabotages
-		sabotage\End!
+		if sabotage\GetActive!
+			sabotage\End!
+			sabotage\ForceUpdate!
 
 GM.Sabotage_EndNonPersistent = =>
 	for sabotage in *@GameData.Sabotages
-		if not sabotage\GetPersistent!
+		if sabotage\GetActive! and not sabotage\GetPersistent!
 			sabotage\End!
 
 GM.Sabotage_PauseAll = =>

@@ -260,6 +260,10 @@ if SERVER
 		-- The backbone of the network update pipeline.
 		-- There's little reason you should be calling this manually.
 		.__netUpdate = =>
+			handle = "NMW AU Sabotage Dirty #{@GetID!}"
+			if timer.Exists handle
+				timer.Remove handle
+
 			for method, accessors in pairs @__accessorTable
 				if not @__oldData[method]
 					@__oldData[method] = {}
@@ -277,6 +281,16 @@ if SERVER
 
 				if changed
 					GAMEMODE[method] GAMEMODE, @GetID!, packet
+
+		--- Forces a network update.
+		-- This should only be called when it's required to issue an
+		-- update immediately.
+		--
+		-- An example of that would be clean up, during which it's important
+		-- to issue an update packet immediately before the sabotage table is
+		-- cleared on the client.
+		.ForceUpdate = =>
+			@__netUpdate!
 
 		--- Defines a pair of Get/Set methods as networkable.
 		-- This will automatically broadcast the new state of the accessor to
