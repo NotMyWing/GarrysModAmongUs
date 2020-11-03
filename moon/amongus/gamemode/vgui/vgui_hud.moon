@@ -140,25 +140,6 @@ hud.SetupButtons = (state, impostor) =>
 
 					draw.RoundedBox 4, pad, pad, w - pad*2, h - pad*2, taskBarOuterColor
 
-				-- If there's a time limit, dock the timer to the right side.
-				if GAMEMODE\GetTimeLimit! > 0
-					with \Add "DLabel"
-						\SetWide ScrW! * 0.08
-						\Dock RIGHT
-						\SetText "..."
-						\SetContentAlignment 6
-						\SetFont "NMW AU Taskbar"
-						\SetColor Color 255, 255, 255
-
-						red = false
-						.Think = ->
-							time = GAMEMODE\GetTimeLimit!
-							if time <= 60 and not red
-								red = true
-								\SetColor Color 255, 0, 0
-
-							\SetText string.FormattedTime(time, "%02i:%02i") .. "  "
-
 				with \Add "DPanel"
 					\Dock FILL
 					.Paint = ->
@@ -168,6 +149,25 @@ hud.SetupButtons = (state, impostor) =>
 						\SetZPos 1
 						\SetFont "NMW AU Taskbar"
 						\SetText "  " .. TRANSLATE "tasks.totalCompleted"
+
+						-- If there's a time limit, dock the timer to the right side.
+						if GAMEMODE\GetTimeLimit! > 0
+							with \Add "DLabel"
+								\SetWide ScrW! * 0.08
+								\Dock RIGHT
+								\SetText "..."
+								\SetContentAlignment 6
+								\SetFont "NMW AU Taskbar"
+								\SetColor Color 255, 255, 255
+
+								red = false
+								.Think = ->
+									time = GAMEMODE\GetTimeLimit!
+									if time <= 60 and not red
+										red = true
+										\SetColor Color 255, 0, 0
+
+									\SetText string.FormattedTime(time, "%02i:%02i") .. "  "
 
 					with @taskbar = \Add "DPanel"
 						taskBarInnerColor = Color 68, 216, 68
