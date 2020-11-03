@@ -94,7 +94,7 @@ GM.Lang or= {
 				AddCSLuaFile path
 				include path
 
-				print "included #{path}"
+				GAMEMODE.Logger.Info "Included lang file #{path}"
 }
 
 GM.Lang\Initialize!

@@ -11,10 +11,10 @@ GM.LoadManifest = =>
 
 		@MapManifest = include fileName
 
-		print "Found the manifest file for #{game.GetMap!}"
+		GAMEMODE.Logger.Info "Found the manifest file for #{game.GetMap!}"
 
 		if @MapManifest.Tasks and type(@MapManifest.Tasks) == "table"
-			print "Found #{#@MapManifest.Tasks} tasks for #{game.GetMap!}"
+			GAMEMODE.Logger.Info "Found #{#@MapManifest.Tasks} tasks for #{game.GetMap!}"
 			for taskName in *@MapManifest.Tasks
 				if SERVER
 					AddCSLuaFile "tasks/#{taskName}.lua"
@@ -25,13 +25,13 @@ GM.LoadManifest = =>
 
 					@Task_Register taskTable
 				else
-					print "Task #{taskName} returned invalid table."
+					GAMEMODE.Logger.Error "Task #{taskName} returned invalid table."
 
 		if @MapManifest.Sabotages and type(@MapManifest.Sabotages) == "table"
-			print "Found #{#@MapManifest.Sabotages} sabotages for #{game.GetMap!}"
+			GAMEMODE.Logger.Info "Found #{#@MapManifest.Sabotages} sabotages for #{game.GetMap!}"
 			for sabotage in *@MapManifest.Sabotages
 				@Sabotage_Register sabotage
 	else
-		print "Couldn't find the manifest file for #{game.GetMap!}! The game mode will not work properly."
+		GAMEMODE.Logger.Error "Couldn't find the manifest file for #{game.GetMap!}! The game mode will not work properly."
 
 GM\LoadManifest!

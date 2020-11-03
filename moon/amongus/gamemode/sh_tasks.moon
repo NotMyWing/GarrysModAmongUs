@@ -15,7 +15,7 @@ GM.TaskCollection.All    or= {}
 GM.Task_Register = (taskTable = {}) =>
 	with taskTable
 		if not .Name
-			print "Tried to register a task with no name"
+			@Logger.Error "Tried to register a task with no name"
 			return
 
 		collection = switch .Type
@@ -26,11 +26,11 @@ GM.Task_Register = (taskTable = {}) =>
 			when @TaskType.Common
 				@TaskCollection.Common
 			else
-				print "Task #{.name} has bad type: #{.Type}"
+				@Logger.Error "Task #{.name} has bad type: #{.Type}"
 				return
 
 		if collection
-			print "Registered task #{.Name}"
+			@Logger.Info "* Registered task #{.Name}"
 
 			collection[.Name] = taskTable
 
@@ -121,7 +121,7 @@ else
 					if IsValid ent[1]
 						taskInstance\SetActivationButton ent[1]
 					else
-						print "Task #{task.Name} has NO suitable buttons on the map. Ignoring."
+						@Logger.Error "Task #{task.Name} has NO suitable buttons on the map. Ignoring."
 						continue
 
 				@GameData.Tasks[playerTable][taskInstance.Name] = taskInstance
@@ -144,7 +144,7 @@ else
 							if IsValid ent[1]
 								taskInstance\SetActivationButton ent[1]
 							else
-								print "Task #{task.Name} has NO suitable buttons on the map. Ignoring."
+								@Logger.Error "Task #{task.Name} has NO suitable buttons on the map. Ignoring."
 								continue
 
 						count += 1

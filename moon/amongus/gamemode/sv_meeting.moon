@@ -27,6 +27,10 @@ GM.Meeting_Start = (ply, bodyColor) =>
 	timer.Create handle, 0.2, 1, ->
 		@Net_BroadcastDead!
 		@Net_BroadcastMeeting aply, bodyColor
+		if bodyColor
+			@Logger.Info "#{ply\Nick!} has found a body! Calling a meeting"
+		else
+			@Logger.Info "#{ply\Nick!} has called a meeting"
 
 		timer.Create handle, 3, 1, ->
 			spawns = ents.FindByClass "info_player_start"
@@ -119,7 +123,10 @@ GM.Meeting_End = =>
 		@Net_BroadcastEject reason, ejected
 
 		if ejected
+			@Logger.Info "#{ejected.nickname} has been ejected"
 			@Player_SetDead ejected
+		else
+			@Logger.Info "Nobody has been ejected during the meeting"
 
 		timer.Pause "NMW AU CheckWin"
 		timer.Create handle, 8, 1, ->

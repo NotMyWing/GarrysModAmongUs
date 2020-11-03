@@ -59,8 +59,12 @@ GM.CheckWin = (reason) =>
 	if not reason
 		reason = if @GetTimeLimit! == 0
 			@GameOverReason.Crewmate
+			@Logger.Info "Game over. Crewmates have won! (time out)"
+
 		elseif @GameData.CompletedTasks >= @GameData.TotalTasks
 			@GameOverReason.Crewmate
+			@Logger.Info "Game over. Crewmates have won! (task win)"
+
 		else
 			numImposters = 0
 			numPlayers = 0
@@ -75,8 +79,11 @@ GM.CheckWin = (reason) =>
 
 			if numImposters == 0
 				@GameOverReason.Crewmate
+				@Logger.Info "Game over. Crewmates have won!"
+
 			elseif numImposters >= numPlayers
 				@GameOverReason.Imposter
+				@Logger.Info "Game over. Imposters have won!"
 
 	if reason
 		@GameOver reason
@@ -144,11 +151,13 @@ GM.StartGame = =>
 
 	time = @ConVars.Countdown\GetFloat! + 0.5
 	@Net_BroadcastCountdown CurTime! + time
+	@Logger.Info "Starting in #{time} s."
 
 	timer.Create handle, time, 1, ->
 		-- Don't start in case somebody has left.
 		for _, ply in ipairs playerMemo
 			if not IsValid ply
+				@Logger.Warn "Couldn't start the round! Someone left after the countdown."
 				return
 
 		-- Create the time limit timer if the cvar is set.
@@ -229,6 +238,9 @@ GM.StartGame = =>
 		@SetGameInProgress true
 		@Net_BroadcastGameStart!
 
+		@Logger.Info "Starting the game with #{#@GameData.PlayerTables} players"
+		@Logger.Info "There are #{@ConVars.ImposterCount\GetInt!} imposter(s) among them"
+
 		-- Start the game after a dramatic pause.
 		-- Teleport players while they're staring at the splash screen.
 		timer.Create handle, 2, 1, ->
@@ -243,6 +255,8 @@ GM.StartGame = =>
 				-- Check if suddenly something went extremely wrong during the windup time.
 				if @CheckWin!
 					return
+
+				@Logger.Info "Game begins! GL & HF"
 
 				-- Set off the timeout timer.
 				if timer.Exists timelimitHandle

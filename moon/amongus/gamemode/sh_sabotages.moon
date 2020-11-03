@@ -30,7 +30,7 @@ GM.Sabotage_Register = (sabotage) => with sabotage
 		if SERVER
 			AddCSLuaFile path
 
-		print "Registered sabotage handler \"#{.Handler}\" (#{path})"
+		@Logger.Info "* Registered sabotage handler \"#{.Handler}\" (#{path})"
 		include "sabotages/#{.Handler}.lua"
 
 GM.Sabotage_Init = =>
@@ -48,7 +48,7 @@ GM.Sabotage_Init = =>
 			instance\Init sabotage.CustomData
 			instance\RefreshCooldown!
 
-			print "Instantiated sabotage ##{i} (#{sabotage.Handler})"
+			@Logger.Info "Instantiated sabotage ##{i} (#{sabotage.Handler})"
 
 			table.insert @GameData.Sabotages, instance
 

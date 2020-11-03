@@ -442,3 +442,24 @@ GM.GetCommunicationsDisabled = => GetGlobalInt "NMW AU CommsDisabled"
 --- Returns whether calling the meeting button is impossible (sabotaged).
 -- @return You guessed it.
 GM.IsMeetingDisabled = => GetGlobalBool "NMW AU MeetingDisabled"
+
+local logger
+logger = {
+	__log: (...) ->
+		MsgC Color( 255, 69, 0 ), "[Among Us] ",
+			CLIENT and Color(227, 220, 110) or Color(151, 218, 229),
+			CLIENT and "[Client] " or "[Server] ",
+			...
+		MsgN!
+
+	Info: (...) ->
+		logger.__log Color(220, 220, 220), "[Info] ", Color(255, 255, 255), ...
+
+	Warn: (...) ->
+		logger.__log Color(255, 255, 0), "[Warn] ", Color(255, 255, 160), ...
+
+	Error: (...) ->
+		logger.__log Color(255, 0, 0), "[Err!] ", Color(255, 80, 80), ...
+}
+
+GM.Logger = logger
