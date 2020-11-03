@@ -147,7 +147,7 @@ return vgui.RegisterTable {
 
 								if instance
 									enabled = \IsEnabled!
-									canSetOff = not GAMEMODE.GameData.Vented and instance\CanStart!
+									canSetOff = not GAMEMODE.UseHighlight and not GAMEMODE.GameData.Vented and instance\CanStart!
 
 									if enabled and not canSetOff
 										\SetEnabled false
