@@ -79,7 +79,7 @@ GM.Lang or= {
 
 		return result
 
-	Initialize: =>
+	Initialize: (gamemode) =>
 		@__database = {}
 		@__entryCache = {}
 
@@ -94,7 +94,7 @@ GM.Lang or= {
 				AddCSLuaFile path
 				include path
 
-				GAMEMODE.Logger.Info "Included lang file #{path}"
+				gamemode.Logger.Info "Included lang file #{path}"
 }
 
-GM.Lang\Initialize!
+GM.Lang\Initialize GM or GAMEMODE

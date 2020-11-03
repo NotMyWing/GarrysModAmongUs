@@ -331,6 +331,11 @@ for _, convar in pairs GM.ConVars
 	), "NMW AU Protect"
 
 hook.Add "Initialize", "NMW AU Initialize", ->
+	MsgN!
+	GAMEMODE.Logger.Info "Thanks for installing Among Us for Garry's Mod!"
+	GAMEMODE.Logger.Info "Brought to you by NotMyWing and contributors"
+	GAMEMODE.Logger.Info "Visit https://github.com/NotMyWing/GarrysModAmongUs for more info"
+	MsgN!
 	GAMEMODE\Restart!
 
 	-- screw implicit returns man
