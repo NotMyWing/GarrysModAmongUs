@@ -58,12 +58,12 @@ GM.CheckWin = (reason) =>
 
 	if not reason
 		reason = if @GetTimeLimit! == 0
-			@GameOverReason.Crewmate
 			@Logger.Info "Game over. Crewmates have won! (time out)"
+			@GameOverReason.Crewmate
 
 		elseif @GameData.CompletedTasks >= @GameData.TotalTasks
-			@GameOverReason.Crewmate
 			@Logger.Info "Game over. Crewmates have won! (task win)"
+			@GameOverReason.Crewmate
 
 		else
 			numImposters = 0
@@ -78,12 +78,12 @@ GM.CheckWin = (reason) =>
 						numPlayers += 1
 
 			if numImposters == 0
-				@GameOverReason.Crewmate
 				@Logger.Info "Game over. Crewmates have won!"
+				@GameOverReason.Crewmate
 
 			elseif numImposters >= numPlayers
-				@GameOverReason.Imposter
 				@Logger.Info "Game over. Imposters have won!"
+				@GameOverReason.Imposter
 
 	if reason
 		@GameOver reason
