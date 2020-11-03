@@ -44,7 +44,7 @@ sabotageBase = {
 			@SetNextUse CurTime! + @GetCooldown!
 
 	--- Returns whether the sabotage is on cooldown.
-	IsOnCooldown: => (@SetCooldownOverride! == 0) and not @__nextUse or @__nextUse > CurTime!
+	IsOnCooldown: => (@GetCooldownOverride! == 0) and not @__nextUse or @__nextUse > CurTime!
 
 	--- Sets the sabotage cooldown.
 	-- Not to be confused with @SetNextUse.
