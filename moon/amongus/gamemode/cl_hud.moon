@@ -170,7 +170,7 @@ GM.HUD_TrackTaskOnMap = (entity, track = true) =>
 				\Track entity, with vgui.Create "DPanel"
 					\SetSize size * 0.1, size * 0.1
 					.Paint = (_, w, h) ->
-						if GAMEMODE\GetCommunicationsDisabled!
+						if GAMEMODE\GetCommunicationsDisabled! and not GAMEMODE.GameData.Imposters[GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]]
 							return
 
 						surface.DisableClipping true

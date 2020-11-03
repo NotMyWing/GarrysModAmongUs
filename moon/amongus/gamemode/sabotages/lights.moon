@@ -14,7 +14,7 @@ if CLIENT
 		elseif not FOG_ENABLED and FOG_MUL > 0
 			FOG_MUL = math.max 0, FOG_MUL - FrameTime! * 0.5
 
-		if FOG_MUL ~= 0
+		if FOG_MUL ~= 0 and not GAMEMODE.GameData.Imposters[GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]]
 			with FOG_SPHERE
 				\SetPos LocalPlayer!\EyePos!
 				\SetupBones!
@@ -65,8 +65,10 @@ comms = {
 		else
 			@__taskEntry = with GAMEMODE\HUD_AddTaskEntry!
 				\SetColor Color 255, 230, 0
-				\SetText GAMEMODE.Lang.GetEntry("tasks.lightsSabotaged") 0
+				\SetText "..."
 				\SetBlink true
+				.Think = ->
+					\SetText GAMEMODE.Lang.GetEntry("tasks.lightsSabotaged") 100 * (1 - FOG_MUL)
 
 			FOG_ENABLED = true
 
@@ -92,6 +94,7 @@ comms = {
 			@SetActivationButtons!
 		elseif IsValid @__taskEntry
 			@__taskEntry\Remove!
+
 			FOG_ENABLED = nil
 
 	SetLights: (value) =>

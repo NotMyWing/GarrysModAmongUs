@@ -451,8 +451,9 @@ hud.Think = =>
 						\SetText TRANSLATE "tasks.commsSabotaged"
 						\SetBlink true
 
-					for task in *@tasks
-						task\Hide!
+					if not GAMEMODE.GameData.Imposters[GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]]
+						for task in *@tasks
+							task\Hide!
 
 					\SetText "  " .. TRANSLATE "tasks.totalCompleted.sabotaged"
 					\SetColor Color 255, 64, 64
@@ -466,8 +467,9 @@ hud.Think = =>
 					if IsValid @__commsBlinker
 						@__commsBlinker\Remove!
 
-					for task in *@tasks
-						task\Show!
+					if not GAMEMODE.GameData.Imposters[GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]]
+						for task in *@tasks
+							task\Show!
 
 					\SetText "  " .. TRANSLATE "tasks.totalCompleted"
 					\SetColor Color 255, 255, 255
