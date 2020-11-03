@@ -290,34 +290,35 @@ hud.SetupButtons = (state, impostor) =>
 				\DockMargin 0, 0, ScreenScale(5), 0
 				\Dock RIGHT
 
-				.Think = =>
-					color = if GAMEMODE.GameData.KillCooldown >= CurTime!
-						\SetAlpha 32
-					elseif IsValid(GAMEMODE.KillHighlight) and not GAMEMODE.GameData.Imposters[GAMEMODE.KillHighlight]
-						\SetAlpha 255
-					else
-						\SetAlpha 32
-
-
 				.Paint = (_, w, h) ->
 					-- Honestly I wish I had a wrapper for this kind of monstrosities.
-					surface.SetDrawColor COLOR_BTN
 					surface.SetMaterial MAT_BUTTONS.kill
 
 					render.PushFilterMag TEXFILTER.ANISOTROPIC
 					render.PushFilterMin TEXFILTER.ANISOTROPIC
+
+					alpha = if GAMEMODE.GameData.KillCooldown >= CurTime!
+						32
+					elseif IsValid(GAMEMODE.KillHighlight) and not GAMEMODE.GameData.Imposters[GAMEMODE.KillHighlight]
+						255
+					else
+						32
+
+					surface.SetDrawColor COLOR_BTN.r, COLOR_BTN.g, COLOR_BTN.b, alpha
 					surface.DrawTexturedRect 0, 0, w, h
+
 					render.PopFilterMag!
 					render.PopFilterMin!
 
 					if GAMEMODE.GameData.KillCooldownOverride or (GAMEMODE.GameData.KillCooldown and GAMEMODE.GameData.KillCooldown >= CurTime!)
-						text = if GAMEMODE.GameData.KillCooldownOverride
+						time = if GAMEMODE.GameData.KillCooldownOverride
 							GAMEMODE.GameData.KillCooldownOverride
 						else
-							math.ceil(math.max(0, GAMEMODE.GameData.KillCooldown - CurTime!))
+							math.max(0, GAMEMODE.GameData.KillCooldown - CurTime!)
 
-						draw.DrawText string.format("%d", text),
-							"NMW AU Cooldown", w * 0.5, h * 0.15, Color(255,255,255,255), TEXT_ALIGN_CENTER
+						if time > 0
+							draw.DrawText string.format("%d", math.ceil time),
+								"NMW AU Cooldown", w * 0.5, h * 0.15, Color(255,255,255,255), TEXT_ALIGN_CENTER
 
 		-- The player icon!
 		with @playerIcon = @buttons\Add "DPanel"
