@@ -29,6 +29,7 @@ flags = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_GAMEDLL
 -- @field TasksVisual (Bool) Should the visual parts of tasks be enabled?
 -- @field DistributeTasksToBots (Bool) Should bot get any tasks?
 -- @field TimeLimit (Integer) Round time limit.
+-- @field Countdown (Integer) How long the pre-round countdown lasts.
 GM.ConVars =
 	ImposterCount:   CreateConVar "au_imposter_count"  , 1 , flags, "", 1, 4
 	KillCooldown:    CreateConVar "au_kill_cooldown"   , 20, flags, "", 1, 60
@@ -49,6 +50,7 @@ GM.ConVars =
 	DistributeTasksToBots: CreateConVar "au_debug_bot_tasks" , 0, flags, "", 0, 1
 
 	TimeLimit: CreateConVar "au_time_limit", 600, flags, "", 0, 1200
+	Countdown: CreateConVar "au_countdown", 5, flags, "", 1, 10
 
 --- Enum of all colors players can get.
 -- @warning This isn't the best approach. Needs fixing.
