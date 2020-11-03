@@ -433,6 +433,10 @@ hud.AddTaskEntry = =>
 			else
 				color
 
+			if .OnBlink and clr ~= .__oldColor
+				.__oldColor = clr
+				\OnBlink!
+
 			draw.SimpleTextOutlined text, "NMW AU Taskbar",
 				ScrW! * 0.0075, h/2, clr, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, Color(0, 0, 0, 64)
 

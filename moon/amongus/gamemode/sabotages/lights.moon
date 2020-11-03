@@ -67,7 +67,7 @@ comms = {
 				\SetColor Color 255, 230, 0
 				\SetText "..."
 				\SetBlink true
-				.Think = ->
+				.OnBlink = ->
 					\SetText GAMEMODE.Lang.GetEntry("tasks.lightsSabotaged") 100 * (1 - FOG_MUL)
 
 			FOG_ENABLED = true
