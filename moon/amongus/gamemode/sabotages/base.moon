@@ -44,7 +44,7 @@ sabotageBase = {
 			@SetNextUse CurTime! + @GetCooldown!
 
 	--- Returns whether the sabotage is on cooldown.
-	IsOnCooldown: => (@GetCooldownOverride! == 0) and not @__nextUse or @__nextUse > CurTime!
+	IsOnCooldown: => (@GetCooldownOverride! ~= 0) or (not @__nextUse or @__nextUse > CurTime!)
 
 	--- Sets the sabotage cooldown.
 	-- Not to be confused with @SetNextUse.
@@ -140,9 +140,6 @@ sabotageBase = {
 	SetPaused: (value) =>
 		if SERVER
 			if @__paused ~= value
-				if not @IsOnCooldown!
-					return
-
 				-- Paused
 				if value
 					@SetCooldownOverride math.max 0, @GetNextUse! - CurTime!
