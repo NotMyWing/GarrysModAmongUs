@@ -222,8 +222,8 @@ GM.HUD_CreateTaskCompletePopup = =>
 				\Remove!
 
 CREW_LAYERS = {
-	Material "au/gui/meeting/crewmate1.png", "smooth"
-	Material "au/gui/meeting/crewmate2.png", "smooth"
+	Material "au/gui/crewmateicon/crewmate1.png", "smooth"
+	Material "au/gui/crewmateicon/crewmate2.png", "smooth"
 }
 
 GM.HUD_CloseVGUI = =>
@@ -276,7 +276,7 @@ hook.Add "Initialize", "Init Hud", ->
 	GAMEMODE\HUD_Reset!
 
 ASSETS = {
-	btn: Material "au/gui/button.png", "smooth"
+	btn: Material "au/gui/floatingbutton.png", "smooth"
 }
 
 hook.Add "HUDPaintBackground", "NMW AU Hud", ->

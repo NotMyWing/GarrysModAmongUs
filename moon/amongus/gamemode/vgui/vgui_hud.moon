@@ -24,9 +24,9 @@ surface.CreateFont "NMW AU Taskbar", {
 hud = {}
 
 MAT_BUTTONS = {
-	kill: Material "au/gui/kill.png"
-	use: Material "au/gui/use.png"
-	report: Material "au/gui/report.png"
+	kill: Material "au/gui/hudbuttons/kill.png"
+	use: Material "au/gui/hudbuttons/use.png"
+	report: Material "au/gui/hudbuttons/report.png"
 }
 
 COLOR_BTN = Color 255, 255, 255

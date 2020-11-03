@@ -70,7 +70,7 @@
        inkscape:label="splash" />
     <image
        sodipodi:absref="/home/cyber/Documents/VS_Code/GarrysModAmongUs/gamemodes/amongus/content/materials/au/gui/meeting/megaphone.svg"
-       xlink:href="meeting/megaphone.svg"
+       xlink:href="../meeting/megaphone.svg"
        inkscape:label="megaphone"
        preserveAspectRatio="none"
        width="201.38216"

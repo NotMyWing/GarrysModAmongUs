@@ -111,8 +111,8 @@ meeting.PlayBackground = (callback) =>
 
 
 CREW_LAYERS = {
-	Material "au/gui/meeting/crewmate1.png", "smooth"
-	Material "au/gui/meeting/crewmate2.png", "smooth"
+	Material "au/gui/crewmateicon/crewmate1.png", "smooth"
+	Material "au/gui/crewmateicon/crewmate2.png", "smooth"
 }
 
 CREW_MINI_LAYERS = {
