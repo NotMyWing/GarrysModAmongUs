@@ -351,6 +351,11 @@ hook.Add "PlayerDisconnected", "NMW AU CheckWin", (ply) -> with GAMEMODE
 					\Net_BroadcastTaskCount .GameData.CompletedTasks
 
 			\CheckWin!
+	elseif timer.Exists "tryStartGame"
+		@Logger.Warn "Couldn't start the round! Someone left after the countdown."
+
+		timer.Destroy "tryStartGame"
+		\CleanUp true
 
 hook.Add "CanPlayerSuicide", "NMW AU Suicide", ->
 	return false

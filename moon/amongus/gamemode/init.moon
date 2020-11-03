@@ -89,7 +89,7 @@ GM.CheckWin = (reason) =>
 		@GameOver reason
 		return true
 
-GM.CleanUp = =>
+GM.CleanUp = (soft) =>
 	-- Shut all ongoing sabotages down gracefully.
 	if @GameData.Sabotages
 		@Sabotage_ForceEndAll!
@@ -103,9 +103,12 @@ GM.CleanUp = =>
 	@SetCommunicationsDisabled false
 
 	@Player_UnhideEveryone!
+	@Net_BroadcastCountdown 0
+
 	timer.Remove "NMW AU CheckWin"
 
-	game.CleanUpMap!
+	if not soft
+		game.CleanUpMap!
 
 GM.Restart = =>
 	@CleanUp!
@@ -143,7 +146,7 @@ GM.StartGame = =>
 
 	@CleanUp!
 
-	handle = "game"
+	handle = "tryStartGame"
 	@GameData.Timers[handle] = true
 
 	-- Count players.
@@ -250,11 +253,10 @@ GM.StartGame = =>
 				if IsValid ply.entity
 					ply.entity\Freeze true
 
-			--
 			timer.Create handle, @SplashScreenTime - 2, 1, ->
 				-- Check if suddenly something went extremely wrong during the windup time.
 				if @CheckWin!
-					return
+					return @CleanUp true
 
 				@Logger.Info "Game begins! GL & HF"
 
