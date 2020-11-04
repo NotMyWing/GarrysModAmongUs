@@ -88,30 +88,48 @@ color_sabotage = Color 32, 255, 32
 color_sabotageb = Color 255, 32, 32
 
 color_kill = Color 255, 0, 0
-color_use   = Color 255, 230, 0
-color_task  = Color 255, 230, 0, 32
+color_task   = Color 255, 230, 0
+color_white = Color 255, 255, 255
+
+GM.GetHighlightColor = (entity) => if IsValid entity
+	className = entity\GetClass!
+
+	return switch className
+		when "prop_vent", "func_vent"
+			color_kill
+		when "prop_meeting_button", "func_meeting_button"
+			color_white
+		when "prop_task_button", "func_task_button", "prop_sabotage_button", "func_sabotage_button"
+			color_task
 
 hook.Add "PreDrawHalos", "NMW AU Highlight", ->
 	-- Highlight our current tasks.
-	for _, task in pairs GAMEMODE.GameData.MyTasks
-		if not task.completed and IsValid(task.entity) and task.entity ~= GAMEMODE.UseHighlight and task.entity\GetPos!\Distance(LocalPlayer!\GetPos!) < 200
-			halo.Add { task.entity }, color_task, 6, 6, 2, true, true
+	if not GAMEMODE.GameData.Imposters[GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]]
+		for _, task in pairs GAMEMODE.GameData.MyTasks
+			color = GAMEMODE\GetHighlightColor task.entity
+			-- Obligatory wall of checks.
+			if color and not task.completed and
+				IsValid(task.entity) and task.entity ~= GAMEMODE.UseHighlight and
+				200 > task.entity\GetPos!\Distance LocalPlayer!\GetPos!
+
+					with util.TraceLine {
+						start: LocalPlayer!\WorldSpaceCenter!
+						endpos: task.entity\WorldSpaceCenter!
+						filter: (trEnt) -> trEnt == ent or not trEnt\IsPlayer!
+					}
+						if .Entity == task.entity
+							halo.Add { task.entity }, color, 3, 3, 2, true, true
 
 	-- Highlight sabotage buttons.
 	for btn in pairs GAMEMODE.GameData.SabotageButtons
 		halo.Add { btn }, math.floor((SysTime! * 4) % 2) ~= 0 and color_sabotage or color_sabotageb, 1, 1, 10, true, true
 
 	if IsValid GAMEMODE.KillHighlight
-		halo.Add { GAMEMODE.KillHighlight }, color_kill, 4, 4, 5, true, true
+		halo.Add { GAMEMODE.KillHighlight }, color_kill, 4, 4, 8, true, true
 
 	if IsValid GAMEMODE.UseHighlight
-		entClass = GAMEMODE.UseHighlight\GetClass!
-		color = if entClass == "prop_vent" or entClass == "func_vent"
-			color_kill
-		else
-			color_use
-
-		halo.Add { GAMEMODE.UseHighlight }, color, 4, 4, 5, true, true
+		if color = GAMEMODE\GetHighlightColor GAMEMODE.UseHighlight
+			halo.Add { GAMEMODE.UseHighlight }, color, 4, 4, 8, true, true
 
 color_crew = Color(255, 255, 255)
 color_imposter = Color(255, 0, 0)

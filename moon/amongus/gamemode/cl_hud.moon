@@ -280,52 +280,85 @@ ASSETS = {
 }
 
 hook.Add "HUDPaintBackground", "NMW AU Hud", ->
-	-- Iterate through the two possible entity types we can interact with.
-	for highlight in *{
-		{
-			button: input.LookupBinding "use"
-			entity: GAMEMODE.UseHighlight
+	if GAMEMODE\IsGameInProgress!
+		if IsValid GAMEMODE.UseHighlight
+			color = GAMEMODE\GetHighlightColor GAMEMODE.UseHighlight
+			if color
+				cam.Start3D!
+				with render
+					.ClearStencil!
+
+					.SetStencilEnable true
+					.SetStencilTestMask 0xFF
+					.SetStencilWriteMask 0xFF
+					.SetStencilReferenceValue 0x01
+
+					.SetStencilCompareFunction STENCIL_NEVER
+					.SetStencilFailOperation STENCIL_REPLACE
+					.SetStencilZFailOperation STENCIL_REPLACE
+
+					GAMEMODE.UseHighlight\DrawModel!
+
+					.SetStencilCompareFunction STENCIL_LESSEQUAL
+					.SetStencilFailOperation STENCIL_KEEP
+					.SetStencilZFailOperation STENCIL_KEEP
+
+				cam.End3D!
+
+				entClass = GAMEMODE.UseHighlight\GetClass!
+
+				surface.SetDrawColor color.r, color.g, color.b, 32 + 8 * math.sin SysTime! * 5
+				surface.DrawRect 0, 0, ScrW!, ScrH!
+
+				render.ClearStencil!
+				render.SetStencilEnable false
+
+		-- Iterate through the two possible entity types we can interact with.
+		for highlight in *{
+			{
+				button: input.LookupBinding "use"
+				entity: GAMEMODE.UseHighlight
+			}
+			-- TO-DO: Make this keybind not hardcoded.
+			{
+				button: "Q"
+				entity: GAMEMODE.KillHighlight
+			}
 		}
-		-- TO-DO: Make this keybind not hardcoded.
-		{
-			button: "Q"
-			entity: GAMEMODE.KillHighlight
-		}
-	}
-		if IsValid highlight.entity
-			pos = highlight.entity\WorldSpaceCenter!\ToScreen!
+			if IsValid highlight.entity
+				pos = highlight.entity\WorldSpaceCenter!\ToScreen!
 
-			nearestPoint = highlight.entity\NearestPoint LocalPlayer!\WorldSpaceCenter!
-			value = 1 * (1 - math.max 0, math.min 1, (1/GAMEMODE.BaseUseRadius) * nearestPoint\Distance LocalPlayer!\WorldSpaceCenter!)
-			size = 0.125 * math.min ScrH!, ScrW!
+				nearestPoint = highlight.entity\NearestPoint LocalPlayer!\WorldSpaceCenter!
+				value = 1 * (1 - math.max 0, math.min 1, (1/GAMEMODE.BaseUseRadius) * nearestPoint\Distance LocalPlayer!\WorldSpaceCenter!)
+				size = 0.125 * math.min ScrH!, ScrW!
 
-			-- Since Garry's Mod doesn't allow scaling fonts on the go,
-			-- we'll have to scale the ENTIRE rendering sequence.
-			m = with Matrix!
-				\Translate Vector pos.x, pos.y, 0
-				\Scale math.Clamp(value, 0.25, 1) * Vector 1, 1, 1
-				\Translate -Vector pos.x, pos.y, 0
+				-- Since Garry's Mod doesn't allow scaling fonts on the go,
+				-- we'll have to scale the ENTIRE rendering sequence.
+				m = with Matrix!
+					\Translate Vector pos.x, pos.y, 0
+					\Scale math.Clamp(value, 0.25, 1) * Vector 1, 1, 1
+					\Translate -Vector pos.x, pos.y, 0
 
-			cam.PushModelMatrix m, true
-			do
-				color = Color 255, 255, 255, math.Clamp 255 * value * 2, 0, 255
-				shadowColor = Color 0, 0, 0, math.Clamp 64 * value * 2, 0, 255
+				cam.PushModelMatrix m, true
+				do
+					color = Color 255, 255, 255, math.Clamp 255 * value * 2, 0, 255
+					shadowColor = Color 0, 0, 0, math.Clamp 96 * value * 2, 0, 255
 
-				-- The button sprite.
-				surface.SetMaterial ASSETS.btn
-				surface.SetDrawColor color
+					-- The button sprite.
+					surface.SetMaterial ASSETS.btn
+					surface.SetDrawColor color
 
-				render.PushFilterMag TEXFILTER.ANISOTROPIC
-				render.PushFilterMin TEXFILTER.ANISOTROPIC
-				surface.DrawTexturedRect pos.x - size/2, pos.y - size/2, size, size
-				render.PopFilterMag!
-				render.PopFilterMin!
+					render.PushFilterMag TEXFILTER.ANISOTROPIC
+					render.PushFilterMin TEXFILTER.ANISOTROPIC
+					surface.DrawTexturedRect pos.x - size/2, pos.y - size/2, size, size
+					render.PopFilterMag!
+					render.PopFilterMin!
 
-				-- The tooltip.
-				draw.SimpleTextOutlined string.upper(highlight.button or "?"), "NMW AU Button Tooltip",
-					pos.x, pos.y - size * 0.15, color,
-					TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 4, shadowColor
-			cam.PopModelMatrix!
+					-- The tooltip.
+					draw.SimpleTextOutlined string.upper(highlight.button or "?"), "NMW AU Button Tooltip",
+						pos.x, pos.y - size * 0.15, color,
+						TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 4, shadowColor
+				cam.PopModelMatrix!
 
 	if IsValid GAMEMODE.Hud
 		GAMEMODE.Hud\PaintManual!
