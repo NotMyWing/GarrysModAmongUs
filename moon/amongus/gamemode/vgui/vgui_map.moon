@@ -214,7 +214,8 @@ return vgui.RegisterTable {
 		surface.PlaySound "au/panel_genericappear.wav"
 
 	EnableSabotageOverlay: =>
-		@sabotageOverlay\Show!
+		if IsValid @sabotageOverlay
+			@sabotageOverlay\Show!
 
 	Close: =>
 		if not @__opened or @__opening or @__closing
