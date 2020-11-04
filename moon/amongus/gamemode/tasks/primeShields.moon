@@ -1,11 +1,5 @@
 taskTable = {
 	Type: GM.TaskType.Short
-	Advance: =>
-		@Complete!
-
-		-- TO-DO: Fire event.
-
-		@NetworkTaskData!
 }
 
 if CLIENT

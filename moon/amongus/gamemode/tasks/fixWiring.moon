@@ -1,27 +1,28 @@
 taskTable = {
 	Type: GM.TaskType.Common
 	Time: 3
-	Initialize: =>
-		@SetMaxSteps 3
+	Init: =>
+		@Base.Init @
 
-		@__taskButtons = GAMEMODE.Util.Shuffle GAMEMODE.Util.FindEntsByTaskName "fixWiring"
+		if SERVER
+			@SetMaxSteps 3
 
-		btn = @__taskButtons[1]
-		table.remove @__taskButtons, 1
-		@SetActivationButton btn
+			@__taskButtons = GAMEMODE.Util.Shuffle GAMEMODE.Util.FindEntsByTaskName "fixWiring"
 
-	Advance: =>
+			btn = @__taskButtons[1]
+			table.remove @__taskButtons, 1
+			@SetActivationButton btn
+
+	OnAdvance: =>
 		currentStep = @GetCurrentStep!
 
 		if currentStep == 3
-			@Complete!
+			@SetCompleted true
 		else
 			@SetActivationButton @__taskButtons[1], true
 			table.remove @__taskButtons, 1
 
 			@SetCurrentStep currentStep + 1
-
-		@NetworkTaskData!
 }
 
 if CLIENT

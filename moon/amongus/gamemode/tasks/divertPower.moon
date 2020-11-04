@@ -2,33 +2,34 @@ taskTable = {
 	Type: GM.TaskType.Short
 
 	-- Called when the task is created, but not yet sent to the player.
-	Initialize: =>
-		@SetMaxSteps 2
+	Init: =>
+		@Base.Init @
 
-		destinations = {}
-		-- Find the task buttons.
-		for _, button in ipairs GAMEMODE.Util.FindEntsByTaskName "divertPower"
-			if button\GetCustomData! == "accept"
-				table.insert destinations, button
-			else
-				@SetActivationButton button
+		if SERVER
+			@SetMaxSteps 2
 
-		@destination = table.Random destinations
-		@SetCustomName "divertPower.#{@destination\GetArea!}"
+			destinations = {}
+			-- Find the task buttons.
+			for _, button in ipairs GAMEMODE.Util.FindEntsByTaskName "divertPower"
+				if button\GetCustomData! == "accept"
+					table.insert destinations, button
+				else
+					@SetActivationButton button
+
+			@destination = table.Random destinations
+			@SetCustomName "divertPower.#{@destination\GetArea!}"
 
 	-- Called whenever the player submits the task.
-	Advance: =>
-		@AdvanceInternal!
+	OnAdvance: =>
+		@Base.OnAdvance @
 
 		if @GetCurrentStep! == 2
 			@SetActivationButton @destination
 			@SetCustomName nil
-
-		@NetworkTaskData!
 }
 
 if CLIENT
-	taskTable.CreateVGUI = (task) =>
+	taskTable.CreateVGUI = =>
 		base = vgui.Create "AmongUsTaskBase"
 
 		with base
@@ -42,7 +43,7 @@ if CLIENT
 					\SetFont "NMW AU PlaceholderText"
 					\SetColor Color 255, 255, 255
 					\SetContentAlignment 5
-					if task.currentStep == 1
+					if @GetCurrentStep! == 1
 						\SetText "\n\nPress to divert power.\n"
 					else
 						\SetText "\n\nPress to accept power\n"
@@ -53,7 +54,7 @@ if CLIENT
 					margin = ScrH! * 0.01
 					\DockMargin margin * 4, 0, margin * 4, margin * 4
 					\SetTall ScrH! * 0.05
-					\SetText if task.currentStep == 1
+					\SetText if @GetCurrentStep! == 1
 						"Divert"
 					else
 						"Accept Power"

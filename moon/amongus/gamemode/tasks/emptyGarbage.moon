@@ -1,34 +1,34 @@
 taskTable = {
 	Type: GM.TaskType.Long
 	Time: 3
-	Initialize: =>
-		@SetMaxSteps 2
+	Init: =>
+		@Base.Init @
 
-		@buttons = {}
-		-- Remap buttons.
-		for _, button in ipairs GAMEMODE.Util.FindEntsByTaskName "emptyGarbage"
-			@buttons[button\GetCustomData!] = button
+		if SERVER
+			@SetMaxSteps 2
 
-		@SetActivationButton if @buttons["chute"]
-			math.random! > 0.5 and @buttons["chute"] or @buttons["garbage"]
-		else
-			@buttons["garbage"]
+			@buttons = {}
+			-- Remap buttons.
+			for _, button in ipairs GAMEMODE.Util.FindEntsByTaskName "emptyGarbage"
+				@buttons[button\GetCustomData!] = button
 
-	Advance: =>
+			@SetActivationButton if @buttons["chute"]
+				math.random! > 0.5 and @buttons["chute"] or @buttons["garbage"]
+			else
+				@buttons["garbage"]
+
+	OnAdvance: =>
 		step = @GetCurrentStep!
 
 		if step == 1
 			@SetCurrentStep 2
 			@SetActivationButton @buttons["second"], true
 		elseif step == 2
-			@Complete!
-
-		@NetworkTaskData!
+			@SetCompleted true
 }
 
 if CLIENT
 	taskTable.CreateVGUI = (task) =>
-		state = task.currentState
 		base = vgui.Create "AmongUsTaskBase"
 
 		with base

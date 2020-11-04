@@ -3,28 +3,28 @@ taskTable = {
 	Time: 9
 
 	-- Called when the task is created, but not yet sent to the player.
-	Initialize: =>
-		@SetMaxSteps 2
+	Init: =>
+		@Base.Init @
 
-		destinations = {}
-		-- Find the task buttons.
-		for _, button in ipairs GAMEMODE.Util.FindEntsByTaskName "uploadData"
-			if button\GetCustomData! ~= "upload"
-				table.insert destinations, button
-			else
-				@destination = button
+		if SERVER
+			@SetMaxSteps 2
 
-		@SetActivationButton table.Random destinations
+			destinations = {}
+			-- Find the task buttons.
+			for _, button in ipairs GAMEMODE.Util.FindEntsByTaskName "uploadData"
+				if button\GetCustomData! ~= "upload"
+					table.insert destinations, button
+				else
+					@destination = button
+
+			@SetActivationButton table.Random destinations
 
 	-- Called whenever the player submits the task.
-	Advance: =>
-		@AdvanceInternal!
+	OnAdvance: =>
+		@Base.OnAdvance @
 
-		if @GetCurrentStep! == 2
-			@SetCustomName "uploadData.2"
-			@SetActivationButton @destination
-
-		@NetworkTaskData!
+		@SetCustomName "uploadData.2"
+		@SetActivationButton @destination
 }
 
 if CLIENT
@@ -42,7 +42,7 @@ if CLIENT
 					\SetFont "NMW AU PlaceholderText"
 					\SetColor Color 255, 255, 255
 					\SetContentAlignment 5
-					if task.currentStep == 1
+					if @GetCurrentStep! == 1
 						\SetText "\n\nPress to download data.\n"
 					else
 						\SetText "\n\nPress to upload data.\n"
@@ -54,12 +54,12 @@ if CLIENT
 					margin = ScrH! * 0.01
 					\DockMargin margin * 4, 0, margin * 4, margin * 4
 					\SetTall ScrH! * 0.05
-					\SetText if task.currentStep == 1
+					\SetText if @GetCurrentStep! == 1
 						"Download"
 					else
 						"Upload"
 
-					text = if task.currentStep == 1
+					text = if @GetCurrentStep! == 1
 						"Downloading... %ds"
 					else
 						"Uploading... %ds"

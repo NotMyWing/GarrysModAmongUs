@@ -3,13 +3,10 @@ taskTable = {
 }
 
 if CLIENT
-	--- Creates a circle polygon.
-	-- Straight from the GMod wiki because I'm lazy.
-	-- And... copied from elsewhere.
 	circle = GM.Render.CreateCircle
 
-	taskTable.CreateVGUI = (task) =>
-		state = task.currentState
+	taskTable.CreateVGUI = =>
+		state = @GetCurrentState!
 		base = vgui.Create "AmongUsTaskBase"
 
 		with base

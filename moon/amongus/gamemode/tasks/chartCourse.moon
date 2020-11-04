@@ -3,8 +3,8 @@ taskTable = {
 }
 
 if CLIENT
-	taskTable.CreateVGUI = (task) =>
-		state = task.currentState
+	taskTable.CreateVGUI = =>
+		state = @GetCurrentState!
 		base = vgui.Create "AmongUsTaskBase"
 
 		with base

@@ -218,43 +218,6 @@ hud.SetupButtons = (state, impostor) =>
 				\Dock FILL
 				.Paint = ->
 
-				for taskName, task in pairs GAMEMODE.GameData.MyTasks
-					table.insert @tasks, with \Add "DPanel"
-						\SetTall ScrH! * 0.04
-						\Dock TOP
-
-						neutral = Color 255, 255, 255
-						completed = Color 0, 221, 0
-						progress = Color 255, 255, 0
-
-						.Paint = (_, w, h) ->
-							surface.SetDrawColor 255, 255, 255, 16
-							surface.DrawRect 0, 0, w, h
-
-							if IsValid task.entity
-								timeout = (task.timeout or 0) - CurTime!
-								timeoutText = if timeout > 0
-									string.format " (%ds)", math.floor timeout
-								else
-									""
-
-								area = TRANSLATE task.customArea or task.entity\GetArea!
-								name = TRANSLATE "task." .. ((task.customName or taskName) or "undefined")
-
-								text = "#{area}: #{name}"
-								if task.multiStep and not task.completed
-									text ..= " (#{(task.currentStep or 1) - 1}/#{task.maxSteps})"
-
-								color = if task.completed
-									completed
-								elseif task.currentStep > 1 or task.currentState > 1
-									progress
-								else
-									neutral
-
-								draw.SimpleTextOutlined text .. timeoutText, "NMW AU Taskbar",
-									ScrW! * 0.0075, h/2, color, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, Color(0, 0, 0, 64)
-
 		-- Use/report button. Content-aware.
 		with @use = @buttons\Add "DPanel"
 			\SetWide @buttons\GetTall!

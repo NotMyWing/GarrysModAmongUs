@@ -371,15 +371,19 @@ GM.TracePlayer = (ply) =>
 					continue
 
 				if SERVER
-					-- Bail out if the player doesn't have this task, or if it's not the current button.
+					-- Bail out if the player doesn't have this task, or if it's not the current button,
+					-- or if the button doesn't consent.
 					if not (@GameData.Tasks[playerTable] and @GameData.Tasks[playerTable][name]) or
-						ent ~= @GameData.Tasks[playerTable][name]\GetActivationButton!
+						ent ~= @GameData.Tasks[playerTable][name]\GetActivationButton! or
+						not @GameData.Tasks[playerTable][name]\CanUse!
 							continue
 
 				if CLIENT
-					-- Bail out if the local player doesn't have this task, or if he's completed it already.
+					-- Bail out if the local player doesn't have this task, or if he's completed it already, or
+					-- if the button doesn't consent.
 					if not @GameData.MyTasks[name] or
-						@GameData.MyTasks[name].completed or ent ~= @GameData.MyTasks[name].entity
+						@GameData.MyTasks[name]\GetCompleted! or ent ~= @GameData.MyTasks[name]\GetActivationButton! or
+						not @GameData.MyTasks[name]\CanUse!
 							continue
 
 			-- Prevent dead players from being able to target corpses.

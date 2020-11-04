@@ -113,40 +113,11 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 
 
 		-- Read the current and total amounts of tasks.
-		GAMEMODE.GameData.CompletedTasks = net.ReadUInt 8
-		GAMEMODE.GameData.TotalTasks = net.ReadUInt 8
+		GAMEMODE.GameData.CompletedTasks = net.ReadUInt 32
 
 		-- Reset the HUD and display the splash.
 		GAMEMODE\HUD_Reset!
 		GAMEMODE\HUD_DisplayShush!
-
-		-- Read our tasks.
-		if GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
-			GAMEMODE.GameData.MyTasks = {}
-
-			count = net.ReadUInt 8
-			for i = 1, count
-				task = {}
-
-				name = net.ReadString name
-				task.entity    = net.ReadEntity!
-				task.important = net.ReadBool!
-				task.multiStep = net.ReadBool!
-				task.maxSteps    = net.ReadUInt 16
-				task.currentStep = net.ReadUInt 16
-				task.currentState = net.ReadUInt 16
-				task.timeout      = net.ReadDouble!
-				task.customName   = net.ReadString!
-				task.customArea   = net.ReadString!
-
-				if task.customName == ""
-					task.customName = nil
-				if task.customArea == ""
-					task.customArea = nil
-
-				GAMEMODE.GameData.MyTasks[name] = task
-
-				GAMEMODE\HUD_TrackTaskOnMap task.entity
 
 		-- Add evil stuff to the map.
 		if imposter
@@ -350,9 +321,9 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	when GAMEMODE.FlowTypes.TasksOpenVGUI
 		name = net.ReadString!
 
-		data = GAMEMODE.GameData.MyTasks[name]
-
-		GAMEMODE\Task_OpenTaskVGUI name, data or {}
+		instance = GAMEMODE.GameData.MyTasks[name]
+		if instance
+			GAMEMODE\Task_OpenTaskVGUI instance
 
 	--
 	-- Update the task data.
@@ -360,42 +331,43 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	--
 	when GAMEMODE.FlowTypes.TasksUpdateData
 		name = net.ReadString!
+		packet = net.ReadTable!
 
-		task = GAMEMODE.GameData.MyTasks[name]
+		instance = GAMEMODE.GameData.MyTasks[name]
 
-		if task
-			task.completed = net.ReadBool!
+		local wasCreated
+		if not instance
+			wasCreated = true
 
-			if not task.completed
-				oldEntity = task.entity
-				task.entity       = net.ReadEntity!
-				task.important    = net.ReadBool!
-				task.currentStep  = net.ReadUInt 16
-				task.currentState = net.ReadUInt 16
-				task.timeout      = net.ReadDouble!
-				task.customName   = net.ReadString!
-				task.customArea   = net.ReadString!
+			instance = GAMEMODE\Task_Instantiate GAMEMODE.TaskCollection.All[name]
+			GAMEMODE.GameData.MyTasks[name] = instance
 
-				if task.customName == ""
-					task.customName = nil
-				if task.customArea == ""
-					task.customArea = nil
+			instance\SetName name
+			instance\Init!
 
-				if task.entity ~= oldEntity
-					GAMEMODE\HUD_TrackTaskOnMap oldEntity, false
-					GAMEMODE\HUD_TrackTaskOnMap task.entity
+		oldActivationButton = instance\GetActivationButton!
 
+		for accessor, value in pairs packet
+			instance["Set#{accessor}"] instance, value
+
+		if not instance\GetCompleted!
+			if not wasCreated
 				surface.PlaySound "au/task_inprogress.wav"
-			else
-				GAMEMODE\HUD_TrackTaskOnMap task.entity, false
-				GAMEMODE\HUD_CreateTaskCompletePopup!
-				surface.PlaySound "au/task_complete.wav"
+
+			if instance\GetActivationButton! ~= oldActivationButton
+				GAMEMODE\HUD_TrackTaskOnMap oldActivationButton, false
+				GAMEMODE\HUD_TrackTaskOnMap instance\GetActivationButton!
+		else
+			surface.PlaySound "au/task_complete.wav"
+			GAMEMODE\HUD_TrackTaskOnMap instance\GetActivationButton!, false
+			GAMEMODE\HUD_CreateTaskCompletePopup!
 
 	--
 	-- Someone has completed a task.
 	--
 	when GAMEMODE.FlowTypes.TasksUpdateCount
-		GAMEMODE.GameData.CompletedTasks = net.ReadUInt 8
+		GAMEMODE.GameData.CompletedTasks = net.ReadUInt 32
+		GAMEMODE.GameData.TotalTasks = net.ReadUInt 32
 
 		GAMEMODE\HUD_UpdateTaskAmount GAMEMODE.GameData.CompletedTasks / GAMEMODE.GameData.TotalTasks
 

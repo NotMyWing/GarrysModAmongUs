@@ -1,5 +1,10 @@
---- Shared module using for localizing strings.
+--- Shared module for defining and managing tasks.
 -- @module sh_tasks
+
+if SERVER
+	AddCSLuaFile "tasks/base.lua"
+
+TASK_BASE = include "tasks/base.lua"
 
 -- Various task collections.
 -- Pretty much none of these aside from All
@@ -36,33 +41,32 @@ GM.Task_Register = (taskTable = {}) =>
 
 			@TaskCollection.All[.Name] = taskTable
 
+GM.Task_Instantiate = (taskTable) =>
+	taskInstance = {
+		Base: TASK_BASE
+	}
+
+	setmetatable taskInstance, {
+		__index: (name) =>
+			val = rawget taskTable, name
+			if val == nil
+				val = rawget TASK_BASE, name
+
+			return val
+	}
+
+	return taskInstance
+
 if CLIENT
 	--- Opens the task VGUI.
 	-- @string name Task name.
 	-- @param data Task data. Normally this should be GAMEMODE.GameData.MyTasks[name].
-	GM.Task_OpenTaskVGUI = (name, data) =>
-		taskClass = @TaskCollection.All[name]
-
-		if taskClass and taskClass.CreateVGUI
+	GM.Task_OpenTaskVGUI = (taskInstance) =>
+		if taskInstance.CreateVGUI
 			@HUD_CloseMap!
+			@HUD_OpenVGUI taskInstance\CreateVGUI!
 
-			@HUD_OpenVGUI taskClass\CreateVGUI data
 else
-	taskBase = include "tasks/sv_base.lua"
-
-	instantiateTask = (taskTable) ->
-		taskInstance = {}
-		setmetatable taskInstance, {
-			__index: (name) =>
-				val = rawget taskTable, name
-				if val == nil
-					val = rawget taskBase, name
-
-				return val
-		}
-
-		return taskInstance
-
 	taskMapToPool = (map) ->
 		pool = {}
 		for _, element in pairs map
@@ -108,52 +112,82 @@ else
 			if IsValid(playerTable.entity) and playerTable.entity\IsBot! and not @ConVarSnapshots.DistributeTasksToBots\GetBool!
 				continue
 
+			-- Instantiates the provided task.
+			-- Duplicate code is bad!
+			instantiate = (taskTable) ->
+				taskInstance = @Task_Instantiate taskTable
+				with taskInstance
+					\SetAssignedPlayer playerTable
+					\SetName taskTable.Name
+					\SetupNetwork!
+					\Init!
+					\SetDirty!
+
+					if not IsValid \GetActivationButton!
+						ent = GAMEMODE.Util.FindEntsByTaskName .Name, true
+						if IsValid ent[1]
+							\SetActivationButton ent[1]
+						else
+							@Logger.Error "Task #{.Name} has NO suitable buttons on the map. Ignoring."
+							return
+
+					@GameData.Tasks[playerTable][.Name] = taskInstance
+					if not @GameData.Imposters[playerTable]
+						totalTasks += 1
+
 			-- Assign the picked common tasks.
 			for id, task in ipairs commonTasks
-				taskInstance = instantiateTask task
-				taskInstance.__assignedPlayer = playerTable
+				instantiate task
 
-				if taskInstance.Initialize
-					taskInstance\Initialize!
-
-				if not IsValid taskInstance\GetActivationButton!
-					ent = GAMEMODE.Util.FindEntsByTaskName task.Name, true
-					if IsValid ent[1]
-						taskInstance\SetActivationButton ent[1]
-					else
-						@Logger.Error "Task #{task.Name} has NO suitable buttons on the map. Ignoring."
-						continue
-
-				@GameData.Tasks[playerTable][taskInstance.Name] = taskInstance
-				if not @GameData.Imposters[playerTable]
-					totalTasks += 1
-
-			-- Now, pick N random tasks from each pool.
+			-- Now, pick N random tasks from each pool and assign.
 			for pool, maxCount in pairs pools
 				count = 0
 				for _, task in ipairs shuffle pool
 					if count < maxCount
-						taskInstance = instantiateTask task
-						taskInstance.__assignedPlayer = playerTable
-
-						if taskInstance.Initialize
-							taskInstance\Initialize!
-
-						if not IsValid taskInstance\GetActivationButton!
-							ent = GAMEMODE.Util.FindEntsByTaskName task.Name, true
-							if IsValid ent[1]
-								taskInstance\SetActivationButton ent[1]
-							else
-								@Logger.Error "Task #{task.Name} has NO suitable buttons on the map. Ignoring."
-								continue
-
-						count += 1
-
-						@GameData.Tasks[playerTable][taskInstance.Name] = taskInstance
-						if not @GameData.Imposters[playerTable]
-							totalTasks += 1
+						instantiate task
 					else
 						break
 
 		@GameData.TotalTasks = totalTasks
 		@GameData.CompletedTasks = 0
+
+
+	--- Forces the player into doing the task.
+	-- This will fail if the player is too far from the activation button.
+	-- This will also fail if the player isn't tasked with the provided task.
+	-- This will also fail if the button did not consent.
+	-- Yes.
+	-- @param playerTable The tasked crewmate.
+	-- @string name Name of the task.
+	GM.Task_Start = (playerTable, name) =>
+		if not IsValid playerTable.entity
+			return
+
+		task = (@GameData.Tasks[playerTable] or {})[name]
+		if not task
+			return
+		
+		ent = task\GetActivationButton!
+		if not IsValid ent
+			return
+
+		if task and playerTable.entity\GetPos!\Distance(ent\GetPos!) <= 128 and task\CanUse!
+			task\Use ent
+		
+		return
+
+	--- Submits the current task. Tied to VGUI. This function will fail
+	-- if the player isn't actually doing any tasks at this moment.
+	-- @param playerTable The tasked crewmate.
+	GM.Task_Submit = (playerTable) =>
+		currentVGUI = @GameData.CurrentVGUI[playerTable]
+		currentTask = (@GameData.Tasks[playerTable] or {})[currentVGUI]
+
+		if currentTask and not currentTask\GetCompleted!
+			if IsValid playerTable.entity
+				ent = currentTask\GetActivationButton!
+
+				if not playerTable.entity\TestPVS ent
+					return
+
+				currentTask\Advance ent

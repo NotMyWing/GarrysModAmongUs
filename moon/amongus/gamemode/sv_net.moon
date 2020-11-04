@@ -168,28 +168,8 @@ GM.Net_UpdateGameData = (ply) =>
 	net.WriteUInt #dead, 8
 	for _, id in ipairs dead
 		net.WriteUInt id, 8
-
-	net.WriteUInt @GameData.CompletedTasks, 8
-	net.WriteUInt @GameData.TotalTasks, 8
-	if playerTable
-		-- Send each task and the info the player should be aware of.
-		playerTasks = @GameData.Tasks[playerTable]
-
-		net.WriteUInt table.Count(playerTasks), 8
-		for name, taskInstance in pairs playerTasks
-			net.WriteString name
-			net.WriteEntity taskInstance\GetActivationButton!
-			net.WriteBool   taskInstance.__isPositionImportant or false
-
-			net.WriteBool taskInstance\IsMultiStep!
-			net.WriteUInt taskInstance\GetMaxSteps!, 16
-			net.WriteUInt taskInstance\GetCurrentStep!, 16
-
-			net.WriteUInt taskInstance\GetCurrentState!, 16
-			net.WriteDouble taskInstance\GetTimeout!
-
-			net.WriteString taskInstance\GetCustomName! or ""
-			net.WriteString taskInstance\GetCustomArea! or ""
+	
+	net.WriteUInt @GameData.CompletedTasks or 0, 32
 
 	net.Send ply
 
@@ -270,33 +250,24 @@ GM.Net_OpenTaskVGUI = (playerTable, name) =>
 -- The implementation of this method is currently atrocious.
 -- @param playerTable The tasked crewmate.
 -- @param taskInstance The task instance.
-GM.Net_UpdateTaskData = (playerTable, taskInstance) =>
+GM.Net_UpdateTaskData = (playerTable, taskName, packet) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.TasksUpdateData, @FlowSize
-
-	net.WriteString taskInstance.Name
-	net.WriteBool taskInstance\IsCompleted!
-	if not taskInstance\IsCompleted!
-		net.WriteEntity taskInstance\GetActivationButton!
-		net.WriteBool taskInstance.__isPositionImportant or false
-		net.WriteUInt taskInstance\GetCurrentStep!, 16
-		net.WriteUInt taskInstance\GetCurrentState!, 16
-		net.WriteDouble taskInstance\GetTimeout!
-		net.WriteString taskInstance\GetCustomName! or ""
-		net.WriteString taskInstance\GetCustomArea! or ""
-
+	net.WriteString taskName
+	net.WriteTable packet
 	net.Send playerTable.entity
 
 --- Broadcasts the new task count.
 -- @param count New task count.
-GM.Net_BroadcastTaskCount = (count) =>
+GM.Net_BroadcastTaskCount = (count, total) =>
 	-- Don't broadcast if comms are sabotaged.
 	if @GetCommunicationsDisabled!
 		return
 
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.TasksUpdateCount, @FlowSize
-	net.WriteUInt count, 8
+	net.WriteUInt count, 32
+	net.WriteUInt total, 32
 	net.Broadcast!
 
 --- Notifies the players that it's time to close their tasks.
@@ -429,7 +400,7 @@ net.Receive "NMW AU Flow", (len, ply) ->
 		--
 		when GAMEMODE.FlowTypes.TasksSubmit
 			if playerTable
-				GAMEMODE\Player_SubmitTask playerTable
+				GAMEMODE\Task_Submit playerTable
 
 		--
 		-- Player has requested a sabotage.
@@ -464,7 +435,7 @@ GM.SetCommunicationsDisabled = (value) =>
 	SetGlobalBool "NMW AU CommsDisabled", value
 
 	if not value and @GameData.CompletedTasks
-		@Net_BroadcastTaskCount @GameData.CompletedTasks
+		@Net_BroadcastTaskCount @GameData.CompletedTasks, @GameData.TotalTasks
 
 --- Sets whether the meeting button is disabled.
 -- This is automatically called whenever a major sabotage is (de-)activated.

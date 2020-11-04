@@ -106,19 +106,23 @@ hook.Add "PreDrawHalos", "NMW AU Highlight", ->
 	-- Highlight our current tasks.
 	if not GAMEMODE.GameData.Imposters[GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]]
 		for _, task in pairs GAMEMODE.GameData.MyTasks
-			color = GAMEMODE\GetHighlightColor task.entity
+			btn = task\GetActivationButton!
+			if not IsValid btn
+				continue
+
+			color = GAMEMODE\GetHighlightColor task\GetActivationButton!
 			-- Obligatory wall of checks.
-			if color and not task.completed and
-				IsValid(task.entity) and task.entity ~= GAMEMODE.UseHighlight and
-				200 > task.entity\GetPos!\Distance LocalPlayer!\GetPos!
+			if color and not task\GetCompleted! and
+				IsValid(btn) and btn ~= GAMEMODE.UseHighlight and
+				200 > btn\GetPos!\Distance LocalPlayer!\GetPos!
 
 					with util.TraceLine {
 						start: LocalPlayer!\WorldSpaceCenter!
-						endpos: task.entity\WorldSpaceCenter!
+						endpos: btn\WorldSpaceCenter!
 						filter: (trEnt) -> trEnt == ent or not trEnt\IsPlayer!
 					}
-						if .Entity == task.entity
-							halo.Add { task.entity }, color, 3, 3, 2, true, true
+						if .Entity == btn
+							halo.Add { btn }, color, 3, 3, 2, true, true
 
 	-- Highlight sabotage buttons.
 	for btn in pairs GAMEMODE.GameData.SabotageButtons

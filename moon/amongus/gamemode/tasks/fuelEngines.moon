@@ -5,20 +5,23 @@ taskTable = {
 	Time: 3
 
 	-- Called when the task is created, but not yet sent to the player.
-	Initialize: =>
-		@SetMaxSteps 2
+	Init: =>
+		@Base.Init @
 
-		@buttons = {}
+		if SERVER
+			@SetMaxSteps 2
 
-		-- Find the task buttons.
-		for _, button in ipairs GAMEMODE.Util.FindEntsByTaskName "fuelEngines"
-			@buttons[button\GetCustomData!] = button
+			@buttons = {}
 
-		-- The first button shall be the barrel in the storage.
-		@SetActivationButton @buttons["barrel"]
+			-- Find the task buttons.
+			for _, button in ipairs GAMEMODE.Util.FindEntsByTaskName "fuelEngines"
+				@buttons[button\GetCustomData!] = button
+
+			-- The first button shall be the barrel in the storage.
+			@SetActivationButton @buttons["barrel"]
 
 	-- Called whenever the player submits the task.
-	Advance: =>
+	OnAdvance: =>
 		state = @GetCurrentState! + 1
 
 		-- The player has filled the jerry can.
@@ -41,15 +44,14 @@ taskTable = {
 		-- The player has filled both engines.
 		-- Complete the task.
 		elseif state == 5
-			@Complete!
+			@SetCompleted true
 
 		@SetCurrentState state
-		@NetworkTaskData!
 }
 
 if CLIENT
-	taskTable.CreateVGUI = (task) =>
-		state = task.currentState
+	taskTable.CreateVGUI = =>
+		state = @GetCurrentState!
 		base = vgui.Create "AmongUsTaskBase"
 
 		with base
@@ -72,7 +74,11 @@ if CLIENT
 
 				local fuelbox
 
-				amt = 0
+				@__amount or= 0
+
+				if @__amount >= taskTable.Time
+					@__amount = 0
+
 				pressed = false
 				finished = false
 				button = with \Add "DButton"
@@ -86,8 +92,8 @@ if CLIENT
 					.OnCursorExited  = -> pressed = false
 					.Think = ->
 						if not finished and pressed
-							amt += FrameTime!
-							if amt >= taskTable.Time
+							@__amount += FrameTime!
+							if @__amount >= taskTable.Time
 								finished = true
 								base\Submit!
 
@@ -96,7 +102,7 @@ if CLIENT
 					\DockMargin margin * 4, 0, margin * 4, margin * 2
 					\Dock FILL
 					.Paint = (_, w, h) ->
-						time = math.min 1, amt / taskTable.Time
+						time = math.min 1, @__amount / taskTable.Time
 						if state == 2 or state == 4
 							time = 1 - time
 

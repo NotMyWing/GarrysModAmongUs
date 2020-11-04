@@ -1,8 +1,11 @@
 taskTable = {
 	Type: GM.TaskType.Long
 	Count: 20
-	Initialize: =>
-		@SetMaxSteps @Count
+	Init: =>
+		@Base.Init @
+
+		if SERVER
+			@SetMaxSteps @Count
 }
 
 if CLIENT
@@ -23,8 +26,8 @@ if CLIENT
 		kil: Material "au/gui/tasks/clearasteroids/weapons_explosion.png", "smooth"
 	}
 
-	taskTable.CreateVGUI = (task) =>
-		state = task.currentState
+	taskTable.CreateVGUI = =>
+		state = @GetCurrentState!
 		base = vgui.Create "AmongUsTaskBase"
 
 		with base
@@ -85,8 +88,8 @@ if CLIENT
 
 								.OnMousePressed = ->
 									destroyed += 1
-									if task.currentStep <= taskTable.Count
-										base\Submit task.currentStep == taskTable.Count
+									if @GetCurrentStep! <= taskTable.Count
+										base\Submit @GetCurrentStep! == taskTable.Count
 
 									hit = true
 									surface.PlaySound SOUNDS.fire

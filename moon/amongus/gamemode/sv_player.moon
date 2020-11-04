@@ -223,30 +223,6 @@ GM.Player_UnVent = (playerTable, instant) =>
 			if IsValid playerTable.entity
 				@Player_Unhide playerTable.entity
 
---- Forces the player into doing the task.
--- This will fail if the player is too far from the activation button.
--- This will also fail if the player isn't tasked with the provided task.
--- This will also fail if the button did not consent.
--- Yes.
--- @param playerTable The tasked crewmate.
--- @string name Name of the task.
-GM.Player_StartTask = (playerTable, name) =>
-	task = (@GameData.Tasks[playerTable] or {})[name]
-
-	if task and @Player_OpenVGUI playerTable, name, (-> task\CancelVisual!)
-		ent = task\GetActivationButton!
-
-		if playerTable.entity\GetPos!\Distance(ent\GetPos!) > 128
-			return
-
-		if not task\Use!
-			return
-
-		task\UseVisual!
-
-		if IsValid playerTable.entity
-			@Net_OpenTaskVGUI playerTable, name
-
 --- Closes the current VGUI if the player has any opened.
 -- Unlike OpenVGUI, this function DOES send a net message
 -- to tell the player to close his VGUI.
@@ -262,6 +238,18 @@ GM.Player_CloseVGUI = (playerTable) =>
 		if @GameData.VGUICallback[playerTable]
 			@GameData.VGUICallback[playerTable]!
 
+--- This function returns whether the player can open a new VGUI.
+-- @param playerTable Player table.
+GM.Player_CanOpenVGUI = (playerTable) =>
+	if @GameData.KillCooldownRemainders[playerTable]
+		return false
+
+	-- Bail if there's already a screen.
+	if @GameData.CurrentVGUI[playerTable]
+		return false
+
+	return true
+
 --- Opens a VGUI for a player.
 -- This is mostly an internal function that helps keeping track of
 -- people with opened VGUIs, such as tasks, sabotages, security cams or
@@ -275,16 +263,10 @@ GM.Player_CloseVGUI = (playerTable) =>
 -- implement the actual VGUI networking yourself.
 --
 -- @param playerTable Player table.
--- @param vgui Virtually anything. Preferably a string identifier.
+-- @param vgui Identifier. Virtually anything. Preferably string.
 -- @param callback Optional callback to call when the GUI is closed.
 GM.Player_OpenVGUI = (playerTable, vgui, callback) =>
-	-- Bail if the kill cooldown is paused.
-	-- This is pretty much guarantees that the player is busy.
-	if @GameData.KillCooldownRemainders[playerTable]
-		return false
-
-	-- Bail if there's already a screen.
-	if @GameData.CurrentVGUI[playerTable]
+	if not @Player_CanOpenVGUI playerTable
 		return false
 
 	@GameData.CurrentVGUI[playerTable] = vgui
@@ -293,29 +275,6 @@ GM.Player_OpenVGUI = (playerTable, vgui, callback) =>
 	@GameData.VGUICallback[playerTable] = callback
 
 	return true
-
---- Submits the current task. This function will fail
--- if the player isn't actually doing any tasks at this moment.
--- @param playerTable The tasked crewmate.
-GM.Player_SubmitTask = (playerTable) =>
-	currentVGUI = @GameData.CurrentVGUI[playerTable]
-	currentTask = (@GameData.Tasks[playerTable] or {})[currentVGUI]
-
-	if currentTask
-		if IsValid playerTable.entity
-			ent = currentTask\GetActivationButton!
-
-			if not playerTable.entity\TestPVS ent
-				return
-
-		btn = currentTask\GetActivationButton!
-		currentTask\Advance!
-
-		if currentTask\IsCompleted!
-			currentTask\CompleteVisual!
-			@CheckWin!
-		else
-			currentTask\AdvanceVisual btn
 
 --- Closes the current VGUI for everybody.
 GM.Player_CloseVGUIsForEveryone = =>
@@ -348,7 +307,7 @@ hook.Add "PlayerDisconnected", "NMW AU CheckWin", (ply) -> with GAMEMODE
 					.GameData.CompletedTasks += table.Count .GameData.Tasks[playerTable]
 					table.Empty .GameData.Tasks[playerTable]
 
-					\Net_BroadcastTaskCount .GameData.CompletedTasks
+					\Net_BroadcastTaskCount .GameData.CompletedTasks, .GameData.TotalTasks
 
 			\CheckWin!
 	elseif timer.Exists "tryStartGame"

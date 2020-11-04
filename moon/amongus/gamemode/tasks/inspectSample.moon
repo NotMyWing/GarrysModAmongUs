@@ -1,22 +1,23 @@
 taskTable = {
 	Type: GM.TaskType.Long
 	Time: 60
-	Initialize: =>
-		@SetMaxSteps 2
+	Init: =>
+		@Base.Init @
 
-	Advance: =>
+		if SERVER
+			@SetMaxSteps 2
+
+	OnAdvance: =>
 		if @GetTimeout! == 0
 			@SetCurrentStep 2
 			@SetTimeout CurTime! + @.Time
-			@NetworkTaskData!
 
 		elseif @GetTimeout! - CurTime! < 0
-			@Complete!
-			@NetworkTaskData!
+			@SetCompleted true
 }
 
 if CLIENT
-	taskTable.CreateVGUI = (task) =>
+	taskTable.CreateVGUI = =>
 		base = vgui.Create "AmongUsTaskBase"
 
 		with base
@@ -35,32 +36,26 @@ if CLIENT
 					\Dock TOP
 					\SizeToContents!
 
-				submitted = task.currentStep ~= 1
 				button = with \Add "DButton"
 					margin = ScrH! * 0.01
 					\DockMargin margin * 4, 0, margin * 4, margin * 4
 					\SetTall ScrH! * 0.05
 					\SetFont "NMW AU PlaceholderText"
 					\Dock BOTTOM
+					\SetText "Submit"
+					\SetEnabled @GetCurrentStep! == 1 or (@GetCurrentStep! == 2 and @GetTimeout! - CurTime! <= 0)
 					.DoClick = ->
-						base\Submit submitted
-
-						submitted = true
+						base\Submit @GetCurrentStep! ~= 1
 						\SetEnabled false
+
 					.Think = ->
-						\SetText if submitted
-							\SetEnabled false
-							if not task.timeout or task.timeout == 0
-								"..."
+						if @GetCurrentStep! == 2
+							\SetText if @GetTimeout! ~= 0 and @GetTimeout! - CurTime! > 0
+								string.format "%ds", math.floor @GetTimeout! - CurTime!
 							else
-								if task.timeout - CurTime! > 0
-									string.format "%ds", math.floor task.timeout - CurTime!
-								else
-									\SetEnabled true
-									.Think = nil
-									"Submit"
-						else
-							"Submit"
+								\SetEnabled true
+								.Think = nil
+								"Submit"
 			\Popup!
 
 		return base

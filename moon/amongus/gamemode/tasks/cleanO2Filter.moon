@@ -1,13 +1,12 @@
 taskTable = {
 	Type: GM.TaskType.Short
 	Count: 6
-	Advance: =>
+	OnAdvance: =>
 		if @GetCurrentState! == @Count
-			@Complete!
+			@SetCompleted true
 		else
 			@SetCurrentState @GetCurrentState! + 1
 
-		@NetworkTaskData!
 }
 
 ASSETS = {
@@ -22,8 +21,8 @@ SOUNDS = {
 }
 
 if CLIENT
-	taskTable.CreateVGUI = (task) =>
-		state = task.currentState
+	taskTable.CreateVGUI = =>
+		state = @GetCurrentState!
 		base = vgui.Create "AmongUsTaskBase"
 
 		with base
@@ -39,7 +38,7 @@ if CLIENT
 					\SetSize width, max_size
 					\SetMaterial ASSETS.foreground
 
-				for i = 1, (taskTable.Count + 1) - task.currentState
+				for i = 1, (taskTable.Count + 1) - state
 					pressed = true
 					rot = math.random -20, 20
 					with \Add "DPanel"
@@ -102,7 +101,7 @@ if CLIENT
 							if .__x < -w * 0.1
 								surface.PlaySound table.Random SOUNDS.suck
 								\Remove!
-								base\Submit task.currentState == taskTable.Count
+								base\Submit @GetCurrentState! == taskTable.Count
 							else
 								velocity *= 0.99
 

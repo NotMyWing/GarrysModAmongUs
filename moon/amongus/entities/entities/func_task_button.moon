@@ -22,7 +22,7 @@ ENT.Draw = =>
 
 ENT.Use = (ply) =>
 	if playerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
-		GAMEMODE\Player_StartTask playerTable, @GetTaskName!
+		GAMEMODE\Task_Start playerTable, @GetTaskName!
 
 ENT.KeyValue = (key, value) =>
 	if key == "model"

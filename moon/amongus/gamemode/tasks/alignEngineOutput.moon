@@ -1,27 +1,27 @@
 taskTable = {
 	Type: GM.TaskType.Short
 	Time: 3
-	Initialize: =>
-		@buttons = GAMEMODE.Util.FindEntsByTaskName "alignEngineOutput"
-		@SetMaxSteps #@buttons
+	Init: =>
+		@Base.Init @
 
-		@SetActivationButton @buttons[@GetCurrentStep!]
+		if SERVER
+			@buttons = GAMEMODE.Util.FindEntsByTaskName "alignEngineOutput"
+			@SetMaxSteps #@buttons
 
-	Advance: =>
+			@SetActivationButton @buttons[@GetCurrentStep!]
+
+	OnAdvance: =>
 		step = @GetCurrentStep!
 
 		if step >= @GetMaxSteps!
-			@Complete!
+			@SetCompleted true
 		else
 			@SetCurrentStep step + 1
 			@SetActivationButton @buttons[step + 1]
-
-		@NetworkTaskData!
 }
 
 if CLIENT
-	taskTable.CreateVGUI = (task) =>
-		state = task.currentState
+	taskTable.CreateVGUI = =>
 		base = vgui.Create "AmongUsTaskBase"
 
 		with base

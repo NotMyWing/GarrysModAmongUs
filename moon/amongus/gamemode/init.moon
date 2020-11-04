@@ -246,9 +246,6 @@ GM.StartGame = =>
 			memo[b] = memo[b] or math.random!
 			memo[a] > memo[b]
 
-		-- Assign the tasks to players.
-		@Task_AssignToPlayers!
-
 		-- Broadcast the important stuff that players must know about the game.
 		@SetGameInProgress true
 		@Net_BroadcastGameStart!
@@ -266,10 +263,6 @@ GM.StartGame = =>
 					ply.entity\Freeze true
 
 			timer.Create handle, @SplashScreenTime - 2, 1, ->
-				-- Check if suddenly something went extremely wrong during the windup time.
-				if @CheckWin!
-					return
-
 				@Logger.Info "Game begins! GL & HF"
 
 				-- Set off the timeout timer.
@@ -291,10 +284,16 @@ GM.StartGame = =>
 					if @GameData.Imposters[ply]
 						@Player_RefreshKillCooldown ply
 
-				@Sabotage_Init!
 				@SetGameState @GameState.Playing
 
+				-- Assign the tasks to players.
+				@Task_AssignToPlayers!
+				@Sabotage_Init!
+
 				@Meeting_ResetCooldown!
+
+				-- Check if suddenly something went extremely wrong during the windup time.
+				@CheckWin!
 
 GM.StartRound = =>
 	-- Spawn the players and spread them around.
