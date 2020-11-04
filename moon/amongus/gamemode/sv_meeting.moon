@@ -55,11 +55,17 @@ GM.Meeting_Start = (ply, bodyColor) =>
 				table.Empty @GameData.Votes
 				table.Empty @GameData.VotesMap
 
-				for _, ply in ipairs player.GetAll!
-					if false and ply\IsBot!
-						skip = math.random! > 0.8
-						rnd = table.Random @GetAlivePlayers!
-						@Meeting_Vote ply, not skip and rnd
+				if @ConVarSnapshots.MeetingBotVote\GetBool!
+					for _, ply in ipairs player.GetAll!
+						if ply\IsBot!
+							handle = "BotVote #{ply\Nick!}"
+							GAMEMODE.GameData.Timers[handle] = true
+							timer.Create handle, (math.random 1, 50 * math.min 5, @ConVarSnapshots.VoteTime\GetInt!) / 50, 1, ->
+								GAMEMODE.GameData.Timers[handle] = nil
+
+								skip = math.random! > 0.8
+								rnd = table.Random @GetAlivePlayers!
+								@Meeting_Vote @GameData.Lookup_PlayerByEntity[ply], not skip and rnd
 
 				timer.Create handle, @ConVarSnapshots.VoteTime\GetInt!, 1, ->
 					@Meeting_End!
@@ -78,14 +84,15 @@ GM.Meeting_Vote = (playerTable, target) =>
 
 		countAlive = 0
 		for _, ply in pairs @GameData.PlayerTables
-			if IsValid(ply.entity) and not GAMEMODE.GameData.DeadPlayers[ply]
-				countAlive += 1
+			if (IsValid(ply.entity) and not ply.entity\IsBot! and not GAMEMODE.GameData.DeadPlayers[ply]) or
+				(@ConVarSnapshots.MeetingBotVote\GetBool! and ply.entity\IsBot!)
+					countAlive += 1
 
-		needed = table.Count(@GameData.VotesMap)
+		voted = table.Count(@GameData.VotesMap)
 
-		@BroadcastVote playerTable, countAlive, needed
+		@Net_BroadcastVote playerTable, countAlive - voted
 
-		if needed >= countAlive
+		if voted >= countAlive
 			timer.Destroy "meeting"
 			@Meeting_End!
 

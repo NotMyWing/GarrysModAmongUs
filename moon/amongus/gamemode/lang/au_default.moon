@@ -158,3 +158,5 @@ with GM.Lang\Get "en"
 
 	for name, value in pairs cvars
 		["cvar.#{name}"] = value
+
+	["vote.voted"] = "%s has voted. %s remaining."

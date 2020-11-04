@@ -2,6 +2,8 @@
 -- Responsible for sending and receiving information to/from the server.
 -- @module cl_net
 
+TRANSLATE = GM.Lang.GetEntry
+
 --- Tell the server that we want to hop to a different vent.
 -- This will do absolutely nothing if the player is not vented, or
 -- if he's not an imposter to begin with.
@@ -231,7 +233,11 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	--
 	when GAMEMODE.FlowTypes.MeetingVote
 		voter = GAMEMODE.GameData.Lookup_PlayerByID[net.ReadUInt 8]
-		GAMEMODE.Hud.Meeting\ApplyVote voter
+		if voter
+			remaining = net.ReadUInt 8
+			GAMEMODE.Hud.Meeting\ApplyVote voter
+			if remaining > 0
+				chat.AddText Color(0, 255, 0), TRANSLATE("vote.voted") voter.nickname, remaining
 
 	--
 	-- Meeting 3/4.

@@ -48,6 +48,7 @@ GM.ConVars =
 	TasksVisual: CreateConVar "au_tasks_enable_visual", 0, flags, "", 0, 1
 
 	DistributeTasksToBots: CreateConVar "au_debug_bot_tasks" , 0, flags, "", 0, 1
+	MeetingBotVote:        CreateConVar "au_debug_bot_vote"  , 0, flags, "", 0, 1
 
 	TimeLimit: CreateConVar "au_time_limit", 600, flags, "", 0, 1200
 	Countdown: CreateConVar "au_countdown", 5, flags, "", 1, 10

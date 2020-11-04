@@ -80,14 +80,12 @@ GM.Net_BroadcastMeeting = (playerTable, bodyColor) =>
 
 --- Notifies the players that somebody has just voted.
 -- @param playerTable Meeting caller.
--- @param current How many players have voted so far?
--- @param total How many votes are we expecting total?
-GM.BroadcastVote = (playerTable, current, total) =>
+-- @param current How many votes we still need?
+GM.Net_BroadcastVote = (playerTable, remaining) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.MeetingVote, @FlowSize
 	net.WriteUInt playerTable.id, 8
-	net.WriteUInt current, 8
-	net.WriteUInt total, 8
+	net.WriteUInt remaining, 8
 	net.Broadcast!
 
 --- Notifies the players about the meeting results.
@@ -168,7 +166,7 @@ GM.Net_UpdateGameData = (ply) =>
 	net.WriteUInt #dead, 8
 	for _, id in ipairs dead
 		net.WriteUInt id, 8
-	
+
 	net.WriteUInt @GameData.CompletedTasks or 0, 32
 
 	net.Send ply
