@@ -272,11 +272,11 @@ GM.Util = {}
 -- @param tbl Table of entities.
 -- @param entity Entity we're sorting agaist.
 -- @return The sorted table.
-GM.Util.SortByDistance = (tbl, entity) ->
+GM.Util.SortByDistance = (tbl, destination) ->
 	memo = {}
 	table.sort tbl, (a, b) ->
-		memo[a] or= (a\GetPos! - entity\GetPos!)\Length!
-		memo[b] or= (b\GetPos! - entity\GetPos!)\Length!
+		memo[a] or= (a\GetPos! - destination)\Length!
+		memo[b] or= (b\GetPos! - destination)\Length!
 
 		return memo[a] > memo[b]
 
@@ -332,7 +332,7 @@ GM.TracePlayer = (ply) =>
 	if not @IsGameInProgress!
 		return
 
-	startPos = ply\WorldSpaceCenter!
+	startPos = ply\EyePos!
 	entities = ents.FindInSphere startPos, @BaseUseRadius * @ConVarSnapshots.KillDistanceMod\GetFloat!
 
 	usable = {}
@@ -355,7 +355,7 @@ GM.TracePlayer = (ply) =>
 			-- towards PVS. Jank, but gets the job done so people can't report bodies
 			-- through closed doors.
 			with tr = util.TraceLine {
-				start: ply\WorldSpaceCenter!
+				start: ply\EyePos!
 				endpos: ent\WorldSpaceCenter!
 				filter: (trEnt) -> trEnt == ent or not trEnt\IsPlayer!
 			}
@@ -429,8 +429,10 @@ GM.TracePlayer = (ply) =>
 				if nearestPoint\Distance(ply\GetPos!) <= @BaseUseRadius
 					table.insert usable, ent
 
-	GAMEMODE.Util.SortByDistance usable, ply
-	GAMEMODE.Util.SortByDistance killable, ply
+	lookPos = ply\EyePos! + ply\GetAimVector! * 32
+
+	GAMEMODE.Util.SortByDistance usable, lookPos
+	GAMEMODE.Util.SortByDistance killable, lookPos
 
 	return killable[#killable], usable[#usable]
 

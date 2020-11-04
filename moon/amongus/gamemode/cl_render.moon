@@ -73,16 +73,12 @@ hook.Add "HUDShouldDraw", "NMW AU HideHud", (element) ->
 		false
 
 hook.Add "CalcView", "NMW AU CalcView", ( ply, pos, angles, fov ) ->
-	newOrigin = if GAMEMODE.GameData.Vented
-		ply\GetPos! + Vector 0, 0, 10
-	else
-		pos - Vector 0, 0, 15
-
-	return {
-		origin: newOrigin
-		:angles
-		:fov
-	}
+	if GAMEMODE.GameData.Vented
+		return {
+			origin: ply\GetPos! + Vector 0, 0, 10
+			:angles
+			:fov
+		}
 
 color_sabotage = Color 32, 255, 32
 color_sabotageb = Color 255, 32, 32
@@ -117,7 +113,7 @@ hook.Add "PreDrawHalos", "NMW AU Highlight", ->
 				200 > btn\GetPos!\Distance LocalPlayer!\GetPos!
 
 					with util.TraceLine {
-						start: LocalPlayer!\WorldSpaceCenter!
+						start: LocalPlayer!\EyePos!
 						endpos: btn\WorldSpaceCenter!
 						filter: (trEnt) -> trEnt == ent or not trEnt\IsPlayer!
 					}
@@ -142,7 +138,7 @@ hook.Add "PostDrawTranslucentRenderables", "NMW AU Nicknames", (depth, skybox) -
 	if skybox
 		return
 
-	players = GAMEMODE.Util.SortByDistance player.GetAll!, LocalPlayer!
+	players = GAMEMODE.Util.SortByDistance player.GetAll!, LocalPlayer!\GetPos!
 
 	aply = GAMEMODE.GameData.Lookup_PlayerByEntity and GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
 	for _, ply in ipairs players

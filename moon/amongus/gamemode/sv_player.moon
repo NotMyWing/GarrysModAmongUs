@@ -291,6 +291,7 @@ GM.PlayerSpawn = (ply) =>
 		ply\SetRunSpeed  defaultSpeed
 		ply\SetMaxSpeed  defaultSpeed
 
+	ply\SetViewOffset Vector 0, 0, 64 - 16
 	ply\SetTeam 1
 	ply\SetNoCollideWithTeammates true
 
