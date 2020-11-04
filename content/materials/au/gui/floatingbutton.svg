@@ -13,7 +13,7 @@
    version="1.1"
    id="svg2719"
    inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
-   sodipodi:docname="button.svg"
+   sodipodi:docname="floatingbutton.svg"
    inkscape:export-filename="/home/cyber/Documents/VS_Code/GarrysModAmongUs/gamemodes/amongus/content/materials/au/gui/button.png"
    inkscape:export-xdpi="50.799999"
    inkscape:export-ydpi="50.799999">
@@ -90,14 +90,14 @@
      style="display:inline">
     <path
        id="path3321"
-       style="display:none;fill:#feffff;fill-opacity:1;stroke:#020203;stroke-width:1.05833;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 25.833984,-6.1933594 C 19.839461,-5.4899664 13.668971,-5.5022352 8.0859375,-6.1875 3.3205263,-6.7724055 -1.0445448,-3.9874486 -2.6679688,0.31835938 l -2.90625,7.70898442 c -0.4504223,1.1946486 -0.6894531,2.4703932 -0.6894531,3.7832032 v 18.185547 c 0,5.865792 4.2670577,10.132812 10.1328125,10.132812 H 29.998047 c 8.250937,0 10.130859,-2.149209 10.130859,-10.132812 V 11.810547 c 0,-1.312795 -0.239631,-2.5882027 -0.689453,-3.7812501 L 36.535156,0.3203125 c -1.626122,-4.3130817 -5.99456,-7.0659407 -10.701172,-6.5136719 z"
+       style="display:inline;fill:#feffff;fill-opacity:1;stroke:#020203;stroke-width:1.05833;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 7.1894531,1.1113281 C 5.8752759,0.95002629 4.6613774,1.7245408 4.2128906,2.9140625 l -2.90625,7.7070315 c -0.141869,0.376277 -0.2167968,0.777775 -0.2167968,1.189453 v 18.185547 c 0,1.538104 1.2412013,2.779297 2.7792968,2.779297 H 29.998047 c 1.560627,0 2.777344,-1.267299 2.777344,-2.779297 V 11.810547 c 0,-0.411674 -0.07509,-0.8136 -0.216797,-1.189453 L 29.654297,2.9140625 c -0.4492,-1.1914462 -1.664234,-1.95511734 -2.962891,-1.8027344 -6.518692,0.7648987 -13.350764,0.7550005 -19.5019529,0 z"
        sodipodi:nodetypes="ccccccc"
        inkscape:label="outline"
-       inkscape:path-effect="#path-effect3326;#path-effect3324"
-       inkscape:original-d="M 6.7360713,3.7230044 3.7369018,11.677707 V 30.128882 H 30.129593 V 11.677707 L 27.130425,3.7230044 c -6.79247,0.8080925 -13.963464,0.8013676 -20.3943537,0 z"
        inkscape:export-xdpi="50.799999"
-       inkscape:export-ydpi="50.799999" />
+       inkscape:export-ydpi="50.799999"
+       inkscape:original-d="M 6.7360713,3.7230044 3.7369018,11.677707 V 30.128882 H 30.129593 V 11.677707 L 27.130425,3.7230044 c -6.79247,0.8080925 -13.963464,0.8013676 -20.3943537,0 z"
+       inkscape:path-effect="#path-effect3326;#path-effect3324" />
     <path
        id="path3284"
        style="display:inline;fill:#8a9494;fill-opacity:1;stroke:none;stroke-width:0.780281;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
