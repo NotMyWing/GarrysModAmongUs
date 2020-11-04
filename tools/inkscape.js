@@ -1,6 +1,6 @@
 const { spawn } = require('child_process');
 const { Transform } = require('stream');
-const path = require('path').posix;
+const path = require('path');
 
 const { InkscapeIsDumbTransform } = require('./InkscapeIsDumbTransform');
 const { streamToBuffer } = require('./util');
