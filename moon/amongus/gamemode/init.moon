@@ -51,7 +51,7 @@ GM.GameOver = (reason) =>
 	handle = "game"
 
 	@GameData.Timers[handle] = true
-	timer.Create handle, 9, 1, ->
+	timer.Create handle, @SplashScreenTime - 1, 1, ->
 		@Restart!
 
 GM.CheckWin = (reason) =>

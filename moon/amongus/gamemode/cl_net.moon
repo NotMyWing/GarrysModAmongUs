@@ -157,7 +157,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	--
 	when GAMEMODE.FlowTypes.Countdown
 		if IsValid GAMEMODE.Hud
-			GAMEMODE.Hud\Countdown net.ReadDouble!
+			GAMEMODE\HUD_Countdown net.ReadDouble!
 
 	--
 	-- Read dead people. This gets sent before the meeting.

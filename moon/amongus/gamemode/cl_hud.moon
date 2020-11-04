@@ -106,7 +106,10 @@ GM.HUD_DisplayGameOver = (reason) =>
 	if IsValid @Hud
 		@HUD_CloseMap!
 
-		@Hud.Splash = with @Hud\Add VGUI_SPLASH
+		if IsValid @__splash
+			@__splash\Remove!
+
+		@__splash = with vgui.CreateFromTable VGUI_SPLASH
 			\DisplayGameOver reason
 
 --- Displays the shush screen.
@@ -114,7 +117,10 @@ GM.HUD_DisplayShush = =>
 	if IsValid @Hud
 		@HUD_CloseMap!
 
-		@Hud.Splash = with @Hud\Add VGUI_SPLASH
+		if IsValid @__splash
+			@__splash\Remove!
+
+		@__splash = with vgui.CreateFromTable VGUI_SPLASH
 			\DisplayShush!
 
 --- Displays the death animation.
@@ -189,6 +195,13 @@ GM.HUD_TrackTaskOnMap = (entity, track = true) =>
 
 GM.HUD_AddTaskEntry = =>
 	return @Hud\AddTaskEntry!
+
+GM.HUD_Countdown = (time) =>
+	if time > CurTime! and IsValid @__splash
+		@__splash\Remove!
+
+	if IsValid @Hud
+		@Hud\Countdown time
 
 surface.CreateFont "NMW AU Task Complete", {
 	font: "Roboto"
