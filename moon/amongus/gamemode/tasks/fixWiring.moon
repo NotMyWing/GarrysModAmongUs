@@ -7,7 +7,9 @@ taskTable = {
 		if SERVER
 			@SetMaxSteps 3
 
-			@__taskButtons = GAMEMODE.Util.Shuffle GAMEMODE.Util.FindEntsByTaskName "fixWiring"
+			@__taskButtons = [button for button in *GAMEMODE.Util.Shuffle(GAMEMODE.Util.FindEntsByTaskName "fixWiring")[, 3]]
+			table.sort @__taskButtons, (a, b) ->
+				(tonumber(a\GetCustomData!) or 0) < (tonumber(b\GetCustomData!) or 0)
 
 			btn = @__taskButtons[1]
 			table.remove @__taskButtons, 1
@@ -16,7 +18,7 @@ taskTable = {
 	OnAdvance: =>
 		currentStep = @GetCurrentStep!
 
-		if currentStep == 3
+		if currentStep == @GetMaxSteps!
 			@SetCompleted true
 		else
 			@SetActivationButton @__taskButtons[1], true
