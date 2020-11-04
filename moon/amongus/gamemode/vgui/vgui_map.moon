@@ -1,10 +1,3 @@
-surface.CreateFont "NMW AU Map Labels", {
-	font: "Roboto"
-	size: ScrH! * 0.035
-	weight: 600
-	outline: true
-}
-
 MAT_ASSETS = {
 	close: Material "au/gui/closebutton.png", "smooth"
 }
@@ -103,7 +96,15 @@ return vgui.RegisterTable {
 			\Center!
 
 	SetPosition: (value) => @__position = value
-	SetScale: (value) => @__scale = value
+	SetScale: (value) =>
+		@__scale = value
+		surface.CreateFont "NMW AU Map Labels", {
+			font: "Roboto"
+			size: 1/value * ScrH! * 0.07
+			weight: 600
+			outline: true
+		}
+
 	SetLabels: (value) => @__labels = value
 
 	SetupFromManifest: (manifest) =>
@@ -132,7 +133,7 @@ return vgui.RegisterTable {
 				\Hide!
 				.Paint = ->
 
-				buttonSize = 0.075 * math.min w, h
+				buttonSize = 1/value * 0.075 * math.min w, h
 				for id, sabotage in ipairs manifest.Sabotages
 					if sabotage.UI
 						with \Add "DImageButton"
@@ -181,6 +182,13 @@ return vgui.RegisterTable {
 			if track
 				@__tracking[entity] = element
 				element\SetParent @__innerPanel
+
+				sizeW, sizeH = element\GetSize!
+				sizeW *= 1.5 / @__scale
+				sizeH *= 1.5 / @__scale
+				element\SetSize sizeW, sizeH
+				element\InvalidateLayout!
+
 			else
 				if IsValid @__tracking[entity]
 					@__tracking[entity]\Remove!

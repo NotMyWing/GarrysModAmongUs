@@ -266,7 +266,7 @@ GM.HUD_InitializeMap = =>
 
 		localPlayerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
 		if localPlayerTable
-			size = 0.05 * \GetInnerSize!
+			size = 0.085 * \GetInnerSize!
 			player = with \Add "DPanel"
 				\SetSize size, size
 				.Paint = ->
@@ -276,7 +276,7 @@ GM.HUD_InitializeMap = =>
 				layers = {}
 				for i = 1, 2
 					with layers[i] = \Add "DPanel"
-						\SetSize size, size
+						\Dock FILL
 						.Image = CREW_LAYERS[i]
 						.Paint = GAMEMODE.Render.DermaFitImage
 				layers[1].Color = localPlayerTable.color
