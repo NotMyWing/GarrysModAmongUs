@@ -135,6 +135,8 @@ else
 					if not @GameData.Imposters[playerTable]
 						totalTasks += 1
 
+				return true
+
 			-- Assign the picked common tasks.
 			for id, task in ipairs commonTasks
 				instantiate task
@@ -143,14 +145,13 @@ else
 			for pool, maxCount in pairs pools
 				count = 0
 				for _, task in ipairs shuffle pool
-					if count < maxCount
-						instantiate task
+					if count < maxCount and instantiate task
+						count += 1
 					else
 						break
 
 		@GameData.TotalTasks = totalTasks
 		@GameData.CompletedTasks = 0
-
 
 	--- Forces the player into doing the task.
 	-- This will fail if the player is too far from the activation button.
@@ -166,14 +167,14 @@ else
 		task = (@GameData.Tasks[playerTable] or {})[name]
 		if not task
 			return
-		
+
 		ent = task\GetActivationButton!
 		if not IsValid ent
 			return
 
 		if task and playerTable.entity\GetPos!\Distance(ent\GetPos!) <= 128 and task\CanUse!
 			task\Use ent
-		
+
 		return
 
 	--- Submits the current task. Tied to VGUI. This function will fail

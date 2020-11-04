@@ -2,9 +2,6 @@ taskTable = {
 	Init: =>
 		@Base.Init @
 
-		if SERVER
-			@SetNetworkable "CompletionTime"
-
 	Type: GM.TaskType.Long
 	Time: 10
 	CanUse: => not IsValid(@GetActivationButton!\GetNW2Entity "Scanning") and
