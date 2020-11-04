@@ -27,6 +27,7 @@ MAT_BUTTONS = {
 	kill: Material "au/gui/hudbuttons/kill.png"
 	use: Material "au/gui/hudbuttons/use.png"
 	report: Material "au/gui/hudbuttons/report.png"
+	vent: Material "au/gui/hudbuttons/vent.png"
 }
 
 COLOR_BTN = Color 255, 255, 255
@@ -231,10 +232,15 @@ hud.SetupButtons = (state, impostor) =>
 					\SetAlpha 32
 
 			.Paint = (_, w, h) ->
-				mat = if IsValid(GAMEMODE.UseHighlight) and 0 ~= GAMEMODE.UseHighlight\GetNW2Int "NMW AU PlayerID"
-					MAT_BUTTONS.report
-				else
-					MAT_BUTTONS.use
+				ent = GAMEMODE.UseHighlight
+				mat = if IsValid ent
+					if 0 ~= ent\GetNW2Int "NMW AU PlayerID"
+						MAT_BUTTONS.report
+					elseif ent\GetClass! == "prop_vent" or ent\GetClass! == "func_vent"
+						MAT_BUTTONS.vent
+
+				if not mat
+					mat = MAT_BUTTONS.use
 
 				-- Like, jesus christ man.
 				surface.SetDrawColor COLOR_BTN
