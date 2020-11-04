@@ -1,3 +1,4 @@
+const svgmin = require('gulp-svgmin');
 const gulp = require('gulp');
 const del = require('del');
 
@@ -63,6 +64,7 @@ watchScripts.description = "Watches lua files and compiles changes.";
  */
 function svg() {
 	return gulp.src('content/**/*.svg', { since: gulp.lastRun(svg) })
+		.pipe(svgmin())
 		.pipe(renderSvg())
 		.pipe(gulp.dest('gamemodes/amongus/content'));
 }

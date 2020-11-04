@@ -24,6 +24,7 @@
   "devDependencies": {
     "del": "^6.0.0",
     "gulp": "^4.0.2",
-    "luamin": "^1.0.4"
+    "luamin": "^1.0.4",
+    "gulp-svgmin": "^3.0.0"
   }
 }
