@@ -43,19 +43,19 @@ GM.GameOver = (reason) =>
 	for index, ply in ipairs player.GetAll!
 		ply\Freeze true
 
-	@SetGameInProgress false
 	@Player_CloseVGUIsForEveryone!
 	@Net_BroadcastDead!
 	@Net_BroadcastGameOver reason
 
-	handle = "game"
+	handle = "gameOver"
 
 	@GameData.Timers[handle] = true
 	timer.Create handle, @SplashScreenTime - 1, 1, ->
+		@SetGameInProgress false
 		@Restart!
 
 GM.CheckWin = (reason) =>
-	if not @IsGameInProgress!
+	if not @IsGameInProgress! or timer.Exists "gameOver"
 		return
 
 	if not reason

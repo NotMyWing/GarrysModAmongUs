@@ -42,6 +42,9 @@ GM.HUD_ShowVents = (vents) =>
 -- You should NOT call this, this WILL break everything horribly.
 -- This is used by the game mode for resetting the HUD between the rounds.
 GM.HUD_Reset = =>
+	if IsValid @__splash
+		@__splash\Remove!
+
 	if IsValid(@Hud) and IsValid(@Hud.TaskScreen)
 		@Hud.TaskScreen\Close!
 
