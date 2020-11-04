@@ -296,23 +296,6 @@ GM.Util.Shuffle = (t) ->
 
 	return t
 
-whitelist = {
-	"func_button": true
-	"func_door": true
-	"func_door_rotating": true
-	"func_meeting_button": true
-	"prop_meeting_button": true
-	"player": true
-	"prop_ragdoll": true
-	"prop_physics": true
-	"func_vent": true
-	"prop_vent": true
-	"func_task_button": true
-	"prop_task_button": true
-	"prop_sabotage_button": true
-	"func_sabotage_button": true
-}
-
 --- Finds all entities with the matching task name field.
 -- @string taskname You guessed it.
 -- @bool first Should this function only return the first found entity?
@@ -347,88 +330,88 @@ GM.TracePlayer = (ply) =>
 		if ent == ply
 			continue
 
-		if whitelist[ent\GetClass!]
-			if SERVER and not ply\TestPVS ent
+		if SERVER and not ply\TestPVS ent
+			continue
+
+		-- Plain old trace first.
+		-- The visibility can be occluded with doors, which don't contribute
+		-- towards PVS. Jank, but gets the job done so people can't report bodies
+		-- through closed doors.
+		with tr = util.TraceLine {
+			start: ply\EyePos!
+			endpos: ent\WorldSpaceCenter!
+			filter: (trEnt) -> trEnt == ent or not trEnt\IsPlayer!
+		}
+			if tr.Entity ~= ent
 				continue
 
-			-- Plain old trace first.
-			-- The visibility can be occluded with doors, which don't contribute
-			-- towards PVS. Jank, but gets the job done so people can't report bodies
-			-- through closed doors.
-			with tr = util.TraceLine {
-				start: ply\EyePos!
-				endpos: ent\WorldSpaceCenter!
-				filter: (trEnt) -> trEnt == ent or not trEnt\IsPlayer!
-			}
-				if tr.Entity ~= ent
-					continue
+		-- Task buttons.
+		if ent\GetClass! == "func_task_button" or ent\GetClass! == "prop_task_button"
+			name = ent\GetTaskName!
 
-			-- Task buttons.
-			if ent\GetClass! == "func_task_button" or ent\GetClass! == "prop_task_button"
-				name = ent\GetTaskName!
-
-				-- Quite simply just bail out if the player is an imposter.
-				if @GameData.Imposters[playerTable]
-					continue
-
-				if SERVER
-					-- Bail out if the player doesn't have this task, or if it's not the current button,
-					-- or if the button doesn't consent.
-					if not (@GameData.Tasks[playerTable] and @GameData.Tasks[playerTable][name]) or
-						ent ~= @GameData.Tasks[playerTable][name]\GetActivationButton! or
-						not @GameData.Tasks[playerTable][name]\CanUse!
-							continue
-
-				if CLIENT
-					-- Bail out if the local player doesn't have this task, or if he's completed it already, or
-					-- if the button doesn't consent.
-					if not @GameData.MyTasks[name] or
-						@GameData.MyTasks[name]\GetCompleted! or ent ~= @GameData.MyTasks[name]\GetActivationButton! or
-						not @GameData.MyTasks[name]\CanUse!
-							continue
-
-			-- Prevent dead players from being able to target corpses.
-			if ent\GetClass! == "prop_ragdoll" and @GameData.DeadPlayers[playerTable]
+			-- Quite simply just bail out if the player is an imposter.
+			if @GameData.Imposters[playerTable]
 				continue
 
-			-- Prevent regular players from using vents.
-			if (ent\GetClass! == "func_vent" or ent\GetClass! == "prop_vent") and not @GameData.Imposters[playerTable]
+			if SERVER
+				-- Bail out if the player doesn't have this task, or if it's not the current button,
+				-- or if the button doesn't consent.
+				if not (@GameData.Tasks[playerTable] and @GameData.Tasks[playerTable][name]) or
+					ent ~= @GameData.Tasks[playerTable][name]\GetActivationButton! or
+					not @GameData.Tasks[playerTable][name]\CanUse!
+						continue
+
+			if CLIENT
+				-- Bail out if the local player doesn't have this task, or if he's completed it already, or
+				-- if the button doesn't consent.
+				if not @GameData.MyTasks[name] or
+					@GameData.MyTasks[name]\GetCompleted! or ent ~= @GameData.MyTasks[name]\GetActivationButton! or
+					not @GameData.MyTasks[name]\CanUse!
+						continue
+
+		-- Prevent dead players from being able to target corpses.
+		if ent\GetClass! == "prop_ragdoll" and @GameData.DeadPlayers[playerTable]
+			continue
+
+		-- Prevent regular players from using vents.
+		if (ent\GetClass! == "func_vent" or ent\GetClass! == "prop_vent") and not @GameData.Imposters[playerTable]
+			continue
+
+		-- Only highlight sabotage buttons when they're active, and the player isn't dead.
+		if (ent\GetClass! == "func_sabotage_button" or ent\GetClass! == "prop_sabotage_button")
+			if @GameData.DeadPlayers[ply] or not @GameData.SabotageButtons[ent]
 				continue
 
-			-- Only highlight sabotage buttons when they're active, and the player isn't dead.
-			if (ent\GetClass! == "func_sabotage_button" or ent\GetClass! == "prop_sabotage_button")
-				if @GameData.DeadPlayers[ply] or not @GameData.SabotageButtons[ent]
-					continue
+		-- Only highlight doors when requested by sabotages.
+		if (ent\GetClass! == "func_door" or ent\GetClass! == "func_door_rotating")
+			if @GameData.DeadPlayers[ply] or not @GameData.SabotageButtons[ent]
+				continue
 
-			-- Only highlight doors when requested by sabotages.
-			if (ent\GetClass! == "func_door" or ent\GetClass! == "func_door_rotating")
-				if @GameData.DeadPlayers[ply] or not @GameData.SabotageButtons[ent]
-					continue
+		-- Only hightlight meeting buttons when the cooldown has passed.
+		if (ent\GetClass! == "func_meeting_button" or ent\GetClass! == "prop_meeting_button")
+			if @IsMeetingDisabled!
+				continue
 
-			if (ent\GetClass! == "func_meeting_button" or ent\GetClass! == "prop_meeting_button")
-				if @IsMeetingDisabled!
-					continue
+			if 0 >= ply\GetNW2Int "NMW AU Meetings"
+				continue
 
-				if 0 >= ply\GetNW2Int "NMW AU Meetings"
-					continue
+			time = GetGlobalFloat("NMW AU NextMeeting") - CurTime!
 
-				time = GetGlobalFloat("NMW AU NextMeeting") - CurTime!
+			if time > 0
+				continue
 
-				if time > 0
-					continue
+		otherPlayerTable = @GameData.Lookup_PlayerByEntity[ent]
 
-			otherPlayerTable = @GameData.Lookup_PlayerByEntity[ent]
+		isKillable = otherPlayerTable and ent\IsPlayer! and not ent\IsDormant! and @GameData.Imposters[playerTable] and
+			not @GameData.Imposters[otherPlayerTable] and not @GameData.DeadPlayers[otherPlayerTable]
 
-			isKillable = otherPlayerTable and ent\IsPlayer! and not ent\IsDormant! and @GameData.Imposters[playerTable] and
-				not @GameData.Imposters[otherPlayerTable] and not @GameData.DeadPlayers[otherPlayerTable]
-
-			isUsable = not isKillable and not ent\IsPlayer!
-			if isKillable
-				table.insert killable, ent
-			elseif isUsable
-				nearestPoint = ent\NearestPoint startPos
-				if nearestPoint\Distance(ply\GetPos!) <= @BaseUseRadius
-					table.insert usable, ent
+		isUsable = not isKillable and not ent\IsPlayer!
+		if isKillable
+			table.insert killable, ent
+		elseif isUsable
+			nearestPoint = ent\NearestPoint startPos
+			if nearestPoint\Distance(ply\GetPos!) <= @BaseUseRadius
+				table.insert usable, ent
 
 	lookPos = ply\EyePos! + ply\GetAimVector! * 32
 
