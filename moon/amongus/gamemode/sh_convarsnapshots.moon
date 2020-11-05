@@ -12,12 +12,11 @@ convarAccessors = {
 
 class ConVarSnapshotWrapper
 	new: (@__convar) =>
+		@__snapshot = {}
 		for accessor in *convarAccessors
-			@["Get#{accessor}"] = => @__snapshot[accessor]
+			@["Get#{accessor}"] = => @__snapshot[accessor] or (@__convar["Get#{accessor}"] @__convar)
 
 	TakeSnapshot: => with @__convar
-		@__snapshot = {}
-
 		for accessor in *convarAccessors
 			@__snapshot[accessor] = @__convar["Get#{accessor}"] @__convar
 
