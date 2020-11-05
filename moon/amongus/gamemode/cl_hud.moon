@@ -13,6 +13,7 @@ VGUI_MAP = include "vgui/vgui_map.lua"
 
 include "vgui/vgui_task_base.lua"
 include "vgui/vgui_sabotage_base.lua"
+include "vgui/vgui_gui_base.lua"
 include "vgui/vgui_task_placeholder.lua"
 
 surface.CreateFont "NMW AU Button Tooltip", {

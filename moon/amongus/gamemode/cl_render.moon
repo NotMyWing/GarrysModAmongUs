@@ -93,10 +93,12 @@ GM.GetHighlightColor = (entity) => if IsValid entity
 	return switch className
 		when "prop_vent", "func_vent"
 			color_kill
-		when "prop_meeting_button", "func_meeting_button"
-			color_white
 		when "prop_task_button", "func_task_button", "prop_sabotage_button", "func_sabotage_button"
 			color_task
+		when "prop_ragdoll"
+			nil
+		else
+			color_white
 
 hook.Add "PreDrawHalos", "NMW AU Highlight", ->
 	-- Highlight our current tasks.
