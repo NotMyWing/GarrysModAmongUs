@@ -1,37 +1,75 @@
 GM.LoadManifest = =>
-	-- Default to an empty table so that things don't die horribly.
-	@MapManifest = {}
+	pathsToCheck = {
+		{ "amongus/gamemode/manifest/#{game.GetMap!}.lua", "LUA" }
+		if @FolderName ~= "amongus"
+			{ "#{@FolderName}/gamemode/manifest/#{game.GetMap!}.lua" , "LUA" }
 
-	dir = @FolderName or "amongus"
-	fileName = "#{dir}/gamemode/manifest/#{game.GetMap!}.lua"
+		{ "amongus/manifest/#{game.GetMap!}.lua", "LUA" }
+	}
 
-	if file.Exists fileName, "LUA"
-		if SERVER
-			AddCSLuaFile fileName
+	for pathToCheck in *pathsToCheck
+		-- This can, and most likely will be null because the second element
+		-- is nullable. See `pathsToCheck = { ... }` above.
+		if not pathToCheck
+			continue
 
-		@MapManifest = include fileName
+		filePath, location = unpack pathToCheck
+		@Logger.Info "Checking #{filePath} for a valid manifest..."
 
-		@Logger.Info "Found the manifest file for #{game.GetMap!}"
+		-- Check if the file actually exists.
+		if file.Exists filePath, location
 
-		if @MapManifest.Tasks and type(@MapManifest.Tasks) == "table"
-			@Logger.Info "Found #{#@MapManifest.Tasks} tasks for #{game.GetMap!}"
-			for taskName in *@MapManifest.Tasks
-				if SERVER
-					AddCSLuaFile "tasks/#{taskName}.lua"
+			-- If it does, include it and check if it's a valid manifest table.
+			manifest = include filePath
+			if not manifest or "table" ~= type manifest
+				@Logger.Error "Map #{game.GetMap!} has malformed manifest!"
+				@Logger.Error "Expected type \"table\", got \"#{type manifest}\""
+				return
 
-				taskTable = include "tasks/#{taskName}.lua"
-				if taskTable
-					taskTable.Name or= taskName
+			-- If it is, AddCSLuaFile it, otherwise bail out.
+			if SERVER
+				AddCSLuaFile filePath
 
-					@Task_Register taskTable
-				else
-					@Logger.Error "Task #{taskName} returned invalid table."
+			@Logger.Info "Found the manifest file!"
+			@MapManifest = manifest
 
-		if @MapManifest.Sabotages and type(@MapManifest.Sabotages) == "table"
-			@Logger.Info "Found #{#@MapManifest.Sabotages} sabotages for #{game.GetMap!}"
-			for sabotage in *@MapManifest.Sabotages
-				@Sabotage_Register sabotage
-	else
-		@Logger.Error "Couldn't find the manifest file for #{game.GetMap!}! The game mode will not work properly."
+			-- Check if "Tasks" sub-table if valid.
+			if @MapManifest.Tasks and type(@MapManifest.Tasks) == "table" and #@MapManifest.Tasks > 0
+				@Logger.Info "Found #{#@MapManifest.Tasks} tasks, registering..."
+
+				-- If it is, scan it for tasks and register everything.
+				for taskName in *@MapManifest.Tasks
+					if SERVER
+						AddCSLuaFile "tasks/#{taskName}.lua"
+
+					taskTable = include "tasks/#{taskName}.lua"
+					if taskTable
+						taskTable.Name or= taskName
+
+						@Task_Register taskTable
+					else
+						@Logger.Error "Task #{taskName} returned invalid table."
+			else
+				@Logger.Error "Found NO tasks for #{game.GetMap!}! The game mode will not function properly!"
+
+			-- Check if "Sabotages" sub-table if valid.
+			if @MapManifest.Sabotages and type(@MapManifest.Sabotages) == "table"
+				@Logger.Info "Found #{#@MapManifest.Sabotages} sabotages, registering..."
+
+				-- If it is, scan it for sabotages and register everything.
+				-- Unlike the task block, this is all being handled by a dedicated method.
+				-- Less code! Prettier!
+				for sabotage in *@MapManifest.Sabotages
+					@Sabotage_Register sabotage
+			else
+				@Logger.Warn "Found no sabotages...?"
+
+			-- Everything's fine, don't check other files.
+			break
+
+		if not @MapManifest
+			@Logger.Error "Couldn't find the manifest file for #{game.GetMap!}! The game mode will not function properly!"
+			-- Default to an empty table so that things don't die horribly.
+			@MapManifest = {}
 
 GM\LoadManifest!

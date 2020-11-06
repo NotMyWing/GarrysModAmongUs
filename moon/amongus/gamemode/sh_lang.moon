@@ -83,18 +83,40 @@ GM.Lang or= {
 		@__database = {}
 		@__entryCache = {}
 
-		dir = GM.FolderName or "amongus"
-		files = file.Find(dir .. "/gamemode/lang/*.lua", "LUA" )
+		pathsToCheck = {
+			{ "amongus/gamemode/lang/", "LUA" }
+			if gamemode.FolderName ~= "amongus"
+				{ "#{gamemode.FolderName}/gamemode/lang/", "LUA" }
 
-		exported = true
-		for _, fileName in ipairs files
-			path = "lang/" .. fileName
+			{ "amongus/lang/", "LUA" }
+		}
 
-			if "lua" == string.sub fileName, -3, -1
-				AddCSLuaFile path
-				include path
+		for pathToCheck in *pathsToCheck
+			-- This can, and most likely will be null because the second element
+			-- is nullable. See `pathsToCheck = { ... }` above.
+			if not pathToCheck
+				continue
 
-				gamemode.Logger.Info "Included lang file #{path}"
+			filePath, location = unpack pathToCheck
+			files = file.Find filePath .. "*.lua", location
+
+			-- Sort files alphabetically.
+			table.sort files
+
+			gamemode.Logger.Info "Checking #{filePath} for language files..."
+
+			-- Scan the provided directory for language files.
+			-- Include everything.
+			for fileName in *files
+				path = "lang/" .. fileName
+
+				if "lua" == string.sub fileName, -3, -1
+					if SERVER
+						AddCSLuaFile path
+
+					include path
+
+					gamemode.Logger.Info "* Included #{path}"
 }
 
 GM.Lang\Initialize GM or GAMEMODE
