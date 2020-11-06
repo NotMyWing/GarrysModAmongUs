@@ -2,6 +2,8 @@
 -- Defines the game mode metadata fields, enums and exports some useful things.
 -- @module shared
 
+GAMEMODE or= GM
+
 AddCSLuaFile()
 
 GM.Name 		= "Among Us"

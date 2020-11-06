@@ -1,3 +1,5 @@
+GAMEMODE or= GM
+
 -- Obligatory includes
 include "shared.lua"
 include "sh_gamedata.lua"
