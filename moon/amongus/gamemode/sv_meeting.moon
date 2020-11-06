@@ -21,7 +21,7 @@ GM.Meeting_Start = (ply, bodyColor) =>
 
 	@Player_CloseVGUIsForEveryone!
 	@Sabotage_EndNonPersistent!
-	@Sabotage_EnableAll false
+	@SetMeetingInProgress true
 
 	@GameData.Timers[handle] = true
 	timer.Create handle, 0.2, 1, ->
@@ -147,8 +147,8 @@ GM.Meeting_End = =>
 			if timer.Exists "timelimit"
 				timer.UnPause "timelimit"
 
-			@Sabotage_RefreshAllCooldowns 5
-			@Sabotage_EnableAll!
+			@Sabotage_RefreshAllCooldowns!
+			@SetMeetingInProgress false
 
 GM.Meeting_ResetCooldown = =>
 	SetGlobalFloat "NMW AU NextMeeting", CurTime! + @ConVarSnapshots.MeetingCooldown\GetFloat!

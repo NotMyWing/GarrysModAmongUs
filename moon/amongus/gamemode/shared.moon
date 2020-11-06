@@ -439,6 +439,10 @@ GM.GetCommunicationsDisabled = => GetGlobalInt "NMW AU CommsDisabled"
 -- @return You guessed it.
 GM.IsMeetingDisabled = => GetGlobalBool "NMW AU MeetingDisabled"
 
+--- Returns whether calling the meeting is in progress.
+-- @return You guessed it.
+GM.IsMeetingInProgress = => GetGlobalBool "NMW AU MeetingInProgress"
+
 --- Returns whether the game is commencing.
 -- @return You guessed it.
 GM.IsGameCommencing = => GetGlobalBool "NMW AU GameCommencing"

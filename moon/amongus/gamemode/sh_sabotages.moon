@@ -53,14 +53,18 @@ GM.Sabotage_Init = =>
 			table.insert @GameData.Sabotages, instance
 
 GM.Sabotage_Start = (playerTable, id) =>
-	if @GameData.Imposters[playerTable] and not @GameData.Vented[playerTable] and IsValid playerTable.entity
-		_, usable = GAMEMODE\TracePlayer playerTable.entity
-		if usable
-			return
+	if not @IsMeetingInProgress! and
+		@GameData.Imposters[playerTable] and
+		not @GameData.Vented[playerTable] and
+		IsValid playerTable.entity
 
-		if instance = @GameData.Sabotages[id]
-			if instance\CanStart!
-				instance\Start!
+			_, usable = GAMEMODE\TracePlayer playerTable.entity
+			if usable
+				return
+
+			if instance = @GameData.Sabotages[id]
+				if instance\CanStart!
+					instance\Start!
 
 GM.Sabotage_OpenVGUI = (playerTable, sabotage, button, callback) =>
 	if @Player_OpenVGUI playerTable, sabotage\GetVGUIID!, callback

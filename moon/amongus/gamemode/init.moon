@@ -104,6 +104,7 @@ GM.CleanUp = (soft) =>
 
 	@PurgeGameData!
 
+	@SetMeetingInProgress false
 	@SetGameInProgress false
 	@SetCommunicationsDisabled false
 

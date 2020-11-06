@@ -441,6 +441,11 @@ GM.SetCommunicationsDisabled = (value) =>
 GM.SetMeetingDisabled = (value) =>
 	SetGlobalBool "NMW AU MeetingDisabled", value
 
+--- Sets whether the meeting button is in progress.
+-- @bool state You guessed it again.
+GM.SetMeetingInProgress = (value) =>
+	SetGlobalBool "NMW AU MeetingInProgress", value
+
 --- Sets whether the game is commencing.
 -- This is mostly used to lock clientside convar displays.
 -- @bool state You guessed it again.
