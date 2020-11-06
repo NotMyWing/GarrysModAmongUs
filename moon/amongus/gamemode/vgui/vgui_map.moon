@@ -101,7 +101,7 @@ return vgui.RegisterTable {
 		@__scale = value
 		surface.CreateFont "NMW AU Map Labels", {
 			font: "Roboto"
-			size: 0.04 * @GetInnerSize!
+			size: 40 * 1024/@GetInnerSize!
 			weight: 600
 			outline: true
 		}
