@@ -12,7 +12,7 @@ GM.Game_GameOver = (reason) =>
 	@GameData.Timers[handle] = true
 	timer.Create handle, @SplashScreenTime - 1, 1, ->
 		@SetGameInProgress false
-		@Restart!
+		@Game_Restart!
 
 GM.Game_CheckWin = (reason) =>
 	if not @IsGameInProgress! or timer.Exists "gameOver"
