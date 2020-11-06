@@ -67,9 +67,9 @@ GM.LoadManifest = =>
 			-- Everything's fine, don't check other files.
 			break
 
-		if not @MapManifest
-			@Logger.Error "Couldn't find the manifest file for #{game.GetMap!}! The game mode will not function properly!"
-			-- Default to an empty table so that things don't die horribly.
-			@MapManifest = {}
+	if not @MapManifest
+		@Logger.Error "Couldn't find the manifest file for #{game.GetMap!}! The game mode will not function properly!"
+		-- Default to an empty table so that things don't die horribly.
+		@MapManifest = {}
 
 GM\LoadManifest!
