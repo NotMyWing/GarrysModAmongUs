@@ -446,3 +446,9 @@ GM.SetMeetingDisabled = (value) =>
 -- @bool state You guessed it again.
 GM.SetGameCommencing = (value) =>
 	SetGlobalBool "NMW AU GameCommencing", value
+
+--- Sets the game state.
+-- @return You guessed it again.
+GM.SetGameState = (newState) =>
+	@GameData.State = newState
+	@Net_BroadcastGameState newState
