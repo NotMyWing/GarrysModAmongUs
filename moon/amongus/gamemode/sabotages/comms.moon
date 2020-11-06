@@ -4,6 +4,7 @@ comms = {
 
 		if SERVER
 			@SetMajor true
+			@SetPersistent true
 
 	OnStart: =>
 		@Base.OnStart @
