@@ -1,4 +1,5 @@
 taskTable = {
+	Name: "chartCourse"
 	Type: GM.TaskType.Short
 }
 

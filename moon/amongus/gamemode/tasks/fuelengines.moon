@@ -1,4 +1,5 @@
 taskTable = {
+	Name: "fuelEngines"
 	Type: GM.TaskType.Long
 
 	-- The time it takes to fill/empty the jerry can.

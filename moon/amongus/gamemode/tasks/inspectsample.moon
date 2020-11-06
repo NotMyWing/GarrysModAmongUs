@@ -1,4 +1,5 @@
 taskTable = {
+	Name: "inspectSample"
 	Type: GM.TaskType.Long
 	Time: 60
 	Init: =>

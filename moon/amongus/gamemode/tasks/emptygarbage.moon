@@ -1,4 +1,5 @@
 taskTable = {
+	Name: "emptyGarbage"
 	Type: GM.TaskType.Long
 	Time: 3
 	Init: =>

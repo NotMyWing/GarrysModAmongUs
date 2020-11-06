@@ -1,4 +1,5 @@
 taskTable = {
+	Name: "stabilizeSteering"
 	Type: GM.TaskType.Short
 	Time: 3
 }

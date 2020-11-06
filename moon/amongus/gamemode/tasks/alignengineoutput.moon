@@ -1,11 +1,12 @@
 taskTable = {
+	Name: "alignEngineOutput"
 	Type: GM.TaskType.Short
 	Time: 3
 	Init: =>
 		@Base.Init @
 
 		if SERVER
-			@buttons = GAMEMODE.Util.FindEntsByTaskName "alignEngineOutput"
+			@buttons = GAMEMODE.Util.FindEntsByTaskName @Name
 			@SetMaxSteps #@buttons
 
 			@SetActivationButton @buttons[@GetCurrentStep!]

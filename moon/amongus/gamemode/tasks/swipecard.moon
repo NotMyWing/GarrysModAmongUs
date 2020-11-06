@@ -1,4 +1,5 @@
 taskTable = {
+	Name: "swipeCard"
 	Type: GM.TaskType.Common
 }
 

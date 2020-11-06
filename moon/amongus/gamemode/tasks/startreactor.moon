@@ -1,4 +1,5 @@
 taskTable = {
+	Name: "startReactor"
 	Type: GM.TaskType.Long
 	Time: 20
 }

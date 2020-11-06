@@ -1,4 +1,5 @@
 taskTable = {
+	Name: "fixWiring"
 	Type: GM.TaskType.Common
 	Time: 3
 	Init: =>
@@ -7,7 +8,7 @@ taskTable = {
 		if SERVER
 			@SetMaxSteps 3
 
-			@__taskButtons = [button for button in *GAMEMODE.Util.Shuffle(GAMEMODE.Util.FindEntsByTaskName "fixWiring")[, 3]]
+			@__taskButtons = [button for button in *GAMEMODE.Util.Shuffle(GAMEMODE.Util.FindEntsByTaskName @Name)[, 3]]
 			table.sort @__taskButtons, (a, b) ->
 				(tonumber(a\GetCustomData!) or 0) < (tonumber(b\GetCustomData!) or 0)
 

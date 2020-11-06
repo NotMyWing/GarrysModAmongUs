@@ -1,4 +1,5 @@
 taskTable = {
+	Name: "clearAsteroids"
 	Type: GM.TaskType.Long
 	Count: 20
 	Init: =>

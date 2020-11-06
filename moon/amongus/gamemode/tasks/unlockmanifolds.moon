@@ -1,4 +1,5 @@
 taskTable = {
+	Name: "unlockManifolds"
 	Type: GM.TaskType.Short
 }
 
