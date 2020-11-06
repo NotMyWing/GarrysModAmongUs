@@ -1,5 +1,5 @@
 taskTable = {
-	@Name: "calibrateDistributor"
+	Name: "calibrateDistributor"
 	Type: GM.TaskType.Short
 }
 
