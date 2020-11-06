@@ -140,8 +140,8 @@ GM.Meeting_End = =>
 			for index, ply in ipairs player.GetAll!
 				ply\Freeze false
 
-			if not @CheckWin!
-				@StartRound!
+			if not @Game_CheckWin!
+				@Game_StartRound!
 
 			timer.UnPause "NMW AU CheckWin"
 			if timer.Exists "timelimit"

@@ -1,4 +1,5 @@
 taskTable = {
+	Name: "cleanO2Filter"
 	Type: GM.TaskType.Short
 	Count: 6
 	OnAdvance: =>

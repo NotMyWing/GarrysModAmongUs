@@ -98,7 +98,7 @@ taskBase = {
 			@OnComplete @GetActivationButton!
 			@CompleteVisual @GetActivationButton!
 
-			GAMEMODE\CheckWin!
+			GAMEMODE\Game_CheckWin!
 			@SetDirty!
 
 	--- Gets whether the task has been completed.
@@ -129,7 +129,6 @@ taskBase = {
 		else
 			@__assignedPlayer
 
-	
 	-- Sets the task name.
 	-- This is provided for the game mode to assign the name.
 	-- There's little reason you should be calling this.
@@ -193,7 +192,7 @@ if SERVER
 			oldStep = @GetCurrentStep!
 			oldState = @GetCurrentState!
 			@OnAdvance btn
-		
+
 			if not @GetCompleted! and (@GetCurrentState! ~= oldState or @GetCurrentStep! ~= oldStep)
 				@AdvanceVisual btn
 

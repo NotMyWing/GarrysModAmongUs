@@ -1,4 +1,5 @@
 taskTable = {
+	Name: "primeShields"
 	Type: GM.TaskType.Short
 }
 

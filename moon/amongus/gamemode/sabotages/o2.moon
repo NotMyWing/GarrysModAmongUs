@@ -44,7 +44,7 @@ o2 = {
 			GAMEMODE.GameData.Timers[@GetVGUIID!] = true
 			timer.Create @GetVGUIID!, @Duration, 1, ->
 				@End!
-				GAMEMODE\CheckWin GAMEMODE.GameOverReason.Imposter
+				GAMEMODE\Game_CheckWin GAMEMODE.GameOverReason.Imposter
 
 			buttons = {}
 			for ent in *ents.GetAll!

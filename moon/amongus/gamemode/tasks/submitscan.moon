@@ -1,4 +1,5 @@
 taskTable = {
+	Name: "submitScan"
 	Init: =>
 		@Base.Init @
 

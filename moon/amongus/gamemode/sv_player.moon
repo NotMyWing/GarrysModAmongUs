@@ -105,7 +105,7 @@ GM.Player_Kill = (victimTable, attackerTable) =>
 	@Net_SendNotifyKilled victimTable, attackerTable
 	@Player_CloseVGUI victimTable
 
-	@CheckWin!
+	@Game_CheckWin!
 
 --- Bumps the kill cooldown of a player.
 -- @param playerTable Player table.
@@ -310,12 +310,12 @@ hook.Add "PlayerDisconnected", "NMW AU CheckWin", (ply) -> with GAMEMODE
 
 					\Net_BroadcastTaskCount .GameData.CompletedTasks, .GameData.TotalTasks
 
-			\CheckWin!
+			\Game_CheckWin!
 	elseif timer.Exists "tryStartGame"
 		@Logger.Warn "Couldn't start the round! Someone left after the countdown."
 
 		timer.Destroy "tryStartGame"
-		\CleanUp true
+		\Game_CleanUp true
 
 hook.Add "CanPlayerSuicide", "NMW AU Suicide", ->
 	return false

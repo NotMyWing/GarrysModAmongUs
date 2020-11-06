@@ -1,5 +1,7 @@
 taskTable = {
-	Type: GM.TaskType.Short
+	Name: "uploadData"
+	Type: GM.TaskType.Long
+	Time: 9
 
 	-- Called when the task is created, but not yet sent to the player.
 	Init: =>
@@ -10,26 +12,24 @@ taskTable = {
 
 			destinations = {}
 			-- Find the task buttons.
-			for _, button in ipairs GAMEMODE.Util.FindEntsByTaskName "divertPower"
-				if button\GetCustomData! == "accept"
+			for _, button in ipairs GAMEMODE.Util.FindEntsByTaskName "uploadData"
+				if button\GetCustomData! ~= "upload"
 					table.insert destinations, button
 				else
-					@SetActivationButton button
+					@destination = button
 
-			@destination = table.Random destinations
-			@SetCustomName "divertPower.#{@destination\GetArea!}"
+			@SetActivationButton table.Random destinations
 
 	-- Called whenever the player submits the task.
 	OnAdvance: =>
 		@Base.OnAdvance @
 
-		if @GetCurrentStep! == 2
-			@SetActivationButton @destination
-			@SetCustomName nil
+		@SetCustomName "uploadData.2"
+		@SetActivationButton @destination
 }
 
 if CLIENT
-	taskTable.CreateVGUI = =>
+	taskTable.CreateVGUI = (task) =>
 		base = vgui.Create "AmongUsTaskBase"
 
 		with base
@@ -44,25 +44,35 @@ if CLIENT
 					\SetColor Color 255, 255, 255
 					\SetContentAlignment 5
 					if @GetCurrentStep! == 1
-						\SetText "\n\nPress to divert power.\n"
+						\SetText "\n\nPress to download data.\n"
 					else
-						\SetText "\n\nPress to accept power\n"
+						\SetText "\n\nPress to upload data.\n"
 					\Dock TOP
 					\SizeToContents!
 
+				local uploadAnim
 				button = with \Add "DButton"
 					margin = ScrH! * 0.01
 					\DockMargin margin * 4, 0, margin * 4, margin * 4
 					\SetTall ScrH! * 0.05
 					\SetText if @GetCurrentStep! == 1
-						"Divert"
+						"Download"
 					else
-						"Accept Power"
+						"Upload"
+
+					text = if @GetCurrentStep! == 1
+						"Downloading... %ds"
+					else
+						"Uploading... %ds"
 
 					\Dock BOTTOM
 					.DoClick = ->
 						\SetEnabled false
-						base\Submit!
+						uploadAnim = \NewAnimation 9, 0, 0, ->
+							base\Submit!
+					.Think = ->
+						if uploadAnim
+							\SetText string.format text, math.max 0, math.floor uploadAnim.EndTime - SysTime!
 
 			\Popup!
 
