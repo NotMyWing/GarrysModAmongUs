@@ -267,7 +267,7 @@ GM.HUD_InitializeMap = =>
 
 		localPlayerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
 		if localPlayerTable
-			size = 0.085 * \GetInnerSize!
+			size = 0.05 * \GetInnerSize!
 			player = with \Add "DPanel"
 				\SetSize size, size
 				.Paint = ->

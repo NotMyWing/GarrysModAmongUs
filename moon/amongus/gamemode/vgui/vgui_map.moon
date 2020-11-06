@@ -12,6 +12,7 @@ return vgui.RegisterTable {
 	__labels: {}
 	__baseMatWidth: 1024
 	__baseMatHeight: 1024
+	__resolution: 1
 
 	Init: =>
 		@SetZPos 30000
@@ -63,8 +64,8 @@ return vgui.RegisterTable {
 						pos = entity\GetPos!
 						w, h = element\GetSize!
 
-						element\SetPos (pos.x - @__position.x) / (@__baseMatWidth * @__scale) * size - w/2,
-							(@__position.y - pos.y) / (@__baseMatWidth * @__scale) * size - h/2
+						element\SetPos (pos.x - @__position.x) / (@__baseMatWidth * @__scale) * size * @__resolution - w/2,
+							(@__position.y - pos.y) / (@__baseMatWidth * @__scale) * size * @__resolution - h/2
 					else
 						@UnTrack entity
 
@@ -100,16 +101,18 @@ return vgui.RegisterTable {
 		@__scale = value
 		surface.CreateFont "NMW AU Map Labels", {
 			font: "Roboto"
-			size: 1/value * ScrH! * 0.07
+			size: 0.04 * @GetInnerSize!
 			weight: 600
 			outline: true
 		}
 
+	SetResolution: (value) => @__resolution = value
+
 	SetLabels: (value) => @__labels = value
 
 	SetupFromManifest: (manifest) =>
-		if manifest.Map and manifest.Map.UI
-			with manifest.Map.UI
+		if manifest.Map
+			with map = manifest.Map.UI or manifest.Map
 				if .OverlayMaterial
 					@SetOverlayMaterial .OverlayMaterial
 
@@ -125,6 +128,9 @@ return vgui.RegisterTable {
 				if .Labels
 					@SetLabels .Labels
 
+				if .Resolution
+					@SetResolution .Resolution
+
 		if manifest.Sabotages
 			with @sabotageOverlay = @__innerPanel\Add "DPanel"
 				w, h = @__innerPanel\GetSize!
@@ -133,7 +139,7 @@ return vgui.RegisterTable {
 				\Hide!
 				.Paint = ->
 
-				buttonSize = 1/value * 0.075 * math.min w, h
+				buttonSize = 0.085 * math.min w, h
 				for id, sabotage in ipairs manifest.Sabotages
 					if sabotage.UI
 						with \Add "DImageButton"
@@ -184,8 +190,8 @@ return vgui.RegisterTable {
 				element\SetParent @__innerPanel
 
 				sizeW, sizeH = element\GetSize!
-				sizeW *= 1.5 / @__scale
-				sizeH *= 1.5 / @__scale
+				sizeW *= 1 / @__scale
+				sizeH *= 1 / @__scale
 				element\SetSize sizeW, sizeH
 				element\InvalidateLayout!
 
@@ -200,7 +206,7 @@ return vgui.RegisterTable {
 	UnTrack: (entity) =>
 		@Track entity, nil, false
 
-	GetInnerSize: => math.min @__innerPanel\GetSize!
+	GetInnerSize: => math.max @__innerPanel\GetSize!
 
 	Popup: =>
 		if @__opened or @__opening or @__closing
