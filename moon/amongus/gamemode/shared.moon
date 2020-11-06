@@ -2,7 +2,7 @@
 -- Defines the game mode metadata fields, enums and exports some useful things.
 -- @module shared
 
-GAMEMODE or= GM
+export GAMEMODE = GAMEMODE or GM
 
 AddCSLuaFile()
 

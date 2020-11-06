@@ -1,4 +1,4 @@
-GAMEMODE or= GM
+export GAMEMODE = GAMEMODE or GM
 
 include "shared.lua"
 include "sh_gamedata.lua"

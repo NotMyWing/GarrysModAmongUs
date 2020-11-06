@@ -1,4 +1,4 @@
-GAMEMODE or= GM
+export GAMEMODE = GAMEMODE or GM
 
 -- Obligatory includes
 include "shared.lua"
