@@ -334,9 +334,6 @@ net.Receive "NMW AU Flow", (len, ply) ->
 		--
 		-- Player wants to kill somebody.
 		--
-		-- TO-DO: this should either validate the distance or be replaced-
-		-- completely with a server-side trace.
-		--
 		when GAMEMODE.FlowTypes.KillRequest
 			if playerTable and GAMEMODE.IsGameInProgress! and GAMEMODE.GameData.Imposters[playerTable] and not ply\IsFrozen!
 				target = net.ReadEntity!

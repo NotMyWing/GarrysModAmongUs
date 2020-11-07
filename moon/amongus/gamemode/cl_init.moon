@@ -55,15 +55,7 @@ key_num = (key) ->
 	if GAMEMODE.GameData.Vented
 		GAMEMODE\Net_VentRequest key - 1
 
-keyBinds = {
-	[KEY_Q]: ->
-		with GAMEMODE
-			if .GameData.Lookup_PlayerByEntity
-				playerTable = .GameData.Lookup_PlayerByEntity[LocalPlayer!]
-
-				if .GameData.Imposters[playerTable] and IsValid(GAMEMODE.KillHighlight) and GAMEMODE.KillHighlight\IsPlayer!
-					\Net_KillRequest .KillHighlight
-
+GAMEMODE.KeyBinds = {
 	[KEY_1]: key_num
 	[KEY_2]: key_num
 	[KEY_3]: key_num
@@ -78,7 +70,7 @@ keyBinds = {
 keyMemo = {}
 
 hook.Add "Tick", "NMW AU KeyBinds", ->
-	for key, fn in pairs keyBinds
+	for key, fn in pairs GAMEMODE.KeyBinds
 		old = keyMemo[key]
 		new = input.IsKeyDown key
 		if new and not old
@@ -143,3 +135,10 @@ hook.Add "OnPlayerChat", "NMW AU DeadSay", (ply, text) ->
 	), ply\GetColor!, ply\Nick!, Color(255, 255, 255), ": ", Color(220, 220, 220), text
 
 	return true
+
+hook.Add "OnSpawnMenuOpen", "NMW AU RequestKill", ->
+	with GAMEMODE
+		playerTable = .GameData.Lookup_PlayerByEntity[LocalPlayer!]
+
+		if .GameData.Imposters[playerTable] and IsValid(GAMEMODE.KillHighlight) and GAMEMODE.KillHighlight\IsPlayer!
+			\Net_KillRequest .KillHighlight

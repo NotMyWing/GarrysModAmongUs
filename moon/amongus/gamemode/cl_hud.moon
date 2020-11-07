@@ -336,9 +336,8 @@ hook.Add "HUDPaintBackground", "NMW AU Hud", ->
 				button: input.LookupBinding "use"
 				entity: GAMEMODE.UseHighlight
 			}
-			-- TO-DO: Make this keybind not hardcoded.
 			{
-				button: "Q"
+				button: input.LookupBinding "menu"
 				entity: GAMEMODE.KillHighlight
 			}
 		}
