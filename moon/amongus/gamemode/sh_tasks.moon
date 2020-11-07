@@ -59,12 +59,14 @@ GM.Task_Instantiate = (taskTable) =>
 
 if CLIENT
 	--- Opens the task VGUI.
-	-- @string name Task name.
-	-- @param data Task data. Normally this should be GAMEMODE.GameData.MyTasks[name].
-	GM.Task_OpenTaskVGUI = (taskInstance) =>
-		if taskInstance.CreateVGUI
-			@HUD_CloseMap!
-			@HUD_OpenVGUI taskInstance\CreateVGUI!
+	hook.Add "GMAU OpenVGUI", "NMW AU OpenTaskVGUI", (data) ->
+		if not data.taskName
+			return
+
+		instance = GAMEMODE.GameData.MyTasks[data.taskName]
+		if instance and instance.CreateVGUI
+			GAMEMODE\HUD_OpenVGUI instance\CreateVGUI!
+			return true
 
 else
 	taskMapToPool = (map) ->

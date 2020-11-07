@@ -321,17 +321,6 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		GAMEMODE\HUD_DisplayGameOver reason
 
 	--
-	-- Display the game over screen when the game is over.
-	-- Reveal the imposters.
-	--
-	when GAMEMODE.FlowTypes.TasksOpenVGUI
-		name = net.ReadString!
-
-		instance = GAMEMODE.GameData.MyTasks[name]
-		if instance
-			GAMEMODE\Task_OpenTaskVGUI instance
-
-	--
 	-- Update the task data.
 	-- Show the message if the task is complete.
 	--
@@ -414,18 +403,24 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 				instance["Set#{accessor}"] instance, value
 
 	--
-	-- The server requested us to open a sabotage UI.
+	-- The server requested us to open a VGUI.
 	--
-	when GAMEMODE.FlowTypes.SabotageOpenVGUI
-		id = net.ReadUInt 8
-		entity = net.ReadEntity!
+	when GAMEMODE.FlowTypes.OpenVGUI
+		data = net.ReadTable! or {}
 
-		if instance = GAMEMODE.GameData.Sabotages[id]
-			instance\ButtonUse GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!], entity
-			GAMEMODE\HUD_OpenVGUI instance\CreateVGUI!
+		success, result = pcall ->
+			hook.Call "GMAU OpenVGUI", nil, data
+
+		if not success
+			GAMEMODE.Logger.Error "Couldn't open VGUI! Error: #{result}"
+			result = nil
+
+		-- oh no
+		if result == nil
+			GAMEMODE\Net_SendCloseVGUI!
 
 	--
-	-- The server requested us to open a sabotage UI.
+	-- The server provided us with the new ConVar snapshots.
 	--
 	when GAMEMODE.FlowTypes.ConVarSnapshots
 		GAMEMODE\ConVarSnapshot_ImportAll net.ReadTable!

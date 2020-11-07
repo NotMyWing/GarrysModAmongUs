@@ -52,56 +52,69 @@ GM.Sabotage_Init = =>
 
 			table.insert @GameData.Sabotages, instance
 
-GM.Sabotage_Start = (playerTable, id) =>
-	if not @IsMeetingInProgress! and
-		@GameData.Imposters[playerTable] and
-		not @GameData.Vented[playerTable] and
-		IsValid playerTable.entity
+if CLIENT
+	--- Opens the sabotage UI.
+	hook.Add "GMAU OpenVGUI", "NMW AU OpenSabotageVGUI", (data) ->
+		if not data.sabotageId
+			return
 
-			_, usable = GAMEMODE\TracePlayer playerTable.entity
-			if usable
-				return
+		if instance = GAMEMODE.GameData.Sabotages[data.sabotageId]
+			instance\ButtonUse GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!], data.button
+			GAMEMODE\HUD_OpenVGUI instance\CreateVGUI!
+			return true
 
-			if instance = @GameData.Sabotages[id]
-				if instance\CanStart!
-					instance\Start!
+else
+	GM.Sabotage_Start = (playerTable, id) =>
+		if not @IsMeetingInProgress! and
+			@GameData.Imposters[playerTable] and
+			not @GameData.Vented[playerTable] and
+			IsValid playerTable.entity
 
-GM.Sabotage_OpenVGUI = (playerTable, sabotage, button, callback) =>
-	if @Player_OpenVGUI playerTable, sabotage\GetVGUIID!, callback
-		if IsValid playerTable.entity
-			@Net_OpenSabotageVGUI playerTable, sabotage, button
+				_, usable = GAMEMODE\TracePlayer playerTable.entity
+				if usable
+					return
 
-GM.Sabotage_Submit = (playerTable, data) =>
-	sabotage = @GameData.Lookup_SabotageByVGUIID[@GameData.CurrentVGUI[playerTable]]
-	if sabotage and sabotage\GetActive!
-		sabotage\Submit playerTable, data
+				if instance = @GameData.Sabotages[id]
+					if instance\CanStart!
+						instance\Start!
 
-GM.Sabotage_ForceEndAll = =>
-	for sabotage in *@GameData.Sabotages
-		if sabotage\GetActive!
-			sabotage\End!
-			sabotage\ForceUpdate!
+	GM.Sabotage_OpenVGUI = (playerTable, sabotage, button, callback) =>
+		@Player_OpenVGUI playerTable, sabotage\GetVGUIID!, {
+			sabotageId: sabotage\GetID!
+			:button
+		}, callback
 
-GM.Sabotage_EndNonPersistent = =>
-	for sabotage in *@GameData.Sabotages
-		if sabotage\GetActive! and not sabotage\GetPersistent!
-			sabotage\End!
+	GM.Sabotage_Submit = (playerTable, data) =>
+		sabotage = @GameData.Lookup_SabotageByVGUIID[@GameData.CurrentVGUI[playerTable]]
+		if sabotage and sabotage\GetActive!
+			sabotage\Submit playerTable, data
 
-GM.Sabotage_PauseAll = =>
-	for sabotage in *@GameData.Sabotages
-		sabotage\SetPaused true
+	GM.Sabotage_ForceEndAll = =>
+		for sabotage in *@GameData.Sabotages
+			if sabotage\GetActive!
+				sabotage\End!
+				sabotage\ForceUpdate!
 
-GM.Sabotage_UnPauseAll = =>
-	for sabotage in *@GameData.Sabotages
-		sabotage\SetPaused false
+	GM.Sabotage_EndNonPersistent = =>
+		for sabotage in *@GameData.Sabotages
+			if sabotage\GetActive! and not sabotage\GetPersistent!
+				sabotage\End!
 
-GM.Sabotage_EnableAll = (enable = true) =>
-	for sabotage in *@GameData.Sabotages
-		sabotage\SetDisabled not enable
+	GM.Sabotage_PauseAll = =>
+		for sabotage in *@GameData.Sabotages
+			sabotage\SetPaused true
 
-GM.Sabotage_RefreshAllCooldowns = (customCooldown) =>
-	for sabotage in *@GameData.Sabotages
-		if customCooldown
-			sabotage\SetNextUse CurTime! + customCooldown
-		else
-			sabotage\RefreshCooldown!
+	GM.Sabotage_UnPauseAll = =>
+		for sabotage in *@GameData.Sabotages
+			sabotage\SetPaused false
+
+	GM.Sabotage_EnableAll = (enable = true) =>
+		for sabotage in *@GameData.Sabotages
+			sabotage\SetDisabled not enable
+
+	GM.Sabotage_RefreshAllCooldowns = (customCooldown) =>
+		for sabotage in *@GameData.Sabotages
+			if customCooldown
+				sabotage\SetNextUse CurTime! + customCooldown
+			else
+				sabotage\RefreshCooldown!

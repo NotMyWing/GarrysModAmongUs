@@ -234,15 +234,6 @@ GM.Net_NotifyVent = (playerTable, reason, links) =>
 
 	net.Send playerTable.entity
 
---- Notifies the player that he's tasked with a task and should open the VGUI.
--- @param playerTable The tasked crewmate.
--- @string name Name of the task.
-GM.Net_OpenTaskVGUI = (playerTable, name) =>
-	net.Start "NMW AU Flow"
-	net.WriteUInt @FlowTypes.TasksOpenVGUI, @FlowSize
-	net.WriteString name
-	net.Send playerTable.entity
-
 --- Updates the player with the new task data.
 -- Even if nothing has been visually changed, this creates a "beep" sound.
 -- The implementation of this method is currently atrocious.
@@ -326,15 +317,14 @@ GM.Net_BroadcastConVarSnapshots = (snapshots) =>
 	net.WriteTable snapshots
 	net.Broadcast!
 
---- Broadcasts imposter-specific sabotage data to the imposters.
--- The packet must be a valid accessor table.
+--- Tells the player to open a VGUI.
+-- @param playerTable Player table.
 -- @param id Sabotage ID.
 -- @param packet Data table.
-GM.Net_OpenSabotageVGUI = (playerTable, sabotage, button) =>
+GM.Net_OpenVGUI = (playerTable, data) =>
 	net.Start "NMW AU Flow"
-	net.WriteUInt @FlowTypes.SabotageOpenVGUI, @FlowSize
-	net.WriteUInt sabotage\GetID!, 8
-	net.WriteEntity button
+	net.WriteUInt @FlowTypes.OpenVGUI, @FlowSize
+	net.WriteTable data
 	net.Send playerTable.entity
 
 net.Receive "NMW AU Flow", (len, ply) ->

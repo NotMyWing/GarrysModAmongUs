@@ -224,8 +224,6 @@ GM.Player_UnVent = (playerTable, instant) =>
 				@Player_Unhide playerTable.entity
 
 --- Closes the current VGUI if the player has any opened.
--- Unlike OpenVGUI, this function DOES send a net message
--- to tell the player to close his VGUI.
 -- @param playerTable Player table.
 GM.Player_CloseVGUI = (playerTable) =>
 	currentVGUI = @GameData.CurrentVGUI[playerTable]
@@ -251,7 +249,7 @@ GM.Player_CanOpenVGUI = (playerTable) =>
 	return true
 
 --- Opens a VGUI for a player.
--- This is mostly an internal function that helps keeping track of
+-- This is the primary function that allows the game mode to keep track of
 -- people with opened VGUIs, such as tasks, sabotages, security cams or
 -- practically anything else. This also pauses the kill timer.
 --
@@ -259,13 +257,11 @@ GM.Player_CanOpenVGUI = (playerTable) =>
 -- If the player is already staring at a VGUI, or if he's vented,
 -- or if his cooldown is paused by something, this will return false.
 --
--- Other than that, this does nothing else on its own. You must
--- implement the actual VGUI networking yourself.
---
 -- @param playerTable Player table.
 -- @param vgui Identifier. Virtually anything. Preferably string.
+-- @param data Extra data to pass to the client.
 -- @param callback Optional callback to call when the GUI is closed.
-GM.Player_OpenVGUI = (playerTable, vgui, callback) =>
+GM.Player_OpenVGUI = (playerTable, vgui, data = {}, callback) =>
 	if not @Player_CanOpenVGUI playerTable
 		return false
 
@@ -273,6 +269,7 @@ GM.Player_OpenVGUI = (playerTable, vgui, callback) =>
 	@Player_PauseKillCooldown playerTable
 
 	@GameData.VGUICallback[playerTable] = callback
+	@Net_OpenVGUI playerTable, data
 
 	return true
 

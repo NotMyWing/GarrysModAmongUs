@@ -153,7 +153,7 @@ GM.Colors = {
 -- @field RequestUpdate 16
 -- @field TasksUpdateData 17
 -- @field TasksSubmit 18
--- @field TasksOpenVGUI 19
+-- @field UNUSED 19
 -- @field CloseVGUI 20
 -- @field TasksUpdateCount 21
 -- @field NotifyKilled 22
@@ -162,7 +162,7 @@ GM.Colors = {
 -- @field SabotageData 25
 -- @field SabotageRequest 26
 -- @field SabotageSubmit 27
--- @field SabotageOpenVGUI 28
+-- @field UNUSED 28
 GM.FlowTypes = {
 	GameStart: 1
 	Countdown: 2
@@ -182,7 +182,7 @@ GM.FlowTypes = {
 	RequestUpdate: 16
 	TasksUpdateData: 17
 	TasksSubmit: 18
-	TasksOpenVGUI: 19
+	UNUSED: 19
 	CloseVGUI: 20
 	TasksUpdateCount: 21
 	NotifyKilled: 22
@@ -191,7 +191,7 @@ GM.FlowTypes = {
 	SabotageData: 25
 	SabotageRequest: 26
 	SabotageSubmit: 27
-	SabotageOpenVGUI: 28
+	UNUSED: 28
 	ConVarSnapshots: 29
 }
 

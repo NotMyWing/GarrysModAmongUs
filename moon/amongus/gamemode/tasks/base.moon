@@ -304,8 +304,7 @@ if SERVER
 		.OnUse = (btn) =>
 			playerTable = @GetAssignedPlayer!
 			if GAMEMODE\Player_CanOpenVGUI playerTable
-				GAMEMODE\Player_OpenVGUI playerTable, @GetName!, (-> @Cancel btn)
-				GAMEMODE\Net_OpenTaskVGUI playerTable, @GetName!
+				GAMEMODE\Player_OpenVGUI playerTable, @GetName!, { taskName: @GetName! }, (-> @Cancel btn)
 
 		--- Called whenever the assigned player closes the GUI without advancing the task.
 		.OnCancel = (btn) =>
