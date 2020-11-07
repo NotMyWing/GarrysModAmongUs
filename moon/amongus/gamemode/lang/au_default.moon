@@ -142,6 +142,7 @@ with GM.Lang\Get "en"
 		au_kill_cooldown:    "Kill Cooldown"
 		au_time_limit:       "Time Limit"
 		au_killdistance_mod: "Kill Distance"
+		au_dead_chat:        "Dead Chat"
 
 		au_meeting_available: "Meetings per Player"
 		au_meeting_cooldown:  "Meeting Button Cooldown"

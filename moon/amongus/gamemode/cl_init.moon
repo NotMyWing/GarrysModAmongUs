@@ -22,6 +22,7 @@ GM.ConVarsDisplay = {
 			{ "Time" , "KillCooldown"    }
 			{ "Time" , "TimeLimit"       }
 			{ "Mod"  , "KillDistanceMod" }
+			{ "Bool" , "DeadChat"        }
 		}
 	}
 	{
@@ -129,3 +130,16 @@ hook.Add "CreateMove", "NMW AU KillScreenMove", (cmd) ->
 		cmd\SetMouseX 0
 		cmd\SetMouseY 0
 		return true
+
+hook.Add "OnPlayerChat", "NMW AU DeadSay", (ply, text) ->
+	if GAMEMODE.ConVarSnapshots.DeadChat\GetBool! or not GAMEMODE\IsGameInProgress!
+		return
+
+	playerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
+
+
+	chat.AddText (if GAMEMODE.GameData.DeadPlayers[playerTable]
+		Color(255, 0, 0), "(GHOST CHAT) "
+	), ply\GetColor!, ply\Nick!, Color(255, 255, 255), ": ", Color(220, 220, 220), text
+
+	return true

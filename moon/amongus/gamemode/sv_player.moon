@@ -341,3 +341,35 @@ hook.Add "KeyPress", "NMW AU UnVent", (ply, key) ->
 		playerTable = @GameData.Lookup_PlayerByEntity[ply]
 		if @GameData.Imposters[playerTable] and @GameData.Vented[playerTable] and (@GameData.VentCooldown[playerTable] or 0) <= CurTime!
 			@Player_UnVent playerTable
+
+hook.Add "PlayerSpray", "NMW AU DeadSpray", (ply) ->
+	if GAMEMODE.ConVarSnapshots.DeadChat\GetBool! or not GAMEMODE\IsGameInProgress!
+		return
+
+	playerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
+
+	return not (playerTable and not GAMEMODE.GameData.DeadPlayers[playerTable])
+
+hook.Add "PlayerCanHearPlayersVoice", "NMW AU DeadVoice", (listener, talker) ->
+	if GAMEMODE.ConVarSnapshots.DeadChat\GetBool! or not GAMEMODE\IsGameInProgress!
+		return
+
+	listenerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[listener]
+	talkerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[talker]
+
+    if not GAMEMODE.GameData.DeadPlayers[listenerTable] or GAMEMODE.GameData.DeadPlayers[talkerTable]
+		return true
+
+hook.Add "PlayerCanSeePlayersChat", "NMW AU DeadChat", (_, _, listener, talker) ->
+	if GAMEMODE.ConVarSnapshots.DeadChat\GetBool! or not GAMEMODE\IsGameInProgress!
+		return
+
+	-- Console message...?
+	if not IsValid(listener) or not IsValid(talker)
+		return
+
+	listenerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[listener]
+	talkerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[talker]
+
+    if not GAMEMODE.GameData.DeadPlayers[listenerTable] or GAMEMODE.GameData.DeadPlayers[talkerTable]
+		return true
