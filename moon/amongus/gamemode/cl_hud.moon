@@ -175,10 +175,10 @@ GM.HUD_TrackTaskOnMap = (entity, track = true) =>
 	if IsValid(@Hud) and IsValid(@Hud.Map)
 		with @Hud.Map
 			if track
-				size = \GetInnerSize!
+				size = 0.06 * math.min ScrW!, ScrH!
 
 				\Track entity, with vgui.Create "DPanel"
-					\SetSize size * 0.1, size * 0.1
+					\SetSize size, size
 					.Paint = (_, w, h) ->
 						if GAMEMODE\GetCommunicationsDisabled! and not GAMEMODE.GameData.Imposters[GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]]
 							return
@@ -267,7 +267,7 @@ GM.HUD_InitializeMap = =>
 
 		localPlayerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
 		if localPlayerTable
-			size = 0.05 * \GetInnerSize!
+			size = 0.04 * math.min ScrW!, ScrH!
 			player = with \Add "DPanel"
 				\SetSize size, size
 				.Paint = ->

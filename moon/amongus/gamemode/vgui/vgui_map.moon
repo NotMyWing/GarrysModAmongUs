@@ -101,7 +101,7 @@ return vgui.RegisterTable {
 		@__scale = value
 		surface.CreateFont "NMW AU Map Labels", {
 			font: "Roboto"
-			size: 40 * 1024/@GetInnerSize!
+			size: 0.03 * math.min ScrW!, ScrH!
 			weight: 600
 			outline: true
 		}
@@ -191,13 +191,6 @@ return vgui.RegisterTable {
 			if track
 				@__tracking[entity] = element
 				element\SetParent @__innerPanel
-
-				sizeW, sizeH = element\GetSize!
-				sizeW *= 1 / @__scale
-				sizeH *= 1 / @__scale
-				element\SetSize sizeW, sizeH
-				element\InvalidateLayout!
-
 			else
 				if IsValid @__tracking[entity]
 					@__tracking[entity]\Remove!
@@ -208,8 +201,6 @@ return vgui.RegisterTable {
 
 	UnTrack: (entity) =>
 		@Track entity, nil, false
-
-	GetInnerSize: => math.max @__innerPanel\GetSize!
 
 	Popup: =>
 		if @__opened or @__opening or @__closing
