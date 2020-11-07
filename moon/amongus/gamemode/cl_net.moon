@@ -215,6 +215,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		-- Is this a body report?
 		bodyColor = net.ReadBool! and net.ReadColor!
 		GAMEMODE\HUD_DisplayMeeting caller, bodyColor
+		GAMEMODE\HUD_HideTaskList true
 
 	--
 	-- Meeting 2/4.
@@ -286,6 +287,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 			net.ReadBool!, net.ReadUInt(8), net.ReadUInt(8)
 
 		GAMEMODE\HUD_DisplayEject reason, ply, confirm, imposter, remaining, total
+		GAMEMODE\HUD_HideTaskList false
 
 	--
 	-- React to game states.

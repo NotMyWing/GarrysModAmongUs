@@ -259,6 +259,14 @@ GM.HUD_OpenVGUI = (panel) =>
 		panel\SetParent @Hud
 		@Hud.CurrentVGUI = panel
 
+GM.HUD_HideTaskList = (state) =>
+	if IsValid @Hud
+		@Hud\HideTaskList state
+
+GM.HUD_ToggleTaskList = =>
+	if IsValid @Hud
+		@Hud\ToggleTaskList!
+
 GM.HUD_InitializeMap = =>
 	@Hud.Map = with @Hud\Add VGUI_MAP
 		\SetupFromManifest @MapManifest

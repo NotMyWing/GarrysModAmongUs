@@ -185,7 +185,7 @@ hud.SetupButtons = (state, impostor) =>
 
 	if localPlayerTable
 		-- The task list.
-		with taskBox = @Add "DPanel"
+		@taskBoxContainer = with @Add "DPanel"
 			margin = ScrH! * 0.015
 			\DockMargin margin, 0, 0, 0
 			\SetWide ScrW! * 0.35
@@ -197,7 +197,8 @@ hud.SetupButtons = (state, impostor) =>
 				margin = ScrH! * 0.0075
 				\Dock TOP
 
-				text = tostring TRANSLATE if impostor
+				key = string.upper input.LookupBinding("gmod_undo") or "?"
+				text = "(#{key}) " .. tostring TRANSLATE if impostor
 					"hud.fakeTasks"
 				else
 					"hud.tasks"
@@ -375,6 +376,20 @@ hud.Countdown = (time) =>
 
 			if @countdownTime - CurTime! <= 0
 				_\Remove!
+
+hud.HideTaskList = (state) =>
+	if IsValid @taskBoxContainer
+		if state
+			@taskBoxContainer\Hide!
+		else
+			@taskBoxContainer\Show!
+
+hud.ToggleTaskList = =>
+	if IsValid @taskBox
+		if @taskBox\IsVisible!
+			@taskBox\Hide!
+		else
+			@taskBox\Show!
 
 hud.AddTaskEntry = =>
 	return with @taskBox\Add "DPanel"

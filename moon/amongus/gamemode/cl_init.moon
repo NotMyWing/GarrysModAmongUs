@@ -56,6 +56,10 @@ key_num = (key) ->
 		GAMEMODE\Net_VentRequest key - 1
 
 GAMEMODE.KeyBinds = {
+	-- Z (gmod_undo).
+	[input.GetKeyCode(input.LookupBinding("gmod_undo") or "")]: ->
+		GAMEMODE\HUD_ToggleTaskList!
+
 	[KEY_1]: key_num
 	[KEY_2]: key_num
 	[KEY_3]: key_num
