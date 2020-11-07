@@ -62,12 +62,6 @@ GM.Net_SendSubmitSabotage = (data = 0) =>
 	net.WriteUInt data, 32
 	net.SendToServer!
 
-moveSounds = {
-	"au/vent_move1.wav"
-	"au/vent_move2.wav"
-	"au/vent_move3.wav"
-}
-
 net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	--
 	-- Define player tables and other necessary game data.
@@ -114,7 +108,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 				GAMEMODE.GameData.DeadPlayers[playerTable] = true
 
 
-		-- Read the current and total amounts of tasks.
+		-- Read the current amount of tasks.
 		GAMEMODE.GameData.CompletedTasks = net.ReadUInt 32
 
 		-- Reset the HUD and display the splash.
@@ -134,7 +128,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 
 	--
 	-- Read dead people. This gets sent before the meeting.
-	-- I'm honestly not sure why this isn't a mart of the
+	-- I'm honestly not sure why this isn't a part of the
 	-- meeting net message.
 	--
 	when GAMEMODE.FlowTypes.BroadcastDead
@@ -179,7 +173,11 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 				GAMEMODE.GameData.Vented = false
 
 			when GAMEMODE.VentNotifyReason.Move
-				surface.PlaySound table.Random moveSounds
+				surface.PlaySound table.Random {
+					"au/vent_move1.wav"
+					"au/vent_move2.wav"
+					"au/vent_move3.wav"
+				}
 
 		-- Fetch what is known about connected vents.
 		hasLinks = net.ReadBool!

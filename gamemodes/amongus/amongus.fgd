@@ -25,7 +25,7 @@
 	output OnTaskUse(void) : "Called when a player starts doing the task using this button"
 	output OnTaskCancel(void) : "Called when a player cancels the task using this button"
 	output OnTaskAdvance(void) : "Called when a player submits the task using this button"
-	output OnTaskComplete(void) : "Called when a player completes the tank using this button"
+	output OnTaskComplete(void) : "Called when a player completes the task using this button"
 ]
 
 @PointClass base(func_task_button, prop_static_base) studioprop() = prop_task_button :
