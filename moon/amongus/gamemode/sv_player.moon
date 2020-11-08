@@ -348,6 +348,8 @@ hook.Add "PlayerUse", "NMW AU Use", (activator, ent) ->
 		if victim
 			GAMEMODE\Meeting_Start activator, victim.color
 
+	return
+
 hook.Add "FindUseEntity", "NMW AU FindUse", (ply, default) ->
 	_, usable = GAMEMODE\TracePlayer ply
 
