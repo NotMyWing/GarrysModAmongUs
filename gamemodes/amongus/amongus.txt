@@ -19,9 +19,9 @@
 
 		2
 		{
-			"name"		"au_imposter_count"
+			"name"		"au_max_imposters"
 			"text"		"Imposter Count"
-			"help"		"The number of imposters"
+			"help"		"The max. number of imposters"
 			"type"		"Numeric"
 			"default"	"1"
 		}
@@ -133,6 +133,15 @@
 			"name"		"au_tasks_enable_visual"
 			"text"		"Visual tasks"
 			"help"		"Should certain tasks (garbage, shields, etc) produce visual effects on completion?"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+
+		15
+		{
+			"name"		"au_warmup_force_auto"
+			"text"		"Automatic Warm-Up"
+			"help"		"Should the warm-up phase be managed by the server?"
 			"type"		"CheckBox"
 			"default"	"0"
 		}

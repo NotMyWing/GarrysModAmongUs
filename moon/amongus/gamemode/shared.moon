@@ -35,7 +35,7 @@ flags = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_GAMEDLL
 -- @field TimeLimit (Integer) Round time limit.
 -- @field Countdown (Integer) How long the pre-round countdown lasts.
 GM.ConVars =
-	ImposterCount:   CreateConVar "au_imposter_count"  , 1 , flags, "", 1, 10
+	ImposterCount:   CreateConVar "au_max_imposters"  , 1 , flags, "", 1, 10
 	MinPlayers:      CreateConVar "au_min_players"     , 3 , flags, "", 3, 128
 	KillCooldown:    CreateConVar "au_kill_cooldown"   , 20, flags, "", 1, 60
 	KillDistanceMod: CreateConVar "au_killdistance_mod", 1 , flags, "", 1, 3
