@@ -43,13 +43,6 @@ AddCSLuaFile "cl_render.lua"
 AddCSLuaFile "sh_convarsnapshots.lua"
 AddCSLuaFile "sh_manifest.lua"
 
-concommand.Add "au_debug_start", ->
-	if GAMEMODE\IsGameInProgress!
-		GAMEMODE\Game_Restart!
-
-	timer.Simple 0, ->
-		GAMEMODE\Game_Start!
-
 concommand.Add "au_debug_restart", ->
 	GAMEMODE\Game_Restart!
 
@@ -60,6 +53,7 @@ hook.Add "Initialize", "NMW AU Initialize", ->
 	GAMEMODE.Logger.Info "Visit https://github.com/NotMyWing/GarrysModAmongUs for more info"
 	MsgN!
 	GAMEMODE\Game_Restart!
+	GAMEMODE\SetOnAutoPilot true
 
 	-- screw implicit returns man
 	return

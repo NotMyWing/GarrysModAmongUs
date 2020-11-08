@@ -292,27 +292,42 @@ GM.PlayerSpawn = (ply) =>
 	ply\SetTeam 1
 	ply\SetNoCollideWithTeammates true
 
-hook.Add "PlayerDisconnected", "NMW AU CheckWin", (ply) -> with GAMEMODE
-	if \IsGameInProgress!
-		if playerTable = .GameData.Lookup_PlayerByEntity[ply]
-			\Player_SetDead playerTable
+hook.Add "PlayerInitialSpawn", "NMW AU AutoPilot", (ply) -> with GAMEMODE
+	oldAutoPilot = \IsOnAutoPilot!
+	if not oldAutoPilot
+		newAutoPilot = false
+		for ply in *player.GetAll!
+			if ply\IsAdmin! or ply\IsListenServerHost!
+				newAutoPilot = true
+				break
 
-			-- If the player was a crewmate and he had tasks,
-			-- "complete" his tasks and broadcast the new count.
-			if not .GameData.Imposters[playerTable]
-				count = table.Count .GameData.Tasks[playerTable]
-				if count > 0
-					.GameData.CompletedTasks += table.Count .GameData.Tasks[playerTable]
-					table.Empty .GameData.Tasks[playerTable]
+		if newAutoPilot and not oldAutoPilot
+			-- to-do: pront this in the chat
+			.Logger.Info "An admin (#{ply\Nick!}) has just connected"
+			.Logger.Info "Upcoming rounds will now be managed manually"
 
-					\Net_BroadcastTaskCount .GameData.CompletedTasks, .GameData.TotalTasks
+			\SetOnAutoPilot newAutoPilot
 
-			\Game_CheckWin!
-	elseif timer.Exists "tryStartGame"
-		@Logger.Warn "Couldn't start the round! Someone left after the countdown."
+hook.Add "PlayerDisconnected", "NMW AU AutoPilot", (ply) -> with GAMEMODE
+	GAMEMODE\Net_BroadcastConnectDisconnect ply\Nick!, false
 
-		timer.Destroy "tryStartGame"
-		\Game_CleanUp true
+	oldAutoPilot = \IsOnAutoPilot!
+	if oldAutoPilot
+		newAutoPilot = false
+		for ply in *player.GetAll!
+			print ply\IsAdmin! or ply\IsListenServerHost!
+			if ply\IsAdmin! or ply\IsListenServerHost!
+				newAutoPilot = true
+				break
+
+		if newAutoPilot and not oldAutoPilot
+			-- to-do: pront this in the chat
+			.Logger.Info "The last admin (#{ply\Nick!}) has just left"
+			.Logger.Info "Upcoming rounds will now be managed by the server"
+
+			\SetOnAutoPilot newAutoPilot
+
+	return
 
 hook.Add "CanPlayerSuicide", "NMW AU Suicide", ->
 	return false

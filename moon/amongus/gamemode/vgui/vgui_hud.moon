@@ -21,6 +21,13 @@ surface.CreateFont "NMW AU Taskbar", {
 	outline: true
 }
 
+surface.CreateFont "NMW AU Start Subtext", {
+	font: "Arial"
+	size: ScreenScale 10
+	weight: 500
+	outline: true
+}
+
 hud = {}
 
 MAT_BUTTONS = {
@@ -55,6 +62,11 @@ hud.SetTaskbarValue = (value) =>
 		refW, refH = @taskbar\GetParent!\GetSize!
 
 		@taskbar\SizeTo refW * value, refH, 2, 0.1
+
+CREW_LAYERS = {
+	Material "au/gui/crewmateicon/crewmate1.png", "smooth"
+	Material "au/gui/crewmateicon/crewmate2.png", "smooth"
+}
 
 hud.SetupButtons = (state, impostor) =>
 	localPlayerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
@@ -104,6 +116,128 @@ hud.SetupButtons = (state, impostor) =>
 
 							draw.SimpleText "#{TRANSLATE("cvar." .. conVarName)}: #{value}", "NMW AU Taskbar",
 								0, (i - 1) * tH * 1.05 + (categoryId - 1) * tH * 1.05, GAMEMODE\IsGameCommencing! and green or white
+
+		-- Round overlay.
+		@roundOverlay = with @Add "DPanel"
+			\SetZPos 30001
+			\SetSize ScrW!, ScrH! * 0.125
+			\SetPos 0, ScrH! * 0.75
+			.Paint = ->
+
+			with \Add "DPanel"
+				margin = ScrW! * 0.25
+				\DockMargin margin, 0, margin, 0
+				\Dock FILL
+				.Paint = ->
+
+				-- Right
+				with \Add "DPanel"
+					\SetWide 0.5 * ScrW! * 0.25
+					\Dock RIGHT
+
+					crewSize = 0.25 * \GetWide!
+
+					-- Count container.
+					with \Add "DPanel"
+						\DockMargin 0, crewSize * 0.25, 0, crewSize * 0.25
+						\DockPadding 0, 0, crewSize * 0.5, 0
+						\Dock FILL
+						.Paint = ->
+
+						-- Crewmate
+						with \Add "DPanel"
+							\SetSize crewSize, crewSize
+							\DockMargin crewSize * 0.25, 0, 0, 0
+							\Dock RIGHT
+							.Paint = ->
+
+							-- A slightly unreadable chunk of garbage code
+							-- responsible for layering the crewmate sprite.
+							layers = {}
+							for i = 1, 2
+								with layers[i] = \Add "DPanel"
+									\Dock FILL
+									.Image = CREW_LAYERS[i]
+									.Paint = GAMEMODE.Render.DermaFitImage
+							layers[1].Color = Color 255, 0, 0
+
+						-- Label
+						with \Add "DLabel"
+							\SetFont "NMW AU Countdown"
+							\SetText "..."
+							\SetContentAlignment 6
+							\Dock FILL
+
+							red    = Color 220, 32, 32
+							yellow = Color 255, 255, 30
+							white  = Color 255, 255, 255
+
+							.Think = ->
+								if GAMEMODE.ConVarSnapshots
+									playerCount = #player.GetAll!
+									needed = GAMEMODE.ConVars.MinPlayers\GetInt!
+
+									\SetText "#{playerCount}/#{needed}"
+
+									\SetColor if playerCount > needed
+										white
+									elseif playerCount == needed
+										yellow
+									else
+										red
+
+					.Paint = ->
+				-- Middle
+				with \Add "DPanel"
+					\SetWide ScrW! * 0.25
+					\Dock RIGHT
+					.Paint = ->
+
+					with \Add "DLabel"
+						\SetTall 0.5 * ScrH! * 0.125
+						\Dock TOP
+						\SetText ""
+						\SetContentAlignment 5
+						\SetFont "NMW AU Countdown"
+						\SetColor Color 255, 255, 255
+						.Think = ->
+							\SetText tostring if LocalPlayer!\IsAdmin!
+								TRANSLATE "prepare.admin"
+							else
+								TRANSLATE "prepare.warmup"
+
+					with \Add "DLabel"
+						\SetTall 0.5 * ScrH! * 0.125
+						\Dock BOTTOM
+						\SetText ""
+						\SetContentAlignment 5
+						\SetFont "NMW AU Start Subtext"
+						\SetColor Color 255, 255, 255
+
+						nextCheck = 0
+						initializedPlayers = {}
+						.Think = ->
+							if GAMEMODE.ConVarSnapshots
+								if SysTime! > nextCheck
+									nextCheck = SysTime! + 0.5
+									initializedPlayers = GAMEMODE\GetFullyInitializedPlayers!
+
+								playerCount = #initializedPlayers
+								needed = GAMEMODE.ConVars.MinPlayers\GetInt!
+
+								\SetText tostring if playerCount < needed
+									TRANSLATE "prepare.waitingForPlayers"
+								elseif LocalPlayer!\IsAdmin!
+									TRANSLATE("prepare.pressToStart") string.upper input.LookupBinding("jump") or "???"
+								else
+									if not GAMEMODE\IsOnAutoPilot!
+										TRANSLATE "prepare.waitingForAdmin"
+									else
+										time = math.max 0, GetGlobalFloat("NMW AU AutoPilotTimer") - CurTime!
+										if time > 0
+											TRANSLATE("prepare.commencing") time
+										else
+											""
 
 		return
 
@@ -426,6 +560,17 @@ hud.AddTaskEntry = =>
 				ScrW! * 0.0075, h/2, clr, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, Color(0, 0, 0, 64)
 
 hud.Think = =>
+	if IsValid @roundOverlay
+		with @roundOverlay
+			shouldHide = IsValid(@countdown) or
+				GAMEMODE\IsGameCommencing! or
+				GAMEMODE\IsGameInProgress!
+
+			if shouldHide and \IsVisible!
+				\Hide!
+			elseif not shouldHide and not \IsVisible!
+				\Show!
+
 	if @taskBarLabel
 		commsSabotaged = GAMEMODE\GetCommunicationsDisabled!
 

@@ -23,7 +23,7 @@ GM.Game_CheckWin = (reason) =>
 			@Logger.Info "Game over. Crewmates have won! (time out)"
 			@GameOverReason.Crewmate
 
-		elseif @GameData.CompletedTasks >= @GameData.TotalTasks
+		elseif @GameData.CompletedTasks and (@GameData.CompletedTasks >= @GameData.TotalTasks)
 			@Logger.Info "Game over. Crewmates have won! (task win)"
 			@GameOverReason.Crewmate
 
@@ -83,16 +83,16 @@ GM.Game_Start = =>
 	if @IsGameInProgress!
 		return
 
+	-- Fetch a table of initialized players.
+	initializedPlayers = @GetFullyInitializedPlayers!
+
 	-- Bail if we don't have enough players.
 	-- TO-DO: print chat message.
-	if #player.GetAll! - @ConVars.ImposterCount\GetInt! * 2 < 1
+	if #initializedPlayers < @ConVars.MinPlayers\GetInt!
 		return
 
 	handle = "tryStartGame"
 	@GameData.Timers[handle] = true
-
-	-- Count players.
-	playerMemo = player.GetAll!
 
 	time = @ConVars.Countdown\GetFloat! + 0.5
 	@Net_BroadcastCountdown CurTime! + time
@@ -105,11 +105,13 @@ GM.Game_Start = =>
 	timer.Create handle, time, 1, ->
 		@SetGameCommencing false
 
-		-- Don't start in case somebody has left.
-		for _, ply in ipairs playerMemo
-			if not IsValid ply
-				@Logger.Warn "Couldn't start the round! Someone left after the countdown."
-				return
+		-- Reset the player table.
+		initializedPlayers = @GetFullyInitializedPlayers!
+
+		-- Bail if we don't have enough players. Again.
+		-- TO-DO: print chat message.
+		if #initializedPlayers < @ConVars.MinPlayers\GetInt!
+			return
 
 		-- Create the time limit timer if the cvar is set.
 		-- That's quite an interesting sentence.
@@ -132,7 +134,7 @@ GM.Game_Start = =>
 		-- Create player "accounts" that we're going
 		-- to use during the entire game.
 		id = 0
-		for _, ply in ipairs player.GetAll!
+		for _, ply in ipairs initializedPlayers
 			id += 1
 			t = {
 				steamid: ply\SteamID!
@@ -144,6 +146,12 @@ GM.Game_Start = =>
 			table.insert @GameData.PlayerTables, t
 			@GameData.Lookup_PlayerByID[id] = t
 			@GameData.Lookup_PlayerByEntity[ply] = t
+
+		-- Make everyone else spectators.
+		for ply in *player.GetAll!
+			if not @GameData.Lookup_PlayerByEntity[ply]
+				@Player_Hide ply
+				@Spectate_CycleMode ply
 
 		-- Shuffle.
 		memo = {}
@@ -159,13 +167,14 @@ GM.Game_Start = =>
 			memo[b] = memo[b] or math.random!
 			memo[a] > memo[b]
 
+		imposterCount = math.min @ConVarSnapshots.ImposterCount\GetInt!, @GetImposterCount #initializedPlayers
 		for index, ply in ipairs @GameData.PlayerTables
 			-- Give the player a color.
 			-- TO-DO: make customizable.
 			ply.color = @Colors[math.floor(#@Colors / #@GameData.PlayerTables) * index]
 
 			-- Make the first N players imposters.
-			if index <= @ConVarSnapshots.ImposterCount\GetInt!
+			if index <= imposterCount
 				@GameData.Imposters[ply] = true
 
 			with ply.entity
@@ -277,3 +286,82 @@ GM.Game_StartRound = =>
 		@Player_RefreshKillCooldown ply
 
 	@Meeting_ResetCooldown!
+
+GM.Game_RestartAutoPilotTimer = =>
+	time = @ConVars.WarmupTime\GetFloat!
+	print time
+
+	SetGlobalFloat "NMW AU AutoPilotTimer", CurTime! + time
+	timer.Create "NMW AU AutoPilot", time, 0, ->
+		@Game_Start!
+
+GM.Game_StopAutoPilotTimer = =>
+	if timer.Exists "NMW AU AutoPilot"
+		timer.Remove "NMW AU AutoPilot"
+
+hook.Add "KeyPress", "NMW AU GameStart", (ply, key) -> with GAMEMODE
+	if (ply\IsAdmin! or ply\IsListenServerHost!) and key == IN_JUMP
+		-- Bail if the game is in progress.
+		if \IsGameInProgress!
+			return
+
+		if \IsGameCommencing!
+			.Logger.Warn "Admin #{ply\Nick!} has stopped the countdown!"
+
+			timer.Destroy "tryStartGame"
+			\Game_CleanUp true
+		else
+			.Logger.Info "Admin #{ply\Nick!} has started the countdown."
+			GAMEMODE\Game_Start!
+
+hook.Add "PlayerDisconnected", "NMW AU CheckWin", (ply) -> with GAMEMODE
+	initializedPlayers = \GetFullyInitializedPlayers!
+
+	if #initializedPlayers == 0
+		@Logger.Info "Everyone left. Stopping the game."
+		\Game_Restart!
+		return
+
+	if \IsGameInProgress!
+		if playerTable = .GameData.Lookup_PlayerByEntity[ply]
+			\Player_SetDead playerTable
+
+			-- If the player was a crewmate and he had tasks,
+			-- "complete" his tasks and broadcast the new count.
+			if .GameData.Tasks and .GameData.Tasks[playerTable] and not .GameData.Imposters[playerTable]
+				count = table.Count .GameData.Tasks[playerTable]
+				if count > 0
+					.GameData.CompletedTasks += table.Count .GameData.Tasks[playerTable]
+					table.Empty .GameData.Tasks[playerTable]
+
+					\Net_BroadcastTaskCount .GameData.CompletedTasks, .GameData.TotalTasks
+
+			\Game_CheckWin!
+	else
+		if timer.Exists "tryStartGame"
+			if #initializedPlayers - @ConVars.ImposterCount\GetInt! * 2 < 1
+				@Logger.Warn "Couldn't start the round! Someone left after the countdown."
+
+				timer.Destroy "tryStartGame"
+				\Game_CleanUp true
+
+	return
+
+timer.Create "NMW AU AutoPilotChecker", 1, 0, ->
+	initializedPlayers = GAMEMODE\GetFullyInitializedPlayers!
+
+	if GAMEMODE\IsGameInProgress! or GAMEMODE\IsGameCommencing!
+		if timer.Exists "NMW AU AutoPilot"
+			GAMEMODE\Game_StopAutoPilotTimer!
+
+		return
+
+	enough = #initializedPlayers >= GAMEMODE.ConVars.MinPlayers\GetInt!
+
+	if enough and GAMEMODE\IsOnAutoPilot! and not timer.Exists "NMW AU AutoPilot"
+		GAMEMODE.Logger.Info "Starting the auto-pilot."
+		GAMEMODE\Game_RestartAutoPilotTimer!
+
+	elseif not enough and timer.Exists "NMW AU AutoPilot"
+		GAMEMODE.Logger.Info "Stopping the auto-pilot."
+		GAMEMODE\Game_StopAutoPilotTimer!

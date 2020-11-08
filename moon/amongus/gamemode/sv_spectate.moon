@@ -49,3 +49,7 @@ hook.Add "PlayerSpawn", "NMW AU Spec", (ply) ->
 		if GAMEMODE\IsGameInProgress!
 			GAMEMODE\Player_Hide ply
 			GAMEMODE\Spectate_CycleMode ply
+
+		GAMEMODE\Net_BroadcastConnectDisconnect ply\Nick!, true, GAMEMODE\IsGameInProgress!
+
+	return
