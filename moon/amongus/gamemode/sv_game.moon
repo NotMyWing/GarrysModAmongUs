@@ -304,6 +304,10 @@ hook.Add "KeyPress", "NMW AU GameStart", (ply, key) -> with GAMEMODE
 		-- Bail if the game is in progress.
 		if \IsGameInProgress!
 			return
+	
+		-- Bail if the game is being managed automatically.
+		if GAMEMODE.ConVars.ForceAutoWarmup\GetBool! or GAMEMODE\IsOnAutoPilot!
+			return
 
 		if \IsGameCommencing!
 			.Logger.Warn "Admin #{ply\Nick!} has stopped the countdown!"
