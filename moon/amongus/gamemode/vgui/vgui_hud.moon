@@ -119,10 +119,17 @@ hud.SetupButtons = (state, impostor) =>
 
 		-- Round overlay.
 		@roundOverlay = with @Add "DPanel"
+			nextCheck = 0
+			local initializedPlayers
+
 			\SetZPos 30001
 			\SetSize ScrW!, ScrH! * 0.125
 			\SetPos 0, ScrH! * 0.75
 			.Paint = ->
+			.Think = ->
+				if GAMEMODE.ConVarSnapshots and SysTime! > nextCheck
+					nextCheck = SysTime! + 0.5
+					initializedPlayers = GAMEMODE\GetFullyInitializedPlayers!
 
 			with \Add "DPanel"
 				margin = ScrW! * 0.25
@@ -137,11 +144,25 @@ hud.SetupButtons = (state, impostor) =>
 
 					crewSize = 0.25 * \GetWide!
 
+					-- Imposter Count Container
+					with \Add "DLabel"
+						\Dock BOTTOM
+						\SetTall 0.5 * ScrH! * 0.125
+						\SetColor Color 255, 255, 255
+						\SetContentAlignment 8
+						\SetText ""
+						\SetFont "NMW AU Start Subtext"
+						.Think = ->
+							if initializedPlayers
+								imposterCount = math.min GAMEMODE.ConVars.ImposterCount\GetInt!, GAMEMODE\GetImposterCount #initializedPlayers
+
+								\SetText tostring TRANSLATE("prepare.imposterCount") imposterCount
+
 					-- Count container.
 					with \Add "DPanel"
-						\DockMargin 0, crewSize * 0.25, 0, crewSize * 0.25
 						\DockPadding 0, 0, crewSize * 0.5, 0
-						\Dock FILL
+						\Dock TOP
+						\SetTall 0.5 * ScrH! * 0.125
 						.Paint = ->
 
 						-- Crewmate
@@ -173,7 +194,7 @@ hud.SetupButtons = (state, impostor) =>
 							white  = Color 255, 255, 255
 
 							.Think = ->
-								if GAMEMODE.ConVarSnapshots
+								if initializedPlayers
 									playerCount = #player.GetAll!
 									needed = GAMEMODE.ConVars.MinPlayers\GetInt!
 
@@ -187,6 +208,7 @@ hud.SetupButtons = (state, impostor) =>
 										red
 
 					.Paint = ->
+
 				-- Middle
 				with \Add "DPanel"
 					\SetWide ScrW! * 0.25
@@ -201,7 +223,7 @@ hud.SetupButtons = (state, impostor) =>
 						\SetFont "NMW AU Countdown"
 						\SetColor Color 255, 255, 255
 						.Think = ->
-							\SetText tostring if LocalPlayer!\IsAdmin!
+							\SetText tostring if not GAMEMODE.ConVars.ForceAutoWarmup\GetBool! and LocalPlayer!\IsAdmin!
 								TRANSLATE "prepare.admin"
 							else
 								TRANSLATE "prepare.warmup"
@@ -214,23 +236,17 @@ hud.SetupButtons = (state, impostor) =>
 						\SetFont "NMW AU Start Subtext"
 						\SetColor Color 255, 255, 255
 
-						nextCheck = 0
-						initializedPlayers = {}
 						.Think = ->
-							if GAMEMODE.ConVarSnapshots
-								if SysTime! > nextCheck
-									nextCheck = SysTime! + 0.5
-									initializedPlayers = GAMEMODE\GetFullyInitializedPlayers!
-
+							if initializedPlayers
 								playerCount = #initializedPlayers
 								needed = GAMEMODE.ConVars.MinPlayers\GetInt!
 
 								\SetText tostring if playerCount < needed
 									TRANSLATE "prepare.waitingForPlayers"
-								elseif LocalPlayer!\IsAdmin!
+								elseif not GAMEMODE.ConVars.ForceAutoWarmup\GetBool! and LocalPlayer!\IsAdmin!
 									TRANSLATE("prepare.pressToStart") string.upper input.LookupBinding("jump") or "???"
 								else
-									if not GAMEMODE\IsOnAutoPilot!
+									if not (GAMEMODE.ConVars.ForceAutoWarmup\GetBool! or GAMEMODE\IsOnAutoPilot!)
 										TRANSLATE "prepare.waitingForAdmin"
 									else
 										time = math.max 0, GetGlobalFloat("NMW AU AutoPilotTimer") - CurTime!

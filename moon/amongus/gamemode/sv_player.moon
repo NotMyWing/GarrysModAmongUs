@@ -294,19 +294,23 @@ GM.PlayerSpawn = (ply) =>
 
 hook.Add "PlayerInitialSpawn", "NMW AU AutoPilot", (ply) -> with GAMEMODE
 	oldAutoPilot = \IsOnAutoPilot!
-	if not oldAutoPilot
-		newAutoPilot = false
+
+	if oldAutoPilot
+		newAutoPilot = true
 		for ply in *player.GetAll!
 			if ply\IsAdmin! or ply\IsListenServerHost!
-				newAutoPilot = true
+				newAutoPilot = false
 				break
 
-		if newAutoPilot and not oldAutoPilot
+		if not newAutoPilot and oldAutoPilot
 			-- to-do: pront this in the chat
-			.Logger.Info "An admin (#{ply\Nick!}) has just connected"
-			.Logger.Info "Upcoming rounds will now be managed manually"
+			if not .ConVars.ForceAutoWarmup\GetBool!
+				.Logger.Info "An admin (#{ply\Nick!}) has just connected"
+				.Logger.Info "Upcoming rounds will now be managed manually"
 
 			\SetOnAutoPilot newAutoPilot
+	
+	return
 
 hook.Add "PlayerDisconnected", "NMW AU AutoPilot", (ply) -> with GAMEMODE
 	GAMEMODE\Net_BroadcastConnectDisconnect ply\Nick!, false
@@ -321,8 +325,9 @@ hook.Add "PlayerDisconnected", "NMW AU AutoPilot", (ply) -> with GAMEMODE
 
 		if newAutoPilot and not oldAutoPilot
 			-- to-do: pront this in the chat
-			.Logger.Info "The last admin (#{ply\Nick!}) has just left"
-			.Logger.Info "Upcoming rounds will now be managed by the server"
+			if not .ConVars.ForceAutoWarmup\GetBool!
+				.Logger.Info "The last admin (#{ply\Nick!}) has just left"
+				.Logger.Info "Upcoming rounds will now be managed by the server"
 
 			\SetOnAutoPilot newAutoPilot
 

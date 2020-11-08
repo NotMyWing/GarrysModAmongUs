@@ -169,6 +169,11 @@ with GM.Lang\Get "en"
 	["prepare.waitingForPlayers"] = "Waiting for players..."
 	["prepare.waitingForAdmin"] = "Waiting for an Admin to start the game."
 	["prepare.commencing"] = "The game will start in %d s."
+	["prepare.imposterCount"] = (count) ->
+		string.format (if count == 1
+			"%d Imposter"
+		else
+			"%d Imposters"), count
 
 	["connected.spectating"] = "%s has joined as a spectator."
 	["connected.spawned"] = "%s is ready to play."

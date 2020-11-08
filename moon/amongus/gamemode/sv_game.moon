@@ -167,7 +167,7 @@ GM.Game_Start = =>
 			memo[b] = memo[b] or math.random!
 			memo[a] > memo[b]
 
-		imposterCount = math.min @ConVarSnapshots.ImposterCount\GetInt!, @GetImposterCount #initializedPlayers
+		imposterCount = math.max GAMEMODE.ConVarSnapshots.ImposterCount\GetInt!, @GetImposterCount #initializedPlayers
 		for index, ply in ipairs @GameData.PlayerTables
 			-- Give the player a color.
 			-- TO-DO: make customizable.
@@ -295,6 +295,7 @@ GM.Game_RestartAutoPilotTimer = =>
 		@Game_Start!
 
 GM.Game_StopAutoPilotTimer = =>
+	SetGlobalFloat "NMW AU AutoPilotTimer", 0
 	if timer.Exists "NMW AU AutoPilot"
 		timer.Remove "NMW AU AutoPilot"
 
@@ -310,8 +311,11 @@ hook.Add "KeyPress", "NMW AU GameStart", (ply, key) -> with GAMEMODE
 			timer.Destroy "tryStartGame"
 			\Game_CleanUp true
 		else
-			.Logger.Info "Admin #{ply\Nick!} has started the countdown."
 			GAMEMODE\Game_Start!
+			if \IsGameCommencing!
+				.Logger.Info "Admin #{ply\Nick!} has started the countdown"
+
+	return
 
 hook.Add "PlayerDisconnected", "NMW AU CheckWin", (ply) -> with GAMEMODE
 	initializedPlayers = \GetFullyInitializedPlayers!
@@ -338,29 +342,28 @@ hook.Add "PlayerDisconnected", "NMW AU CheckWin", (ply) -> with GAMEMODE
 			\Game_CheckWin!
 	else
 		if timer.Exists "tryStartGame"
-			if #initializedPlayers - @ConVars.ImposterCount\GetInt! * 2 < 1
-				@Logger.Warn "Couldn't start the round! Someone left after the countdown."
+			.Logger.Warn "Couldn't start the round! Someone left after the countdown"
 
-				timer.Destroy "tryStartGame"
-				\Game_CleanUp true
+			timer.Destroy "tryStartGame"
+			\Game_CleanUp true
 
 	return
 
-timer.Create "NMW AU AutoPilotChecker", 1, 0, ->
-	initializedPlayers = GAMEMODE\GetFullyInitializedPlayers!
-
+timer.Create "NMW AU AutoPilotChecker", 0.25, 0, ->
 	if GAMEMODE\IsGameInProgress! or GAMEMODE\IsGameCommencing!
 		if timer.Exists "NMW AU AutoPilot"
 			GAMEMODE\Game_StopAutoPilotTimer!
 
 		return
 
+	initializedPlayers = GAMEMODE\GetFullyInitializedPlayers!
+	auto = GAMEMODE.ConVars.ForceAutoWarmup\GetBool! or GAMEMODE\IsOnAutoPilot!
 	enough = #initializedPlayers >= GAMEMODE.ConVars.MinPlayers\GetInt!
 
-	if enough and GAMEMODE\IsOnAutoPilot! and not timer.Exists "NMW AU AutoPilot"
-		GAMEMODE.Logger.Info "Starting the auto-pilot."
+	if enough and auto and not timer.Exists "NMW AU AutoPilot"
+		GAMEMODE.Logger.Info "Starting the automated round management"
 		GAMEMODE\Game_RestartAutoPilotTimer!
 
-	elseif not enough and timer.Exists "NMW AU AutoPilot"
-		GAMEMODE.Logger.Info "Stopping the auto-pilot."
+	elseif (not auto or not enough) and timer.Exists "NMW AU AutoPilot"
+		GAMEMODE.Logger.Info "Stopping the automated round management"
 		GAMEMODE\Game_StopAutoPilotTimer!
