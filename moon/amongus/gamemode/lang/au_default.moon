@@ -138,7 +138,7 @@ with GM.Lang\Get "en"
 	["hud.cvar.time"] = "%d s."
 
 	cvars = {
-		au_imposter_count:   "Imposters"
+		au_imposter_count:   "Max. Imposters"
 		au_kill_cooldown:    "Kill Cooldown"
 		au_time_limit:       "Time Limit"
 		au_killdistance_mod: "Kill Distance"
@@ -161,3 +161,20 @@ with GM.Lang\Get "en"
 		["cvar.#{name}"] = value
 
 	["vote.voted"] = "%s has voted. %s remaining."
+
+	["prepare.admin"] = "You're an Admin!"
+	["prepare.pressToStart"] = "Press [%s] to start the game."
+
+	["prepare.warmup"] = "Warm-Up Time!"
+	["prepare.waitingForPlayers"] = "Waiting for players..."
+	["prepare.waitingForAdmin"] = "Waiting for an Admin to start the game."
+	["prepare.commencing"] = "The game will start in %d s."
+	["prepare.imposterCount"] = (count) ->
+		string.format (if count == 1
+			"%d Imposter"
+		else
+			"%d Imposters"), count
+
+	["connected.spectating"] = "%s has joined as a spectator."
+	["connected.spawned"] = "%s is ready to play."
+	["connected.disconnected"] = "%s has left the game!"

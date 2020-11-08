@@ -109,9 +109,13 @@ else
 		for _, playerTable in pairs @GameData.PlayerTables
 			@GameData.Tasks[playerTable] = {}
 
+			-- Don't assign tasks to leavers.
+			if not IsValid playerTable.entity
+				continue
+
 			-- Don't assign tasks to bots, but create their table to prevent
 			-- the logic from dying horribly.
-			if IsValid(playerTable.entity) and playerTable.entity\IsBot! and not @ConVarSnapshots.DistributeTasksToBots\GetBool!
+			if playerTable.entity\IsBot! and not @ConVarSnapshots.DistributeTasksToBots\GetBool!
 				continue
 
 			-- Instantiates the provided task.

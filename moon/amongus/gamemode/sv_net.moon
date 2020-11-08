@@ -317,6 +317,16 @@ GM.Net_BroadcastConVarSnapshots = (snapshots) =>
 	net.WriteTable snapshots
 	net.Broadcast!
 
+--- Sends a connect/disconnect update to everyone.
+-- @param snapshots ConVar snapshots.
+GM.Net_BroadcastConnectDisconnect = (nickname, connected, spectator = false) =>
+	net.Start "NMW AU Flow"
+	net.WriteUInt @FlowTypes.ConnectDisconnect, @FlowSize
+	net.WriteString nickname
+	net.WriteBool connected
+	net.WriteBool spectator
+	net.Broadcast!
+
 --- Tells the player to open a VGUI.
 -- @param playerTable Player table.
 -- @param id Sabotage ID.
@@ -365,8 +375,8 @@ net.Receive "NMW AU Flow", (len, ply) ->
 		-- Player wants to sync the game data.
 		--
 		when GAMEMODE.FlowTypes.RequestUpdate
-			if not ply.nwm_au_updated
-				ply.nwm_au_updated = true
+			if not ply\GetNW2Bool "NMW AU Initalized"
+				ply\SetNW2Bool "NMW AU Initialized", true
 
 				if GAMEMODE.IsGameInProgress!
 					GAMEMODE\Net_UpdateGameData ply
@@ -444,3 +454,8 @@ GM.SetGameCommencing = (value) =>
 GM.SetGameState = (newState) =>
 	@GameData.State = newState
 	@Net_BroadcastGameState newState
+
+--- Sets whether the game flow is controlled by the server.
+-- @return You guessed it again.
+GM.SetOnAutoPilot = (newState) =>
+	SetGlobalBool "NMW AU AutoPilot", newState

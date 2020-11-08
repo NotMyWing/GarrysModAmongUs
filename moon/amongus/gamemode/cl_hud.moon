@@ -300,6 +300,8 @@ GM.HUD_InitializeImposterMap = =>
 hook.Add "Initialize", "Init Hud", ->
 	GAMEMODE\HUD_Reset!
 
+	return
+
 ASSETS = {
 	btn: Material "au/gui/floatingbutton.png", "smooth"
 }

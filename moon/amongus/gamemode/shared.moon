@@ -16,7 +16,8 @@ flags = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_GAMEDLL
 --- Table of all ConVars the game mode is using.
 -- These are tracked and cannot be changed during the round.
 -- @table GM.ConVars
--- @field ImposterCount (Integer) Max imposters.
+-- @field ImposterCount (Integer) Max. imposters.
+-- @field ImposterCount (Integer) Min. players.
 -- @field KillCooldown (Integer) Kill cooldown.
 -- @field KillDistanceMod (Number) Kill distance multiplier.
 -- @field ConfirmEjects (Bool) Should the ejects be confirmed?
@@ -34,7 +35,8 @@ flags = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_GAMEDLL
 -- @field TimeLimit (Integer) Round time limit.
 -- @field Countdown (Integer) How long the pre-round countdown lasts.
 GM.ConVars =
-	ImposterCount:   CreateConVar "au_imposter_count"  , 1 , flags, "", 1, 4
+	ImposterCount:   CreateConVar "au_max_imposters"   , 1 , flags, "", 1, 10
+	MinPlayers:      CreateConVar "au_min_players"     , 3 , flags, "", 3, 128
 	KillCooldown:    CreateConVar "au_kill_cooldown"   , 20, flags, "", 1, 60
 	KillDistanceMod: CreateConVar "au_killdistance_mod", 1 , flags, "", 1, 3
 	ConfirmEjects:   CreateConVar "au_confirm_ejects"  , 1 , flags, "", 0, 1
@@ -55,7 +57,10 @@ GM.ConVars =
 	MeetingBotVote:        CreateConVar "au_debug_bot_vote"  , 0, flags, "", 0, 1
 
 	TimeLimit: CreateConVar "au_time_limit", 600, flags, "", 0, 1200
-	Countdown: CreateConVar "au_countdown", 5, flags, "", 1, 10
+	Countdown: CreateConVar "au_countdown" , 5  , flags, "", 1, 10
+
+	WarmupTime:      CreateConVar "au_warmup_time"      , 60, flags, "", 0, 120
+	ForceAutoWarmup: CreateConVar "au_warmup_force_auto", 0 , flags, "", 0, 1
 
 --- Enum of all colors players can get.
 -- @warning This isn't the best approach. Needs fixing.
@@ -193,8 +198,9 @@ GM.FlowTypes = {
 	SabotageData: 25
 	SabotageRequest: 26
 	SabotageSubmit: 27
-	UNUSED: 28
+	UNUSED2: 28
 	ConVarSnapshots: 29
+	ConnectDisconnect: 30
 }
 
 GM.FlowSize = math.ceil math.log table.Count(GM.FlowTypes) + 1, 2
@@ -448,6 +454,20 @@ GM.IsMeetingInProgress = => GetGlobalBool "NMW AU MeetingInProgress"
 --- Returns whether the game is commencing.
 -- @return You guessed it.
 GM.IsGameCommencing = => GetGlobalBool "NMW AU GameCommencing"
+
+--- Returns whether the game flow is controlled by the server.
+-- @return You guessed it.
+GM.IsOnAutoPilot = => GetGlobalBool "NMW AU AutoPilot"
+
+--- Returns a table of fully initialized players.
+GM.GetFullyInitializedPlayers = => return for ply in *player.GetAll!
+	if ply\IsBot! or ply\GetNW2Bool "NMW AU Initialized"
+		ply
+	else
+		continue
+
+--- Gets the imposter count based on the provided number.
+GM.GetImposterCount = (_, count) -> math.floor(((count or _) - 1)/6) + 1
 
 local logger
 logger = {

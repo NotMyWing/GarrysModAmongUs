@@ -292,27 +292,46 @@ GM.PlayerSpawn = (ply) =>
 	ply\SetTeam 1
 	ply\SetNoCollideWithTeammates true
 
-hook.Add "PlayerDisconnected", "NMW AU CheckWin", (ply) -> with GAMEMODE
-	if \IsGameInProgress!
-		if playerTable = .GameData.Lookup_PlayerByEntity[ply]
-			\Player_SetDead playerTable
+hook.Add "PlayerInitialSpawn", "NMW AU AutoPilot", (ply) -> with GAMEMODE
+	oldAutoPilot = \IsOnAutoPilot!
 
-			-- If the player was a crewmate and he had tasks,
-			-- "complete" his tasks and broadcast the new count.
-			if not .GameData.Imposters[playerTable]
-				count = table.Count .GameData.Tasks[playerTable]
-				if count > 0
-					.GameData.CompletedTasks += table.Count .GameData.Tasks[playerTable]
-					table.Empty .GameData.Tasks[playerTable]
+	if oldAutoPilot
+		newAutoPilot = true
+		for ply in *player.GetAll!
+			if ply\IsAdmin! or ply\IsListenServerHost!
+				newAutoPilot = false
+				break
 
-					\Net_BroadcastTaskCount .GameData.CompletedTasks, .GameData.TotalTasks
+		if not newAutoPilot and oldAutoPilot
+			-- to-do: pront this in the chat
+			if not .ConVars.ForceAutoWarmup\GetBool!
+				.Logger.Info "An admin (#{ply\Nick!}) has just connected"
+				.Logger.Info "Upcoming rounds will now be managed manually"
 
-			\Game_CheckWin!
-	elseif timer.Exists "tryStartGame"
-		@Logger.Warn "Couldn't start the round! Someone left after the countdown."
+			\SetOnAutoPilot newAutoPilot
+	
+	return
 
-		timer.Destroy "tryStartGame"
-		\Game_CleanUp true
+hook.Add "PlayerDisconnected", "NMW AU AutoPilot", (ply) -> with GAMEMODE
+	GAMEMODE\Net_BroadcastConnectDisconnect ply\Nick!, false
+
+	oldAutoPilot = \IsOnAutoPilot!
+	if oldAutoPilot
+		newAutoPilot = false
+		for ply in *player.GetAll!
+			if ply\IsAdmin! or ply\IsListenServerHost!
+				newAutoPilot = true
+				break
+
+		if newAutoPilot and not oldAutoPilot
+			-- to-do: pront this in the chat
+			if not .ConVars.ForceAutoWarmup\GetBool!
+				.Logger.Info "The last admin (#{ply\Nick!}) has just left"
+				.Logger.Info "Upcoming rounds will now be managed by the server"
+
+			\SetOnAutoPilot newAutoPilot
+
+	return
 
 hook.Add "CanPlayerSuicide", "NMW AU Suicide", ->
 	return false
@@ -328,6 +347,8 @@ hook.Add "PlayerUse", "NMW AU Use", (activator, ent) ->
 		victim = GAMEMODE.GameData.Lookup_PlayerByID[bodyid]
 		if victim
 			GAMEMODE\Meeting_Start activator, victim.color
+
+	return
 
 hook.Add "FindUseEntity", "NMW AU FindUse", (ply, default) ->
 	_, usable = GAMEMODE\TracePlayer ply

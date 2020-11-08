@@ -221,8 +221,11 @@ if SERVER
 				btn\Fire "OnTaskComplete"
 
 		--- Marks the task dirty, notifying the game mode that
-		-- the data should be broadcasted to the clients.
+		-- the data should be broadcasted to the client.
 		.SetDirty = =>
+			if not IsValid @GetAssignedPlayer!.entity
+				return
+
 			-- This sends an update packet next tick.
 			-- Really jank, I know.
 			handle = "NMW AU Task Dirty #{@GetID!}"
@@ -254,6 +257,9 @@ if SERVER
 			handle = "NMW AU Task Dirty #{@GetID!}"
 			if timer.Exists handle
 				timer.Remove handle
+
+			if not IsValid @GetAssignedPlayer!.entity
+				return
 
 			packet = {}
 

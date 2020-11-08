@@ -41,6 +41,8 @@ hook.Add "KeyPress", "NMW AU Spectate Cycle", (ply, key) ->
 				GAMEMODE\Spectate_CycleMode ply
 			when IN_DUCK
 				ply\Spectate OBS_MODE_ROAMING
+	
+	return
 
 GM.__specInitialized = {}
 hook.Add "PlayerSpawn", "NMW AU Spec", (ply) ->
@@ -49,3 +51,7 @@ hook.Add "PlayerSpawn", "NMW AU Spec", (ply) ->
 		if GAMEMODE\IsGameInProgress!
 			GAMEMODE\Player_Hide ply
 			GAMEMODE\Spectate_CycleMode ply
+
+		GAMEMODE\Net_BroadcastConnectDisconnect ply\Nick!, true, GAMEMODE\IsGameInProgress!
+
+	return

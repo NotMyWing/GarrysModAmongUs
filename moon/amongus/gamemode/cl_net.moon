@@ -315,8 +315,8 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		GAMEMODE.ImposterCount = net.ReadUInt 8
 		for i = 1, GAMEMODE.ImposterCount
 			plyid = net.ReadUInt 8
-			ply = GAMEMODE.GameData.Lookup_PlayerByID[plyid]
-			GAMEMODE.GameData.Imposters[ply] = true
+			if ply = GAMEMODE.GameData.Lookup_PlayerByID[plyid]
+				GAMEMODE.GameData.Imposters[ply] = true
 
 		GAMEMODE\HUD_DisplayGameOver reason
 
@@ -424,3 +424,24 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	--
 	when GAMEMODE.FlowTypes.ConVarSnapshots
 		GAMEMODE\ConVarSnapshot_ImportAll net.ReadTable!
+
+	--
+	-- The server provided us with the new ConVar snapshots.
+	--
+	when GAMEMODE.FlowTypes.ConnectDisconnect
+		nickname = net.ReadString!
+		connected = net.ReadBool!
+		spectator = net.ReadBool!
+
+		chat.AddText Color(220, 32, 32), "[Among Us] ", Color(255, 255, 255), tostring if connected
+			surface.PlaySound "au/player_spawn.wav"
+
+			if spectator
+				TRANSLATE("connected.spectating") nickname
+			else
+				TRANSLATE("connected.spawned") nickname
+		else
+			surface.PlaySound "au/player_disconnect.wav"
+
+			TRANSLATE("connected.disconnected") nickname
+

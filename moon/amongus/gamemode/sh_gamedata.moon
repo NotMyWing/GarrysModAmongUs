@@ -20,7 +20,6 @@ with GM
 			.VentCooldown           or= {}
 			.KillCooldownRemainders or= {}
 			.KillCooldowns          or= {}
-			.KillCooldownPause      or= {}
 			.CurrentVGUI            or= {}
 			.VGUICallback           or= {}
 

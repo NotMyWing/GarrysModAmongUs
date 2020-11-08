@@ -146,3 +146,5 @@ hook.Add "OnSpawnMenuOpen", "NMW AU RequestKill", ->
 
 		if .GameData.Imposters[playerTable] and IsValid(GAMEMODE.KillHighlight) and GAMEMODE.KillHighlight\IsPlayer!
 			\Net_KillRequest .KillHighlight
+
+	return
