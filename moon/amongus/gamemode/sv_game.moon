@@ -289,7 +289,6 @@ GM.Game_StartRound = =>
 
 GM.Game_RestartAutoPilotTimer = =>
 	time = @ConVars.WarmupTime\GetFloat!
-	print time
 
 	SetGlobalFloat "NMW AU AutoPilotTimer", CurTime! + time
 	timer.Create "NMW AU AutoPilot", time, 0, ->

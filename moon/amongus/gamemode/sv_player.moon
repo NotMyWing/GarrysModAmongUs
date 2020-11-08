@@ -315,7 +315,6 @@ hook.Add "PlayerDisconnected", "NMW AU AutoPilot", (ply) -> with GAMEMODE
 	if oldAutoPilot
 		newAutoPilot = false
 		for ply in *player.GetAll!
-			print ply\IsAdmin! or ply\IsListenServerHost!
 			if ply\IsAdmin! or ply\IsListenServerHost!
 				newAutoPilot = true
 				break
