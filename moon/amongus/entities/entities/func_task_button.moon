@@ -9,7 +9,8 @@ ENT.Initialize = =>
 	if SERVER
 		@SetMoveType MOVETYPE_VPHYSICS
 		@SetSolid SOLID_VPHYSICS
-		@SetModel self.Model
+		if self.Model
+			@SetModel self.Model
 		@SetUseType SIMPLE_USE
 
 	else
