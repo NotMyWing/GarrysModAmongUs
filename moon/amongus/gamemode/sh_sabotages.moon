@@ -34,8 +34,11 @@ GM.Sabotage_Register = (sabotage) => with sabotage
 		include "sabotages/#{.Handler}.lua"
 
 GM.Sabotage_Init = =>
+	if not @MapManifest or not @MapManifest.Sabotages
+		return
+
 	table.Empty @GameData.Sabotages
-	for i, sabotage in ipairs @MapManifest.Sabotages or {}
+	for i, sabotage in ipairs @MapManifest.Sabotages
 		if @Sabotage_Handlers[sabotage.Handler]
 			instance = instantiateSabotage @Sabotage_Handlers[sabotage.Handler]
 			instance.__handler = sabotage.Handler

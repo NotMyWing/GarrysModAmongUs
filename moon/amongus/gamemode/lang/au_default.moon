@@ -165,6 +165,9 @@ with GM.Lang\Get "en"
 	["prepare.admin"] = "You're an Admin!"
 	["prepare.pressToStart"] = "Press [%s] to start the game."
 
+	["prepare.invalidMap"] = "Invalid Map!"
+	["prepare.invalidMap.subText"] = "No map manifest file found."
+
 	["prepare.warmup"] = "Warm-Up Time!"
 	["prepare.waitingForPlayers"] = "Waiting for players..."
 	["prepare.waitingForAdmin"] = "Waiting for an Admin to start the game."

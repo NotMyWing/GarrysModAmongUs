@@ -141,73 +141,73 @@ hud.SetupButtons = (state, impostor) =>
 				with \Add "DPanel"
 					\SetWide 0.5 * ScrW! * 0.25
 					\Dock RIGHT
+					.Paint = ->
 
-					crewSize = 0.25 * \GetWide!
+					if GAMEMODE.MapManifest
+						crewSize = 0.25 * \GetWide!
 
-					-- Imposter Count Container
-					with \Add "DLabel"
-						\Dock BOTTOM
-						\SetTall 0.5 * ScrH! * 0.125
-						\SetColor Color 255, 255, 255
-						\SetContentAlignment 8
-						\SetText ""
-						\SetFont "NMW AU Start Subtext"
-						.Think = ->
-							if initializedPlayers
-								imposterCount = math.min GAMEMODE.ConVars.ImposterCount\GetInt!, GAMEMODE\GetImposterCount #initializedPlayers
-
-								\SetText tostring TRANSLATE("prepare.imposterCount") imposterCount
-
-					-- Count container.
-					with \Add "DPanel"
-						\DockPadding 0, 0, crewSize * 0.5, 0
-						\Dock TOP
-						\SetTall 0.5 * ScrH! * 0.125
-						.Paint = ->
-
-						-- Crewmate
-						with \Add "DPanel"
-							\SetSize crewSize, crewSize
-							\DockMargin crewSize * 0.25, 0, 0, 0
-							\Dock RIGHT
-							.Paint = ->
-
-							-- A slightly unreadable chunk of garbage code
-							-- responsible for layering the crewmate sprite.
-							layers = {}
-							for i = 1, 2
-								with layers[i] = \Add "DPanel"
-									\Dock FILL
-									.Image = CREW_LAYERS[i]
-									.Paint = GAMEMODE.Render.DermaFitImage
-							layers[1].Color = Color 255, 0, 0
-
-						-- Label
+						-- Imposter Count Container
 						with \Add "DLabel"
-							\SetFont "NMW AU Countdown"
-							\SetText "..."
-							\SetContentAlignment 6
-							\Dock FILL
-
-							red    = Color 220, 32, 32
-							yellow = Color 255, 255, 30
-							white  = Color 255, 255, 255
-
+							\Dock BOTTOM
+							\SetTall 0.5 * ScrH! * 0.125
+							\SetColor Color 255, 255, 255
+							\SetContentAlignment 8
+							\SetText ""
+							\SetFont "NMW AU Start Subtext"
 							.Think = ->
 								if initializedPlayers
-									playerCount = #player.GetAll!
-									needed = GAMEMODE.ConVars.MinPlayers\GetInt!
+									imposterCount = math.min GAMEMODE.ConVars.ImposterCount\GetInt!, GAMEMODE\GetImposterCount #initializedPlayers
 
-									\SetText "#{playerCount}/#{needed}"
+									\SetText tostring TRANSLATE("prepare.imposterCount") imposterCount
 
-									\SetColor if playerCount > needed
-										white
-									elseif playerCount == needed
-										yellow
-									else
-										red
+						-- Count container.
+						with \Add "DPanel"
+							\DockPadding 0, 0, crewSize * 0.5, 0
+							\Dock TOP
+							\SetTall 0.5 * ScrH! * 0.125
+							.Paint = ->
 
-					.Paint = ->
+							-- Crewmate
+							with \Add "DPanel"
+								\SetSize crewSize, crewSize
+								\DockMargin crewSize * 0.25, 0, 0, 0
+								\Dock RIGHT
+								.Paint = ->
+
+								-- A slightly unreadable chunk of garbage code
+								-- responsible for layering the crewmate sprite.
+								layers = {}
+								for i = 1, 2
+									with layers[i] = \Add "DPanel"
+										\Dock FILL
+										.Image = CREW_LAYERS[i]
+										.Paint = GAMEMODE.Render.DermaFitImage
+								layers[1].Color = Color 255, 0, 0
+
+							-- Label
+							with \Add "DLabel"
+								\SetFont "NMW AU Countdown"
+								\SetText "..."
+								\SetContentAlignment 6
+								\Dock FILL
+
+								red    = Color 220, 32, 32
+								yellow = Color 255, 255, 30
+								white  = Color 255, 255, 255
+
+								.Think = ->
+									if initializedPlayers
+										playerCount = #player.GetAll!
+										needed = GAMEMODE.ConVars.MinPlayers\GetInt!
+
+										\SetText "#{playerCount}/#{needed}"
+
+										\SetColor if playerCount > needed
+											white
+										elseif playerCount == needed
+											yellow
+										else
+											red
 
 				-- Middle
 				with \Add "DPanel"
@@ -223,7 +223,9 @@ hud.SetupButtons = (state, impostor) =>
 						\SetFont "NMW AU Countdown"
 						\SetColor Color 255, 255, 255
 						.Think = ->
-							\SetText tostring if not GAMEMODE.ConVars.ForceAutoWarmup\GetBool! and LocalPlayer!\IsAdmin!
+							\SetText tostring if not GAMEMODE.MapManifest
+								TRANSLATE "prepare.invalidMap"
+							elseif not GAMEMODE.ConVars.ForceAutoWarmup\GetBool! and LocalPlayer!\IsAdmin!
 								TRANSLATE "prepare.admin"
 							else
 								TRANSLATE "prepare.warmup"
@@ -241,7 +243,9 @@ hud.SetupButtons = (state, impostor) =>
 								playerCount = #initializedPlayers
 								needed = GAMEMODE.ConVars.MinPlayers\GetInt!
 
-								\SetText tostring if playerCount < needed
+								\SetText tostring if not GAMEMODE.MapManifest
+									TRANSLATE "prepare.invalidMap.subText"
+								elseif playerCount < needed
 									TRANSLATE "prepare.waitingForPlayers"
 								elseif not GAMEMODE.ConVars.ForceAutoWarmup\GetBool! and LocalPlayer!\IsAdmin!
 									TRANSLATE("prepare.pressToStart") string.upper input.LookupBinding("jump") or "???"
