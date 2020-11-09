@@ -169,7 +169,7 @@ GM.Game_Start = =>
 			memo[b] = memo[b] or math.random!
 			memo[a] > memo[b]
 
-		imposterCount = math.max GAMEMODE.ConVarSnapshots.ImposterCount\GetInt!, @GetImposterCount #initializedPlayers
+		imposterCount = math.min GAMEMODE.ConVarSnapshots.ImposterCount\GetInt!, @GetImposterCount #initializedPlayers
 		for index, ply in ipairs @GameData.PlayerTables
 			-- Give the player a color.
 			-- TO-DO: make customizable.

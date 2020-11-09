@@ -138,7 +138,7 @@ with GM.Lang\Get "en"
 	["hud.cvar.time"] = "%d s."
 
 	cvars = {
-		au_imposter_count:   "Max. Imposters"
+		au_max_imposters:    "Max. Imposters"
 		au_kill_cooldown:    "Kill Cooldown"
 		au_time_limit:       "Time Limit"
 		au_killdistance_mod: "Kill Distance"
