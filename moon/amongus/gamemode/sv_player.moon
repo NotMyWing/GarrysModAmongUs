@@ -394,3 +394,5 @@ hook.Add "PlayerCanSeePlayersChat", "NMW AU DeadChat", (_, _, listener, talker) 
 
     if not GAMEMODE.GameData.DeadPlayers[listenerTable] or GAMEMODE.GameData.DeadPlayers[talkerTable]
 		return true
+
+hook.Add "IsSpawnpointSuitable", "NMW AU SpawnSuitable", -> true
