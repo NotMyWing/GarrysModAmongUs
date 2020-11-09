@@ -35,6 +35,8 @@ npx gulp watch
 
 ## License
 
-TBD.
+**Code:** [MIT license](/LICENSE)
+
+**Custom assets:** [Creative Commons BY-NC-SA 4.0](/LICENSE_ART)
 
 Among Us texture and sound assets by InnerSloth.
