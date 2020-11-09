@@ -2,6 +2,12 @@
 -- Interfaces the HUD things. Responsible for everything Derma-related.
 -- @module cl_hud
 
+include "vgui/vgui_task_base.lua"
+include "vgui/vgui_sabotage_base.lua"
+include "vgui/vgui_gui_base.lua"
+include "vgui/vgui_map_base.lua"
+include "vgui/vgui_task_placeholder.lua"
+
 VGUI_HUD = include "vgui/vgui_hud.lua"
 VGUI_MEETING = include "vgui/vgui_meeting.lua"
 VGUI_EJECT = include "vgui/vgui_eject.lua"
@@ -10,11 +16,6 @@ VGUI_BLINK = include "vgui/vgui_blink.lua"
 VGUI_VENT = include "vgui/vgui_vent.lua"
 VGUI_KILL = include "vgui/vgui_kill.lua"
 VGUI_MAP = include "vgui/vgui_map.lua"
-
-include "vgui/vgui_task_base.lua"
-include "vgui/vgui_sabotage_base.lua"
-include "vgui/vgui_gui_base.lua"
-include "vgui/vgui_task_placeholder.lua"
 
 surface.CreateFont "NMW AU Button Tooltip", {
 	font: "Arial"
