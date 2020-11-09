@@ -112,15 +112,8 @@ hook.Add "PreDrawHalos", "NMW AU Highlight", ->
 			-- Obligatory wall of checks.
 			if color and not task\GetCompleted! and
 				IsValid(btn) and btn ~= GAMEMODE.UseHighlight and
-				200 > btn\GetPos!\Distance LocalPlayer!\GetPos!
-
-					with util.TraceLine {
-						start: LocalPlayer!\EyePos!
-						endpos: btn\WorldSpaceCenter!
-						filter: (trEnt) -> trEnt == ent or not trEnt\IsPlayer!
-					}
-						if .Entity == btn
-							halo.Add { btn }, color, 3, 3, 2, true, true
+				160 > btn\GetPos!\Distance LocalPlayer!\GetPos!
+					halo.Add { btn }, color, 3, 3, 2, true, true
 
 	-- Highlight sabotage buttons.
 	for btn in pairs GAMEMODE.GameData.SabotageButtons

@@ -343,17 +343,9 @@ GM.TracePlayer = (ply) =>
 		if SERVER and not ply\TestPVS ent
 			continue
 
-		-- Plain old trace first.
-		-- The visibility can be occluded with doors, which don't contribute
-		-- towards PVS. Jank, but gets the job done so people can't report bodies
-		-- through closed doors.
-		with tr = util.TraceLine {
-			start: ply\EyePos!
-			endpos: ent\WorldSpaceCenter!
-			filter: (trEnt) -> trEnt == ent or not trEnt\IsPlayer!
-		}
-			if tr.Entity ~= ent
-				continue
+		-- No point entities. No view models.
+		if not ent\GetModel! or ent\GetModelRadius! == 0
+			continue
 
 		-- Task buttons.
 		if ent\GetClass! == "func_task_button" or ent\GetClass! == "prop_task_button"
