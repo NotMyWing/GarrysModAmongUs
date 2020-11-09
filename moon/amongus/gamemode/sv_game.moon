@@ -49,6 +49,8 @@ GM.Game_CheckWin = (reason) =>
 
 	if reason
 		@Game_GameOver reason
+		hook.Call "GMAU GameEnd"
+
 		return true
 
 GM.Game_CleanUp = (soft) =>
@@ -240,6 +242,8 @@ GM.Game_Start = =>
 				-- Check if suddenly something went extremely wrong during the windup time.
 				@Game_CheckWin!
 
+				hook.Call "GMAU GameStart"
+
 GM.Game_Restart = =>
 	@Game_CleanUp!
 
@@ -263,6 +267,7 @@ GM.Game_Restart = =>
 			ply\SetEyeAngles point\GetAngles!
 
 	@SetGameState @GameState.Preparing
+	hook.Call "GMAU Restart"
 
 GM.Game_StartRound = =>
 	-- Spawn the players and spread them around.
@@ -304,7 +309,7 @@ hook.Add "KeyPress", "NMW AU GameStart", (ply, key) -> with GAMEMODE
 		-- Bail if the game is in progress.
 		if \IsGameInProgress!
 			return
-	
+
 		-- Bail if the game is being managed automatically.
 		if GAMEMODE.ConVars.ForceAutoWarmup\GetBool! or GAMEMODE\IsOnAutoPilot!
 			return

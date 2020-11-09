@@ -25,6 +25,7 @@ GM.Meeting_Start = (ply, bodyColor) =>
 
 	@GameData.Timers[handle] = true
 	timer.Create handle, 0.2, 1, ->
+		hook.Call "GMAU MeetingStart"
 		@Net_BroadcastDead!
 		@Net_BroadcastMeeting aply, bodyColor
 		if bodyColor
@@ -149,6 +150,8 @@ GM.Meeting_End = =>
 
 			@Sabotage_RefreshAllCooldowns!
 			@SetMeetingInProgress false
+
+			hook.Call "GMAU MeetingEnd"
 
 GM.Meeting_ResetCooldown = =>
 	SetGlobalFloat "NMW AU NextMeeting", CurTime! + @ConVarSnapshots.MeetingCooldown\GetFloat!

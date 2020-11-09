@@ -86,13 +86,25 @@ hook.Add "Tick", "NMW AU KeyBinds", ->
 	return
 
 hook.Add "Tick", "NMW AU Highlight", ->
+	oldHighlight = GAMEMODE.UseHighlight
+
 	if IsValid(LocalPlayer!) and GAMEMODE\IsGameInProgress! and GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
 		killable, usable = GAMEMODE\TracePlayer LocalPlayer!
 		GAMEMODE.KillHighlight = killable
 		GAMEMODE.UseHighlight = usable
 	else
-		GAMEMODE.KillHighlight = killable
-		GAMEMODE.UseHighlight = usable
+		GAMEMODE.KillHighlight = nil
+		GAMEMODE.UseHighlight = nil
+
+	if GAMEMODE.Hud
+		if GAMEMODE.UseHighlight ~= oldHighlight
+			material = if IsValid GAMEMODE.UseHighlight
+				hook.Call "GMAU UseButtonOverride", nil, GAMEMODE.UseHighlight
+
+			if GAMEMODE.Hud.UseButtonOverride ~= material
+				GAMEMODE.Hud.UseButtonOverride = material
+
+		oldHighlight = GAMEMODE.UseHighlight
 
 	-- screw implicit returns man
 	return
