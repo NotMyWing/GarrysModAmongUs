@@ -12,6 +12,8 @@ surface.CreateFont "NMW AU Map Labels", {
 }
 
 map = {
+	__baseMatWidth: 0
+	__baseMatHeight: 0
 	__color: Color 255, 255, 255
 	__position: Vector 0, 0, 0
 	__scale: 1
@@ -69,8 +71,7 @@ map = {
 			\SetSize ScrH! * 0.09, ScrH! * 0.09
 
 			x, y = @__innerPanel\GetPos!
-			x -= ScrH! * 0.11
-			\SetPos x, y
+			\SetPos x - \GetWide! * 1.1, y
 
 			.DoClick = ->
 				@Close!
@@ -91,6 +92,10 @@ map = {
 		with @__innerPanel
 			\SetSize w, h
 			\Center!
+
+			x, y = @__innerPanel\GetPos!
+			with @__closeButton
+				\SetPos x - \GetWide! * 1.1, y
 
 		@__baseMat = value
 
