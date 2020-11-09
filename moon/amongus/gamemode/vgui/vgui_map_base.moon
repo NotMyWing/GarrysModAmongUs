@@ -44,13 +44,13 @@ map = {
 					surface.SetAlphaMultiplier 0.85
 					surface.SetDrawColor 255, 255, 255
 					surface.SetMaterial @__baseMat
-					surface.DrawTexturedRect 0, 0, w, h
+					surface.DrawTexturedRectRotated 0, 0, w, h, @__rotation
 
 				if @__overlayMat
 					surface.SetAlphaMultiplier 0.925 + 0.05 * math.sin SysTime! * 2.5
 					surface.SetDrawColor @__color
 					surface.SetMaterial @__overlayMat
-					surface.DrawTexturedRect 0, 0, w, h
+					surface.DrawTexturedRectRotated 0, 0, w, h, @__rotation
 
 				if shouldFilter
 					render.PopFilterMag!
@@ -81,6 +81,9 @@ map = {
 
 	SetColor: (value) => @__color = value
 	GetColor: => @__color
+
+	SetRotation: (value) => @__rotation = value
+	GetRotation: => @__rotation
 
 	SetBackgroundMaterial: (value) =>
 		@__baseMatWidth, @__baseMatHeight = if texture = value\GetTexture "$basetexture"
@@ -177,7 +180,6 @@ map = {
 			@OnClose!
 
 	Paint: =>
-
 }
 
 vgui.Register "AmongUsMapBase", map, "DPanel"
