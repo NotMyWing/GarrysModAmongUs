@@ -20,7 +20,6 @@ ENT.Initialize = =>
 		@SetSolid SOLID_VPHYSICS
 		@SetModel @Model
 		@SetUseType SIMPLE_USE
-		@SetAngles Angle 0, 0, 0
 
 		if @Links
 			newLinks = {}
