@@ -12,34 +12,37 @@ if CLIENT
 ENT.Base  = "base_anim"
 ENT.Type  = "anim"
 
-ENT.RenderGroup = RENDERGROUP_TRANSLUCENT
+ENT.RenderGroup = RENDERGROUP_OPAQUE
 
 ENT.Initialize = =>
 	if SERVER
 		@SetMoveType MOVETYPE_VPHYSICS
 		@SetSolid SOLID_VPHYSICS
-		@SetModel self.Model
 		@SetUseType SIMPLE_USE
+		if @Model
+			@SetModel @Model
 	else
 		@SetRenderBounds @OBBMins!, @OBBMaxs!
 
-ENT.Use = (ply) =>
-	if SERVER
-		if ply\GetNW2Int("NMW AU Meetings") <= 0
-			return
+if SERVER
+	ENT.KeyValue = (key, value) =>
+		if key == "model"
+			@Model = value
 
-		time = GetGlobalFloat("NMW AU NextMeeting") - CurTime!
+	ENT.Use = (ply) =>
+		if SERVER
+			if ply\GetNW2Int("NMW AU Meetings") <= 0
+				return
 
-		if time > 0
-			return
+			time = GetGlobalFloat("NMW AU NextMeeting") - CurTime!
 
-		if GAMEMODE\Meeting_Start ply
-			@EmitSound "au/panel_emergencybutton.wav", 60
-			ply\SetNW2Int "NMW AU Meetings", ply\GetNW2Int("NMW AU Meetings") - 1
+			if time > 0
+				return
 
-ENT.KeyValue = (key, value) =>
-	if key == "model"
-		self.Model = value
+			if GAMEMODE\Meeting_Start ply
+				@EmitSound "au/panel_emergencybutton.wav", 60
+				ply\SetNW2Int "NMW AU Meetings", ply\GetNW2Int("NMW AU Meetings") - 1
+
 
 if CLIENT
 	TRANSLATE = GAMEMODE.Lang.GetEntry
@@ -63,16 +66,13 @@ if CLIENT
 			else
 				TRANSLATE("meetingButton.default") LocalPlayer!\Nick!, LocalPlayer!\GetNW2Int "NMW AU Meetings"
 
-	ENT.Draw = =>
-		@DrawModel!
-
 	COLOR_BLACK = Color 0, 0, 0, 128
-	ENT.DrawTranslucent = =>
+	ENT.Draw = =>
 		@DrawModel!
 
 		if not GAMEMODE\IsGameInProgress!
 			return
-		
+
 		if not @__textLines
 			return
 

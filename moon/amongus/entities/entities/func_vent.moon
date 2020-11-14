@@ -1,25 +1,17 @@
 AddCSLuaFile!
 
-if CLIENT
-	surface.CreateFont "NMW AU Meeting Button", {
-		font: "Arial"
-		size: ScrH! * 0.125
-		weight: 500
-		outline: true
-		antialias: true
-	}
-
 ENT.Base  = "base_anim"
 ENT.Type  = "anim"
 
-ENT.RenderGroup = RENDERGROUP_TRANSLUCENT
+ENT.RenderGroup = RENDERGROUP_OPAQUE
 
 ENT.Initialize = =>
 	if SERVER
 		@SetMoveType MOVETYPE_VPHYSICS
 		@SetSolid SOLID_VPHYSICS
-		@SetModel @Model
 		@SetUseType SIMPLE_USE
+		if @Model
+			@SetModel @Model
 
 		if @Links
 			newLinks = {}
@@ -32,25 +24,20 @@ ENT.Initialize = =>
 	else
 		@SetRenderBounds @OBBMins!, @OBBMaxs!
 
-ENT.Draw = =>
-	@DrawModel!
+if SERVER
+	ENT.Use = (ply) =>
+		if SERVER
+			if playerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
+				GAMEMODE\Player_Vent playerTable, @
 
-ENT.Use = (ply) =>
-	if SERVER
-		if playerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
-			GAMEMODE\Player_Vent playerTable, @
+	ENT.KeyValue = (key, value) =>
+		if key == "model"
+			@Model = value
 
-ENT.KeyValue = (key, value) =>
-	if key == "model"
-		@Model = value
+		if key == "Link"
+			@Links or= {}
+			if name = string.match(value, "([^,]+),")
+				@Links[name] = true
 
-	if key == "Link"
-		@Links or= {}
-		if name = string.match(value, "([^,]+),")
-			@Links[name] = true
-
-	if key == "viewangle"
-		@ViewAngle = Angle value
-
-ENT.Draw = =>
-	@DrawModel!
+		if key == "viewangle"
+			@ViewAngle = Angle value
