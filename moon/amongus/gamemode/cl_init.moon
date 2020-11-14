@@ -3,6 +3,7 @@ export GAMEMODE = GAMEMODE or GM
 include "shared.lua"
 include "sh_gamedata.lua"
 include "sh_lang.lua"
+include "meta/sh_player.lua"
 include "cl_hud.lua"
 include "cl_net.lua"
 include "cl_render.lua"
