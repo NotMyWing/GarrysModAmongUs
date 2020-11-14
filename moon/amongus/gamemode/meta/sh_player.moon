@@ -4,13 +4,13 @@ with FindMetaTable "Player"
 	.IsPlaying        = => not not GAMEMODE.GameData.Lookup_PlayerByEntity[@]
 	.IsDead           = => not not GAMEMODE.GameData.DeadPlayers[@GetAUPlayerTable!]
 	.IsInVent         = =>
-		if CLIENT
-			GAMEMODE.GameData.Vented[@GetAUPlayerTable!]
+		if CLIENT and @ == LocalPlayer!
+			GAMEMODE.GameData.Vented
 		else
 			GAMEMODE.GameData.Vented[@GetAUPlayerTable!]
 
 	.GetCurrentVGUI = =>
-		if CLIENT
+		if CLIENT and @ == LocalPlayer!
 			GAMEMODE.Hud.CurrentVGUI
 		else
 			GAMEMODE.GameData.CurrentVGUI[@GetAUPlayerTable!]
