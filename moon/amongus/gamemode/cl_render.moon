@@ -130,65 +130,57 @@ color_crew = Color 255, 255, 255
 color_imposter = Color 255, 0, 0
 color_black = Color 0, 0, 0, 128
 
-hook.Add "PostDrawTranslucentRenderables", "NMW AU Nicknames", (depth, skybox) ->
-	-- No skyboxes.
-	if skybox
-		return
+hook.Add "PostPlayerDraw", "NMW AU Nicknames", (ply) ->
+	-- Don't draw our nickname.
+	-- Don't draw ghost nicknames.
+	-- Don't draw invalid players' nicknames... what?
+	return if not ply\IsValid! or ply\IsDormant! or ply == LocalPlayer!
 
 	-- No drawing if something doesn't want us to draw.
-	if true == hook.Call "GMAU PreDrawNicknames"
-		return
+	return if true == hook.Call "GMAU PreDrawNicknames"
 
-	for ply in *GAMEMODE.Util.SortByDistance player.GetAll!, LocalPlayer!\GetPos!
-		-- Don't draw our nickname.
-		-- Don't draw ghost nicknames.
-		-- Don't draw invalid players' nicknames... what?
-		if not ply\IsValid! or ply\IsDormant! or ply == LocalPlayer!
-			continue
+	-- Position the text directly above the player's head.
+	pos = ply\OBBMaxs!
+	pos += ply\GetPos! + Vector -pos.x, -pos.y, 2
 
-		-- Position the text directly above the player's head.
-		pos = ply\OBBMaxs!
-		pos += ply\GetPos! + Vector -pos.x, -pos.y, 2
+	-- Calculate the text angle.
+	angle = (pos - LocalPlayer!\GetPos!)\Angle!
+	angle = Angle angle.p, angle.y, 0
+	angle.y += 10 * math.sin CurTime!
 
-		-- Calculate the text angle.
-		angle = (pos - LocalPlayer!\GetPos!)\Angle!
-		angle = Angle angle.p, angle.y, 0
-		angle.y += 10 * math.sin CurTime!
+	calculated = {
+		player: ply
+		playerPos: pos
+		textAngle: angle
+	}
 
-		calculated = {
-			player: ply
-			playerPos: pos
-			textAngle: angle
-		}
+	-- Pass the table to hooks.
+	-- If something returned `true`, pass.
+	return if true == hook.Call "GMAU CalcNicknames", nil, calculated
 
-		-- Pass the table to hooks.
-		-- If something returned `true`, pass.
-		if true == hook.Call "GMAU CalcNicknames", nil, calculated
-			continue
+	-- Rotation shenanigans.
+	calculated.textAngle\RotateAroundAxis calculated.textAngle\Up!, -90
+	calculated.textAngle\RotateAroundAxis calculated.textAngle\Forward!, 90
 
-		-- Rotation shenanigans.
-		calculated.textAngle\RotateAroundAxis calculated.textAngle\Up!, -90
-		calculated.textAngle\RotateAroundAxis calculated.textAngle\Forward!, 90
+	-- Draw the actual 3D2D text above the player in question.
+	cam.Start3D2D calculated.playerPos, calculated.textAngle, 0.075
+	do
+		-- Draw a "better" outline.
+		passes = 4
+		for i = -passes/2, passes/2
+			for j = -passes/2, passes/2
+				if i == 0 or j == 0
+					continue
 
-		-- Draw the actual 3D2D text above the player in question.
-		cam.Start3D2D calculated.playerPos, calculated.textAngle, 0.075
-		do
-			-- Draw a "better" outline.
-			passes = 4
-			for i = -passes/2, passes/2
-				for j = -passes/2, passes/2
-					if i == 0 or j == 0
-						continue
+				offsetX = 2 * i
+				offsetY = 2 * j
+				draw.SimpleText ply\Nick!, "NMW AU Meeting Button",
+					offsetX, offsetY, color_black, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER
 
-					offsetX = 2 * i
-					offsetY = 2 * j
-					draw.SimpleText ply\Nick!, "NMW AU Meeting Button",
-						offsetX, offsetY, color_black, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER
+		color = if ply\IsImposter!
+			color_imposter
+		else
+			color_crew
 
-			color = if ply\IsImposter!
-				color_imposter
-			else
-				color_crew
-
-			draw.SimpleText ply\Nick!, "NMW AU Meeting Button", 0, 0, color, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER
-		cam.End3D2D!
+		draw.SimpleText ply\Nick!, "NMW AU Meeting Button", 0, 0, color, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER
+	cam.End3D2D!
