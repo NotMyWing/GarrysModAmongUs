@@ -332,7 +332,7 @@ GM.TracePlayer = (ply) =>
 	usable = {}
 	killable = {}
 
-	playerTable = @GameData.Lookup_PlayerByEntity[ply]
+	playerTable = ply\GetAUPlayerTable!
 	if not playerTable or (SERVER and @GameData.Vented[playerTable]) or (CLIENT and @GameData.Vented)
 		return
 

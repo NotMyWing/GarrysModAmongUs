@@ -1,6 +1,10 @@
 skipPlaceholder = { id: 0 }
 
 GM.Meeting_Start = (ply, bodyColor) =>
+	if "Player" == type ply
+		ply = ply\GetAUPlayerTable!
+	return unless ply
+
 	if not @IsGameInProgress!
 		return
 

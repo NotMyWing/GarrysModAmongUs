@@ -185,8 +185,7 @@ hook.Add "PostDrawTranslucentRenderables", "NMW AU Nicknames", (depth, skybox) -
 					draw.SimpleText ply\Nick!, "NMW AU Meeting Button",
 						offsetX, offsetY, color_black, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER
 
-			playerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
-			color = if playerTable and GAMEMODE.GameData.Imposters[playerTable]
+			color = if ply\IsImposter!
 				color_imposter
 			else
 				color_crew

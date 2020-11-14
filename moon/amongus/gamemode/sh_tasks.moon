@@ -101,7 +101,7 @@ else
 				break
 
 		totalTasks = 0
-		@GameData.Tasks = {}
+		table.Empty @GameData.Tasks
 
 		-- Assign tasks to each player, including imposters.
 		-- Imposters get tasks too, but can't complete them and their

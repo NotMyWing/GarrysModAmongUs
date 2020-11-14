@@ -68,6 +68,10 @@ if CLIENT
 
 else
 	GM.Sabotage_Start = (playerTable, id) =>
+		if "Player" == type playerTable
+			playerTable = playerTable\GetAUPlayerTable!
+		return unless playerTable
+
 		if not @IsMeetingInProgress! and
 			@GameData.Imposters[playerTable] and
 			not @GameData.Vented[playerTable] and
@@ -82,12 +86,20 @@ else
 						instance\Start!
 
 	GM.Sabotage_OpenVGUI = (playerTable, sabotage, button, callback) =>
+		if "Player" == type playerTable
+			playerTable = playerTable\GetAUPlayerTable!
+		return unless playerTable
+
 		@Player_OpenVGUI playerTable, sabotage\GetVGUIID!, {
 			sabotageId: sabotage\GetID!
 			:button
 		}, callback
 
 	GM.Sabotage_Submit = (playerTable, data) =>
+		if "Player" == type playerTable
+			playerTable = playerTable\GetAUPlayerTable!
+		return unless playerTable
+
 		sabotage = @GameData.Lookup_SabotageByVGUIID[@GameData.CurrentVGUI[playerTable]]
 		if sabotage and sabotage\GetActive!
 			sabotage\Submit playerTable, data

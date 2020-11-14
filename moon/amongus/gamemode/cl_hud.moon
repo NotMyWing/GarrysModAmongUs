@@ -94,7 +94,11 @@ GM.HUD_DisplayMeeting = (caller, bodyColor) =>
 -- @param imposter If confirms are enabled, was this person an imposter?
 -- @param remaining If confirms are enabled, how many imposters left?
 -- @param total If confirms are enabled, how many imposters there are total?
-GM.HUD_DisplayEject = (reason, playerTable, confirm, imposter, remaining, total) =>
+GM.HUD_DisplayEject = (reason, ply, confirm, imposter, remaining, total) =>
+	if "Player" == type ply
+		ply = ply\GetAUPlayerTable!
+	return unless ply
+
 	if IsValid @Hud
 		if IsValid @Hud.Eject
 			@Hud.Meeting\Remove!
@@ -102,7 +106,7 @@ GM.HUD_DisplayEject = (reason, playerTable, confirm, imposter, remaining, total)
 		@HUD_CloseMap!
 
 		@Hud.Eject = with @Hud\Add VGUI_EJECT
-			\Eject reason, playerTable, confirm, imposter, remaining, total
+			\Eject reason, ply, confirm, imposter, remaining, total
 
 --- Displays the game over screen.
 -- @see shared.GameOverReason
@@ -132,6 +136,14 @@ GM.HUD_DisplayShush = =>
 -- @param killer The killer.
 -- @param victim The killed.
 GM.HUD_PlayKill = (killer, victim) =>
+	if "Player" == type killer
+		killer = killer\GetAUPlayerTable!
+	return unless killer
+
+	if "Player" == type victim
+		victim = victim\GetAUPlayerTable!
+	return unless victim
+
 	if IsValid @Hud
 		if IsValid @Hud.Kill
 			@Hud.Kill\Remove!

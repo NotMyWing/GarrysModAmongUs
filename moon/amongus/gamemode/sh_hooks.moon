@@ -21,10 +21,7 @@ hook.Add "Move", "NMW AU Move", (ply, mvd) ->
 			return true
 
 hook.Add "PlayerFootstep", "NMW AU Footsteps", (ply) ->
-	aply = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
-	if GAMEMODE.GameData.DeadPlayers and GAMEMODE.GameData.DeadPlayers[aply]
-		return true
+	return true if ply\IsDead!
 
 hook.Add "EntityEmitSound", "NMW AU Ragdoll Sounds", (t) ->
-	if IsValid(t.Entity) and t.Entity\GetClass! == "prop_ragdoll"
-		return false
+	return false if IsValid(t.Entity) and t.Entity\GetClass! == "prop_ragdoll"

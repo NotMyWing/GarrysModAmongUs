@@ -22,6 +22,7 @@ with GM
 			.KillCooldowns          or= {}
 			.CurrentVGUI            or= {}
 			.VGUICallback           or= {}
+			.Tasks                  or= {}
 
 			.Lookup_SabotageByVGUIID or= {}
 

@@ -27,6 +27,10 @@ GM.Player_UnhideEveryone = =>
 --- Sets the player as dead.
 -- @param playerTable Player table.
 GM.Player_SetDead = (playerTable) =>
+	if "Player" == type playerTable
+		playerTable = playerTable\GetAUPlayerTable!
+	return unless playerTable
+
 	if IsValid playerTable.entity
 		color = playerTable.entity\GetColor!
 		color.a = 90
@@ -53,6 +57,14 @@ GM.Player_SetDead = (playerTable) =>
 -- @param victimTable Victim player table.
 -- @param attackerTable Attacker player table.
 GM.Player_Kill = (victimTable, attackerTable) =>
+	if "Player" == type victimTable
+		victimTable = victimTable\GetAUPlayerTable!
+	return unless victimTable
+
+	if "Player" == type attackerTable
+		attackerTable = attackerTable\GetAUPlayerTable!
+	return unless attackerTable
+
 	-- Bail if one of the players is invalid. The game mode will handle the killing internally.
 	if not (IsValid(victimTable.entity) and IsValid(victimTable.entity))
 		return
@@ -110,6 +122,10 @@ GM.Player_Kill = (victimTable, attackerTable) =>
 --- Bumps the kill cooldown of a player.
 -- @param playerTable Player table.
 GM.Player_RefreshKillCooldown = (playerTable) =>
+	if "Player" == type playerTable
+		playerTable = playerTable\GetAUPlayerTable!
+	return unless playerTable
+
 	cd = CurTime! + @ConVarSnapshots.KillCooldown\GetFloat!
 	@GameData.KillCooldowns[playerTable] = cd
 
@@ -119,6 +135,10 @@ GM.Player_RefreshKillCooldown = (playerTable) =>
 --- Pauses the kill cooldown of a player.
 -- @param playerTable Player table.
 GM.Player_PauseKillCooldown = (playerTable, pause = true) =>
+	if "Player" == type playerTable
+		playerTable = playerTable\GetAUPlayerTable!
+	return unless playerTable
+
 	if @GameData.KillCooldowns[playerTable]
 		if pause
 			remainder = math.max 0, @GameData.KillCooldowns[playerTable] - CurTime!
@@ -137,6 +157,10 @@ GM.Player_PauseKillCooldown = (playerTable, pause = true) =>
 -- Convenience wrapper.
 -- @param playerTable Player table.
 GM.Player_UnPauseKillCooldown = (playerTable) =>
+	if "Player" == type playerTable
+		playerTable = playerTable\GetAUPlayerTable!
+	return unless playerTable
+
 	@Player_PauseKillCooldown playerTable, false
 
 --- Helper function that packs all known vent links into a table of strings.
@@ -153,6 +177,10 @@ packVentLinks = (vent) ->
 -- @param playerTable Player table.
 -- @param targetVentId Target vent ID. Must a string. Vent IDs are currently defined in Hammer per-vent.
 GM.Player_VentTo = (playerTable, targetVentId) =>
+	if "Player" == type playerTable
+		playerTable = playerTable\GetAUPlayerTable!
+	return unless playerTable
+
 	vent = @GameData.Vented[playerTable]
 
 	if vent and vent.Links and @GameData.Imposters[playerTable] and IsValid(vent.Links[targetVentId]) and (@GameData.VentCooldown[playerTable] or 0) <= CurTime!
@@ -173,6 +201,10 @@ GM.Player_VentTo = (playerTable, targetVentId) =>
 -- @param playerTable Player table.
 -- @param vent Vent entity.
 GM.Player_Vent = (playerTable, vent) =>
+	if "Player" == type playerTable
+		playerTable = playerTable\GetAUPlayerTable!
+	return unless playerTable
+
 	if not @GameData.DeadPlayers[playerTable] and @GameData.Imposters[playerTable] and not @GameData.Vented[playerTable]
 		if IsValid playerTable.entity
 			@Net_NotifyVent playerTable, @VentNotifyReason.Vent, packVentLinks vent
@@ -202,6 +234,10 @@ GM.Player_Vent = (playerTable, vent) =>
 -- You don't have to check.
 -- @param playerTable Player table.
 GM.Player_UnVent = (playerTable, instant) =>
+	if "Player" == type playerTable
+		playerTable = playerTable\GetAUPlayerTable!
+	return unless playerTable
+
 	if vent = @GameData.Vented[playerTable]
 		@Player_UnPauseKillCooldown playerTable
 		@GameData.VentCooldown[playerTable] = CurTime! + 1.5
@@ -226,6 +262,10 @@ GM.Player_UnVent = (playerTable, instant) =>
 --- Closes the current VGUI if the player has any opened.
 -- @param playerTable Player table.
 GM.Player_CloseVGUI = (playerTable) =>
+	if "Player" == type playerTable
+		playerTable = playerTable\GetAUPlayerTable!
+	return unless playerTable
+
 	currentVGUI = @GameData.CurrentVGUI[playerTable]
 
 	if currentVGUI
@@ -239,6 +279,10 @@ GM.Player_CloseVGUI = (playerTable) =>
 --- This function returns whether the player can open a new VGUI.
 -- @param playerTable Player table.
 GM.Player_CanOpenVGUI = (playerTable) =>
+	if "Player" == type playerTable
+		playerTable = playerTable\GetAUPlayerTable!
+	return unless playerTable
+
 	if @GameData.KillCooldownRemainders[playerTable]
 		return false
 
@@ -262,6 +306,10 @@ GM.Player_CanOpenVGUI = (playerTable) =>
 -- @param data Extra data to pass to the client.
 -- @param callback Optional callback to call when the GUI is closed.
 GM.Player_OpenVGUI = (playerTable, vgui, data = {}, callback) =>
+	if "Player" == type playerTable
+		playerTable = playerTable\GetAUPlayerTable!
+	return unless playerTable
+
 	if not @Player_CanOpenVGUI playerTable
 		return false
 
@@ -309,7 +357,7 @@ hook.Add "PlayerInitialSpawn", "NMW AU AutoPilot", (ply) -> with GAMEMODE
 				.Logger.Info "Upcoming rounds will now be managed manually"
 
 			\SetOnAutoPilot newAutoPilot
-	
+
 	return
 
 hook.Add "PlayerDisconnected", "NMW AU AutoPilot", (ply) -> with GAMEMODE
@@ -340,13 +388,13 @@ hook.Add "EntityTakeDamage", "NMW AU Damage", (target, dmg) ->
 	dmg\ScaleDamage 0
 
 -- Handle body reports.
-hook.Add "PlayerUse", "NMW AU Use", (activator, ent) ->
-	aply = GAMEMODE.GameData.Lookup_PlayerByEntity[activator]
-	if aply and GAMEMODE\IsGameInProgress!
+hook.Add "PlayerUse", "NMW AU UseBody", (activator, ent) ->
+	playerTable = activator\GetAUPlayerTable!
+	if playerTable and GAMEMODE\IsGameInProgress!
 		bodyid = ent\GetNW2Int "NMW AU PlayerID"
 		victim = GAMEMODE.GameData.Lookup_PlayerByID[bodyid]
 		if victim
-			GAMEMODE\Meeting_Start activator, victim.color
+			GAMEMODE\Meeting_Start playerTable, victim.color
 
 	return
 
