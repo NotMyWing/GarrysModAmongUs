@@ -347,6 +347,10 @@ GM.TracePlayer = (ply) =>
 		if not ent\GetModel! or ent\GetModelRadius! == 0
 			continue
 
+		-- Don't match triggers.
+		if string.match ent\GetClass!, "^trigger_"
+			continue
+
 		-- Task buttons.
 		if ent\GetClass! == "func_task_button" or ent\GetClass! == "prop_task_button"
 			name = ent\GetTaskName!
@@ -419,6 +423,9 @@ GM.TracePlayer = (ply) =>
 
 	GAMEMODE.Util.SortByDistance usable, lookPos
 	GAMEMODE.Util.SortByDistance killable, lookPos
+
+	if SERVER
+		PrintTable usable
 
 	return killable[#killable], usable[#usable]
 
