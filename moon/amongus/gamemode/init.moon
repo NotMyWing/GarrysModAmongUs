@@ -12,6 +12,7 @@ include "sv_resources.lua"
 include "sv_player.lua"
 include "sv_meeting.lua"
 include "sv_game.lua"
+include "sv_footsteps.lua"
 
 include "sh_hooks.lua"
 include "sh_tasks.lua"
