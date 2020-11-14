@@ -13,6 +13,8 @@ sabotageBase = {
 
 	--- Starts the sabotage.
 	Start: =>
+		return if true == hook.Call "GMAU SabotageStart", nil, @
+
 		if SERVER
 			@SetActive true
 
@@ -25,14 +27,18 @@ sabotageBase = {
 
 	--- Ends the sabotage.
 	End: =>
+		return if true == hook.Call "GMAU SabotageEnd", nil, @
+
 		if SERVER
 			@SetActive false
 
 		@OnEnd!
 
 	--- Internal function.
-	-- Only when a player submits arbitrary data through VGUI.
+	-- Called only when a player submits arbitrary data through VGUI.
 	Submit: (playerTable, data) =>
+		return if true == hook.Call "GMAU SabotageSubmit", nil, @
+
 		@OnSubmit playerTable, data
 
 	--- Refreshes the sabotage cooldown.
@@ -108,9 +114,9 @@ sabotageBase = {
 
 		if CLIENT
 			if value
-				@OnStart!
+				@Start!
 			else
-				@OnEnd!
+				@End!
 		else
 			@SetDirty!
 
