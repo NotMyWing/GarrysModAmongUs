@@ -7,6 +7,7 @@ include "vgui/vgui_sabotage_base.lua"
 include "vgui/vgui_gui_base.lua"
 include "vgui/vgui_map_base.lua"
 include "vgui/vgui_task_placeholder.lua"
+include "vgui/vgui_crewmate.lua"
 
 VGUI_HUD = include "vgui/vgui_hud.lua"
 VGUI_MEETING = include "vgui/vgui_meeting.lua"
@@ -289,19 +290,9 @@ GM.HUD_InitializeMap = =>
 		localPlayerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
 		if localPlayerTable
 			size = 0.04 * math.min ScrW!, ScrH!
-			player = with \Add "DPanel"
+			player = with \Add "AmongUsCrewmate"
 				\SetSize size, size
-				.Paint = ->
-
-				-- A slightly unreadable chunk of garbage code
-				-- responsible for layering the crewmate sprite.
-				layers = {}
-				for i = 1, 2
-					with layers[i] = \Add "DPanel"
-						\Dock FILL
-						.Image = CREW_LAYERS[i]
-						.Paint = GAMEMODE.Render.DermaFitImage
-				layers[1].Color = localPlayerTable.color
+				\SetColor localPlayerTable.color
 
 			\Track LocalPlayer!, player
 
