@@ -252,11 +252,6 @@ GM.HUD_CreateTaskCompletePopup = =>
 			\MoveTo 0, -\GetTall!, 0.25, 0.75, nil, ->
 				\Remove!
 
-CREW_LAYERS = {
-	Material "au/gui/crewmateicon/crewmate1.png", "smooth"
-	Material "au/gui/crewmateicon/crewmate2.png", "smooth"
-}
-
 GM.HUD_CloseVGUI = =>
 	if IsValid @Hud.CurrentVGUI
 		if @Hud.CurrentVGUI.Close

@@ -109,17 +109,6 @@ meeting.PlayBackground = (callback) =>
 				surface.DisableClipping false
 			cam.PopModelMatrix!
 
-
-CREW_LAYERS = {
-	Material "au/gui/crewmateicon/crewmate1.png", "smooth"
-	Material "au/gui/crewmateicon/crewmate2.png", "smooth"
-}
-
-CREW_MINI_LAYERS = {
-	Material "au/gui/meeting/crewmate_mini1.png", "smooth"
-	Material "au/gui/meeting/crewmate_mini2.png", "smooth"
-}
-
 --- Removes all confirm popups.
 -- Kind of redundant, honestly.
 meeting.PurgeConfirms = =>
@@ -422,12 +411,10 @@ meeting.OpenDiscuss = (caller) =>
 										-- responsible for layering the crewmate sprite.
 										layers = {}
 										for i = 1, 2
-											with layers[i] = crew\Add "DPanel"
+											with layers[i] = crew\Add "AmongUsCrewmate"
 												\SetSize crew\GetTall! * 0.8, crew\GetTall! * 0.8
 												\SetPos crew\GetWide! / 2 - \GetWide! / 2, crew\GetTall! / 2 - \GetTall! / 2
-												.Image = CREW_LAYERS[i]
-												.Paint = GAMEMODE.Render.DermaFitImage
-										layers[1].Color = ply.color
+												\SetColor ply.color
 
 										-- Create the red cross overlay if the player is kil.
 										if not alive then
@@ -676,15 +663,14 @@ meeting.End = (results = {}) =>
 
 					layers = {}
 					for i = 1, 2
-						with layers[i] = \Add "DPanel"
+						with layers[i] = \Add "AmongUsCrewmate"
 							\SetSize outputPanel\GetTall! * 0.8, outputPanel\GetTall! * 0.8
 							\SetPos outputPanel\GetTall! * 0.1, outputPanel\GetTall! * 0.1
-							.Image = CREW_MINI_LAYERS[i]
-							.Paint = GAMEMODE.Render.DermaFitImage
+							\SetFlipX true
 
-					aply = GAMEMODE.GameData.Lookup_PlayerByID[voter]
-					if aply
-						layers[1].Color = aply.color
+							playerTable = GAMEMODE.GameData.Lookup_PlayerByID[voter]
+							if playerTable
+								\SetColor playerTable.color
 
 					.Paint = ->
 

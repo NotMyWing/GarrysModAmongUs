@@ -63,11 +63,6 @@ hud.SetTaskbarValue = (value) =>
 
 		@taskbar\SizeTo refW * value, refH, 2, 0.1
 
-CREW_LAYERS = {
-	Material "au/gui/crewmateicon/crewmate1.png", "smooth"
-	Material "au/gui/crewmateicon/crewmate2.png", "smooth"
-}
-
 hud.SetupButtons = (state, impostor) =>
 	localPlayerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
 
@@ -178,11 +173,10 @@ hud.SetupButtons = (state, impostor) =>
 								-- responsible for layering the crewmate sprite.
 								layers = {}
 								for i = 1, 2
-									with layers[i] = \Add "DPanel"
+									with layers[i] = \Add "AmongUsCrewmate"
 										\Dock FILL
-										.Image = CREW_LAYERS[i]
-										.Paint = GAMEMODE.Render.DermaFitImage
-								layers[1].Color = Color 255, 0, 0
+										\SetColor Color 255, 0, 0
+										\SetFlipX true
 
 							-- Label
 							with \Add "DLabel"
