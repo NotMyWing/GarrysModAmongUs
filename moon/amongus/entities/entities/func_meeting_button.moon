@@ -68,6 +68,8 @@ if CLIENT
 
 	COLOR_BLACK = Color 0, 0, 0, 128
 	ENT.DrawTranslucent = =>
+		@DrawModel!
+
 		if not GAMEMODE\IsGameInProgress!
 			return
 
