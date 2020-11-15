@@ -58,15 +58,14 @@ GM.Meeting_Start = (playerTable, bodyColor) =>
 			table.Empty @GameData.VotesMap
 
 			if @ConVarSnapshots.MeetingBotVote\GetBool!
-				for _, ply in ipairs player.GetAll!
+				for ply in *player.GetAll!
 					if ply\IsBot!
-						handle = "BotVote #{ply\Nick!}"
-						GAMEMODE.GameData.Timers[handle] = true
+						botHandle = "BotVote #{ply\Nick!}"
+						GAMEMODE.GameData.Timers[botHandle] = true
 
 						time = (math.random 1, 50 * math.min 5, @ConVarSnapshots.VoteTime\GetInt!) / 50
-
-						timer.Create handle, time, 1, ->
-							GAMEMODE.GameData.Timers[handle] = nil
+						timer.Create botHandle, time, 1, ->
+							GAMEMODE.GameData.Timers[botHandle] = nil
 
 							skip = math.random! > 0.8
 							rnd = table.Random @GetAlivePlayers!
