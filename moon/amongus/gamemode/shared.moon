@@ -424,9 +424,6 @@ GM.TracePlayer = (ply) =>
 	GAMEMODE.Util.SortByDistance usable, lookPos
 	GAMEMODE.Util.SortByDistance killable, lookPos
 
-	if SERVER
-		PrintTable usable
-
 	return killable[#killable], usable[#usable]
 
 --- Returns whether the game is progress.
