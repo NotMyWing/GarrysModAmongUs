@@ -152,13 +152,13 @@ map = {
 		@MoveTo 0, 0, 0.2, nil, nil, ->
 			@__opening = false
 
+			if @OnOpen
+				@OnOpen!
+
 		@SetAlpha 0
 		@AlphaTo 255, 0.1, 0.01
 
-		surface.PlaySound "au/panel_genericappear.wav"
-
-		if @OnOpen
-			@OnOpen!
+		surface.PlaySound "au/panel_genericappear.wav"!
 
 	Close: =>
 		if not @__opened or @__opening or @__closing
@@ -173,8 +173,8 @@ map = {
 			surface.PlaySound "au/panel_genericdisappear.wav"
 			@SetMouseInputEnabled false
 
-		if @OnClose
-			@OnClose!
+			if @OnClose
+				@OnClose!
 
 	Paint: =>
 
