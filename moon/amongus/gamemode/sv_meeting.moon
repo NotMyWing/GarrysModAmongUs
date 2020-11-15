@@ -1,17 +1,15 @@
 skipPlaceholder = { id: 0 }
 
-GM.Meeting_Start = (ply, bodyColor) =>
-	if "Player" == type ply
-		ply = ply\GetAUPlayerTable!
-	return unless ply
+GM.Meeting_Start = (playerTable, bodyColor) =>
+	if "Player" == type playerTable
+		playerTable = playerTable\GetAUPlayerTable!
+	return unless playerTable
 
 	if not @IsGameInProgress!
 		return
 
-	aply = @GameData.Lookup_PlayerByEntity[ply]
-
 	handle = "meeting"
-	if @GameData.DeadPlayers[aply]
+	if @GameData.DeadPlayers[playerTable]
 		return
 
 	if timer.Exists handle
@@ -27,53 +25,55 @@ GM.Meeting_Start = (ply, bodyColor) =>
 	@Sabotage_EndNonPersistent!
 	@SetMeetingInProgress true
 
+	hook.Call "GMAU MeetingStart"
+	@Net_BroadcastDead!
+	@Net_BroadcastMeeting playerTable, bodyColor
+	if bodyColor
+		@Logger.Info "#{playerTable.nickname} has found a body! Calling a meeting"
+	else
+		@Logger.Info "#{playerTable.nickname} has called a meeting"
+
 	@GameData.Timers[handle] = true
-	timer.Create handle, 0.2, 1, ->
-		hook.Call "GMAU MeetingStart"
-		@Net_BroadcastDead!
-		@Net_BroadcastMeeting aply, bodyColor
-		if bodyColor
-			@Logger.Info "#{ply\Nick!} has found a body! Calling a meeting"
-		else
-			@Logger.Info "#{ply\Nick!} has called a meeting"
+	timer.Create handle, 3, 1, ->
+		spawns = ents.FindByClass "info_player_start"
+		for index, otherPlayerTable in ipairs @GameData.PlayerTables
+			if IsValid otherPlayerTable.entity
+				with otherPlayerTable.entity
+					point = spawns[(index % #spawns) + 1]
+					\SetPos point\GetPos!
+					\SetAngles point\GetAngles!
+					\SetEyeAngles point\GetAngles!
 
-		timer.Create handle, 3, 1, ->
-			spawns = ents.FindByClass "info_player_start"
-			for index, ply in ipairs @GameData.PlayerTables
-				if IsValid ply.entity
-					with ply.entity
-						point = spawns[(index % #spawns) + 1]
-						\SetPos point\GetPos!
-						\SetAngles point\GetAngles!
-						\SetEyeAngles point\GetAngles!
+					if @GameData.Vented[otherPlayerTable] and not @GameData.DeadPlayers[otherPlayerTable]
+						@Player_Unhide otherPlayerTable.entity
+						@Player_UnPauseKillCooldown otherPlayerTable
+						@Net_NotifyVent otherPlayerTable, @VentNotifyReason.UnVent
+						@GameData.Vented[otherPlayerTable] = false
 
-						if @GameData.Vented[ply] and not @GameData.DeadPlayers[ply]
-							@Player_Unhide playerTable.entity
-							@Player_UnPauseKillCooldown playerTable
-							@Net_NotifyVent ply, @VentNotifyReason.UnVent
-							@GameData.Vented[ply] = false
+		@Net_BroadcastDiscuss playerTable
 
-			@Net_BroadcastDiscuss aply
+		timer.Create handle, @ConVarSnapshots.VotePreTime\GetInt! + 3, 1, ->
+			@GameData.Voting = true
+			table.Empty @GameData.Votes
+			table.Empty @GameData.VotesMap
 
-			timer.Create handle, @ConVarSnapshots.VotePreTime\GetInt! + 3, 1, ->
-				@GameData.Voting = true
-				table.Empty @GameData.Votes
-				table.Empty @GameData.VotesMap
+			if @ConVarSnapshots.MeetingBotVote\GetBool!
+				for _, ply in ipairs player.GetAll!
+					if ply\IsBot!
+						handle = "BotVote #{ply\Nick!}"
+						GAMEMODE.GameData.Timers[handle] = true
 
-				if @ConVarSnapshots.MeetingBotVote\GetBool!
-					for _, ply in ipairs player.GetAll!
-						if ply\IsBot!
-							handle = "BotVote #{ply\Nick!}"
-							GAMEMODE.GameData.Timers[handle] = true
-							timer.Create handle, (math.random 1, 50 * math.min 5, @ConVarSnapshots.VoteTime\GetInt!) / 50, 1, ->
-								GAMEMODE.GameData.Timers[handle] = nil
+						time = (math.random 1, 50 * math.min 5, @ConVarSnapshots.VoteTime\GetInt!) / 50
 
-								skip = math.random! > 0.8
-								rnd = table.Random @GetAlivePlayers!
-								@Meeting_Vote @GameData.Lookup_PlayerByEntity[ply], not skip and rnd
+						timer.Create handle, time, 1, ->
+							GAMEMODE.GameData.Timers[handle] = nil
 
-				timer.Create handle, @ConVarSnapshots.VoteTime\GetInt!, 1, ->
-					@Meeting_End!
+							skip = math.random! > 0.8
+							rnd = table.Random @GetAlivePlayers!
+							@Meeting_Vote ply\GetAUPlayerTable!, not skip and rnd
+
+			timer.Create handle, @ConVarSnapshots.VoteTime\GetInt!, 1, ->
+				@Meeting_End!
 
 	return true
 
