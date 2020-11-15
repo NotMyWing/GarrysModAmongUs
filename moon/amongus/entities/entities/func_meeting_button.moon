@@ -12,7 +12,7 @@ if CLIENT
 ENT.Base  = "base_anim"
 ENT.Type  = "anim"
 
-ENT.RenderGroup = RENDERGROUP_OPAQUE
+ENT.RenderGroup = RENDERGROUP_BOTH
 
 ENT.Initialize = =>
 	if SERVER
@@ -67,9 +67,7 @@ if CLIENT
 				TRANSLATE("meetingButton.default") LocalPlayer!\Nick!, LocalPlayer!\GetNW2Int "NMW AU Meetings"
 
 	COLOR_BLACK = Color 0, 0, 0, 128
-	ENT.Draw = =>
-		@DrawModel!
-
+	ENT.DrawTranslucent = =>
 		if not GAMEMODE\IsGameInProgress!
 			return
 
