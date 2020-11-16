@@ -176,6 +176,8 @@ meeting.CreateConfirm = (height, id) =>
 				\InvalidateLayout!
 				\AlphaTo 255, 0.1, 0
 
+COLOR_WHITE = Color 255, 255, 255
+
 meeting.OpenDiscuss = (caller) =>
 	with @discussWindow = @Add "DPanel"
 		newWidth, newHeight = GAMEMODE.Render.FitMaterial MAT_MEETING_TABLET.tablet,
@@ -196,14 +198,18 @@ meeting.OpenDiscuss = (caller) =>
 
 		.Image = MAT_MEETING_TABLET.tablet
 		.Paint = GAMEMODE.Render.DermaFitImage
+		if LocalPlayer!\IsDead!
+			.PaintOver = (_, w, h) ->
+				newWidth, newHeight = GAMEMODE.Render.FitMaterial MAT_MEETING_TABLET.shatter, w, h
 
-		-- Apply the broken screen overlay if we're dead.
-		if GAMEMODE.GameData.DeadPlayers[GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]]
-			with \Add "DPanel"
-				\SetSize newWidth, newHeight
-				\SetZPos 30001
-				.Image = MAT_MEETING_TABLET.shatter
-				.Paint = GAMEMODE.Render.DermaFitImage
+				surface.SetMaterial MAT_MEETING_TABLET.shatter
+				surface.SetDrawColor COLOR_WHITE
+
+				render.PushFilterMag TEXFILTER.ANISOTROPIC
+				render.PushFilterMin TEXFILTER.ANISOTROPIC
+				surface.DrawTexturedRect w/2 - newWidth/2, h/2 - newHeight/2, newWidth, newHeight
+				render.PopFilterMag!
+				render.PopFilterMin!
 
 		@buttons = {}
 
@@ -531,8 +537,7 @@ meeting.OpenDiscuss = (caller) =>
 		\AlphaTo 0, 0.1, 3, ->
 			\Remove!
 
-			@discussWindow\SetMouseInputEnabled true
-			gui.EnableScreenClicker true
+			@discussWindow\MakePopup!
 
 		.Paint = (_, w, h) ->
 			if not _.circle
