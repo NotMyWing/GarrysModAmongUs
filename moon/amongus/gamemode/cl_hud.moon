@@ -16,7 +16,7 @@ VGUI_SPLASH = include "vgui/vgui_splash.lua"
 VGUI_BLINK = include "vgui/vgui_blink.lua"
 VGUI_VENT = include "vgui/vgui_vent.lua"
 VGUI_KILL = include "vgui/vgui_kill.lua"
-VGUI_MAP = include "vgui/vgui_map.lua"
+VGUI_MAP = include "vgui/vgui_map.lua"	
 
 surface.CreateFont "NMW AU Button Tooltip", {
 	font: "Arial"
@@ -98,7 +98,6 @@ GM.HUD_DisplayMeeting = (caller, bodyColor) =>
 GM.HUD_DisplayEject = (reason, ply, confirm, imposter, remaining, total) =>
 	if "Player" == type ply
 		ply = ply\GetAUPlayerTable!
-	return unless ply
 
 	if IsValid @Hud
 		if IsValid @Hud.Eject
