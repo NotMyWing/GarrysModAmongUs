@@ -343,7 +343,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		oldActivationButton = instance\GetActivationButton!
 
 		for accessor, value in pairs packet
-			instance["Set#{accessor}"] instance, value
+			instance["Set#{accessor}"] instance, value ~= "_nil" and value
 
 		if not instance\GetCompleted!
 			if not wasCreated
@@ -400,7 +400,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 
 		if instance = GAMEMODE.GameData.Sabotages[id]
 			for accessor, value in pairs packet
-				instance["Set#{accessor}"] instance, value
+				instance["Set#{accessor}"] instance, value ~= "nil" and value
 
 	--
 	-- The server requested us to open a VGUI.

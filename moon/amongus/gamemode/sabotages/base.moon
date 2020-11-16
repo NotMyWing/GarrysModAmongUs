@@ -280,9 +280,10 @@ if SERVER
 				changed = false
 				for accessor in *accessors
 					value = @["Get#{accessor}"] @
+
 					if not oldData or value ~= oldData[accessor]
 						oldData[accessor] = value
-						packet[accessor] = value
+						packet[accessor] = value == nil and "_nil" or value
 						changed = true
 
 				if changed
