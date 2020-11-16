@@ -1,30 +1,37 @@
 TRANSLATE = GM.Lang.GetEntry
 
 surface.CreateFont "NMW AU Countdown", {
-	font: "Arial"
+	font: "Roboto"
 	size: ScreenScale 20
-	weight: 500
+	weight: 550
 	outline: true
 }
 
 surface.CreateFont "NMW AU Cooldown", {
-	font: "Arial"
+	font: "Roboto"
 	size: ScrH! * 0.125
-	weight: 500
+	weight: 550
 	outline: true
 }
 
 surface.CreateFont "NMW AU Taskbar", {
 	font: "Roboto"
-	size: ScrH! * 0.025
-	weight: 600
+	size: ScrH! * 0.026
+	weight: 550
 	outline: true
 }
 
 surface.CreateFont "NMW AU Start Subtext", {
-	font: "Arial"
+	font: "Roboto"
 	size: ScreenScale 10
 	weight: 500
+	outline: true
+}
+
+surface.CreateFont "NMW AU ConVar List", {
+	font: "Roboto"
+	size: ScrH! * 0.023
+	weight: 550
 	outline: true
 }
 
@@ -48,10 +55,10 @@ hud.Init = =>
 		@SetSize ScrW!, ScrH!
 
 	with @buttons = @Add "DPanel"
-		\SetTall ScrH! * 0.20
+		\SetTall ScrH! * 0.19
 
 		margin = ScreenScale 5
-		\DockMargin margin, margin, margin, margin
+		\DockMargin margin * 3, margin, margin * 3, margin
 		\Dock BOTTOM
 		\SetZPos -1
 
@@ -109,7 +116,7 @@ hud.SetupButtons = (state, impostor) =>
 						if value
 							i += 1
 
-							draw.SimpleText "#{TRANSLATE("cvar." .. conVarName)}: #{value}", "NMW AU Taskbar",
+							draw.SimpleText "#{TRANSLATE("cvar." .. conVarName)}: #{value}", "NMW AU ConVar List",
 								0, (i - 1) * tH * 1.05 + (categoryId - 1) * tH * 1.05, GAMEMODE\IsGameCommencing! and green or white
 
 		-- Round overlay.

@@ -1,7 +1,7 @@
 surface.CreateFont "NMW AU PlaceholderText", {
 	font: "Roboto"
 	size: ScreenScale 10
-	weight: 200
+	weight: 550
 }
 
 placeholder = {}

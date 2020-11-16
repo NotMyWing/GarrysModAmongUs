@@ -16,12 +16,12 @@ VGUI_SPLASH = include "vgui/vgui_splash.lua"
 VGUI_BLINK = include "vgui/vgui_blink.lua"
 VGUI_VENT = include "vgui/vgui_vent.lua"
 VGUI_KILL = include "vgui/vgui_kill.lua"
-VGUI_MAP = include "vgui/vgui_map.lua"	
+VGUI_MAP = include "vgui/vgui_map.lua"
 
 surface.CreateFont "NMW AU Button Tooltip", {
-	font: "Arial"
+	font: "Roboto"
 	size: ScreenScale 22
-	weight: 500
+	weight: 550
 	outline: true
 }
 
@@ -223,7 +223,7 @@ GM.HUD_Countdown = (time) =>
 surface.CreateFont "NMW AU Task Complete", {
 	font: "Roboto"
 	size: ScrH! * 0.06
-	weight: 400
+	weight: 550
 	outline: true
 }
 

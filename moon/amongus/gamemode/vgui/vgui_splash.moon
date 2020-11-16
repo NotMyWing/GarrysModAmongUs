@@ -1,21 +1,21 @@
 TRANSLATE = GM.Lang.GetEntry
 
 surface.CreateFont "NMW AU Role", {
-	font: "Roboto"
+	font: "System"
 	size: ScreenScale 80
-	weight: 500
+	weight: 550
 }
 
 surface.CreateFont "NMW AU Role Subtext", {
 	font: "Roboto"
 	size: ScreenScale 20
-	weight: 500
+	weight: 550
 }
 
 surface.CreateFont "NMW AU Splash Nickname", {
 	font: "Roboto"
 	size: ScreenScale 80
-	weight: 1000
+	weight: 550
 }
 
 splash = {}

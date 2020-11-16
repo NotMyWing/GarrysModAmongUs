@@ -1,21 +1,21 @@
 TRANSLATE = GM.Lang.GetEntry
 
 surface.CreateFont "NMW AU Meeting Nickname", {
-	font: "Arial"
+	font: "Roboto"
 	size: ScreenScale 15
-	weight: 500
+	weight: 550
 }
 
 surface.CreateFont "NMW AU Meeting Title", {
-	font: "Arial"
+	font: "Roboto"
 	size: ScreenScale 25
-	weight: 500
+	weight: 550
 }
 
 surface.CreateFont "NMW AU Meeting Time", {
-	font: "Arial"
+	font: "Roboto"
 	size: ScreenScale 16
-	weight: 500
+	weight: 550
 }
 
 

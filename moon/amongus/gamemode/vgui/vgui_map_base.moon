@@ -6,8 +6,8 @@ TRANSLATE = GM.Lang.GetEntry
 
 surface.CreateFont "NMW AU Map Labels", {
 	font: "Roboto"
-	size: 0.03 * math.min ScrW!, ScrH!
-	weight: 600
+	size: 0.025 * math.min ScrW!, ScrH!
+	weight: 550
 	outline: true
 }
 

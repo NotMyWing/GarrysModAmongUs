@@ -4,7 +4,7 @@ if CLIENT
 	surface.CreateFont "NMW AU Meeting Button", {
 		font: "Roboto"
 		size: ScrH! * 0.125
-		weight: 500
+		weight: 550
 		outline: false
 		antialias: true
 	}

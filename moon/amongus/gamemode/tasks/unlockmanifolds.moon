@@ -7,7 +7,7 @@ if CLIENT
 	surface.CreateFont "NMW AU Manifolds Text", {
 		font: "Roboto"
 		size: ScrH! * 0.5 / 8
-		weight: 200
+		weight: 550
 	}
 
 	taskTable.CreateVGUI = =>
@@ -18,7 +18,7 @@ if CLIENT
 				max_size = ScrH! * 0.5
 
 				\SetBackgroundColor Color 64, 64, 64
-				
+
 				-- Slightly less cursed things ahead.
 				buttons = GAMEMODE.Util.Shuffle [ i for i = 1, 10 ]
 				rows = 2
@@ -45,7 +45,7 @@ if CLIENT
 
 									val = buttons[(j - 1) * (#buttons/rows) + i]
 									\SetText val
-									
+
 									buttons[(j - 1) * (#buttons/rows) + i] = btn
 									.OnToggled = (_, state) ->
 										if val ~= currentStep

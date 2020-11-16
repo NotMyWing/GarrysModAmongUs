@@ -1,16 +1,16 @@
 TRANSLATE = GM.Lang.GetEntry
 
 surface.CreateFont "NMW AU Eject Text", {
-	font: "Arial"
+	font: "Roboto"
 	size: ScreenScale 20
-	weight: 500
+	weight: 550
 	outline: true
 }
 
 surface.CreateFont "NMW AU Eject Subtext", {
-	font: "Arial"
+	font: "Roboto"
 	size: ScreenScale 12
-	weight: 500
+	weight: 550
 	outline: true
 }
 
