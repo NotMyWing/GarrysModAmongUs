@@ -437,10 +437,7 @@ hook.Add "PlayerCanSeePlayersChat", "NMW AU DeadChat", (_, _, listener, talker) 
 	if not IsValid(listener) or not IsValid(talker)
 		return
 
-	listenerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[listener]
-	talkerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[talker]
-
-    if not GAMEMODE.GameData.DeadPlayers[listenerTable] or GAMEMODE.GameData.DeadPlayers[talkerTable]
-		return true
+    if not listener\IsDead! or talker\IsDead!
+		return false
 
 hook.Add "IsSpawnpointSuitable", "NMW AU SpawnSuitable", -> true

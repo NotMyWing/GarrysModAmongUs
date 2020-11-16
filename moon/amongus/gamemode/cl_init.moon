@@ -144,12 +144,13 @@ hook.Add "OnPlayerChat", "NMW AU DeadSay", (ply, text) ->
 	if GAMEMODE.ConVarSnapshots.DeadChat\GetBool! or not GAMEMODE\IsGameInProgress!
 		return
 
-	playerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
+	if not ply\IsValid!
+		return
 
-
-	chat.AddText (if GAMEMODE.GameData.DeadPlayers[playerTable]
+	ghostColor, ghostText = if ply.IsDead and ply\IsDead!
 		Color(255, 0, 0), "(GHOST CHAT) "
-	), ply\GetColor!, ply\Nick!, Color(255, 255, 255), ": ", Color(220, 220, 220), text
+
+	chat.AddText ghostColor, ghostText, ply\GetColor!, ply\Nick!, Color(255, 255, 255), ": ", ply\IsDead! and Color(220, 220, 220), text
 
 	return true
 
