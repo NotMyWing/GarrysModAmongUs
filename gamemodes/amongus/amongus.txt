@@ -145,5 +145,23 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
+
+		16
+		{
+			"name"		"au_dead_chat"
+			"text"		"Dead Chat"
+			"help"		"Should dead players be able to talk?"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
+
+		17
+		{
+			"name"		"au_game_chat"
+			"text"		"Game Chat"
+			"help"		"Should players be able to talk during the game?"
+			"type"		"CheckBox"
+			"default"	"0"
+		}
 	}
 }
