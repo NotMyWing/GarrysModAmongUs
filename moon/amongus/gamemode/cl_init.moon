@@ -23,6 +23,7 @@ GM.ConVarsDisplay = {
 			{ "Time" , "KillCooldown"    }
 			{ "Time" , "TimeLimit"       }
 			{ "Mod"  , "KillDistanceMod" }
+			{ "Bool" , "GameChat"        }
 			{ "Bool" , "DeadChat"        }
 		}
 	}

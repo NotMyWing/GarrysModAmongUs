@@ -337,6 +337,13 @@ GM.Net_OpenVGUI = (playerTable, data) =>
 	net.WriteTable data
 	net.Send playerTable.entity
 
+--- Sends a game chat error message to the player.
+-- @param messageData
+GM.Net_SendGameChatError = (playerTable) =>
+	net.Start "NMW AU Flow"
+	net.WriteUInt @FlowTypes.GameChatNotification, @FlowSize
+	net.Send playerTable.entity
+
 net.Receive "NMW AU Flow", (len, ply) ->
 	playerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
 

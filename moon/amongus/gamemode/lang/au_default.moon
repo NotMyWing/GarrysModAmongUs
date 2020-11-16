@@ -142,6 +142,7 @@ with GM.Lang\Get "en"
 		au_kill_cooldown:    "Kill Cooldown"
 		au_time_limit:       "Time Limit"
 		au_killdistance_mod: "Kill Distance"
+		au_game_chat:        "Talking During Game"
 		au_dead_chat:        "Dead Chat"
 
 		au_meeting_available: "Meetings per Player"
@@ -181,3 +182,5 @@ with GM.Lang\Get "en"
 	["connected.spectating"] = "%s has joined as a spectator."
 	["connected.spawned"] = "%s is ready to play."
 	["connected.disconnected"] = "%s has left the game!"
+
+	["chat.noTalkingDuringGame"] = "You cannot talk during the game!"

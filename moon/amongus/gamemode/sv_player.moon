@@ -419,25 +419,35 @@ hook.Add "PlayerSpray", "NMW AU DeadSpray", (ply) ->
 
 	return not (playerTable and not GAMEMODE.GameData.DeadPlayers[playerTable])
 
-hook.Add "PlayerCanHearPlayersVoice", "NMW AU DeadVoice", (listener, talker) ->
-	if GAMEMODE.ConVarSnapshots.DeadChat\GetBool! or not GAMEMODE\IsGameInProgress!
-		return
-
-	listenerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[listener]
-	talkerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[talker]
-
-    if not GAMEMODE.GameData.DeadPlayers[listenerTable] or GAMEMODE.GameData.DeadPlayers[talkerTable]
-		return true
-
-hook.Add "PlayerCanSeePlayersChat", "NMW AU DeadChat", (_, _, listener, talker) ->
-	if GAMEMODE.ConVarSnapshots.DeadChat\GetBool! or not GAMEMODE\IsGameInProgress!
-		return
-
+shutYourUp = (listener, talker) ->
 	-- Console message...?
 	if not IsValid(listener) or not IsValid(talker)
 		return
 
-    if not listener\IsDead! or talker\IsDead!
-		return false
+	-- No talking during game, unless it's a meeting.
+	if not GAMEMODE.ConVarSnapshots.GameChat\GetBool! and GAMEMODE\IsGameInProgress! and not GAMEMODE\IsMeetingInProgress!
+		playerTable = talker\GetAUPlayerTable!
+
+		if playerTable and not talker\IsDead!
+			return false
+
+	-- If talker is dead, only display the message to other dead players.
+	if not GAMEMODE.ConVarSnapshots.DeadChat\GetBool!
+		if talker\IsDead! and not listener\IsDead!
+			return false
+
+hook.Add "PlayerCanHearPlayersVoice", "NMW AU DeadChat", shutYourUp
+hook.Add "PlayerCanSeePlayersChat", "NMW AU DeadChat", (_, _, a, b) -> shutYourUp a, b
+
+hook.Add "PlayerSay", "NMW AU DeadChat", (ply) ->
+	-- Suppress and notify if the player is trying to talk during the game.
+	if not GAMEMODE.ConVarSnapshots.GameChat\GetBool! and GAMEMODE\IsGameInProgress! and not GAMEMODE\IsMeetingInProgress!
+		playerTable = ply\GetAUPlayerTable!
+
+		if playerTable and not ply\IsDead!
+			GAMEMODE\Net_SendGameChatError playerTable
+			return ""
+
+	return
 
 hook.Add "IsSpawnpointSuitable", "NMW AU SpawnSuitable", -> true

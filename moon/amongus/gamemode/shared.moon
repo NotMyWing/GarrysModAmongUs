@@ -41,6 +41,7 @@ GM.ConVars =
 	KillDistanceMod: CreateConVar "au_killdistance_mod", 1 , flags, "", 1, 3
 	ConfirmEjects:   CreateConVar "au_confirm_ejects"  , 1 , flags, "", 0, 1
 	DeadChat:        CreateConVar "au_dead_chat"       , 0 , flags, "", 0, 1
+	GameChat:        CreateConVar "au_game_chat"       , 0 , flags, "", 0, 1
 
 	MeetingCooldown:   CreateConVar "au_meeting_cooldown"      , 20, flags, "", 1, 60
 	MeetingsPerPlayer: CreateConVar "au_meeting_available"     , 2 , flags, "", 1, 5
@@ -189,7 +190,7 @@ GM.FlowTypes = {
 	RequestUpdate: 16
 	TasksUpdateData: 17
 	TasksSubmit: 18
-	UNUSED: 19
+	GameChatNotification: 19
 	CloseVGUI: 20
 	TasksUpdateCount: 21
 	NotifyKilled: 22
