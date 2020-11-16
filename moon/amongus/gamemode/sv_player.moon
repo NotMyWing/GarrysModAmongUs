@@ -223,6 +223,8 @@ GM.Player_Vent = (playerTable, vent) =>
 			@Player_Hide playerTable.entity
 			@Player_PauseKillCooldown playerTable
 
+			vent\TriggerOutput "OnVentIn", playerTable.entity
+
 		-- @Sabotage_PauseAll!
 		timer.Create handle, 0.125, 1, ->
 			if IsValid playerTable.entity
@@ -250,6 +252,8 @@ GM.Player_UnVent = (playerTable, instant) =>
 
 		handle = "vent" .. playerTable.nickname
 		@Net_BroadcastVent playerTable.entity, vent\GetPos!, true
+
+		vent\TriggerOutput "OnVentOut", playerTable.entity
 
 		timer.Create handle, 0.5, 1, ->
 			@GameData.Vented[playerTable] = nil

@@ -50,3 +50,6 @@ else
 
 		if key == "viewangle"
 			@ViewAngle = Angle value
+
+		if "On" == string.sub key, 1, 2
+			@StoreOutput key, value

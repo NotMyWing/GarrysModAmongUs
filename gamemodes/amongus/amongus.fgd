@@ -41,6 +41,9 @@
 
 	input Link(void) : "here be connection"
 	output Link(void) : "A different vent this vent is connected to."
+
+	output OnVentIn(void) : "Called when a player jumps into this vent"
+	output OnVentOut(void) : "Called when a player jumps out of this vent"
 ]
 
 @PointClass base(func_vent, prop_static_base) studioprop() = prop_vent :
