@@ -337,6 +337,7 @@ hook.Add "PlayerDisconnected", "NMW AU CheckWin", (ply) -> with GAMEMODE
 	if \IsGameInProgress!
 		if playerTable = .GameData.Lookup_PlayerByEntity[ply]
 			\Player_SetDead playerTable
+			\Player_CloseVGUI playerTable
 
 			-- If the player was a crewmate and he had tasks,
 			-- "complete" his tasks and broadcast the new count.
