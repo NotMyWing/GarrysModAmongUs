@@ -6,6 +6,17 @@ const renderSvg = require('./tools/inkscape');
 const minifyLua = require('./tools/luamin');
 const compileMoonscript = require('./tools/moonscript');
 
+const lastRunCache = new Map();
+function lastRunIgnoreErrors(task) {
+	const lastRun = gulp.lastRun(task);
+	if(lastRun) {
+		lastRunCache.set(task, lastRun);
+		return lastRun;
+	}
+	else {
+		return lastRunCache.get(task);
+	}
+}
 
 /**
  * Cleans the build.
@@ -20,7 +31,7 @@ clean.description = "Cleans the build.";
  * Minifies lua files.
  */
 function lua() {
-	return gulp.src('moon/**/*.lua', { since: gulp.lastRun(lua) })
+	return gulp.src('moon/**/*.lua', { since: lastRunIgnoreErrors(lua) })
 		.pipe(minifyLua())
 		.pipe(gulp.dest('gamemodes'));
 }
@@ -31,7 +42,7 @@ lua.description = "Minifies lua files.";
  * Compiles moonscript files.
  */
 function moon() {
-	return gulp.src('moon/**/*.moon', { since: gulp.lastRun(moon) })
+	return gulp.src('moon/**/*.moon', { since: lastRunIgnoreErrors(moon) })
 		.pipe(compileMoonscript())
 		// .pipe(minifyLua())
 		.pipe(gulp.dest('gamemodes'));
@@ -63,7 +74,7 @@ watchScripts.description = "Watches lua files and compiles changes.";
  * Renders SVG assets.
  */
 function svg() {
-	return gulp.src('content/**/*.svg', { since: gulp.lastRun(svg) })
+	return gulp.src('content/**/*.svg', { since: lastRunIgnoreErrors(svg) })
 		.pipe(svgmin())
 		.pipe(renderSvg())
 		.pipe(gulp.dest('gamemodes/amongus/content'));
@@ -75,7 +86,7 @@ svg.description = "Renders SVG assets.";
  * Copies materials.
  */
 function materials() {
-	return gulp.src(['content/**/*', '!content/**/*.svg'], { since: gulp.lastRun(materials) })
+	return gulp.src(['content/**/*', '!content/**/*.svg'], { since: lastRunIgnoreErrors(materials) })
 		.pipe(gulp.dest('gamemodes/amongus/content'));
 }
 materials.description = "Copies materials.";
