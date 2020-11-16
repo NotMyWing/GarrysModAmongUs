@@ -14,6 +14,8 @@ ENT.Initialize = =>
 			@SetModel @Model
 	else
 		@SetRenderBounds @OBBMins!, @OBBMaxs!
+		if @GetBrushPlaneCount! > 0
+			@__nextGarrysModIsDumbCheck = CurTime! + 5
 
 	@AddEFlags EFL_FORCE_CHECK_TRANSMIT
 
@@ -25,6 +27,13 @@ ENT.SetupDataTables = =>
 if CLIENT
 	ENT.Draw = =>
 		@DrawModel!
+
+	ENT.Think = =>
+		if @__nextGarrysModIsDumbCheck and CurTime! > @__nextGarrysModIsDumbCheck
+			@__nextGarrysModIsDumbCheck = @__nextGarrysModIsDumbCheck + 10
+
+			@SetRenderBounds @OBBMins!, @OBBMaxs!
+
 else
 	ENT.KeyValue = (key, value) =>
 		if key == "model"

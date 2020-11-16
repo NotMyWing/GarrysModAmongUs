@@ -14,6 +14,8 @@ ENT.Initialize = =>
 			@SetModel @Model
 	else
 		@SetRenderBounds @OBBMins!, @OBBMaxs!
+		if @GetBrushPlaneCount! > 0
+			@__nextGarrysModIsDumbCheck = CurTime! + 5
 
 	@AddEFlags EFL_FORCE_CHECK_TRANSMIT
 
@@ -23,7 +25,14 @@ ENT.SetupDataTables = =>
 	@NetworkVar "String", 1, "TaskName"
 	@NetworkVar "String", 2, "CustomData"
 
-if SERVER
+if CLIENT
+	ENT.Think = =>
+		if @__nextGarrysModIsDumbCheck and CurTime! > @__nextGarrysModIsDumbCheck
+			@__nextGarrysModIsDumbCheck = @__nextGarrysModIsDumbCheck + 10
+
+			@SetRenderBounds @OBBMins!, @OBBMaxs!
+
+else
 	ENT.Use = (ply) =>
 		if playerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
 			GAMEMODE\Task_Start playerTable, @GetTaskName!

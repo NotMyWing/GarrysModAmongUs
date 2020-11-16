@@ -23,6 +23,8 @@ ENT.Initialize = =>
 			@SetModel @Model
 	else
 		@SetRenderBounds @OBBMins!, @OBBMaxs!
+		if @GetBrushPlaneCount! > 0
+			@__nextGarrysModIsDumbCheck = CurTime! + 5
 
 if SERVER
 	ENT.KeyValue = (key, value) =>
@@ -65,6 +67,11 @@ if CLIENT
 				TRANSLATE("meetingButton.cooldown") math.floor time
 			else
 				TRANSLATE("meetingButton.default") LocalPlayer!\Nick!, LocalPlayer!\GetNW2Int "NMW AU Meetings"
+
+		if @__nextGarrysModIsDumbCheck and CurTime! > @__nextGarrysModIsDumbCheck
+			@__nextGarrysModIsDumbCheck = @__nextGarrysModIsDumbCheck + 10
+
+			@SetRenderBounds @OBBMins!, @OBBMaxs!
 
 	COLOR_BLACK = Color 0, 0, 0, 128
 	ENT.DrawTranslucent = =>
