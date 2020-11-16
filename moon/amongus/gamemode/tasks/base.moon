@@ -157,7 +157,7 @@ if SERVER
 
 			btn = @GetActivationButton!
 			if IsValid btn
-				btn\Fire "OnTaskUse"
+				btn\TriggerOutput "OnTaskUse", @GetAssignedPlayer!
 
 		--- Internal function.
 		-- Called whenever player closes the GUI without advancing the task.
@@ -177,7 +177,7 @@ if SERVER
 				return
 
 			if IsValid btn
-				btn\Fire "OnTaskCancel"
+				btn\TriggerOutput "OnTaskCancel", @GetAssignedPlayer!
 
 		--- Internal function.
 		-- Called whenever the assigned player uses the button. (opens the UI)
@@ -206,7 +206,7 @@ if SERVER
 
 			btn = @GetActivationButton!
 			if IsValid btn
-				btn\Fire "OnTaskAdvance"
+				btn\TriggerOutput "OnTaskAdvance", @GetAssignedPlayer!
 
 		--- Triggers the "OnTaskComplete" output of the current button.
 		-- This gets called strictly when the task is completed.
@@ -218,7 +218,7 @@ if SERVER
 
 			btn = @GetActivationButton!
 			if IsValid btn
-				btn\Fire "OnTaskComplete"
+				btn\TriggerOutput "OnTaskComplete", @GetAssignedPlayer!
 
 		--- Marks the task dirty, notifying the game mode that
 		-- the data should be broadcasted to the client.
