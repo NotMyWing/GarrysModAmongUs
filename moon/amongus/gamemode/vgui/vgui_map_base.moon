@@ -56,6 +56,7 @@ map = {
 					render.PopFilterMag!
 					render.PopFilterMin!
 
+			.PaintOver = (_, w, h) ->
 				surface.SetAlphaMultiplier 0.95
 				for label in *@__labels
 					x = label.Position.x * w
