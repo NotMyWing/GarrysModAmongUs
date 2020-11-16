@@ -62,6 +62,8 @@ if CLIENT
 
 					.OnReleased = ->
 						if not moving and moved and depressed
+							return unless swiped
+
 							swiped = false
 							depressed = false
 
@@ -92,6 +94,8 @@ if CLIENT
 								base\Submit!
 
 					.OnDepressed = ->
+						return if @GetCompleted!
+
 						if not moving and moved and not depressed
 							swipeStart = SysTime!
 							ledGreen\AlphaTo 0, 0.1
