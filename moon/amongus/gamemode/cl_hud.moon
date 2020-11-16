@@ -157,17 +157,10 @@ GM.HUD_PlayKill = (killer, victim) =>
 -- Doesn't open anything if something else is on the screen.
 -- @return Has the map been opened?
 GM.HUD_OpenMap = =>
-	if IsValid @Hud.Meeting
-		return
-
-	if IsValid @Hud.TaskScreen
-		return
-
-	if IsValid @Hud.Eject
-		return
-
-	if IsValid @Hud.Splash
-		return
+	return if IsValid @Hud.Meeting
+	return if IsValid @Hud.TaskScreen
+	return if IsValid @Hud.Eject
+	return if IsValid @Hud.Splash
 
 	if GAMEMODE\IsGameInProgress! and IsValid(GAMEMODE.Hud) and IsValid(GAMEMODE.Hud.Map)
 		GAMEMODE.Hud.Map\Popup!
@@ -193,8 +186,8 @@ GM.HUD_TrackTaskOnMap = (entity, track = true) =>
 				\Track entity, with vgui.Create "DPanel"
 					\SetSize size, size
 					.Paint = (_, w, h) ->
-						if GAMEMODE\GetCommunicationsDisabled! and not GAMEMODE.GameData.Imposters[GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]]
-							return
+						return if GAMEMODE\GetCommunicationsDisabled! and
+							not LocalPlayer!\IsImposter!
 
 						surface.DisableClipping true
 						surface.SetDrawColor 255, 230, 0
@@ -210,8 +203,7 @@ GM.HUD_TrackTaskOnMap = (entity, track = true) =>
 			else
 				\UnTrack entity
 
-GM.HUD_AddTaskEntry = =>
-	return @Hud\AddTaskEntry!
+GM.HUD_AddTaskEntry = => @Hud\AddTaskEntry!
 
 GM.HUD_Countdown = (time) =>
 	if time > CurTime! and IsValid @__splash
@@ -387,12 +379,8 @@ hook.Add "HUDPaintBackground", "NMW AU Hud", ->
 	if IsValid GAMEMODE.Hud
 		GAMEMODE.Hud\PaintManual!
 
-hook.Add "ScoreboardShow", "NMW AU Map", ->
-	if GAMEMODE\HUD_OpenMap!
-		return true
-
-hook.Add "ScoreboardHide", "NMW AU Map", ->
-	GAMEMODE\HUD_CloseMap!
+hook.Add "ScoreboardShow", "NMW AU Map", -> true if GAMEMODE\HUD_OpenMap!
+hook.Add "ScoreboardHide", "NMW AU Map", -> GAMEMODE\HUD_CloseMap!
 
 concommand.Add "au_debug_eject_test", ->
 	if IsValid GAMEMODE.Hud.Eject

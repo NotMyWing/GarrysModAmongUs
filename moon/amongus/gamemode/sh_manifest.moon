@@ -10,8 +10,7 @@ GM.LoadManifest = =>
 	for pathToCheck in *pathsToCheck
 		-- This can, and most likely will be null because the second element
 		-- is nullable. See `pathsToCheck = { ... }` above.
-		if not pathToCheck
-			continue
+		continue unless pathToCheck
 
 		filePath, location = unpack pathToCheck
 		@Logger.Info "Checking #{filePath} for a valid manifest..."

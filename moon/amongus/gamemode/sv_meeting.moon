@@ -5,15 +5,12 @@ GM.Meeting_Start = (playerTable, bodyColor) =>
 		playerTable = playerTable\GetAUPlayerTable!
 	return unless playerTable
 
-	if not @IsGameInProgress!
-		return
+	return unless @IsGameInProgress!
 
 	handle = "meeting"
-	if @GameData.DeadPlayers[playerTable]
-		return
 
-	if timer.Exists handle
-		return
+	return if @GameData.DeadPlayers[playerTable]
+	return if timer.Exists handle
 
 	if timer.Exists "timelimit"
 		timer.Pause "timelimit"
@@ -27,6 +24,7 @@ GM.Meeting_Start = (playerTable, bodyColor) =>
 
 	hook.Call "GMAU MeetingStart"
 	@Net_BroadcastDead!
+
 	@Net_BroadcastMeeting playerTable, bodyColor
 	if bodyColor
 		@Logger.Info "#{playerTable.nickname} has found a body! Calling a meeting"
@@ -113,14 +111,15 @@ GM.Meeting_FinalizeVotes = =>
 	table.sort voteTable, (a, b) ->
 		return #a.votes > #b.votes
 
-	if not voteTable[1]
-		return voteTable, @EjectReason.Vote
+	-- Player has been ejected.
+	return voteTable, @EjectReason.Vote if not voteTable[1]
 
-	if voteTable[1] and voteTable[2] and #voteTable[1].votes == #voteTable[2].votes
-		return voteTable, @EjectReason.Tie
+	-- Tie.
+	return voteTable, @EjectReason.Tie if voteTable[1] and voteTable[2] and
+		#voteTable[1].votes == #voteTable[2].votes
 
-	if voteTable[1].target.id == 0
-		return voteTable, @EjectReason.Skipped
+	-- Skip.
+	return voteTable, @EjectReason.Skipped if voteTable[1].target.id == 0
 
 	return voteTable, @EjectReason.Vote, voteTable[1].target
 

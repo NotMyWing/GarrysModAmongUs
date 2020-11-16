@@ -2,8 +2,7 @@ resource.AddWorkshop "2227901495"
 
 add = (cur) ->
 	files, folders = file.Find(cur .. "/*", "GAME")
-	if not files and not folders
-		return
+	return unless files or folders
 
 	for _, f in ipairs files or {}
 		f = cur .. "/" .. f

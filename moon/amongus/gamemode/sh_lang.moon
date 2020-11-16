@@ -5,8 +5,7 @@ entryMeta = {
 	__call: (...) => @.__entry ...
 	__tostring: =>
 		result = @.__entry and @__entry!
-		if result == nil
-			return "Unknown"
+		return "Unknown" if result == nil
 
 		str = tostring result
 		return if "string" == type str
@@ -55,8 +54,7 @@ GM.Lang or= {
 			else
 				lang = GMOD_LANGUAGE\GetString!
 
-		if entry == nil or entry == ""
-			return NIL
+		return NIL if entry == nil or entry == ""
 
 		if @__entryCache[lang] and @__entryCache[lang][entry]
 			return @__entryCache[lang][entry]
@@ -94,8 +92,7 @@ GM.Lang or= {
 		for pathToCheck in *pathsToCheck
 			-- This can, and most likely will be null because the second element
 			-- is nullable. See `pathsToCheck = { ... }` above.
-			if not pathToCheck
-				continue
+			continue unless pathToCheck
 
 			filePath, location = unpack pathToCheck
 			files = file.Find filePath .. "*.lua", location

@@ -20,8 +20,6 @@ hook.Add "Move", "NMW AU Move", (ply, mvd) ->
 			mvd\SetVelocity Vector 0, 0, 0
 			return true
 
-hook.Add "PlayerFootstep", "NMW AU Footsteps", (ply) ->
-	return true if ply\IsDead!
-
+hook.Add "PlayerFootstep", "NMW AU Footsteps", (ply) -> true if ply\IsDead!
 hook.Add "EntityEmitSound", "NMW AU Ragdoll Sounds", (t) ->
-	return false if IsValid(t.Entity) and t.Entity\GetClass! == "prop_ragdoll"
+	false if IsValid(t.Entity) and t.Entity\GetClass! == "prop_ragdoll"

@@ -60,8 +60,7 @@ GM.Task_Instantiate = (taskTable) =>
 if CLIENT
 	--- Opens the task VGUI.
 	hook.Add "GMAU OpenVGUI", "NMW AU OpenTaskVGUI", (data) ->
-		if not data.taskName
-			return
+		return unless data.taskName
 
 		instance = GAMEMODE.GameData.MyTasks[data.taskName]
 		if instance and instance.CreateVGUI
@@ -80,9 +79,8 @@ else
 	-- This assumes that the gamedata table is properly filled.
 	-- Yes, this implies that you shouldn't call this.
 	GM.Task_AssignToPlayers = =>
-		if not @MapManifest.Tasks
-			-- What in the world is happening there?
-			return
+		-- What in the world is happening there?
+		return unless @MapManifest.Tasks
 
 		shuffle = @Util.Shuffle
 
@@ -110,13 +108,12 @@ else
 			@GameData.Tasks[playerTable] = {}
 
 			-- Don't assign tasks to leavers.
-			if not IsValid playerTable.entity
-				continue
+			continue unless IsValid playerTable.entity
+
 
 			-- Don't assign tasks to bots, but create their table to prevent
 			-- the logic from dying horribly.
-			if playerTable.entity\IsBot! and not @ConVarSnapshots.DistributeTasksToBots\GetBool!
-				continue
+			continue if playerTable.entity\IsBot! and not @ConVarSnapshots.DistributeTasksToBots\GetBool!
 
 			-- Instantiates the provided task.
 			-- Duplicate code is bad!
@@ -167,16 +164,13 @@ else
 	-- @param playerTable The tasked crewmate.
 	-- @string name Name of the task.
 	GM.Task_Start = (playerTable, name) =>
-		if not IsValid playerTable.entity
-			return
+		return unless IsValid playerTable.entity
 
 		task = (@GameData.Tasks[playerTable] or {})[name]
-		if not task
-			return
+		return unless task
 
 		ent = task\GetActivationButton!
-		if not IsValid ent
-			return
+		return unless IsValid ent
 
 		if task and playerTable.entity\GetPos!\Distance(ent\GetPos!) <= 128 and task\CanUse!
 			task\Use ent
@@ -194,7 +188,6 @@ else
 			if IsValid playerTable.entity
 				ent = currentTask\GetActivationButton!
 
-				if not playerTable.entity\TestPVS ent
-					return
+				return unless playerTable.entity\TestPVS ent
 
 				currentTask\Advance ent

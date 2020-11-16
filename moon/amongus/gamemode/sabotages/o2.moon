@@ -74,8 +74,7 @@ o2 = {
 
 	OnSubmit: (playerTable, data) =>
 		if btn = @__activatedButtons[playerTable]
-			if data ~= @GetCode!
-				return
+			return if data ~= @GetCode!
 
 			removed = false
 

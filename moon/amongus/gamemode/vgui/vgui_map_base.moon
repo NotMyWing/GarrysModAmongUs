@@ -140,8 +140,7 @@ map = {
 					@SetResolution .Resolution
 
 	Popup: =>
-		if @__opened or @__opening or @__closing
-			return
+		return if @__opened or @__opening or @__closing
 
 		@__opened = true
 		@__opening = true
@@ -162,8 +161,7 @@ map = {
 		surface.PlaySound "au/panel_genericappear.wav"
 
 	Close: =>
-		if not @__opened or @__opening or @__closing
-			return
+		return if not @__opened or @__opening or @__closing
 
 		@__opened = false
 		@__closing = true

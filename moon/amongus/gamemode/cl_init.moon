@@ -112,9 +112,7 @@ hook.Add "Tick", "NMW AU Highlight", ->
 	return
 
 GM.HUDDrawTargetID = ->
-hook.Add "EntityEmitSound", "TimeWarpSounds", (t) ->
-	if t.Entity\IsRagdoll!
-		return false
+hook.Add "EntityEmitSound", "TimeWarpSounds", (t) -> false if t.Entity\IsRagdoll!
 
 hook.Add "CreateClientsideRagdoll", "test", (owner, rag) ->
 	rag\GetPhysicsObject!\SetMaterial "gmod_silent"
@@ -142,11 +140,8 @@ hook.Add "CreateMove", "NMW AU KillScreenMove", (cmd) ->
 		return true
 
 hook.Add "OnPlayerChat", "NMW AU DeadSay", (ply, text) ->
-	if GAMEMODE.ConVarSnapshots.DeadChat\GetBool! or not GAMEMODE\IsGameInProgress!
-		return
-
-	if not ply\IsValid!
-		return
+	return if GAMEMODE.ConVarSnapshots.DeadChat\GetBool! or not GAMEMODE\IsGameInProgress!
+	return unless ply\IsValid!
 
 	ghostColor, ghostText = if ply.IsDead and ply\IsDead!
 		Color(255, 0, 0), "(GHOST CHAT) "

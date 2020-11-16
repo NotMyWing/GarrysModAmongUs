@@ -15,8 +15,7 @@ GM.Game_GameOver = (reason) =>
 		@Game_Restart!
 
 GM.Game_CheckWin = (reason) =>
-	if not @IsGameInProgress! or timer.Exists "gameOver"
-		return
+	return unless @IsGameInProgress! or timer.Exists "gameOver"
 
 	if not reason
 		reason = if @GetTimeLimit! == 0
@@ -78,20 +77,17 @@ GM.Game_CleanUp = (soft) =>
 
 GM.Game_Start = =>
 	-- Bail if the manifest is missing or malformed.
-	if not @MapManifest or not @MapManifest.Tasks
-		return
+	return unless @MapManifest and @MapManifest.Tasks
 
 	-- Bail if the game is already in progress.
-	if @IsGameInProgress!
-		return
+	return if @IsGameInProgress!
 
 	-- Fetch a table of initialized players.
 	initializedPlayers = @GetFullyInitializedPlayers!
 
 	-- Bail if we don't have enough players.
 	-- TO-DO: print chat message.
-	if #initializedPlayers < @ConVars.MinPlayers\GetInt!
-		return
+	return if #initializedPlayers < @ConVars.MinPlayers\GetInt!
 
 	handle = "tryStartGame"
 	@GameData.Timers[handle] = true
@@ -112,8 +108,7 @@ GM.Game_Start = =>
 
 		-- Bail if we don't have enough players. Again.
 		-- TO-DO: print chat message.
-		if #initializedPlayers < @ConVars.MinPlayers\GetInt!
-			return
+		return if #initializedPlayers < @ConVars.MinPlayers\GetInt!
 
 		-- Create the time limit timer if the cvar is set.
 		-- That's quite an interesting sentence.
@@ -307,12 +302,10 @@ GM.Game_StopAutoPilotTimer = =>
 hook.Add "KeyPress", "NMW AU GameStart", (ply, key) -> with GAMEMODE
 	if (ply\IsAdmin! or ply\IsListenServerHost!) and key == IN_JUMP
 		-- Bail if the game is in progress.
-		if \IsGameInProgress!
-			return
+		return if \IsGameInProgress!
 
 		-- Bail if the game is being managed automatically.
-		if GAMEMODE.ConVars.ForceAutoWarmup\GetBool! or GAMEMODE\IsOnAutoPilot!
-			return
+		return if GAMEMODE.ConVars.ForceAutoWarmup\GetBool! or GAMEMODE\IsOnAutoPilot!
 
 		if \IsGameCommencing!
 			.Logger.Warn "Admin #{ply\Nick!} has stopped the countdown!"

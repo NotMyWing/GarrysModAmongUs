@@ -38,9 +38,9 @@ if CLIENT
 						for i, pos in ipairs positions
 							if activated[i]
 								surface.SetDrawColor 32, 221, 32
-							else 
+							else
 								surface.SetDrawColor 32, 221, 32, 64
-							surface.DrawRect w*pos - w*treshold/2, 0, w*treshold, h 
+							surface.DrawRect w*pos - w*treshold/2, 0, w*treshold, h
 
 				local pressed
 				with \Add "DButton"
@@ -68,8 +68,7 @@ if CLIENT
 
 						if SysTime! > (.__nextCheck or SysTime!)
 							for i, pos in ipairs positions
-								if activated[i]
-									continue
+								continue if activated[i]
 
 								dist = math.abs pos - (.__x/max_size)
 

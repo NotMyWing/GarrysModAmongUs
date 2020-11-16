@@ -33,13 +33,11 @@ if SERVER
 
 	ENT.Use = (ply) =>
 		if SERVER
-			if ply\GetNW2Int("NMW AU Meetings") <= 0
-				return
+			return if ply\GetNW2Int("NMW AU Meetings") <= 0
 
 			time = GetGlobalFloat("NMW AU NextMeeting") - CurTime!
 
-			if time > 0
-				return
+			return if time > 0
 
 			if GAMEMODE\Meeting_Start ply
 				@EmitSound "au/panel_emergencybutton.wav", 60
@@ -50,8 +48,7 @@ if CLIENT
 	TRANSLATE = GAMEMODE.Lang.GetEntry
 
 	ENT.Think = =>
-		if not GAMEMODE\IsGameInProgress!
-			return
+		return unless GAMEMODE\IsGameInProgress!
 
 		-- Translate the button text.
 		-- This has been moved to @Think because of the table churn.
@@ -77,11 +74,8 @@ if CLIENT
 	ENT.DrawTranslucent = =>
 		@DrawModel!
 
-		if not GAMEMODE\IsGameInProgress!
-			return
-
-		if not @__textLines
-			return
+		return unless GAMEMODE\IsGameInProgress!
+		return unless @__textLines
 
 		-- Position the text above the highest point of the meeting button.
 		-- This might cause issues if the button doesn't have a collision model.
@@ -116,8 +110,7 @@ if CLIENT
 				passes = 6
 				for i = -passes/2, passes/2
 					for j = -passes/2, passes/2
-						if i == 0 or j == 0
-							continue
+						continue if i == 0 or j == 0
 
 						offsetX = 2 * i
 						offsetY = 2 * j

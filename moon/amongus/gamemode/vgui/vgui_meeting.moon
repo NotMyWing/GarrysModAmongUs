@@ -288,8 +288,7 @@ meeting.OpenDiscuss = (caller) =>
 					.Image = MAT_MEETING_TABLET.skip
 					.Paint = GAMEMODE.Render.DermaFitImage
 					.DoClick = (_) ->
-						if not \IsEnabled!
-							return
+						return unless \IsEnabled!
 
 						@PurgeConfirms!
 
@@ -452,8 +451,7 @@ meeting.OpenDiscuss = (caller) =>
 										playerItem.voted = with crew\Add "DPanel"
 											\SetAlpha 0
 											.Paint = (_) ->
-												if \GetAlpha! == 0
-													return
+												return if \GetAlpha! == 0
 
 												w = crew\GetTall!
 
@@ -516,8 +514,7 @@ meeting.OpenDiscuss = (caller) =>
 
 												.DoClick = ->
 													-- duh
-													if not \IsEnabled!
-														return
+													return unless \IsEnabled!
 
 													@PurgeConfirms!
 													surface.PlaySound "au/votescreen_avote.wav"
@@ -655,8 +652,7 @@ meeting.End = (results = {}) =>
 		for _, result in pairs results
 			outputPanel = @buttons[result.targetid].output
 
-			if not outputPanel
-				continue
+			continue unless outputPanel
 
 			-- Display a mini-crewmate icon for each player that voted against this person.
 			for i, voter in ipairs result.votes

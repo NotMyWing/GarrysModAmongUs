@@ -40,8 +40,7 @@ GM.Player_SetDead = (playerTable) =>
 		-- Hide the player for alive players.
 		-- Unhide the player for dead players, and the other way around.
 		for _, otherPlayerTable in pairs @GameData.PlayerTables
-			if otherPlayerTable == playerTable or not IsValid(otherPlayerTable.entity)
-				continue
+			continue if otherPlayerTable == playerTable or not IsValid(otherPlayerTable.entity)
 
 			if @GameData.DeadPlayers[otherPlayerTable]
 				playerTable.entity\SetPreventTransmit otherPlayerTable.entity, false
@@ -66,29 +65,24 @@ GM.Player_Kill = (victimTable, attackerTable) =>
 	return unless attackerTable
 
 	-- Bail if one of the players is invalid. The game mode will handle the killing internally.
-	if not (IsValid(victimTable.entity) and IsValid(victimTable.entity))
-		return
+	return unless (IsValid(victimTable.entity) and IsValid(victimTable.entity))
+
 
 	-- Bail if one of the players is dead.
-	if @GameData.DeadPlayers[attackerTable] or @GameData.DeadPlayers[victimTable]
-		return
+	return if @GameData.DeadPlayers[attackerTable] or @GameData.DeadPlayers[victimTable]
 
 	-- Bail if the attacker is not an imposter, or if the target is an imposter.
-	if not @GameData.Imposters[attackerTable] or @GameData.Imposters[victimTable]
-		return
+	return unless @GameData.Imposters[attackerTable] or @GameData.Imposters[victimTable]
 
 	-- Bail if player has a cooldown.
-	if @GameData.KillCooldowns[attackerTable] > CurTime!
-		return
+	return if @GameData.KillCooldowns[attackerTable] > CurTime!
 
 	-- Bail if the kill cooldown is paused
-	if @GameData.KillCooldownRemainders[attackerTable]
-		return
+	return if @GameData.KillCooldownRemainders[attackerTable]
 
 	-- Bail if the attacker is too far.
-	if (@BaseUseRadius * @ConVarSnapshots.KillDistanceMod\GetFloat!) <
+	return if (@BaseUseRadius * @ConVarSnapshots.KillDistanceMod\GetFloat!) <
 		victimTable.entity\GetPos!\Distance attackerTable.entity\GetPos!
-		return
 
 	with corpse = ents.Create "prop_ragdoll"
 		\SetPos victimTable.entity\GetPos!
@@ -287,12 +281,11 @@ GM.Player_CanOpenVGUI = (playerTable) =>
 		playerTable = playerTable\GetAUPlayerTable!
 	return unless playerTable
 
-	if @GameData.KillCooldownRemainders[playerTable]
-		return false
+	-- Bail if the player is in a vent.
+	return false if @GameData.Vented[playerTable]
 
 	-- Bail if there's already a screen.
-	if @GameData.CurrentVGUI[playerTable]
-		return false
+	return false if @GameData.CurrentVGUI[playerTable]
 
 	return true
 
@@ -314,8 +307,7 @@ GM.Player_OpenVGUI = (playerTable, vgui, data = {}, callback) =>
 		playerTable = playerTable\GetAUPlayerTable!
 	return unless playerTable
 
-	if not @Player_CanOpenVGUI playerTable
-		return false
+	return false unless @Player_CanOpenVGUI playerTable
 
 	@GameData.CurrentVGUI[playerTable] = vgui
 	@Player_PauseKillCooldown playerTable
@@ -385,8 +377,7 @@ hook.Add "PlayerDisconnected", "NMW AU AutoPilot", (ply) -> with GAMEMODE
 
 	return
 
-hook.Add "CanPlayerSuicide", "NMW AU Suicide", ->
-	return false
+hook.Add "CanPlayerSuicide", "NMW AU Suicide", -> false
 
 hook.Add "EntityTakeDamage", "NMW AU Damage", (target, dmg) ->
 	dmg\ScaleDamage 0
@@ -416,8 +407,7 @@ hook.Add "KeyPress", "NMW AU UnVent", (ply, key) ->
 			@Player_UnVent playerTable
 
 hook.Add "PlayerSpray", "NMW AU DeadSpray", (ply) ->
-	if GAMEMODE.ConVarSnapshots.DeadChat\GetBool! or not GAMEMODE\IsGameInProgress!
-		return
+	return if GAMEMODE.ConVarSnapshots.DeadChat\GetBool! or not GAMEMODE\IsGameInProgress!
 
 	playerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
 
@@ -425,20 +415,17 @@ hook.Add "PlayerSpray", "NMW AU DeadSpray", (ply) ->
 
 shutYourUp = (listener, talker) ->
 	-- Console message...?
-	if not IsValid(listener) or not IsValid(talker)
-		return
+	return unless IsValid(listener) and IsValid(talker)
 
 	-- No talking during game, unless it's a meeting.
 	if not GAMEMODE.ConVarSnapshots.GameChat\GetBool! and GAMEMODE\IsGameInProgress! and not GAMEMODE\IsMeetingInProgress!
 		playerTable = talker\GetAUPlayerTable!
 
-		if playerTable and not talker\IsDead!
-			return false
+		return false if playerTable and not talker\IsDead!
 
 	-- If talker is dead, only display the message to other dead players.
-	if not GAMEMODE.ConVarSnapshots.DeadChat\GetBool!
-		if talker\IsDead! and not listener\IsDead!
-			return false
+	return false if not GAMEMODE.ConVarSnapshots.DeadChat\GetBool! and
+		(talker\IsDead! and not listener\IsDead!)
 
 hook.Add "PlayerCanHearPlayersVoice", "NMW AU DeadChat", shutYourUp
 hook.Add "PlayerCanSeePlayersChat", "NMW AU DeadChat", (_, _, a, b) -> shutYourUp a, b

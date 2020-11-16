@@ -22,8 +22,7 @@ instantiateSabotage = (tbl) ->
 GM.Sabotage_Handlers = {}
 
 GM.Sabotage_Register = (sabotage) => with sabotage
-	if not .Handler
-		return
+	return unless .Handler
 
 	@Sabotage_Handlers[.Handler] or= do
 		path = "sabotages/#{.Handler}.lua"
@@ -34,8 +33,7 @@ GM.Sabotage_Register = (sabotage) => with sabotage
 		include "sabotages/#{.Handler}.lua"
 
 GM.Sabotage_Init = =>
-	if not @MapManifest or not @MapManifest.Sabotages
-		return
+	return unless @MapManifest and @MapManifest.Sabotages
 
 	table.Empty @GameData.Sabotages
 	for i, sabotage in ipairs @MapManifest.Sabotages
@@ -58,8 +56,7 @@ GM.Sabotage_Init = =>
 if CLIENT
 	--- Opens the sabotage UI.
 	hook.Add "GMAU OpenVGUI", "NMW AU OpenSabotageVGUI", (data) ->
-		if not data.sabotageId
-			return
+		return unless data.sabotageId
 
 		if instance = GAMEMODE.GameData.Sabotages[data.sabotageId]
 			instance\ButtonUse GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!], data.button
@@ -78,8 +75,7 @@ else
 			IsValid playerTable.entity
 
 				_, usable = GAMEMODE\TracePlayer playerTable.entity
-				if usable
-					return
+				return if usable
 
 				if instance = @GameData.Sabotages[id]
 					if instance\CanStart!
@@ -90,8 +86,7 @@ else
 			playerTable = playerTable\GetAUPlayerTable!
 		return unless playerTable
 
-		if playerTable.entity\IsDead!
-			return
+		return if playerTable.entity\IsDead!
 
 		@Player_OpenVGUI playerTable, sabotage\GetVGUIID!, {
 			sabotageId: sabotage\GetID!
@@ -103,8 +98,7 @@ else
 			playerTable = playerTable\GetAUPlayerTable!
 		return unless playerTable
 
-		if playerTable.entity\IsDead!
-			return
+		return if playerTable.entity\IsDead!
 
 		sabotage = @GameData.Lookup_SabotageByVGUIID[@GameData.CurrentVGUI[playerTable]]
 		if sabotage and sabotage\GetActive!

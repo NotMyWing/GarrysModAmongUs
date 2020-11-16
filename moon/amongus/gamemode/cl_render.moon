@@ -72,13 +72,11 @@ hook.Add "HUDShouldDraw", "NMW AU HideHud", (element) ->
 	if hide[element]
 		false
 
-hook.Add "CalcView", "NMW AU CalcView", ( ply, pos, angles, fov ) ->
-	if GAMEMODE.GameData.Vented
-		return {
-			origin: ply\GetPos! + Vector 0, 0, 10
-			:angles
-			:fov
-		}
+hook.Add "CalcView", "NMW AU CalcView", ( ply, pos, angles, fov ) -> {
+	origin: ply\GetPos! + Vector 0, 0, 10
+	:angles
+	:fov
+} if GAMEMODE.GameData.Vented
 
 color_sabotage = Color 32, 255, 32
 color_sabotageb = Color 255, 32, 32
@@ -88,9 +86,7 @@ color_task   = Color 255, 230, 0
 color_white = Color 255, 255, 255
 
 GM.GetHighlightColor = (entity) => if IsValid entity
-	className = entity\GetClass!
-
-	return switch className
+	return switch entity\GetClass!
 		when "prop_vent", "func_vent"
 			color_kill
 		when "prop_task_button", "func_task_button", "prop_sabotage_button", "func_sabotage_button"
@@ -105,8 +101,7 @@ hook.Add "PreDrawHalos", "NMW AU Highlight", ->
 	if not GAMEMODE.GameData.Imposters[GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]]
 		for _, task in pairs GAMEMODE.GameData.MyTasks
 			btn = task\GetActivationButton!
-			if not IsValid btn
-				continue
+			continue unless IsValid btn
 
 			color = GAMEMODE\GetHighlightColor task\GetActivationButton!
 			-- Obligatory wall of checks.
@@ -169,8 +164,7 @@ hook.Add "PostPlayerDraw", "NMW AU Nicknames", (ply) ->
 		passes = 4
 		for i = -passes/2, passes/2
 			for j = -passes/2, passes/2
-				if i == 0 or j == 0
-					continue
+				continue if i == 0 or j == 0
 
 				offsetX = 2 * i
 				offsetY = 2 * j

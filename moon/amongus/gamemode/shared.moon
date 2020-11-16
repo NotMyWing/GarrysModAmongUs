@@ -296,8 +296,7 @@ GM.Util.FindEntsByTaskName = (taskname, first = false) ->
 -- @return The closest killable entity. Nullable.
 -- @return The closest usable entity. Nullable.
 GM.TracePlayer = (ply) =>
-	if not @IsGameInProgress!
-		return
+	return unless @IsGameInProgress!
 
 	startPos = ply\EyePos!
 	entities = ents.FindInSphere startPos, @BaseUseRadius * @ConVarSnapshots.KillDistanceMod\GetFloat!
@@ -306,78 +305,61 @@ GM.TracePlayer = (ply) =>
 	killable = {}
 
 	playerTable = ply\GetAUPlayerTable!
-	if not playerTable or (SERVER and @GameData.Vented[playerTable]) or (CLIENT and @GameData.Vented)
-		return
+	return if not playerTable or (SERVER and @GameData.Vented[playerTable]) or (CLIENT and @GameData.Vented)
 
 	for _, ent in ipairs entities
-		if ent == ply
-			continue
-
-		if SERVER and not ply\TestPVS ent
-			continue
+		continue if ent == ply
+		continue if SERVER and not ply\TestPVS ent
 
 		-- No point entities. No view models.
-		if not ent\GetModel! or ent\GetModelRadius! == 0
-			continue
+		continue if not ent\GetModel! or ent\GetModelRadius! == 0
 
 		-- Don't match triggers.
-		if string.match ent\GetClass!, "^trigger_"
-			continue
+		continue if string.match ent\GetClass!, "^trigger_"
 
 		-- Task buttons.
 		if ent\GetClass! == "func_task_button" or ent\GetClass! == "prop_task_button"
 			name = ent\GetTaskName!
 
 			-- Quite simply just bail out if the player is an imposter.
-			if @GameData.Imposters[playerTable]
-				continue
+			continue if @GameData.Imposters[playerTable]
 
 			if SERVER
 				-- Bail out if the player doesn't have this task, or if it's not the current button,
 				-- or if the button doesn't consent.
-				if not (@GameData.Tasks[playerTable] and @GameData.Tasks[playerTable][name]) or
+				continue if not (@GameData.Tasks[playerTable] and @GameData.Tasks[playerTable][name]) or
 					ent ~= @GameData.Tasks[playerTable][name]\GetActivationButton! or
 					not @GameData.Tasks[playerTable][name]\CanUse!
-						continue
 
 			if CLIENT
 				-- Bail out if the local player doesn't have this task, or if he's completed it already, or
 				-- if the button doesn't consent.
-				if not @GameData.MyTasks[name] or
+				continue if not @GameData.MyTasks[name] or
 					@GameData.MyTasks[name]\GetCompleted! or ent ~= @GameData.MyTasks[name]\GetActivationButton! or
 					not @GameData.MyTasks[name]\CanUse!
-						continue
 
 		-- Prevent dead players from being able to target corpses.
-		if ent\GetClass! == "prop_ragdoll" and @GameData.DeadPlayers[playerTable]
-			continue
+		continue if ent\GetClass! == "prop_ragdoll" and @GameData.DeadPlayers[playerTable]
 
 		-- Prevent regular players from using vents.
-		if (ent\GetClass! == "func_vent" or ent\GetClass! == "prop_vent") and not @GameData.Imposters[playerTable]
-			continue
+		continue if (ent\GetClass! == "func_vent" or ent\GetClass! == "prop_vent") and not @GameData.Imposters[playerTable]
 
 		-- Only highlight sabotage buttons when they're active, and the player isn't dead.
 		if (ent\GetClass! == "func_sabotage_button" or ent\GetClass! == "prop_sabotage_button")
-			if @GameData.DeadPlayers[ply] or not @GameData.SabotageButtons[ent]
-				continue
+			continue if @GameData.DeadPlayers[ply] or not @GameData.SabotageButtons[ent]
 
 		-- Only highlight doors when requested by sabotages.
 		if (ent\GetClass! == "func_door" or ent\GetClass! == "func_door_rotating")
-			if @GameData.DeadPlayers[ply] or not @GameData.SabotageButtons[ent]
-				continue
+			continue if @GameData.DeadPlayers[ply] or not @GameData.SabotageButtons[ent]
 
 		-- Only hightlight meeting buttons when the cooldown has passed.
 		if (ent\GetClass! == "func_meeting_button" or ent\GetClass! == "prop_meeting_button")
-			if @IsMeetingDisabled!
-				continue
-
-			if 0 >= ply\GetNW2Int "NMW AU Meetings"
-				continue
+			continue if @IsMeetingDisabled!
+			continue if 0 >= ply\GetNW2Int "NMW AU Meetings"
 
 			time = GetGlobalFloat("NMW AU NextMeeting") - CurTime!
 
-			if time > 0
-				continue
+			continue if time > 0
 
 		otherPlayerTable = @GameData.Lookup_PlayerByEntity[ent]
 
@@ -387,6 +369,7 @@ GM.TracePlayer = (ply) =>
 		isUsable = not isKillable and not ent\IsPlayer!
 		if isKillable
 			table.insert killable, ent
+
 		elseif isUsable
 			nearestPoint = ent\NearestPoint startPos
 			if nearestPoint\Distance(ply\GetPos!) <= @BaseUseRadius

@@ -83,8 +83,7 @@ comms = {
 			@SetLights table.Copy @__lights
 
 			for state in *@__lights
-				if not state
-					return
+				return unless state
 
 			@End!
 

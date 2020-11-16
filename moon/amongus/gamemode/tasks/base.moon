@@ -86,8 +86,7 @@ taskBase = {
 	--- Sets whether the task is completed.
 	-- This can only be set ONCE! For quite obvious reasons.
 	SetCompleted: (value) =>
-		if @GetCompleted!
-			return
+		return if @GetCompleted!
 
 		@__completed = value
 		if SERVER
@@ -134,8 +133,7 @@ taskBase = {
 	-- There's little reason you should be calling this.
 	-- Perhaps, you're looking for @SetCustomName?
 	SetName: (value) =>
-		if @__name
-			return
+		return if @__name
 
 		@__name = value
 
@@ -152,8 +150,7 @@ if SERVER
 		-- Does nothing if "au_tasks_enable_visual" is set to 0.
 		-- There's little reason you should be calling this.
 		.UseVisual = =>
-			if not @CanVisual!
-				return
+			return unless @CanVisual!
 
 			btn = @GetActivationButton!
 			if IsValid btn
@@ -173,8 +170,7 @@ if SERVER
 		-- Does nothing if "au_tasks_enable_visual" is set to 0.
 		-- There's little reason you should be calling this.
 		.CancelVisual = (btn = @GetActivationButton!) =>
-			if not @CanVisual!
-				return
+			return unless @CanVisual!
 
 			if IsValid btn
 				btn\TriggerOutput "OnTaskCancel", @GetAssignedPlayer!
@@ -201,8 +197,7 @@ if SERVER
 		-- Does nothing if "au_tasks_enable_visual" is set to 0.
 		-- There's little reason you should be calling this.
 		.AdvanceVisual = (btn = @GetActivationButton!) =>
-			if not @CanVisual!
-				return
+			return unless @CanVisual!
 
 			btn = @GetActivationButton!
 			if IsValid btn
@@ -213,8 +208,7 @@ if SERVER
 		-- Does nothing if "au_tasks_enable_visual" is set to 0.
 		-- There's little reason you should be calling this.
 		.CompleteVisual = (btn = @GetActivationButton!) =>
-			if not @CanVisual!
-				return
+			return unless @CanVisual!
 
 			btn = @GetActivationButton!
 			if IsValid btn
@@ -223,8 +217,7 @@ if SERVER
 		--- Marks the task dirty, notifying the game mode that
 		-- the data should be broadcasted to the client.
 		.SetDirty = =>
-			if not IsValid @GetAssignedPlayer!.entity
-				return
+			return unless IsValid @GetAssignedPlayer!.entity
 
 			-- This sends an update packet next tick.
 			-- Really jank, I know.
@@ -258,8 +251,7 @@ if SERVER
 			if timer.Exists handle
 				timer.Remove handle
 
-			if not IsValid @GetAssignedPlayer!.entity
-				return
+			return unless IsValid @GetAssignedPlayer!.entity
 
 			packet = {}
 
