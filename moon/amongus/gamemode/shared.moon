@@ -22,6 +22,7 @@ flags = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_GAMEDLL
 -- @field KillDistanceMod (Number) Kill distance multiplier.
 -- @field ConfirmEjects (Bool) Should the ejects be confirmed?
 -- @field DeadChat (Bool) Should dead players be able to talk?
+-- @field GameChat (Bool) Should players be able to talk during the game?
 -- @field MeetingCooldown (Integer) Meeting cooldown.
 -- @field MeetingsPerPlayer (Integer) How many meetings a crewmate can call.
 -- @field VoteTime (Integer) How long the voting lasts.
@@ -34,6 +35,8 @@ flags = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_GAMEDLL
 -- @field DistributeTasksToBots (Bool) Should bot get any tasks?
 -- @field TimeLimit (Integer) Round time limit.
 -- @field Countdown (Integer) How long the pre-round countdown lasts.
+-- @field WarmupTime (Integer) How long should the warmup phase last?
+-- @field ForceAutoWarmup (Bool) Should the automated round management be forced?
 GM.ConVars =
 	ImposterCount:   CreateConVar "au_max_imposters"   , 1 , flags, "", 1, 10
 	MinPlayers:      CreateConVar "au_min_players"     , 3 , flags, "", 3, 128
@@ -133,8 +136,6 @@ GM.Colors = {
 	Color 255, 238, 232
 }
 
--- luadoc is dumb
-
 --- Enum of all flow types.
 --
 -- "Flow" is a reliable channel used for pretty much everything
@@ -142,35 +143,6 @@ GM.Colors = {
 --
 -- Using one channel guarantees the lack of race conditions.
 -- Besides, polluting the game with tens of random network strings is just bad.
--- @table GM.FlowTypes
--- @field GameStart 1
--- @field Countdown 2
--- @field KillRequest 3
--- @field BroadcastDead 4
--- @field KillCooldown 5
--- @field GameState 6
--- @field GameOver 7
--- @field Meeting 8
--- @field OpenDiscuss 9
--- @field Eject 10
--- @field MeetingVote 11
--- @field MeetingEnd 12
--- @field NotifyVent 13
--- @field VentAnim 14
--- @field VentRequest 15
--- @field RequestUpdate 16
--- @field TasksUpdateData 17
--- @field TasksSubmit 18
--- @field UNUSED 19
--- @field CloseVGUI 20
--- @field TasksUpdateCount 21
--- @field NotifyKilled 22
--- @field KillCooldownPause 23
--- @field OpenVGUI 24
--- @field SabotageData 25
--- @field SabotageRequest 26
--- @field SabotageSubmit 27
--- @field UNUSED 28
 GM.FlowTypes = {
 	GameStart: 1
 	Countdown: 2
