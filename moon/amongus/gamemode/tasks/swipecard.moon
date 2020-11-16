@@ -5,8 +5,8 @@ taskTable = {
 
 if CLIENT
 	surface.CreateFont "NMW AU Swipe", {
-		font: "Roboto"
-		size: 0.05 * math.min ScrH! * 0.8, ScrW! * 0.8
+		font: "Lucida Console"
+		size: 0.045 * math.min ScrH! * 0.8, ScrW! * 0.8
 	}
 
 	ASSETS = {
@@ -138,18 +138,22 @@ if CLIENT
 						\SetFont "NMW AU Swipe"
 						\SetText "PLEASE INSERT CARD"
 						\SetSize max_size * (738/900), max_size * (51/900)
-						\SetPos max_size * (80/900), max_size * (35/900)
 						\SetContentAlignment 4
+
+						labelPos = math.floor max_size * (80/900)
+						labelAltPos = math.floor max_size * (100/900)
+
+						\SetPos labelPos, max_size * (35/900)
 
 						cb = ->
 							\NewAnimation 0, 1, 0, ->
-								text = \GetText!
-								if text[1] == " "
-									text = string.sub text, 2, -1
+								x, y = \GetPos!
+								x = if labelPos == x
+									labelAltPos
 								else
-									text = " " .. text
+									labelPos
 
-								\SetText text
+								\SetPos x, y
 
 								cb!
 
