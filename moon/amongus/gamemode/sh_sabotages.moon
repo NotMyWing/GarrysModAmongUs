@@ -90,6 +90,9 @@ else
 			playerTable = playerTable\GetAUPlayerTable!
 		return unless playerTable
 
+		if playerTable.entity\IsDead!
+			return
+
 		@Player_OpenVGUI playerTable, sabotage\GetVGUIID!, {
 			sabotageId: sabotage\GetID!
 			:button
@@ -99,6 +102,9 @@ else
 		if "Player" == type playerTable
 			playerTable = playerTable\GetAUPlayerTable!
 		return unless playerTable
+
+		if playerTable.entity\IsDead!
+			return
 
 		sabotage = @GameData.Lookup_SabotageByVGUIID[@GameData.CurrentVGUI[playerTable]]
 		if sabotage and sabotage\GetActive!
