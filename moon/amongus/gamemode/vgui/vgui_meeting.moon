@@ -187,6 +187,8 @@ meeting.OpenDiscuss = (caller) =>
 		\SetPos @GetWide!/2 - newWidth/2, @GetTall!/2 - newHeight/2
 		\SetAlpha 0
 		\AlphaTo 255, 0.1, 0
+		\SetMouseInputEnabled true
+		gui.EnableScreenClicker true
 
 		time = DISCUSS_SPLASH_TIME + GAMEMODE.ConVarSnapshots.VotePreTime\GetInt! + GAMEMODE.ConVarSnapshots.VoteTime\GetInt! + 0.5
 		voteEndTime = SysTime! + time
@@ -536,8 +538,6 @@ meeting.OpenDiscuss = (caller) =>
 		\AlphaTo 255, 0.1, 0
 		\AlphaTo 0, 0.1, 3, ->
 			\Remove!
-
-			@discussWindow\MakePopup!
 
 		.Paint = (_, w, h) ->
 			if not _.circle
