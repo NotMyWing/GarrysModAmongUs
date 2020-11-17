@@ -15,7 +15,7 @@ GM.Game_GameOver = (reason) =>
 		@Game_Restart!
 
 GM.Game_CheckWin = (reason) =>
-	return unless @IsGameInProgress! or timer.Exists "gameOver"
+	return if not @IsGameInProgress! or timer.Exists "gameOver"
 
 	if not reason
 		reason = if @GetTimeLimit! == 0
