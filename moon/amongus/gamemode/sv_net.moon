@@ -212,6 +212,23 @@ GM.Net_BroadcastDead = =>
 
 	net.Broadcast!
 
+--- Updates all ghosts with the new dead players table.
+GM.Net_BroadcastDeadToGhosts = =>
+	dead = {}
+	for playerTable, _ in pairs @GameData.DeadPlayers
+		table.insert dead, playerTable.id
+
+	net.Start "NMW AU Flow"
+	net.WriteUInt @FlowTypes.BroadcastDead, @FlowSize
+	net.WriteUInt #dead, 8
+	for _, id in ipairs dead
+		net.WriteUInt id, 8
+
+	net.Send for playerTable, _ in pairs @GameData.DeadPlayers
+		continue unless IsValid playerTable.entity
+
+		playerTable.entity
+
 --- Notifies the player that he has, in fact, just commited a crime.
 -- @param playerTable An imposter.
 GM.Net_KillNotify = (playerTable) =>
@@ -279,6 +296,7 @@ GM.Net_SendNotifyKilled = (playerTable, killerTable) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.NotifyKilled, @FlowSize
 	net.WriteUInt killerTable.id, 8
+
 	net.Send playerTable.entity
 
 --- Broadcasts sabotage data to players.

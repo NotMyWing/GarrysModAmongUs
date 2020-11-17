@@ -110,6 +110,7 @@ GM.Player_Kill = (victimTable, attackerTable) =>
 
 	@Net_SendNotifyKilled victimTable, attackerTable
 	@Player_CloseVGUI victimTable
+	@Net_BroadcastDeadToGhosts!
 
 	@Game_CheckWin!
 
