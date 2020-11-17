@@ -12,13 +12,13 @@ include "sv_resources.lua"
 include "sv_player.lua"
 include "sv_meeting.lua"
 include "sv_game.lua"
-include "sv_footsteps.lua"
 
 include "sh_hooks.lua"
 include "sh_tasks.lua"
 include "sh_sabotages.lua"
 include "sh_convarsnapshots.lua"
 include "sh_manifest.lua"
+include "sh_footsteps.lua"
 
 -- Obligatory client stuff
 AddCSLuaFile "sh_lang.lua"
@@ -47,6 +47,7 @@ AddCSLuaFile "cl_net.lua"
 AddCSLuaFile "cl_render.lua"
 AddCSLuaFile "sh_convarsnapshots.lua"
 AddCSLuaFile "sh_manifest.lua"
+AddCSLuaFile "sh_footsteps.lua"
 
 concommand.Add "au_debug_restart", ->
 	GAMEMODE\Game_Restart!
