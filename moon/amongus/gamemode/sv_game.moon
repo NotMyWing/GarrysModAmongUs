@@ -193,7 +193,7 @@ GM.Game_Start = =>
 		@Net_BroadcastGameStart!
 
 		@Logger.Info "Starting the game with #{#@GameData.PlayerTables} players"
-		@Logger.Info "There are #{@ConVars.ImposterCount\GetInt!} imposter(s) among them"
+		@Logger.Info "There are #{imposterCount} imposter(s) among them"
 
 		-- Start the game after a dramatic pause.
 		-- Teleport players while they're staring at the splash screen.
