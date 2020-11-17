@@ -4,70 +4,85 @@ GM.Meeting_Start = (playerTable, bodyColor) =>
 	if "Player" == type playerTable
 		playerTable = playerTable\GetAUPlayerTable!
 	return unless playerTable
-
+	return if @GameData.DeadPlayers[playerTable]
 	return unless @IsGameInProgress!
 
 	handle = "meeting"
-
-	return if @GameData.DeadPlayers[playerTable]
 	return if timer.Exists handle
 
 	if timer.Exists "timelimit"
 		timer.Pause "timelimit"
 
-	for index, ply in ipairs player.GetAll!
+	for ply in *player.GetAll!
 		ply\Freeze true
 
 	@Player_CloseVGUIsForEveryone!
 	@Sabotage_EndNonPersistent!
 	@SetMeetingInProgress true
 
-	hook.Call "GMAU MeetingStart"
 	@Net_BroadcastDead!
-
 	@Net_BroadcastMeeting playerTable, bodyColor
+
 	if bodyColor
 		@Logger.Info "#{playerTable.nickname} has found a body! Calling a meeting"
 	else
 		@Logger.Info "#{playerTable.nickname} has called a meeting"
 
+	hook.Call "GMAU MeetingStart", nil, bodyColor
+
 	@GameData.Timers[handle] = true
 	timer.Create handle, 3, 1, ->
-		spawns = ents.FindByClass "info_player_start"
-		for index, otherPlayerTable in ipairs @GameData.PlayerTables
-			if IsValid otherPlayerTable.entity
-				with otherPlayerTable.entity
-					point = spawns[(index % #spawns) + 1]
-					\SetPos point\GetPos!
-					\SetAngles point\GetAngles!
-					\SetEyeAngles point\GetAngles!
+		-- Try find meeting start positions.
+		spawns = ents.FindByClass "info_player_meeting"
+		if #spawns == 0
+			-- We found no meeting start positions. Fall back to regular spawn points.
+			spawns = ents.FindByClass "info_player_start"
+			if #spawns == 0
+				-- We found literally nothing.
+				return error "Couldn't find any spawn positions"
 
-					if @GameData.Vented[otherPlayerTable] and not @GameData.DeadPlayers[otherPlayerTable]
-						@Player_Unhide otherPlayerTable.entity
-						@Player_UnPauseKillCooldown otherPlayerTable
-						@Net_NotifyVent otherPlayerTable, @VentNotifyReason.UnVent
-						@GameData.Vented[otherPlayerTable] = false
+		for index, otherPlayerTable in ipairs @GameData.PlayerTables
+			continue unless IsValid otherPlayerTable.entity
+
+			with otherPlayerTable.entity
+				-- Unvent vented players.
+				-- The reason why this block isn't just calling Player_UnVent
+				-- is that we don't want to play animations in front of everyone.
+				if @GameData.Vented[otherPlayerTable]
+					@Player_Unhide otherPlayerTable.entity
+					@Player_UnPauseKillCooldown otherPlayerTable
+					@Net_NotifyVent otherPlayerTable, @VentNotifyReason.UnVent
+					@GameData.Vented[otherPlayerTable] = false
+
+				-- Spread the players around.
+				point = spawns[((index - 1) % #spawns) + 1]
+				\SetPos point\GetPos!
+				\SetAngles point\GetAngles!
+				\SetEyeAngles point\GetAngles!
 
 		@Net_BroadcastDiscuss playerTable
 
+		-- Wait for the meeting to start.
 		timer.Create handle, @ConVarSnapshots.VotePreTime\GetInt! + 3, 1, ->
 			@GameData.Voting = true
 			table.Empty @GameData.Votes
 			table.Empty @GameData.VotesMap
 
+			-- If the convar is set, make bots vote.
 			if @ConVarSnapshots.MeetingBotVote\GetBool!
 				for ply in *player.GetAll!
-					if ply\IsBot!
-						botHandle = "BotVote #{ply\Nick!}"
-						GAMEMODE.GameData.Timers[botHandle] = true
+					continue unless ply\IsBot!
 
-						time = (math.random 1, 50 * math.min 5, @ConVarSnapshots.VoteTime\GetInt!) / 50
-						timer.Create botHandle, time, 1, ->
-							GAMEMODE.GameData.Timers[botHandle] = nil
+					botHandle = "BotVote #{ply\Nick!}"
+					GAMEMODE.GameData.Timers[botHandle] = true
 
-							skip = math.random! > 0.8
-							rnd = table.Random @GetAlivePlayers!
-							@Meeting_Vote ply\GetAUPlayerTable!, not skip and rnd
+					time = (math.random 1, 50 * math.min 5, @ConVarSnapshots.VoteTime\GetInt!) / 50
+					timer.Create botHandle, time, 1, ->
+						GAMEMODE.GameData.Timers[botHandle] = nil
+
+						skip = math.random! > 0.8
+						rnd = table.Random @GetAlivePlayers!
+						@Meeting_Vote ply\GetAUPlayerTable!, not skip and rnd
 
 			timer.Create handle, @ConVarSnapshots.VoteTime\GetInt!, 1, ->
 				@Meeting_End!
@@ -140,7 +155,7 @@ GM.Meeting_End = =>
 
 		timer.Pause "NMW AU CheckWin"
 		timer.Create handle, 8, 1, ->
-			for index, ply in ipairs player.GetAll!
+			for ply in *player.GetAll!
 				ply\Freeze false
 
 			if not @Game_CheckWin!

@@ -254,23 +254,27 @@ GM.Game_Restart = =>
 		ply\Freeze false
 		ply\Spawn!
 
-		-- ???????
 		if #spawns ~= 0
-			point = spawns[(index % #spawns) + 1]
+			point = spawns[((index - 1) % #spawns) + 1]
 			ply\SetPos point\GetPos!
 			ply\SetAngles point\GetAngles!
 			ply\SetEyeAngles point\GetAngles!
+		else
+			return error "Couldn't find any spawn positions"
 
 	@SetGameState @GameState.Preparing
 	hook.Call "GMAU Restart"
 
 GM.Game_StartRound = =>
-	-- Spawn the players and spread them around.
 	spawns = ents.FindByClass "info_player_start"
+	if #spawns == 0
+		return error "Couldn't find any spawn positions"
+
+	-- Spawn the players and spread them around.
 	for index, ply in ipairs @GameData.PlayerTables
 		if IsValid ply.entity
 			with ply.entity
-				point = spawns[(index % #spawns) + 1]
+				point = spawns[((index - 1) % #spawns) + 1]
 				\Spawn!
 				\SetPos point\GetPos!
 				\SetAngles point\GetAngles!
@@ -278,10 +282,12 @@ GM.Game_StartRound = =>
 
 	-- Call janitors to get rid of the bodies.
 	bodies = ents.FindByClass "prop_ragdoll"
-	for _, body in ipairs bodies
-		if 0 ~= body\GetNW2Int "NMW AU PlayerID"
-			body\Remove!
+	for body in *bodies
+		continue if 0 == body\GetNW2Int "NMW AU PlayerID"
 
+		body\Remove!
+
+	-- Refresh kill cooldowns.
 	for ply in pairs @GameData.Imposters
 		@Player_RefreshKillCooldown ply
 
