@@ -302,6 +302,7 @@ GM.TracePlayer = (ply) =>
 	entities = ents.FindInSphere startPos, @BaseUseRadius * @ConVarSnapshots.KillDistanceMod\GetFloat!
 
 	usable = {}
+	highlightable = {}
 	killable = {}
 
 	playerTable = ply\GetAUPlayerTable!
@@ -310,6 +311,16 @@ GM.TracePlayer = (ply) =>
 	for _, ent in ipairs entities
 		continue if ent == ply
 		continue if SERVER and not ply\TestPVS ent
+
+		otherPlayerTable = @GameData.Lookup_PlayerByEntity[ent]
+
+		isKillable = otherPlayerTable and ent\IsPlayer! and not ent\IsDormant! and @GameData.Imposters[playerTable] and
+			not @GameData.Imposters[otherPlayerTable] and not @GameData.DeadPlayers[otherPlayerTable]
+
+		isUsable = not isKillable and not ent\IsPlayer!
+		isHightlightable = isUsable and @ShouldHighlightEntity ent
+		-- Skip checking if we found at least one highlightable entity.
+		continue if #highlightable > 0 and not isHightlightable
 
 		-- No point entities. No view models.
 		continue if not ent\GetModel! or ent\GetModelRadius! == 0
@@ -361,21 +372,18 @@ GM.TracePlayer = (ply) =>
 
 			continue if time > 0
 
-		otherPlayerTable = @GameData.Lookup_PlayerByEntity[ent]
-
-		isKillable = otherPlayerTable and ent\IsPlayer! and not ent\IsDormant! and @GameData.Imposters[playerTable] and
-			not @GameData.Imposters[otherPlayerTable] and not @GameData.DeadPlayers[otherPlayerTable]
-
-		isUsable = not isKillable and not ent\IsPlayer!
 		if isKillable
 			table.insert killable, ent
 
 		elseif isUsable
 			nearestPoint = ent\NearestPoint startPos
 			if nearestPoint\Distance(ply\GetPos!) <= @BaseUseRadius
-				table.insert usable, ent
+				table.insert isHightlightable and highlightable or usable, ent
 
 	lookPos = ply\EyePos! + ply\GetAimVector! * 32
+
+	-- Prioritize highlightable entities.
+	usable = #highlightable > 0 and highlightable or usable
 
 	GAMEMODE.Util.SortByDistance usable, lookPos
 	GAMEMODE.Util.SortByDistance killable, lookPos
@@ -420,6 +428,34 @@ GM.GetFullyInitializedPlayers = => return for ply in *player.GetAll!
 
 --- Gets the imposter count based on the provided number.
 GM.GetImposterCount = (_, count) -> math.floor(((count or _) - 1)/6) + 1
+
+--- Tells the game mode that the entity should be highlighted as usable.
+-- @param entity Entity to be highlighted.
+-- @param highlight Should the entity be highlighted?
+-- @param color Optional color. Defaults to white.
+GM.SetUseHighlight = (entity, highlight = false, color = Color(255, 255, 255)) =>
+	entity\SetNW2Bool "NMW AU UseHighlight", highlight
+	if highlight
+		entity\SetNW2Vector "NMW AU HighlightColor", color\ToVector!
+
+--- Gets whether the entity should be highlighted.
+-- @param entity Entity.
+GM.ShouldHighlightEntity = (entity) =>
+	return false unless IsValid entity
+	return true if entity\GetNW2Bool "NMW AU UseHighlight"
+
+	return true if switch string.match entity\GetClass!, "[^_]*_(.+)"
+		when "task_button", "meeting_button", "vent", "sabotage_button"
+			true
+
+	return true if hook.Call "GMAU ShouldHighlight", nil, entity
+	return true if @IsPlayerBody entity
+
+	return false
+
+--- Returns whether the entity is a player body.
+-- @param entity Entity.
+GM.IsPlayerBody = (entity) => 0 < entity\GetNW2Int "NMW AU PlayerID"
 
 local logger
 logger = {

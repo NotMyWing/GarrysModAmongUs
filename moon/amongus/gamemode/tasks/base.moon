@@ -58,8 +58,12 @@ taskBase = {
 	--- Duh.
 	GetActivationButton: => @__button
 
-	SetPositionImportant: (value) => @__positionImportant
-	GetPositionImportant: => @__positionImportant
+	SetPositionImportant: (value) =>
+		@__positionImportant = value
+		if SERVER
+			@SetDirty!
+
+	GetPositionImportant: => @__positionImportant or false
 
 	--- Sets the custom name for the task.
 	-- Useful if you want your task to specify some extra info.

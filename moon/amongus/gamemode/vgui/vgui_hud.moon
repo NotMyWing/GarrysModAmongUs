@@ -390,7 +390,7 @@ hud.SetupButtons = (state, impostor) =>
 			.Paint = (_, w, h) ->
 				ent = GAMEMODE.UseHighlight
 				mat = @UseButtonOverride or if IsValid ent
-					if 0 ~= ent\GetNW2Int "NMW AU PlayerID"
+					if GAMEMODE\IsPlayerBody ent
 						MAT_BUTTONS.report
 					elseif ent\GetClass! == "prop_vent" or ent\GetClass! == "func_vent"
 						MAT_BUTTONS.vent

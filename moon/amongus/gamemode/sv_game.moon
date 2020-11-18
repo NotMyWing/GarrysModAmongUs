@@ -283,7 +283,7 @@ GM.Game_StartRound = =>
 	-- Call janitors to get rid of the bodies.
 	bodies = ents.FindByClass "prop_ragdoll"
 	for body in *bodies
-		continue if 0 == body\GetNW2Int "NMW AU PlayerID"
+		continue unless @IsPlayerBody body
 
 		body\Remove!
 

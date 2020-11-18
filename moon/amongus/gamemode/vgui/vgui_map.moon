@@ -29,7 +29,7 @@ return vgui.RegisterTable {
 								if instance
 									enabled = \IsEnabled!
 									canSetOff = not GAMEMODE\IsMeetingInProgress! and
-										not GAMEMODE.UseHighlight and
+										not IsValid(GAMEMODE.UseHighlight) and
 										not GAMEMODE.GameData.Vented and
 										instance\CanStart!
 

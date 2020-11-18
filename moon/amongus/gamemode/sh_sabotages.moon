@@ -75,7 +75,7 @@ else
 			IsValid playerTable.entity
 
 				_, usable = GAMEMODE\TracePlayer playerTable.entity
-				return if usable
+				return if @ShouldHighlightEntity usable
 
 				if instance = @GameData.Sabotages[id]
 					if instance\CanStart!

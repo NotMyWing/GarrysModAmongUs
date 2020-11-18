@@ -81,34 +81,27 @@ hook.Add "CalcView", "NMW AU CalcView", ( ply, pos, angles, fov ) -> {
 color_sabotage = Color 32, 255, 32
 color_sabotageb = Color 255, 32, 32
 
-color_kill = Color 255, 0, 0
-color_task   = Color 255, 230, 0
+color_kill  = Color 255, 0, 0
+color_task  = Color 255, 230, 0
 color_white = Color 255, 255, 255
 
 GM.GetHighlightColor = (entity) => if IsValid entity
+	return (entity\GetNW2Vector "NMW AU HighlightColor")\ToColor! if entity\GetNW2Bool "NMW AU UseHighlight"
+
+	hookResult = hook.Call "GMAU ShouldHighlight"
+	return color_white if hookResult == true
+	return hookResult if IsColor hookResult
+
 	return switch entity\GetClass!
 		when "prop_vent", "func_vent"
 			color_kill
-		when "prop_task_button", "func_task_button", "prop_sabotage_button", "func_sabotage_button"
+		when "prop_task_button", "func_task_button"
 			color_task
-		when "prop_ragdoll"
-			nil
-		else
+		when "prop_meeting_button", "func_meeting_button"
 			color_white
 
 hook.Add "PreDrawHalos", "NMW AU Highlight", ->
-	-- Highlight our current tasks.
-	if not GAMEMODE.GameData.Imposters[GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]]
-		for _, task in pairs GAMEMODE.GameData.MyTasks
-			btn = task\GetActivationButton!
-			continue unless IsValid btn
-
-			color = GAMEMODE\GetHighlightColor task\GetActivationButton!
-			-- Obligatory wall of checks.
-			if color and not task\GetCompleted! and
-				IsValid(btn) and btn ~= GAMEMODE.UseHighlight and
-				160 > btn\GetPos!\Distance LocalPlayer!\GetPos!
-					halo.Add { btn }, color, 3, 3, 2, true, true
+	return unless GAMEMODE\IsGameInProgress!
 
 	-- Highlight sabotage buttons.
 	for btn in pairs GAMEMODE.GameData.SabotageButtons
@@ -117,9 +110,40 @@ hook.Add "PreDrawHalos", "NMW AU Highlight", ->
 	if IsValid GAMEMODE.KillHighlight
 		halo.Add { GAMEMODE.KillHighlight }, color_kill, 4, 4, 8, true, true
 
+	highlighted = {}
 	if IsValid GAMEMODE.UseHighlight
 		if color = GAMEMODE\GetHighlightColor GAMEMODE.UseHighlight
+			highlighted[GAMEMODE.UseHighlight] = true
 			halo.Add { GAMEMODE.UseHighlight }, color, 4, 4, 8, true, true
+
+	-- Highlight all highlightables, except tasks.
+	for ent in *ents.FindInSphere LocalPlayer!\GetPos!, 160
+		continue if ent.GetTaskName
+		continue if highlighted[ent]
+
+		-- Only highlight vents for the imposters.
+		continue if not LocalPlayer!\IsImposter! and
+			(ent\GetClass! == "func_vent" or ent\GetClass! == "prop_vent")
+
+		color = GAMEMODE\GetHighlightColor ent
+		if color
+			halo.Add { ent }, color, 3, 3, 2, true, true
+
+	-- Highlight tasks. The reason why they're handled separately is that
+	-- it's impossible to do in the upper block without re-iterating the entire task list every time.
+	if not LocalPlayer!\IsImposter!
+		for taskName, taskInstance in pairs GAMEMODE.GameData.MyTasks
+			button = taskInstance\GetActivationButton!
+			continue unless IsValid button
+			continue if highlighted[button]
+
+			color = GAMEMODE\GetHighlightColor button
+
+			continue if not taskInstance\GetPositionImportant! and
+				160 < button\GetPos!\Distance LocalPlayer!\GetPos!
+
+			if button
+				halo.Add { button }, color, 3, 3, 2, true, true
 
 color_crew = Color 255, 255, 255
 color_imposter = Color 255, 0, 0

@@ -93,7 +93,7 @@ hook.Add "Tick", "NMW AU Highlight", ->
 	if IsValid(LocalPlayer!) and LocalPlayer!\IsPlaying!
 		killable, usable = GAMEMODE\TracePlayer LocalPlayer!
 		GAMEMODE.KillHighlight = killable
-		GAMEMODE.UseHighlight = usable
+		GAMEMODE.UseHighlight = GAMEMODE\ShouldHighlightEntity(usable) and usable
 	else
 		GAMEMODE.KillHighlight = nil
 		GAMEMODE.UseHighlight = nil
