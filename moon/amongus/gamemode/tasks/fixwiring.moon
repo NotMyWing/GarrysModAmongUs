@@ -154,6 +154,7 @@ if CLIENT
 								.__id = wires[j][i]
 
 								\SetSize hitboxWidth, hitboxHeight
+								\SetText ""
 
 								hitX = originX + xOffset - (hitboxWidth / 2)
 								hitY = originY + yOffset - (hitboxHeight / 2)
