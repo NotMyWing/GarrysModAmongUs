@@ -133,6 +133,8 @@ hook.Add "PreDrawHalos", "NMW AU Highlight", ->
 	-- it's impossible to do in the upper block without re-iterating the entire task list every time.
 	if not LocalPlayer!\IsImposter!
 		for taskName, taskInstance in pairs GAMEMODE.GameData.MyTasks
+			continue if taskInstance\GetCompleted!
+
 			button = taskInstance\GetActivationButton!
 			continue unless IsValid button
 			continue if highlighted[button]
