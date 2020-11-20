@@ -6,21 +6,24 @@ ASSETS = {
 	background: Material "au/gui/meeting/bg.png", "smooth"
 }
 
+ROTATION_MATRIX = Matrix!
+
 return vgui.RegisterTable {
 	PlayBackground: (callback) =>
+		local shrinkAnim, rot
 		with bg = @Add "DPanel"
 			\SetSize @GetWide!, @GetTall!
 			\SetPos 0, 0
 
-			.rot = 33
+			rot = 33
 			\NewAnimation 0.1, 0, -1, ->
-				.rot = -33
+				rot = -33
 				\NewAnimation 0.1, 0, -1, ->
-					.rot = 0
+					rot = 0
 					if callback
 						callback!
 					@AlphaTo 0, 0.35, 3
-					.shrinkAnim = \NewAnimation 0.35, 3, -1, ->
+					shrinkAnim = \NewAnimation 0.35, 3, -1, ->
 						@Remove!
 
 			aspect = 435/948
@@ -30,19 +33,21 @@ return vgui.RegisterTable {
 				ltsv = Vector ltsx, ltsy, 0
 				v = Vector w / 2, h / 2, 0
 
-				m = Matrix!
-				m\Translate ltsv
-				m\Translate v
-				m\Rotate Angle 0, .rot, 0
-				if .rot ~= 0
-					m\Scale Vector 1.5, 1.5, 1.5
-				if .shrinkAnim
-					m\Scale Vector 1, (math.Clamp((.shrinkAnim.EndTime - SysTime!) / (.shrinkAnim.EndTime - .shrinkAnim.StartTime), 0, 1)), 1
+				with ROTATION_MATRIX
+					\Identity!
+					\Translate ltsv
+					\Translate v
+					\Rotate Angle 0, rot, 0
 
-				m\Translate -v
-				m\Translate -ltsv
+					if rot ~= 0
+						\Scale Vector 1.5, 1.5, 1.5
+					if shrinkAnim
+						\Scale Vector 1, (math.Clamp((shrinkAnim.EndTime - SysTime!) / (shrinkAnim.EndTime - shrinkAnim.StartTime), 0, 1)), 1
 
-				cam.PushModelMatrix m, true
+					\Translate -v
+					\Translate -ltsv
+
+				cam.PushModelMatrix ROTATION_MATRIX, true
 				do
 					surface.DisableClipping true
 					surface.SetDrawColor 255, 255, 255

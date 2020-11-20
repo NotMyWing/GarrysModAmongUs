@@ -4,6 +4,7 @@ taskTable = {
 }
 
 if CLIENT
+	ROTATION_MATRIX = Matrix!
 	circle = GM.Render.CreateCircle
 
 	taskTable.CreateVGUI = =>
@@ -120,15 +121,15 @@ if CLIENT
 								ltsv = Vector ltsx, ltsy, 0
 								v = Vector w / 2, h / 2, 0
 
-								m = Matrix!
-								m\Translate ltsv
-								m\Translate v
-								m\Rotate Angle 0, rotations[i], 0
-								m\Translate -v
-								m\Translate -ltsv
+								with ROTATION_MATRIX
+									\Identity!
+									\Translate ltsv
+									\Translate v
+									\Rotate Angle 0, rotations[i], 0
+									\Translate -v
+									\Translate -ltsv
 
-								cam.PushModelMatrix m, true
-
+								cam.PushModelMatrix ROTATION_MATRIX, true
 								do
 									knobW = w * 0.15
 									knobH = w * 0.22
@@ -155,7 +156,7 @@ if CLIENT
 							.Paint = ->
 							with \Add "DPanel"
 								\Dock FILL
-								
+
 								innerPadding = padding * 0.5
 								\DockPadding innerPadding, innerPadding, innerPadding, innerPadding
 								\SetBackgroundColor Color 16, 16, 16

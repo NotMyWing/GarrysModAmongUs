@@ -60,22 +60,25 @@ meeting = {}
 
 DISCUSS_SPLASH_TIME = 3
 
+ROTATION_MATRIX = Matrix!
+
 --- Creates the famous pre-vote popup.
 -- I had fun coming up with this one.
 meeting.PlayBackground = (callback) =>
+	local rot, shrinkAnim
 	with bg = @Add "DPanel"
 		\SetSize @GetWide!, @GetTall!
 		\SetPos 0, 0
 
-		.rot = 33
+		rot = 33
 		\NewAnimation 0.1, 0, -1, ->
-			.rot = -33
+			rot = -33
 			\NewAnimation 0.1, 0, -1, ->
-				.rot = 0
+				rot = 0
 				if callback
 					callback!
 				\NewAnimation 3, 0, -1, ->
-					.shrinkAnim = \NewAnimation 0.35, 0
+					shrinkAnim = \NewAnimation 0.35, 0
 
 		aspect = 435/948
 
@@ -84,19 +87,20 @@ meeting.PlayBackground = (callback) =>
 			ltsv = Vector ltsx, ltsy, 0
 			v = Vector w / 2, h / 2, 0
 
-			m = Matrix!
-			m\Translate ltsv
-			m\Translate v
-			m\Rotate Angle 0, .rot, 0
-			if .rot ~= 0
-				m\Scale Vector 1.5, 1.5, 1.5
-			if .shrinkAnim
-				m\Scale Vector 1, ((.shrinkAnim.EndTime - SysTime!) / (.shrinkAnim.EndTime - .shrinkAnim.StartTime)), 1
+			with ROTATION_MATRIX
+				\Identity!
+				\Translate ltsv
+				\Translate v
+				\Rotate Angle 0, rot, 0
+				if rot ~= 0
+					\Scale Vector 1.5, 1.5, 1.5
+				if shrinkAnim
+					\Scale Vector 1, ((shrinkAnim.EndTime - SysTime!) / (shrinkAnim.EndTime - shrinkAnim.StartTime)), 1
 
-			m\Translate -v
-			m\Translate -ltsv
+				\Translate -v
+				\Translate -ltsv
 
-			cam.PushModelMatrix m, true
+			cam.PushModelMatrix ROTATION_MATRIX, true
 			do
 				surface.DisableClipping true
 				surface.SetDrawColor 255, 255, 255
@@ -385,18 +389,19 @@ meeting.OpenDiscuss = (caller) =>
 											ltsv = Vector ltsx, ltsy, 0
 											v = Vector w - mWidth - mWidth * 0.25 + mWidth/2, h / 2, 0
 
-											m = Matrix!
-											m\Translate ltsv
-											m\Translate v
+											with ROTATION_MATRIX
+												\Identity!
+												\Translate ltsv
+												\Translate v
 
-											if value ~= 1
-												m\Rotate Angle 0, (math.sin(math.rad(CurTime! * 1200))) * 12 * value, 0
-												m\Scale (1 + value) * Vector 1, 1, 1
+												if value ~= 1
+													\Rotate Angle 0, (math.sin(math.rad(CurTime! * 1200))) * 12 * value, 0
+													\Scale (1 + value) * Vector 1, 1, 1
 
-											m\Translate -v
-											m\Translate -ltsv
+												\Translate -v
+												\Translate -ltsv
 
-											cam.PushModelMatrix m, true
+											cam.PushModelMatrix ROTATION_MATRIX, true
 											surface.SetMaterial MAT_MEETING_TABLET.megaphone
 											surface.SetDrawColor Color 255, 255, 255, 255 * 1/value
 											surface.DrawTexturedRect w - mWidth - mWidth * 0.25, 0, mWidth, mHeight
@@ -572,38 +577,39 @@ meeting.OpenDiscuss = (caller) =>
 				.PopFilterMag!
 				.PopFilterMin!
 
+				ltsx, ltsy = _\LocalToScreen 0, 0
+				ltsv = Vector ltsx, ltsy, 0
+
 				-- Let's enter the abyss.
 				do
-					ltsx, ltsy = _\LocalToScreen 0, 0
-					ltsv = Vector ltsx, ltsy, 0
 					v = Vector w/3, h / 1.5, 0
 
-					m = Matrix!
-					m\Translate ltsv
-					m\Translate v
-					m\Rotate Angle 0, (math.sin(math.rad(CurTime! * 1200))) * 2, 0
-					m\Translate -v
-					m\Translate -ltsv
+					with ROTATION_MATRIX
+						\Identity!
+						\Translate ltsv
+						\Translate v
+						\SetAngles Angle 0, (math.sin(math.rad(CurTime! * 1200))) * 2, 0
+						\Translate -v
+						\Translate -ltsv
 
-					cam.PushModelMatrix m, true
+					cam.PushModelMatrix ROTATION_MATRIX, true
 					surface.SetMaterial MAT_DISCUSS.yes_crewLeft
 					surface.DrawTexturedRect -w*0.15, h/2-h*0.125, w/2 + w*0.1, h/2+h*0.2
 					cam.PopModelMatrix!
 
 				-- Let's enter the abyss one more time.
 				do
-					ltsx, ltsy = _\LocalToScreen 0, 0
-					ltsv = Vector ltsx, ltsy, 0
 					v = Vector w/2 + w/4, h / 2 + h/3, 0
 
-					m = Matrix!
-					m\Translate ltsv
-					m\Translate v
-					m\Rotate Angle 0, (math.cos(math.rad(CurTime! * 1200))) * 2, 0
-					m\Translate -v
-					m\Translate -ltsv
+					with ROTATION_MATRIX
+						\Identity!
+						\Translate ltsv
+						\Translate v
+						\SetAngles Angle 0, (math.cos(math.rad(CurTime! * 1200))) * 2, 0
+						\Translate -v
+						\Translate -ltsv
 
-					cam.PushModelMatrix m, true
+					cam.PushModelMatrix ROTATION_MATRIX, true
 					surface.SetMaterial MAT_DISCUSS.yes_crewRight
 					surface.DrawTexturedRect w/2, h/2-h*0.05, w/2 + w*0.2, h/2+h*0.2
 					cam.PopModelMatrix!

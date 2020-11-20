@@ -27,6 +27,8 @@ if CLIENT
 		kil: Material "au/gui/tasks/clearasteroids/weapons_explosion.png", "smooth"
 	}
 
+	ROTATION_MATRIX = Matrix!
+
 	taskTable.CreateVGUI = =>
 		state = @GetCurrentState!
 		base = vgui.Create "AmongUsTaskBase"
@@ -109,17 +111,18 @@ if CLIENT
 									ltsv = Vector ltsx, ltsy, 0
 									v = Vector w / 2, h / 2, 0
 
-									m = Matrix!
-									m\Translate ltsv
-									m\Translate v
-									m\Rotate Angle 0, rotation, 0
-									m\Translate -v
-									m\Translate -ltsv
+									with ROTATION_MATRIX
+										\Identity!
+										\Translate ltsv
+										\Translate v
+										\Rotate Angle 0, rotation, 0
+										\Translate -v
+										\Translate -ltsv
 
 									scX1, scY1 = innerPanel\LocalToScreen 0, 0
 									scX2, scY2 = innerPanel\LocalToScreen innerPanel\GetSize!
 									render.SetScissorRect scX1, scY1, scX2, scY2, true
-									cam.PushModelMatrix m, true
+									cam.PushModelMatrix ROTATION_MATRIX, true
 									surface.DisableClipping true
 									do
 										surface.SetDrawColor 255, 255, 255

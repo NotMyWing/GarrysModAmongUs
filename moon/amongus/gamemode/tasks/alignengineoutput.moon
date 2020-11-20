@@ -21,6 +21,7 @@ taskTable = {
 }
 
 if CLIENT
+	ROTATION_MATRIX = Matrix!
 	ASSETS_DIR = "au/gui/tasks/alignengineoutput/"
 	ASSETS = {
 		base:         Material ASSETS_DIR .. "base.png"        , "smooth"
@@ -78,7 +79,8 @@ if CLIENT
 							ltsv = Vector ltsx, ltsy, 0
 							v = Vector w, h / 2
 
-							m = with Matrix!
+							with ROTATION_MATRIX
+								\Identity!
 								\Translate ltsv
 								\Translate v
 								\Rotate Angle 0, 2.5 * theta, 0
@@ -86,7 +88,7 @@ if CLIENT
 								\Translate -ltsv
 
 							surface.DisableClipping true
-							cam.PushModelMatrix m, true
+							cam.PushModelMatrix ROTATION_MATRIX, true
 
 							-- Setup scissor.
 							-- Garry's Mod is dumb and rotates the clipping area as well,
@@ -240,7 +242,8 @@ if CLIENT
 							ltsv = Vector ltsx, ltsy, 0
 							v = Vector circlePositionX, circlePositionY
 
-							m = with Matrix!
+							with ROTATION_MATRIX
+								\Identity!
 								\Translate ltsv
 								\Translate v
 								\Rotate Angle 0, theta, 0
@@ -248,7 +251,7 @@ if CLIENT
 								\Translate -ltsv
 
 							surface.DisableClipping true
-							cam.PushModelMatrix m, true
+							cam.PushModelMatrix ROTATION_MATRIX, true
 
 							surface.SetDrawColor 255, 255, 255
 

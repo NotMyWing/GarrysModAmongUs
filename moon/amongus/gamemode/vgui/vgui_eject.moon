@@ -21,6 +21,8 @@ MAT_CREWMATE = {
 	Material "au/gui/eject/crewmate2.png", "smooth"
 }
 
+ROTATION_MATRIX = Matrix!
+
 eject = {}
 
 eject.Init = => with @
@@ -127,7 +129,7 @@ eject.Eject = (reason, ply, confirm = false, imposter = false, remaining = 0, to
 
 				@WriteText text, subtext
 
-			.accumulator = 0
+			accumulator = 0
 			starttime = SysTime!
 			endtime = SysTime! + 5
 
@@ -135,20 +137,21 @@ eject.Eject = (reason, ply, confirm = false, imposter = false, remaining = 0, to
 			-- Just a tiny bit.
 			.Paint = (_, w, h) ->
 				curtime = math.max 0.1, (endtime - SysTime!) / (endtime - starttime)
-				.accumulator += curtime * 2.5
+				accumulator += curtime * 2.5
 
 				ltsx, ltsy = _\LocalToScreen 0, 0
 				ltsv = Vector ltsx, ltsy, 0
 				v = Vector w / 2, h / 2, 0
 
-				m = Matrix!
-				m\Translate ltsv
-				m\Translate v
-				m\Rotate Angle 0, .accumulator, 0
-				m\Translate -v
-				m\Translate -ltsv
+				with ROTATION_MATRIX
+					\Identity!
+					\Translate ltsv
+					\Translate v
+					\Rotate Angle 0, accumulator, 0
+					\Translate -v
+					\Translate -ltsv
 
-				cam.PushModelMatrix m, true
+				cam.PushModelMatrix ROTATION_MATRIX, true
 				do
 					surface.DisableClipping true
 					surface.SetDrawColor ply.color

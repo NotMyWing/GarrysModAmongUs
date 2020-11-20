@@ -41,6 +41,7 @@ if CLIENT
 	}
 
 	WIRE_SOUND = ["au/panel_electrical_wire#{i}.wav" for i = 1, 3]
+	ROTATION_MATRIX = Matrix!
 
 	taskTable.CreateVGUI = =>
 		base = vgui.Create "AmongUsTaskBase"
@@ -256,23 +257,23 @@ if CLIENT
 										-- Calculate the distance between the origin and target.
 										-- Bail if under threshold.
 										dist = math.sqrt math.pow(ltsx + w - targetX, 2) + math.pow(ltsy + originY - targetY, 2)
-										if dist > max_size * 0.035
-											m = Matrix!
-											ltsv = Vector ltsx + w, ltsy + originY, 0
+										ltsv = Vector ltsx + w, ltsy + originY, 0
 
-											-- Calculate the angle between the origin and target.
-											th = math.deg math.atan2 targetX - ltsv.x, targetY - ltsv.y
+										-- Calculate the angle between the origin and target.
+										th = math.deg math.atan2 targetX - ltsv.x, targetY - ltsv.y
 
-											-- Rotate.
-											m\Translate ltsv
-											m\Rotate Angle 0, 360 - 0.995 * (th - 90), 0
-											m\Translate -ltsv
+										-- Rotate.
+										with ROTATION_MATRIX
+											\Identity!
+											\Translate ltsv
+											\Rotate Angle 0, 360 - 0.995 * (th - 90), 0
+											\Translate -ltsv
 
-											-- Push and tell the following code that a matrix has been pushed.
-											cam.PushModelMatrix m
-											matrixPushed = true
-										else
-											dist = 0
+										-- Push and tell the following code that a matrix has been pushed.
+										cam.PushModelMatrix ROTATION_MATRIX
+										matrixPushed = true
+									else
+										dist = 0
 
 									-- This entire block is just bad, but https://i.imgur.com/U15slgm.png
 

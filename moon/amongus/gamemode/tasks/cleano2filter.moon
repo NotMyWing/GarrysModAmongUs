@@ -10,18 +10,20 @@ taskTable = {
 
 }
 
-ASSETS = {
-	base: Material "au/gui/tasks/cleano2filter/o2_bgBase.png", "smooth"
-	foreground: Material "au/gui/tasks/cleano2filter/o2_bgTop.png", "smooth"
-	leaves: [Material("au/gui/tasks/cleano2filter/o2_leaf#{i}.png", "smooth") for i = 1, 7]
-}
-
-SOUNDS = {
-	leaf: ["au/panel_o2_leaf#{i}.wav" for i = 1, 4]
-	suck: ["au/panel_o2_suck#{i}.wav" for i = 1, 3]
-}
-
 if CLIENT
+	ASSETS = {
+		base: Material "au/gui/tasks/cleano2filter/o2_bgBase.png", "smooth"
+		foreground: Material "au/gui/tasks/cleano2filter/o2_bgTop.png", "smooth"
+		leaves: [Material("au/gui/tasks/cleano2filter/o2_leaf#{i}.png", "smooth") for i = 1, 7]
+	}
+
+	SOUNDS = {
+		leaf: ["au/panel_o2_leaf#{i}.wav" for i = 1, 4]
+		suck: ["au/panel_o2_suck#{i}.wav" for i = 1, 3]
+	}
+
+	ROTATION_MATRIX = Matrix!
+
 	taskTable.CreateVGUI = =>
 		state = @GetCurrentState!
 		base = vgui.Create "AmongUsTaskBase"
@@ -118,17 +120,18 @@ if CLIENT
 							ltsv = Vector ltsx, ltsy, 0
 							v = Vector w / 2, h / 2, 0
 
-							m = Matrix!
-							m\Translate ltsv
-							m\Translate v
-							m\Rotate Angle 0, rot, 0
-							m\Translate -v
-							m\Translate -ltsv
+							with ROTATION_MATRIX
+								\Identity!
+								\Translate ltsv
+								\Translate v
+								\Rotate Angle 0, rot, 0
+								\Translate -v
+								\Translate -ltsv
 
 							scX1, scY1 = parent\LocalToScreen 0, 0
 							scX2, scY2 = parent\LocalToScreen parent\GetSize!
 							render.SetScissorRect scX1, scY1, scX2, scY2, true
-							cam.PushModelMatrix m, true
+							cam.PushModelMatrix ROTATION_MATRIX, true
 							surface.DisableClipping true
 							do
 								surface.SetMaterial mat

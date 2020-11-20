@@ -296,6 +296,10 @@ ASSETS = {
 	btn: Material "au/gui/floatingbutton.png", "smooth"
 }
 
+HIGHLIGHT_MATRIX = Matrix!
+COLOR_WHITE = Color 255, 255, 255
+COLOR_BLACK = Color 0, 0, 0, 160
+
 hook.Add "HUDPaintBackground", "NMW AU Hud", ->
 	if GAMEMODE\IsGameInProgress!
 		if IsValid GAMEMODE.UseHighlight
@@ -345,36 +349,41 @@ hook.Add "HUDPaintBackground", "NMW AU Hud", ->
 				pos = highlight.entity\WorldSpaceCenter!\ToScreen!
 
 				nearestPoint = highlight.entity\NearestPoint LocalPlayer!\EyePos!
-				value = 1 * (1 - math.max 0, math.min 1, (1/GAMEMODE.BaseUseRadius) * nearestPoint\Distance LocalPlayer!\EyePos!)
+				value = (1 - math.max 0, math.min 1, (1/GAMEMODE.BaseUseRadius) * nearestPoint\Distance LocalPlayer!\EyePos!)
 				size = 0.125 * math.min ScrH!, ScrW!
 
 				-- Since Garry's Mod doesn't allow scaling fonts on the go,
 				-- we'll have to scale the ENTIRE rendering sequence.
-				m = with Matrix!
+				m = with HIGHLIGHT_MATRIX
+					\Identity!
 					\Translate Vector pos.x, pos.y, 0
 					\Scale math.Clamp(value, 0.25, 1) * Vector 1, 1, 1
 					\Translate -Vector pos.x, pos.y, 0
 
-				cam.PushModelMatrix m, true
-				do
-					color = Color 255, 255, 255, math.Clamp 255 * value * 2, 0, 255
-					shadowColor = Color 0, 0, 0, math.Clamp 96 * value * 2, 0, 255
+				surface.SetAlphaMultiplier value
 
+				render.PushFilterMag TEXFILTER.ANISOTROPIC
+				render.PushFilterMin TEXFILTER.ANISOTROPIC
+
+				cam.PushModelMatrix HIGHLIGHT_MATRIX, true
+				do
 					-- The button sprite.
 					surface.SetMaterial ASSETS.btn
-					surface.SetDrawColor color
+					surface.SetDrawColor COLOR_WHITE
 
-					render.PushFilterMag TEXFILTER.ANISOTROPIC
-					render.PushFilterMin TEXFILTER.ANISOTROPIC
 					surface.DrawTexturedRect pos.x - size/2, pos.y - size/2, size, size
-					render.PopFilterMag!
-					render.PopFilterMin!
 
 					-- The tooltip.
 					draw.SimpleTextOutlined string.upper(highlight.button or "?"), "NMW AU Button Tooltip",
-						pos.x, pos.y - size * 0.15, color,
-						TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 4, shadowColor
+						pos.x, pos.y - size * 0.15, COLOR_WHITE,
+						TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 3, COLOR_BLACK
+
 				cam.PopModelMatrix!
+
+				render.PopFilterMag!
+				render.PopFilterMin!
+
+				surface.SetAlphaMultiplier 1
 
 	if IsValid GAMEMODE.Hud
 		GAMEMODE.Hud\PaintManual!

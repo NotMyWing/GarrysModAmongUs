@@ -29,6 +29,7 @@ ASSETS = {
 }
 
 SHUT_TIME = 3
+ROTATION_MATRIX = Matrix!
 
 --- Displays the crewmate shhing at you.
 splash.DisplayShush = =>
@@ -49,19 +50,20 @@ splash.DisplayShush = =>
 			ltsv = Vector ltsx, ltsy, 0
 			v = Vector w / 2, h / 2, 0
 
-			-- I want to die.
-			m = Matrix!
-			m\Translate ltsv
-			m\Translate v
-			m\Rotate Angle 0, (CurTime! * 6) % 360, 0
-			m\Translate -v
-			m\Translate -ltsv
+			with ROTATION_MATRIX
+				\Identity!
+				\Translate ltsv
+				\Translate v
+				\Rotate Angle 0, (CurTime! * 6) % 360, 0
+				\Translate -v
+				\Translate -ltsv
 
-			cam.PushModelMatrix m, true
+			cam.PushModelMatrix ROTATION_MATRIX, true
 			do
 				surface.SetDrawColor 255, 255, 255
 				surface.SetMaterial ASSETS.no_bg
 				surface.DrawTexturedRect 0, 0, w, h
+
 			cam.PopModelMatrix!
 
 		-- The crewmate sprite.
@@ -108,14 +110,15 @@ splash.DisplayShush = =>
 				v = Vector w / 2, h / 2, 0
 				th = 1 - (math.min 1, (CurTime! - @__createTime) / 0.5)
 
-				m = Matrix!
-				m\Translate ltsv
-				m\Translate v
-				m\Rotate Angle 0, 0 + th * 45, 0
-				m\Translate -v
-				m\Translate -ltsv
+				with ROTATION_MATRIX
+					\Identity!
+					\Translate ltsv
+					\Translate v
+					\Rotate Angle 0, 0 + th * 45, 0
+					\Translate -v
+					\Translate -ltsv
 
-				cam.PushModelMatrix m, true
+				cam.PushModelMatrix ROTATION_MATRIX, true
 				do
 					surface.DisableClipping true
 					surface.SetDrawColor 255, 255, 255
@@ -271,14 +274,15 @@ splash.DisplayPlayers = (reason) =>
 							ltsv = Vector ltsx, ltsy, 0
 							v = Vector w / 2, h / 2 + w * 0.875, 0
 
-							m = Matrix!
-							m\Translate ltsv
-							m\Translate v
-							m\Scale (\GetWide! / mdl_size) * 0.25 * Vector 1, 1, 1
-							m\Translate -v
-							m\Translate -ltsv
+							with ROTATION_MATRIX
+								\Identity!
+								\Translate ltsv
+								\Translate v
+								\Scale (w / mdl_size) * 0.25 * Vector 1, 1, 1
+								\Translate -v
+								\Translate -ltsv
 
-							cam.PushModelMatrix m, true
+							cam.PushModelMatrix ROTATION_MATRIX, true
 							surface.DisableClipping true
 							do
 								render.PushFilterMag TEXFILTER.ANISOTROPIC
