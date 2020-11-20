@@ -118,16 +118,13 @@ if CLIENT
 								surface.DrawPoly innerInnerCirc
 
 								ltsx, ltsy = _\LocalToScreen 0, 0
-								ltsv = Vector ltsx, ltsy, 0
-								v = Vector w / 2, h / 2, 0
+								v = Vector ltsx + w / 2, ltsy + h / 2, 0
 
 								with ROTATION_MATRIX
 									\Identity!
-									\Translate ltsv
 									\Translate v
 									\Rotate Angle 0, rotations[i], 0
 									\Translate -v
-									\Translate -ltsv
 
 								cam.PushModelMatrix ROTATION_MATRIX, true
 								do

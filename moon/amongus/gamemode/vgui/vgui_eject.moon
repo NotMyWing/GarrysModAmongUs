@@ -140,16 +140,13 @@ eject.Eject = (reason, ply, confirm = false, imposter = false, remaining = 0, to
 				accumulator += curtime * 2.5
 
 				ltsx, ltsy = _\LocalToScreen 0, 0
-				ltsv = Vector ltsx, ltsy, 0
-				v = Vector w / 2, h / 2, 0
+				v = Vector ltsx + w / 2, ltsy + h / 2, 0
 
 				with ROTATION_MATRIX
 					\Identity!
-					\Translate ltsv
 					\Translate v
 					\Rotate Angle 0, accumulator, 0
 					\Translate -v
-					\Translate -ltsv
 
 				cam.PushModelMatrix ROTATION_MATRIX, true
 				do

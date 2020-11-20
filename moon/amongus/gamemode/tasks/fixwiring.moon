@@ -257,17 +257,17 @@ if CLIENT
 										-- Calculate the distance between the origin and target.
 										-- Bail if under threshold.
 										dist = math.sqrt math.pow(ltsx + w - targetX, 2) + math.pow(ltsy + originY - targetY, 2)
-										ltsv = Vector ltsx + w, ltsy + originY, 0
+										vector = Vector ltsx + w, ltsy + originY, 0
 
 										-- Calculate the angle between the origin and target.
-										th = math.deg math.atan2 targetX - ltsv.x, targetY - ltsv.y
+										th = math.deg math.atan2 targetX - vector.x, targetY - vector.y
 
 										-- Rotate.
 										with ROTATION_MATRIX
 											\Identity!
-											\Translate ltsv
+											\Translate vector
 											\Rotate Angle 0, 360 - 0.995 * (th - 90), 0
-											\Translate -ltsv
+											\Translate -vector
 
 										-- Push and tell the following code that a matrix has been pushed.
 										cam.PushModelMatrix ROTATION_MATRIX

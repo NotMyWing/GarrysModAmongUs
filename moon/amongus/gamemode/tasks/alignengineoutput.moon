@@ -76,16 +76,13 @@ if CLIENT
 						do
 							-- Setup the rotation matrix.
 							ltsx, ltsy = _\LocalToScreen 0, 0
-							ltsv = Vector ltsx, ltsy, 0
-							v = Vector w, h / 2
+							v = Vector ltsx + w, ltsy + h / 2
 
 							with ROTATION_MATRIX
 								\Identity!
-								\Translate ltsv
 								\Translate v
 								\Rotate Angle 0, 2.5 * theta, 0
 								\Translate -v
-								\Translate -ltsv
 
 							surface.DisableClipping true
 							cam.PushModelMatrix ROTATION_MATRIX, true
@@ -239,16 +236,13 @@ if CLIENT
 
 							-- Prepare the rotation matrix.
 							ltsx, ltsy = _\LocalToScreen 0, 0
-							ltsv = Vector ltsx, ltsy, 0
-							v = Vector circlePositionX, circlePositionY
+							v = Vector ltsx + circlePositionX, ltsy + circlePositionY
 
 							with ROTATION_MATRIX
 								\Identity!
-								\Translate ltsv
 								\Translate v
 								\Rotate Angle 0, theta, 0
 								\Translate -v
-								\Translate -ltsv
 
 							surface.DisableClipping true
 							cam.PushModelMatrix ROTATION_MATRIX, true

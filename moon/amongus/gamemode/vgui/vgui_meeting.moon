@@ -84,12 +84,10 @@ meeting.PlayBackground = (callback) =>
 
 		.Paint = (_, w, h) ->
 			ltsx, ltsy = _\LocalToScreen 0, 0
-			ltsv = Vector ltsx, ltsy, 0
-			v = Vector w / 2, h / 2, 0
+			v = Vector ltsx + w / 2, ltsy + h / 2, 0
 
 			with ROTATION_MATRIX
 				\Identity!
-				\Translate ltsv
 				\Translate v
 				\Rotate Angle 0, rot, 0
 				if rot ~= 0
@@ -98,7 +96,6 @@ meeting.PlayBackground = (callback) =>
 					\Scale Vector 1, ((shrinkAnim.EndTime - SysTime!) / (shrinkAnim.EndTime - shrinkAnim.StartTime)), 1
 
 				\Translate -v
-				\Translate -ltsv
 
 			cam.PushModelMatrix ROTATION_MATRIX, true
 			do
@@ -386,12 +383,10 @@ meeting.OpenDiscuss = (caller) =>
 											mWidth, mHeight = GAMEMODE.Render.FitMaterial MAT_MEETING_TABLET.megaphone, w, h
 
 											ltsx, ltsy = _\LocalToScreen 0, 0
-											ltsv = Vector ltsx, ltsy, 0
-											v = Vector w - mWidth - mWidth * 0.25 + mWidth/2, h / 2, 0
+											v = Vector ltsx + w - mWidth - mWidth * 0.25 + mWidth/2, ltsy + h / 2, 0
 
 											with ROTATION_MATRIX
 												\Identity!
-												\Translate ltsv
 												\Translate v
 
 												if value ~= 1
@@ -399,7 +394,6 @@ meeting.OpenDiscuss = (caller) =>
 													\Scale (1 + value) * Vector 1, 1, 1
 
 												\Translate -v
-												\Translate -ltsv
 
 											cam.PushModelMatrix ROTATION_MATRIX, true
 											surface.SetMaterial MAT_MEETING_TABLET.megaphone
@@ -578,19 +572,16 @@ meeting.OpenDiscuss = (caller) =>
 				.PopFilterMin!
 
 				ltsx, ltsy = _\LocalToScreen 0, 0
-				ltsv = Vector ltsx, ltsy, 0
 
 				-- Let's enter the abyss.
 				do
-					v = Vector w/3, h / 1.5, 0
+					v = Vector ltsx + w/3, ltsy + h / 1.5, 0
 
 					with ROTATION_MATRIX
 						\Identity!
-						\Translate ltsv
 						\Translate v
 						\SetAngles Angle 0, (math.sin(math.rad(CurTime! * 1200))) * 2, 0
 						\Translate -v
-						\Translate -ltsv
 
 					cam.PushModelMatrix ROTATION_MATRIX, true
 					surface.SetMaterial MAT_DISCUSS.yes_crewLeft
@@ -599,15 +590,13 @@ meeting.OpenDiscuss = (caller) =>
 
 				-- Let's enter the abyss one more time.
 				do
-					v = Vector w/2 + w/4, h / 2 + h/3, 0
+					v = Vector ltsx + w/2 + w/4, ltsy + h / 2 + h/3, 0
 
 					with ROTATION_MATRIX
 						\Identity!
-						\Translate ltsv
 						\Translate v
 						\SetAngles Angle 0, (math.cos(math.rad(CurTime! * 1200))) * 2, 0
 						\Translate -v
-						\Translate -ltsv
 
 					cam.PushModelMatrix ROTATION_MATRIX, true
 					surface.SetMaterial MAT_DISCUSS.yes_crewRight

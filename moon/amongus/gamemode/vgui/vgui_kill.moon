@@ -30,12 +30,10 @@ return vgui.RegisterTable {
 
 			.Paint = (_, w, h) ->
 				ltsx, ltsy = _\LocalToScreen 0, 0
-				ltsv = Vector ltsx, ltsy, 0
-				v = Vector w / 2, h / 2, 0
+				v = Vector ltsx + w / 2, ltsy + h / 2, 0
 
 				with ROTATION_MATRIX
 					\Identity!
-					\Translate ltsv
 					\Translate v
 					\Rotate Angle 0, rot, 0
 
@@ -45,7 +43,6 @@ return vgui.RegisterTable {
 						\Scale Vector 1, (math.Clamp((shrinkAnim.EndTime - SysTime!) / (shrinkAnim.EndTime - shrinkAnim.StartTime), 0, 1)), 1
 
 					\Translate -v
-					\Translate -ltsv
 
 				cam.PushModelMatrix ROTATION_MATRIX, true
 				do

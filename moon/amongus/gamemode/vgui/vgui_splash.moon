@@ -47,16 +47,13 @@ splash.DisplayShush = =>
 
 		.Paint = (_, w, h) ->
 			ltsx, ltsy = _\LocalToScreen 0, 0
-			ltsv = Vector ltsx, ltsy, 0
-			v = Vector w / 2, h / 2, 0
+			v = Vector ltsx + w / 2, ltsy + h / 2, 0
 
 			with ROTATION_MATRIX
 				\Identity!
-				\Translate ltsv
 				\Translate v
 				\Rotate Angle 0, (CurTime! * 6) % 360, 0
 				\Translate -v
-				\Translate -ltsv
 
 			cam.PushModelMatrix ROTATION_MATRIX, true
 			do
@@ -106,17 +103,14 @@ splash.DisplayShush = =>
 
 			.Paint = (_, w, h) ->
 				ltsx, ltsy = _\LocalToScreen 0, 0
-				ltsv = Vector ltsx, ltsy, 0
-				v = Vector w / 2, h / 2, 0
+				v = Vector ltsx + w / 2, ltsy + h / 2, 0
 				th = 1 - (math.min 1, (CurTime! - @__createTime) / 0.5)
 
 				with ROTATION_MATRIX
 					\Identity!
-					\Translate ltsv
 					\Translate v
 					\Rotate Angle 0, 0 + th * 45, 0
 					\Translate -v
-					\Translate -ltsv
 
 				cam.PushModelMatrix ROTATION_MATRIX, true
 				do
@@ -271,16 +265,13 @@ splash.DisplayPlayers = (reason) =>
 							oldPaint _, w, h
 
 							ltsx, ltsy = _\LocalToScreen 0, 0
-							ltsv = Vector ltsx, ltsy, 0
-							v = Vector w / 2, h / 2 + w * 0.875, 0
+							v = Vector ltsx + w / 2, ltsy + h / 2 + w * 0.875, 0
 
 							with ROTATION_MATRIX
 								\Identity!
-								\Translate ltsv
 								\Translate v
 								\Scale (w / mdl_size) * 0.25 * Vector 1, 1, 1
 								\Translate -v
-								\Translate -ltsv
 
 							cam.PushModelMatrix ROTATION_MATRIX, true
 							surface.DisableClipping true

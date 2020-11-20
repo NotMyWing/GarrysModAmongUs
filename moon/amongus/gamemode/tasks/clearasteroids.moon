@@ -108,16 +108,13 @@ if CLIENT
 								mat = table.Random ASSETS.meteors
 								.Paint = (_, w, h) ->
 									ltsx, ltsy = _\LocalToScreen 0, 0
-									ltsv = Vector ltsx, ltsy, 0
-									v = Vector w / 2, h / 2, 0
+									v = Vector ltsx + w / 2, ltsy + h / 2, 0
 
 									with ROTATION_MATRIX
 										\Identity!
-										\Translate ltsv
 										\Translate v
 										\Rotate Angle 0, rotation, 0
 										\Translate -v
-										\Translate -ltsv
 
 									scX1, scY1 = innerPanel\LocalToScreen 0, 0
 									scX2, scY2 = innerPanel\LocalToScreen innerPanel\GetSize!
