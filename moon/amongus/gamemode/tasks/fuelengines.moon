@@ -15,7 +15,7 @@ taskTable = {
 			@buttons = {}
 
 			-- Find the task buttons.
-			for _, button in ipairs GAMEMODE.Util.FindEntsByTaskName "fuelEngines"
+			for button in *GAMEMODE.Util.FindEntsByTaskName "fuelEngines"
 				@buttons[button\GetCustomData!] = button
 
 			-- The first button shall be the barrel in the storage.

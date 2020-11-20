@@ -144,7 +144,7 @@ GM.Net_UpdateGameData = (ply) =>
 	net.WriteTable @ConVarSnapshot_ExportAll!
 
 	net.WriteUInt #@GameData.PlayerTables, 8
-	for _, aply in ipairs @GameData.PlayerTables
+	for aply in *@GameData.PlayerTables
 		net.WriteString aply.steamid
 		net.WriteString aply.nickname
 		net.WriteColor aply.color
@@ -160,11 +160,11 @@ GM.Net_UpdateGameData = (ply) =>
 		net.WriteBool false
 
 	dead = {}
-	for deadPlayerTable, _ in pairs @GameData.DeadPlayers
+	for deadPlayerTable in pairs @GameData.DeadPlayers
 		table.insert dead, deadPlayerTable.id
 
 	net.WriteUInt #dead, 8
-	for _, id in ipairs dead
+	for id in *dead
 		net.WriteUInt id, 8
 
 	net.WriteUInt @GameData.CompletedTasks or 0, 32
@@ -201,13 +201,13 @@ GM.Net_PauseKillCooldown = (playerTable, remainder) =>
 --- Updates all players with the new dead players table.
 GM.Net_BroadcastDead = =>
 	dead = {}
-	for playerTable, _ in pairs @GameData.DeadPlayers
+	for playerTable in pairs @GameData.DeadPlayers
 		table.insert dead, playerTable.id
 
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.BroadcastDead, @FlowSize
 	net.WriteUInt #dead, 8
-	for _, id in ipairs dead
+	for id in *dead
 		net.WriteUInt id, 8
 
 	net.Broadcast!
@@ -215,16 +215,16 @@ GM.Net_BroadcastDead = =>
 --- Updates all ghosts with the new dead players table.
 GM.Net_BroadcastDeadToGhosts = =>
 	dead = {}
-	for playerTable, _ in pairs @GameData.DeadPlayers
+	for playerTable in pairs @GameData.DeadPlayers
 		table.insert dead, playerTable.id
 
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.BroadcastDead, @FlowSize
 	net.WriteUInt #dead, 8
-	for _, id in ipairs dead
+	for id in *dead
 		net.WriteUInt id, 8
 
-	net.Send for playerTable, _ in pairs @GameData.DeadPlayers
+	net.Send for playerTable in pairs @GameData.DeadPlayers
 		continue unless IsValid playerTable.entity
 
 		playerTable.entity

@@ -73,7 +73,7 @@ hud.SetTaskbarValue = (value) =>
 hud.SetupButtons = (state, impostor) =>
 	localPlayerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
 
-	for _, v in ipairs @buttons\GetChildren!
+	for v in *@buttons\GetChildren!
 		v\Remove!
 
 	@buttons\SetAlpha 0
@@ -96,7 +96,7 @@ hud.SetupButtons = (state, impostor) =>
 				conVars = GAMEMODE\IsGameCommencing! and GAMEMODE.ConVarSnapshots or GAMEMODE.ConVars
 				i = 0
 				for categoryId, category in ipairs GAMEMODE.ConVarsDisplay
-					for _, conVarTable in ipairs category.ConVars
+					for conVarTable in *category.ConVars
 						type   = conVarTable[1]
 						conVar = conVars[conVarTable[2]]
 						conVarName = conVar\GetName!

@@ -292,7 +292,7 @@ splash.DisplayPlayers = (reason) =>
 				-- In case it's a start splash screen, display our team
 				-- In case it's a game over screen, display the winning team
 				players = {}
-				for _, playerTable in ipairs GAMEMODE.GameData.PlayerTables
+				for playerTable in *GAMEMODE.GameData.PlayerTables
 					if playerTable.entity ~= LocalPlayer!
 						-- Game Over
 						if reason

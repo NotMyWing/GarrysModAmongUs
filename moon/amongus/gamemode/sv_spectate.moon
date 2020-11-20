@@ -3,7 +3,7 @@ GM.SpectateMap = {}
 GM.Spectate_CycleEntity = (ply, delta = 0) =>
 	pool = {}
 	local cur, first
-	for i, otherPly in ipairs player.GetAll!
+	for otherPly in *player.GetAll!
 		if ply ~= otherPly and otherPly\Alive! and otherPly\GetObserverMode! > 0
 			table.insert pool, otherPly
 
@@ -41,7 +41,7 @@ hook.Add "KeyPress", "NMW AU Spectate Cycle", (ply, key) ->
 				GAMEMODE\Spectate_CycleMode ply
 			when IN_DUCK
 				ply\Spectate OBS_MODE_ROAMING
-	
+
 	return
 
 GM.__specInitialized = {}

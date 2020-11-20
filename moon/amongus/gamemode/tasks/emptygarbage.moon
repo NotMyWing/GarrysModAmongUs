@@ -10,7 +10,7 @@ taskTable = {
 
 			@buttons = {}
 			-- Remap buttons.
-			for _, button in ipairs GAMEMODE.Util.FindEntsByTaskName "emptyGarbage"
+			for button in *GAMEMODE.Util.FindEntsByTaskName "emptyGarbage"
 				@buttons[button\GetCustomData!] = button
 
 			@SetActivationButton if @buttons["chute"]

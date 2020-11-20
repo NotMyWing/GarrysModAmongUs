@@ -1,6 +1,6 @@
 
 GM.Game_GameOver = (reason) =>
-	for index, ply in ipairs player.GetAll!
+	for ply in *player.GetAll!
 		ply\Freeze true
 
 	@Player_CloseVGUIsForEveryone!
@@ -31,7 +31,7 @@ GM.Game_CheckWin = (reason) =>
 			numPlayers = 0
 
 			-- Count imposters and players and decide whether the game is over.
-			for _, ply in pairs @GameData.PlayerTables
+			for ply in *@GameData.PlayerTables
 				if IsValid(ply.entity) and not @GameData.DeadPlayers[ply]
 					if @GameData.Imposters[ply]
 						numImposters += 1
@@ -57,7 +57,7 @@ GM.Game_CleanUp = (soft) =>
 	if @GameData.Sabotages
 		@Sabotage_ForceEndAll!
 
-	for handle, _ in pairs @GameData.Timers
+	for handle in pairs @GameData.Timers
 		timer.Remove handle
 
 	@PurgeGameData!
@@ -131,7 +131,7 @@ GM.Game_Start = =>
 		-- Create player "accounts" that we're going
 		-- to use during the entire game.
 		id = 0
-		for _, ply in ipairs initializedPlayers
+		for ply in *initializedPlayers
 			id += 1
 			t = {
 				steamid: ply\SteamID!
@@ -200,7 +200,7 @@ GM.Game_Start = =>
 		timer.Create handle, 2, 1, ->
 			@Game_StartRound!
 
-			for index, ply in ipairs @GameData.PlayerTables
+			for ply in *@GameData.PlayerTables
 				if IsValid ply.entity
 					ply.entity\Freeze true
 
@@ -219,7 +219,7 @@ GM.Game_Start = =>
 						timer.Remove "NMW AU CheckWin"
 
 				-- Unfreeze everyone and broadcast buttons.
-				for index, ply in ipairs @GameData.PlayerTables
+				for ply in *@GameData.PlayerTables
 					if IsValid ply.entity
 						ply.entity\Freeze fal
 

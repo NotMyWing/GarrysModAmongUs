@@ -113,7 +113,7 @@ meeting.PlayBackground = (callback) =>
 --- Removes all confirm popups.
 -- Kind of redundant, honestly.
 meeting.PurgeConfirms = =>
-	for _, btn in pairs @buttons
+	for btn in *@buttons
 		btn\SetEnabled true
 
 		if IsValid btn.confirm
@@ -124,7 +124,7 @@ meeting.PurgeConfirms = =>
 
 --- Disables all buttons. Duh.
 meeting.DisableAllButtons = =>
-	for _, btn in pairs @buttons
+	for btn in *@buttons
 		if IsValid btn.buttonOverlay
 			with btn.buttonOverlay
 				\SetEnabled false
@@ -332,7 +332,7 @@ meeting.OpenDiscuss = (caller) =>
 							return va > vb
 
 						-- Now, create a button per player.
-						for _, ply in ipairs GAMEMODE.GameData.PlayerTables or {}
+						for ply in *GAMEMODE.GameData.PlayerTables
 							alive = IsValid(ply.entity) and not GAMEMODE.GameData.DeadPlayers[ply]
 
 							-- Since the base game has shadows behind the buttons, we'll need to
@@ -644,7 +644,7 @@ meeting.End = (results = {}) =>
 	@DisableAllButtons!
 
 	@skipArea\AlphaTo 255, 0.25, 0, ->
-		for _, result in pairs results
+		for result in *results
 			outputPanel = @buttons[result.targetid].output
 
 			continue unless outputPanel

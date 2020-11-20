@@ -28,7 +28,7 @@ if CLIENT
 				}
 
 				dimColors = {}
-				for _, color in ipairs colors
+				for color in *colors
 					with color
 						table.insert dimColors, Color .r, .g, .b, 127
 

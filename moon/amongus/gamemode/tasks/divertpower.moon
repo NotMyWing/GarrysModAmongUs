@@ -11,7 +11,7 @@ taskTable = {
 
 			destinations = {}
 			-- Find the task buttons.
-			for _, button in ipairs GAMEMODE.Util.FindEntsByTaskName "divertPower"
+			for button in *GAMEMODE.Util.FindEntsByTaskName "divertPower"
 				if button\GetCustomData! == "accept"
 					table.insert destinations, button
 				else

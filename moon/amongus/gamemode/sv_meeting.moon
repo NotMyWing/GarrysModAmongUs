@@ -100,7 +100,7 @@ GM.Meeting_Vote = (playerTable, target) =>
 		table.insert @GameData.Votes[target], playerTable
 
 		countAlive = 0
-		for _, ply in pairs @GameData.PlayerTables
+		for ply in *@GameData.PlayerTables
 			if (IsValid(ply.entity) and not ply.entity\IsBot! and not GAMEMODE.GameData.DeadPlayers[ply]) or
 				(@ConVarSnapshots.MeetingBotVote\GetBool! and ply.entity\IsBot!)
 					countAlive += 1

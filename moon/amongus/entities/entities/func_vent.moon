@@ -16,7 +16,7 @@ ENT.Initialize = =>
 		if @Links
 			newLinks = {}
 
-			for _, ent in ipairs ents.GetAll!
+			for ent in *ents.GetAll!
 				if @Links[ent\GetName!]
 					table.insert newLinks, ent
 

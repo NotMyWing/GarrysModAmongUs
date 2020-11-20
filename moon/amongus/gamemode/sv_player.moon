@@ -8,7 +8,7 @@
 -- @param ply Player entity.
 -- @param hide Should we hide?
 GM.Player_Hide = (ply, hide = true) =>
-	for _, otherPly in ipairs player.GetAll!
+	for otherPly in *player.GetAll!
 		if otherPly ~= ply
 			ply\SetPreventTransmit otherPly, hide
 
@@ -21,7 +21,7 @@ GM.Player_Unhide = (ply) =>
 --- Unhides everyone.
 -- A small wrapper for my, as well as your, convenience.
 GM.Player_UnhideEveryone = =>
-	for _, ply in ipairs player.GetAll!
+	for ply in *player.GetAll!
 		@Player_Unhide ply
 
 --- Sets the player as dead.
@@ -39,7 +39,7 @@ GM.Player_SetDead = (playerTable) =>
 
 		-- Hide the player for alive players.
 		-- Unhide the player for dead players, and the other way around.
-		for _, otherPlayerTable in pairs @GameData.PlayerTables
+		for otherPlayerTable in *@GameData.PlayerTables
 			continue if otherPlayerTable == playerTable or not IsValid(otherPlayerTable.entity)
 
 			if @GameData.DeadPlayers[otherPlayerTable]
@@ -163,7 +163,7 @@ GM.Player_UnPauseKillCooldown = (playerTable) =>
 packVentLinks = (vent) ->
 	links = {}
 	if vent.Links and #vent.Links > 0
-		for _, link in ipairs vent.Links
+		for link in *vent.Links
 			table.insert links, link\GetName! or "N/A"
 
 	return links
@@ -320,7 +320,7 @@ GM.Player_OpenVGUI = (playerTable, vgui, data = {}, callback) =>
 
 --- Closes the current VGUI for everybody.
 GM.Player_CloseVGUIsForEveryone = =>
-	for _, playerTable in pairs @GameData.PlayerTables
+	for playerTable in *@GameData.PlayerTables
 		@Player_CloseVGUI playerTable
 
 	@Net_BroadcastCloseVGUI!

@@ -68,12 +68,7 @@ if CLIENT
 			return true
 
 else
-	taskMapToPool = (map) ->
-		pool = {}
-		for _, element in pairs map
-			table.insert pool, element
-
-		return pool
+	taskMapToPool = (map) -> [v for k, v in pairs map]
 
 	--- Assigns the tasks to current players.
 	-- This assumes that the gamedata table is properly filled.
@@ -92,7 +87,7 @@ else
 		-- Pick N random common tasks from the pool.
 		commonTasks = {}
 
-		for _, task in ipairs shuffle taskMapToPool @TaskCollection.Common
+		for task in *shuffle taskMapToPool @TaskCollection.Common
 			if #commonTasks < @ConVarSnapshots.TasksCommon\GetInt!
 				table.insert commonTasks, task
 			else
@@ -104,7 +99,7 @@ else
 		-- Assign tasks to each player, including imposters.
 		-- Imposters get tasks too, but can't complete them and their
 		-- tasks don't count towards the pool.
-		for _, playerTable in pairs @GameData.PlayerTables
+		for playerTable in *@GameData.PlayerTables
 			@GameData.Tasks[playerTable] = {}
 
 			-- Don't assign tasks to leavers.
@@ -141,13 +136,13 @@ else
 				return true
 
 			-- Assign the picked common tasks.
-			for id, task in ipairs commonTasks
+			for task in *commonTasks
 				instantiate task
 
 			-- Now, pick N random tasks from each pool and assign.
 			for pool, maxCount in pairs pools
 				count = 0
-				for _, task in ipairs shuffle pool
+				for task in *shuffle pool
 					if count < maxCount and instantiate task
 						count += 1
 					else

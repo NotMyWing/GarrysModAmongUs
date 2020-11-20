@@ -49,7 +49,7 @@ if CLIENT
 									buttons[(j - 1) * (#buttons/rows) + i] = btn
 									.OnToggled = (_, state) ->
 										if val ~= currentStep
-											for _, btn in ipairs buttons
+											for btn in *buttons
 												\SetToggle false
 												\SetEnabled true
 

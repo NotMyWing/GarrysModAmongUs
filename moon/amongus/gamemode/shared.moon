@@ -240,7 +240,7 @@ GM.GetAlivePlayers = =>
 	players = {}
 
 	if @GameData.PlayerTables and @GameData.DeadPlayers
-		for _, v in ipairs @GameData.PlayerTables
+		for v in *@GameData.PlayerTables
 			disconnected = not IsValid v.entity
 			if not disconnected and not @GameData.DeadPlayers[v]
 				table.insert players, v
@@ -284,7 +284,7 @@ GM.Util.Shuffle = (t) ->
 -- @bool first Should this function only return the first found entity?
 GM.Util.FindEntsByTaskName = (taskname, first = false) ->
 	with t = {}
-		for _, ent in ipairs ents.GetAll!
+		for ent in *ents.GetAll!
 			if ent.GetTaskName and ent\GetTaskName! == taskname
 				table.insert t, ent
 				if first
@@ -308,7 +308,7 @@ GM.TracePlayer = (ply) =>
 	playerTable = ply\GetAUPlayerTable!
 	return if not playerTable or (SERVER and @GameData.Vented[playerTable]) or (CLIENT and @GameData.Vented)
 
-	for _, ent in ipairs entities
+	for ent in *entities
 		continue if ent == ply
 		continue if SERVER and not ply\TestPVS ent
 

@@ -12,7 +12,7 @@ taskTable = {
 
 			destinations = {}
 			-- Find the task buttons.
-			for _, button in ipairs GAMEMODE.Util.FindEntsByTaskName "uploadData"
+			for button in *GAMEMODE.Util.FindEntsByTaskName "uploadData"
 				if button\GetCustomData! ~= "upload"
 					table.insert destinations, button
 				else
