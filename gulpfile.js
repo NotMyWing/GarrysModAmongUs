@@ -1,8 +1,7 @@
-const svgmin = require('gulp-svgmin');
 const gulp = require('gulp');
 const del = require('del');
 
-const renderSvg = require('./tools/inkscape');
+const renderSvg = require('./tools/resvg');
 const minifyLua = require('./tools/luamin');
 const compileMoonscript = require('./tools/moonscript');
 
@@ -75,7 +74,7 @@ watchScripts.description = "Watches lua files and compiles changes.";
  */
 function svg() {
 	return gulp.src('content/**/*.svg', { since: lastRunIgnoreErrors(svg) })
-		.pipe(svgmin())
+		//.pipe(svgmin())
 		.pipe(renderSvg())
 		.pipe(gulp.dest('gamemodes/amongus/content'));
 }

@@ -8,8 +8,7 @@ This project is built using Gulp. To get started, you will need to install Node.
 
 Navigate into the project directory and run:
 ```sh
-sudo add-apt-repository ppa:inkscape.dev/stable
-sudo apt install luarocks inkscape
+sudo apt install luarocks
 sudo luarocks install moonscript
 npm install
 ```
