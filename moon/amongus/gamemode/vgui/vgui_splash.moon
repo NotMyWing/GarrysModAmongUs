@@ -171,11 +171,11 @@ splash.DisplayPlayers = (reason) =>
 			-- Play a contextual sound depending on why we're showing the screen.
 			surface.PlaySound if reason
 				if reason == GAMEMODE.GameOverReason.Imposter
-					"au/victory_imposter.wav"
+					"au/victory_imposter.ogg"
 				elseif reason == GAMEMODE.GameOverReason.Crewmate
-					"au/victory_crew.wav"
+					"au/victory_crew.ogg"
 			else
-				"au/start.wav"
+				"au/start.ogg"
 
 			with @Add "DLabel"
 				\SetSize @GetWide!, @GetTall! * 0.3

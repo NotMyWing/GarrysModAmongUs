@@ -40,7 +40,7 @@ if SERVER
 			return if time > 0
 
 			if GAMEMODE\Meeting_Start ply
-				@EmitSound "au/panel_emergencybutton.wav", 60
+				@EmitSound "au/panel_emergencybutton.ogg", 60
 				ply\SetNW2Int "NMW AU Meetings", ply\GetNW2Int("NMW AU Meetings") - 1
 
 

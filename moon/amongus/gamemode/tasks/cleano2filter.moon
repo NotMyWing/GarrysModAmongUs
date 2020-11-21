@@ -18,8 +18,8 @@ if CLIENT
 	}
 
 	SOUNDS = {
-		leaf: ["au/panel_o2_leaf#{i}.wav" for i = 1, 4]
-		suck: ["au/panel_o2_suck#{i}.wav" for i = 1, 3]
+		leaf: ["au/panel_o2_leaf#{i}.ogg" for i = 1, 4]
+		suck: ["au/panel_o2_suck#{i}.ogg" for i = 1, 3]
 	}
 
 	ROTATION_MATRIX = Matrix!

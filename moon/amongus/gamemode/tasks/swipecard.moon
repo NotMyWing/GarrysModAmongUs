@@ -19,10 +19,10 @@ if CLIENT
 	}
 
 	SOUNDS = {
-		out: "au/panel_admin_walletout.wav"
-		accept: "au/panel_admin_cardaccept.wav"
-		deny: "au/panel_admin_carddeny_f2.wav"
-		swipe: ["au/panel_admin_cardmove#{i}.wav" for i = 1, 3]
+		out: "au/panel_admin_walletout.ogg"
+		accept: "au/panel_admin_cardaccept.ogg"
+		deny: "au/panel_admin_carddeny_f2.ogg"
+		swipe: ["au/panel_admin_cardmove#{i}.ogg" for i = 1, 3]
 	}
 
 	taskTable.CreateVGUI = =>

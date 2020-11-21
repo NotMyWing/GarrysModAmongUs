@@ -13,8 +13,8 @@ if CLIENT
 	TRANSLATE = GM.Lang.GetEntry
 
 	SOUNDS = {
-		hit: ["au/panel_weaponhit#{i}.wav" for i = 1, 3]
-		fire: "au/panel_weaponfire.wav"
+		hit: ["au/panel_weaponhit#{i}.ogg" for i = 1, 3]
+		fire: "au/panel_weaponfire.ogg"
 	}
 
 	ASSETS = {

@@ -27,7 +27,7 @@ soundScriptReplacements = {
 
 --- Helper function to add a list of footstep sounds
 -- @string name The name of the soundscript to override
--- @string sound The base name (minus %d.wav) of the file to add
+-- @string sound The base name (minus %d.ogg) of the file to add
 addFootstepSound = (name, snd) ->
 	soundTable = {
 		name: "#{name}.StepLeft"
@@ -38,7 +38,7 @@ addFootstepSound = (name, snd) ->
 		sound: {}
 	}
 
-	files = file.Find "sound/#{basedir}/#{snd}*.wav", 'GAME'
+	files = file.Find "sound/#{basedir}/#{snd}*.ogg", 'GAME'
 
 	for i, file in ipairs(files)
 		file = "#{basedir}/#{file}"

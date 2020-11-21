@@ -43,7 +43,7 @@ base.Popup = =>
 	@SetAlpha 0
 	@AlphaTo 255, 0.1, 0.01
 
-	surface.PlaySound @__appearSound or "au/panel_genericappear.wav"
+	surface.PlaySound @__appearSound or "au/panel_genericappear.ogg"
 
 base.Submit = (autoClose = true) =>
 	GAMEMODE\Net_SendSubmitTask!
@@ -57,7 +57,7 @@ base.Close = =>
 
 	@AlphaTo 0, 0.1
 	@MoveTo 0, ScrH!, 0.1, 0, -1, ->
-		surface.PlaySound @__disappearSound or "au/panel_genericdisappear.wav"
+		surface.PlaySound @__disappearSound or "au/panel_genericdisappear.ogg"
 		@Remove!
 
 base.SetAppearSound = (value) => @__appearSound = value

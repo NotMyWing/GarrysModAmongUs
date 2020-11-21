@@ -155,7 +155,7 @@ meeting.CreateConfirm = (height, id) =>
 			\SetImage "au/gui/meeting/confirm_yes.png"
 			\SetStretchToFit true
 			.DoClick = ->
-				surface.PlaySound "au/votescreen_lockin.wav"
+				surface.PlaySound "au/votescreen_lockin.ogg"
 				@DisableAllButtons!
 				GAMEMODE\Net_SendVote id
 
@@ -293,7 +293,7 @@ meeting.OpenDiscuss = (caller) =>
 
 						@PurgeConfirms!
 
-						surface.PlaySound "au/votescreen_avote.wav"
+						surface.PlaySound "au/votescreen_avote.ogg"
 						\SetEnabled false
 
 						skipButton.confirm = with @CreateConfirm sh * 0.6
@@ -516,7 +516,7 @@ meeting.OpenDiscuss = (caller) =>
 													return unless \IsEnabled!
 
 													@PurgeConfirms!
-													surface.PlaySound "au/votescreen_avote.wav"
+													surface.PlaySound "au/votescreen_avote.ogg"
 													playerItem.buttonOverlay\SetEnabled false
 
 													playerItem.confirm = with @CreateConfirm playerItem.buttonOverlay\GetTall! * 0.9, ply.id
@@ -629,7 +629,7 @@ meeting.OpenDiscuss = (caller) =>
 meeting.ApplyVote = (playerTable) =>
 	if btn = @buttons[playerTable.id]
 		if playerTable.entity ~= LocalPlayer!
-			surface.PlaySound "au/notification.wav"
+			surface.PlaySound "au/notification.ogg"
 
 		btn.voted\AlphaTo 255, 0.1
 
@@ -675,9 +675,9 @@ meeting.End = (results = {}) =>
 -- @param bodyColor In case this is a body report, the color of the body. Optional.
 meeting.StartEmergency = (playerTable, bodyColor) =>
 	if bodyColor
-		surface.PlaySound "au/report_body.wav"
+		surface.PlaySound "au/report_body.ogg"
 	else
-		surface.PlaySound "au/alarm_emergencymeeting.wav"
+		surface.PlaySound "au/alarm_emergencymeeting.ogg"
 
 	@PlayBackground ->
 		with emergency_caller = @Add "DPanel"

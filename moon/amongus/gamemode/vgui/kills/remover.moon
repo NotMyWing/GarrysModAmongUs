@@ -24,13 +24,13 @@ remover.Play = (killer, victim) =>
 
 			\SetSize newW, newH
 			\SetZPos 2
-			
+
 			if i == 1
 				\AlignLeft w * 0.15
 			else
 				\AlignRight w * 0.15
 			\CenterVertical!
-			
+
 			.SpriteBatch = ASSETS.crewmate
 			.Paint = (_, w, h) ->
 				for layer, mat in ipairs .SpriteBatch
@@ -38,7 +38,7 @@ remover.Play = (killer, victim) =>
 						surface.SetDrawColor inputCrewmates[i].color
 					else
 						surface.SetDrawColor 255, 255, 255
-					
+
 					surface.SetMaterial mat
 					render.PushFilterMag TEXFILTER.ANISOTROPIC
 					render.PushFilterMin TEXFILTER.ANISOTROPIC
@@ -79,15 +79,15 @@ remover.Play = (killer, victim) =>
 							if layer == 1
 								crewmates[2].SpriteBatch = ASSETS.corpseStand
 								surface.PlaySound table.Random {
-									"weapons/airboat/airboat_gun_lastshot1.wav"
-									"weapons/airboat/airboat_gun_lastshot2.wav"
+									"weapons/airboat/airboat_gun_lastshot1.ogg"
+									"weapons/airboat/airboat_gun_lastshot2.ogg"
 								}
 
 								-- Create a toolgun halo around the victim's head
 								with crewmates[2]\Add "DPanel"
 									size = math.min crewmates[2]\GetSize!
 									\SetSize size, size
-									
+
 									\AlignTop -size * 0.15
 									\SetZPos 10
 
@@ -138,7 +138,7 @@ remover.Play = (killer, victim) =>
 										surface.DisableClipping false
 										render.PopFilterMag!
 										render.PopFilterMin!
-							
+
 									\SetAlpha 0
 									\AlphaTo 255, 0.05, 0, ->
 										\AlphaTo 0, 0.2, 0, ->

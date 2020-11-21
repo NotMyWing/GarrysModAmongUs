@@ -81,7 +81,7 @@ eject.WriteText = (text, subtext) =>
 		@ejectTextLabel.Text ..= text[i]
 
 		if text[i] ~= "" and text[i] ~= " "
-			surface.PlaySound "au/eject_text.wav"
+			surface.PlaySound "au/eject_text.ogg"
 
 		if i ~= #text
 			@ejectTextLabel\NewAnimation 1.5/#text, 0, 0, callback

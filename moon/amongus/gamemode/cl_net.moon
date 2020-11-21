@@ -145,7 +145,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	-- to add a new flow type just for this.
 	--
 	when GAMEMODE.FlowTypes.KillRequest
-		surface.PlaySound "au/impostor_kill.wav"
+		surface.PlaySound "au/impostor_kill.ogg"
 		GAMEMODE\HUD_Blink 0.1, 0, 0
 
 	--
@@ -165,18 +165,18 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		-- Play a contextual sound.
 		switch reason
 			when GAMEMODE.VentNotifyReason.Vent
-				surface.PlaySound "au/vent_open.wav"
+				surface.PlaySound "au/vent_open.ogg"
 				GAMEMODE.GameData.Vented = true
 
 			when GAMEMODE.VentNotifyReason.UnVent
-				surface.PlaySound "au/vent_open.wav"
+				surface.PlaySound "au/vent_open.ogg"
 				GAMEMODE.GameData.Vented = false
 
 			when GAMEMODE.VentNotifyReason.Move
 				surface.PlaySound table.Random {
-					"au/vent_move1.wav"
-					"au/vent_move2.wav"
-					"au/vent_move3.wav"
+					"au/vent_move1.ogg"
+					"au/vent_move2.ogg"
+					"au/vent_move3.ogg"
 				}
 
 		-- Fetch what is known about connected vents.
@@ -347,13 +347,13 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 
 		if not instance\GetCompleted!
 			if not wasCreated
-				surface.PlaySound "au/task_inprogress.wav"
+				surface.PlaySound "au/task_inprogress.ogg"
 
 			if instance\GetActivationButton! ~= oldActivationButton
 				GAMEMODE\HUD_TrackTaskOnMap oldActivationButton, false
 				GAMEMODE\HUD_TrackTaskOnMap instance\GetActivationButton!
 		else
-			surface.PlaySound "au/task_complete.wav"
+			surface.PlaySound "au/task_complete.ogg"
 			GAMEMODE\HUD_TrackTaskOnMap instance\GetActivationButton!, false
 			GAMEMODE\HUD_CreateTaskCompletePopup!
 
@@ -434,14 +434,14 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		spectator = net.ReadBool!
 
 		chat.AddText Color(220, 32, 32), "[Among Us] ", Color(255, 255, 255), tostring if connected
-			surface.PlaySound "au/player_spawn.wav"
+			surface.PlaySound "au/player_spawn.ogg"
 
 			if spectator
 				TRANSLATE("connected.spectating") nickname
 			else
 				TRANSLATE("connected.spawned") nickname
 		else
-			surface.PlaySound "au/player_disconnect.wav"
+			surface.PlaySound "au/player_disconnect.ogg"
 
 			TRANSLATE("connected.disconnected") nickname
 

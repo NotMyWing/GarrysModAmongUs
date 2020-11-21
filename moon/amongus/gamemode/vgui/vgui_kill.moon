@@ -64,7 +64,7 @@ return vgui.RegisterTable {
 			@Remove!
 
 	Kill: (killer, victim) =>
-		surface.PlaySound "au/impostor_killmusic.wav"
+		surface.PlaySound "au/impostor_killmusic.ogg"
 		@PlayBackground ->
 			with @Add table.Random KILLS
 				\SetWide ScrW! * 0.5

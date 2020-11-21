@@ -40,15 +40,15 @@ if CLIENT
 		wireEndBg: Material "au/gui/tasks/fixWiring/wireTipBg.png", "smooth"
 	}
 
-	WIRE_SOUND = ["au/panel_electrical_wire#{i}.wav" for i = 1, 3]
+	WIRE_SOUND = ["au/panel_electrical_wire#{i}.ogg" for i = 1, 3]
 	ROTATION_MATRIX = Matrix!
 
 	taskTable.CreateVGUI = =>
 		base = vgui.Create "AmongUsTaskBase"
 
 		return with base
-			\SetAppearSound "au/panel_electricalwiresopen.wav"
-			\SetDisappearSound "au/panel_electricalwiresclose.wav"
+			\SetAppearSound "au/panel_electricalwiresopen.ogg"
+			\SetDisappearSound "au/panel_electricalwiresclose.ogg"
 			\Setup with vgui.Create "DImage"
 				max_size = ScrH! * 0.8
 

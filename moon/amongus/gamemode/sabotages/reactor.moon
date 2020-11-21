@@ -7,7 +7,7 @@ if CLIENT
 		if CRISIS_ENABLED
 			if SysTime! > nextTick
 				nextTick = SysTime! + 2.5
-				surface.PlaySound "au/alarm_sabotage.wav"
+				surface.PlaySound "au/alarm_sabotage.ogg"
 
 			if nextTick - SysTime! > 1.8
 				cam.Start2D!

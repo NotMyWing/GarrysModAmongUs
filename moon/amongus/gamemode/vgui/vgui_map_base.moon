@@ -160,7 +160,7 @@ map = {
 		@SetAlpha 0
 		@AlphaTo 255, 0.1, 0.01
 
-		surface.PlaySound "au/panel_genericappear.wav"
+		surface.PlaySound "au/panel_genericappear.ogg"
 
 	Close: =>
 		return if not @__opened or @__opening or @__closing
@@ -171,7 +171,7 @@ map = {
 		@AlphaTo 0, 0.1
 		@MoveTo 0, ScrH!, 0.1, 0, -1, ->
 			@__closing = false
-			surface.PlaySound "au/panel_genericdisappear.wav"
+			surface.PlaySound "au/panel_genericdisappear.ogg"
 			@SetMouseInputEnabled false
 
 			if @OnClose
