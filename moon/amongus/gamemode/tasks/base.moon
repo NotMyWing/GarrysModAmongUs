@@ -191,10 +191,10 @@ if SERVER
 		-- This gets called when the assignet player submits the task.
 		-- You should only be calling this if your custom task doesn't have a VGUI.
 		-- DO NOT override this unless you know what you're doing.
-		.Advance = (btn = @GetActivationButton!) =>
+		.Advance = (btn = @GetActivationButton!, data = 0) =>
 			oldStep = @GetCurrentStep!
 			oldState = @GetCurrentState!
-			@OnAdvance btn
+			@OnAdvance btn, data
 
 			if not @GetCompleted! and (@GetCurrentState! ~= oldState or @GetCurrentStep! ~= oldStep)
 				@AdvanceVisual btn
@@ -322,7 +322,7 @@ if SERVER
 
 		--- Called whenever the assigned player submits the task.
 		-- This is the function you need to override if you want custom logic.
-		.OnAdvance = (btn) =>
+		.OnAdvance = (btn, data = 0) =>
 			if @GetMaxSteps! > 1
 				if @GetCurrentStep! >= @GetMaxSteps!
 					@SetCompleted true
@@ -335,8 +335,8 @@ else
 	TRANSLATE = GM.Lang.GetEntry
 
 	with taskBase
-		.Submit = =>
-			GAMEMODE\Net_SendSubmitTask!
+		.Submit = (data = 0) =>
+			GAMEMODE\Net_SendSubmitTask data
 
 		.CreateTaskEntry = =>
 			@__taskEntry = with GAMEMODE\HUD_AddTaskEntry!

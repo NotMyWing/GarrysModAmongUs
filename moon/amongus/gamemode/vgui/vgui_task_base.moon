@@ -45,8 +45,8 @@ base.Popup = =>
 
 	surface.PlaySound @__appearSound or "au/panel_genericappear.ogg"
 
-base.Submit = (autoClose = true) =>
-	GAMEMODE\Net_SendSubmitTask!
+base.Submit = (autoClose = true, data = 0) =>
+	GAMEMODE\Net_SendSubmitTask data
 
 	if autoClose
 		@NewAnimation 0, 2, 0, ->

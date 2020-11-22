@@ -175,7 +175,7 @@ else
 	--- Submits the current task. Tied to VGUI. This function will fail
 	-- if the player isn't actually doing any tasks at this moment.
 	-- @param playerTable The tasked crewmate.
-	GM.Task_Submit = (playerTable) =>
+	GM.Task_Submit = (playerTable, data = 0) =>
 		currentVGUI = @GameData.CurrentVGUI[playerTable]
 		currentTask = (@GameData.Tasks[playerTable] or {})[currentVGUI]
 
@@ -185,4 +185,4 @@ else
 
 				return unless playerTable.entity\TestPVS ent
 
-				currentTask\Advance ent
+				currentTask\Advance ent, data

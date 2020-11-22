@@ -420,7 +420,7 @@ net.Receive "NMW AU Flow", (len, ply) ->
 		--
 		when GAMEMODE.FlowTypes.TasksSubmit
 			if playerTable
-				GAMEMODE\Task_Submit playerTable
+				GAMEMODE\Task_Submit playerTable, net.ReadUInt 32
 
 		--
 		-- Player has requested a sabotage.

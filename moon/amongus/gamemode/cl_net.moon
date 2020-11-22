@@ -37,9 +37,10 @@ GM.Net_SendVote = (id) =>
 
 --- Notifies the server that the task has been completed.
 -- This will fail horribly if the player isn't doing any tasks.
-GM.Net_SendSubmitTask = =>
+GM.Net_SendSubmitTask = (data = 0) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.TasksSubmit, @FlowSize
+	net.WriteUInt data, 32
 	net.SendToServer!
 
 --- Notifies the server that the task window has been closed.
