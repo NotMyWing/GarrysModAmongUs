@@ -153,12 +153,13 @@ if SERVER
 		-- This doesn't get called if the user couldn't actually use the task for some reason.
 		-- Does nothing if "au_tasks_enable_visual" is set to 0.
 		-- There's little reason you should be calling this.
-		.UseVisual = =>
+		.UseVisual = (btn = @GetActivationButton!) =>
 			return unless @CanVisual!
 
-			btn = @GetActivationButton!
-			if IsValid btn
-				btn\TriggerOutput "OnTaskUse", @GetAssignedPlayer!
+			activator = @GetAssignedPlayer!.entity
+
+			if IsValid(btn) and IsValid activator
+				btn\TriggerOutput "OnTaskUse", activator
 
 		--- Internal function.
 		-- Called whenever player closes the GUI without advancing the task.
@@ -176,8 +177,10 @@ if SERVER
 		.CancelVisual = (btn = @GetActivationButton!) =>
 			return unless @CanVisual!
 
-			if IsValid btn
-				btn\TriggerOutput "OnTaskCancel", @GetAssignedPlayer!
+			activator = @GetAssignedPlayer!.entity
+
+			if IsValid(btn) and IsValid activator
+				btn\TriggerOutput "OnTaskCancel", activator
 
 		--- Internal function.
 		-- Called whenever the assigned player uses the button. (opens the UI)
@@ -203,9 +206,10 @@ if SERVER
 		.AdvanceVisual = (btn = @GetActivationButton!) =>
 			return unless @CanVisual!
 
-			btn = @GetActivationButton!
-			if IsValid btn
-				btn\TriggerOutput "OnTaskAdvance", @GetAssignedPlayer!
+			activator = @GetAssignedPlayer!.entity
+
+			if IsValid(btn) and IsValid activator
+				btn\TriggerOutput "OnTaskAdvance", activator
 
 		--- Triggers the "OnTaskComplete" output of the current button.
 		-- This gets called strictly when the task is completed.
@@ -214,9 +218,10 @@ if SERVER
 		.CompleteVisual = (btn = @GetActivationButton!) =>
 			return unless @CanVisual!
 
-			btn = @GetActivationButton!
-			if IsValid btn
-				btn\TriggerOutput "OnTaskComplete", @GetAssignedPlayer!
+			activator = @GetAssignedPlayer!.entity
+
+			if IsValid(btn) and IsValid activator
+				btn\TriggerOutput "OnTaskComplete", activator
 
 		--- Marks the task dirty, notifying the game mode that
 		-- the data should be broadcasted to the client.
