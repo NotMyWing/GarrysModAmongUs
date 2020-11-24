@@ -185,6 +185,7 @@ if SERVER
 		--- Internal function.
 		-- Called whenever the assigned player uses the button. (opens the UI)
 		.Use = (btn) =>
+			@UseVisual btn
 			@OnUse btn
 
 		--- Internal function.
@@ -310,7 +311,6 @@ if SERVER
 		--- Called whenever the assigned player uses the button. (opens the UI)
 		-- Don't forget to base-call this if you want a VGUI.
 		.OnUse = (btn) =>
-			@UseVisual btn
 			playerTable = @GetAssignedPlayer!
 			if GAMEMODE\Player_CanOpenVGUI playerTable
 				GAMEMODE\Player_OpenVGUI playerTable, @GetName!, { taskName: @GetName! }, (-> @Cancel btn)
