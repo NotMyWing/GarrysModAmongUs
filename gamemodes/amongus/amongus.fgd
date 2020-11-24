@@ -1,5 +1,17 @@
 @include "base.fgd"
 
+@BaseClass = AULocatable :
+	"Defines an entity as being located in an area for the gamemode for i18n purposes"
+[
+	areaname(string) : "Area Name" : : "The internal (ie, non-localized) name of the area this button is in"
+]
+
+@BaseClass base(AULocatable) = AUTaskButton :
+	"Properties shared among sabotage/task buttons"
+[
+	customdata(string) : "Custom Data" : : "Any data to pass to the task instance for this button"
+]
+
 @PointClass base(PlayerClass, Angles) studio("models/editor/playerstart.mdl") = info_player_start_meeting :
 	"Optional spawn point for the meeting area, as seen in Mira HQ and Polus."
 [
@@ -15,12 +27,10 @@
 [
 ]
 
-@SolidClass base(Origin, RenderFields, Targetname) = func_task_button :
+@SolidClass base(Origin, RenderFields, Targetname, AUTaskButton) = func_task_button :
 	"Task button yo."
 [
-	taskname(string) : "The task this button is associated with"
-	areaname(string) : "Button area"
-	customdata(string) : "Custom task data"
+	taskname(string) : "Task Name" : : "The internal name of the task this button activates"
 
 	output OnTaskUse(void) : "Called when a player starts doing the task using this button"
 	output OnTaskCancel(void) : "Called when a player cancels the task using this button"
@@ -36,11 +46,11 @@
 @SolidClass base(Origin, RenderFields, Targetname) = func_vent :
 	"Vent."
 [
-	viewangle(angle) : "View angle"
-	viewpoint(vector) : "Optional camera point"
+	viewangle(angle) : "View Angle" : : "Sets player's view to this angle when they vent here"
+	viewpoint(vector) : "View Position" : : "Optional: Moves player's view to this location when they vent here"
 
-	input Link(void) : "here be connection"
-	output Link(void) : "A different vent this vent is connected to."
+	input Link(void) : "Vent which can reach this vent"
+	output Link(void) : "Vent which can be reached from this vent"
 
 	output OnVentIn(void) : "Called when a player jumps into this vent"
 	output OnVentOut(void) : "Called when a player jumps out of this vent"
@@ -51,12 +61,10 @@
 [
 ]
 
-@SolidClass base(Origin, RenderFields, Targetname) = func_sabotage_button :
+@SolidClass base(Origin, RenderFields, Targetname, AUTaskButton) = func_sabotage_button :
 	"Sabotage button. Pretty much the same thing as task button, but not quite."
 [
-	sabotagename(string) : "The sabotage this button is associated with"
-	areaname(string) : "Button area"
-	customdata(string) : "Custom task data"
+	sabotagename(string) "Sabotage Name" : : "The internal name of the sabotage this button is associated with"
 ]
 
 @SolidClass base(func_sabotage_button, prop_static_base) = prop_sabotage_button :
