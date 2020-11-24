@@ -185,6 +185,7 @@ if SERVER
 		--- Internal function.
 		-- Called whenever the assigned player uses the button. (opens the UI)
 		.Use = (btn) =>
+			@UseVisual btn
 			@OnUse btn
 
 		--- Internal function.
