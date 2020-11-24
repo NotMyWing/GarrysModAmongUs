@@ -366,7 +366,7 @@ GM.TracePlayer = (ply) =>
 		-- Only hightlight meeting buttons when the cooldown has passed.
 		if (ent\GetClass! == "func_meeting_button" or ent\GetClass! == "prop_meeting_button")
 			continue if @IsMeetingDisabled!
-			continue if 0 >= ply\GetNW2Int "NMW AU Meetings"
+			continue if 0 >= ply\GetNWInt "NMW AU Meetings"
 
 			time = GetGlobalFloat("NMW AU NextMeeting") - CurTime!
 
@@ -421,7 +421,7 @@ GM.IsOnAutoPilot = => GetGlobalBool "NMW AU AutoPilot"
 
 --- Returns a table of fully initialized players.
 GM.GetFullyInitializedPlayers = => return for ply in *player.GetAll!
-	if ply\IsBot! or ply\GetNW2Bool "NMW AU Initialized"
+	if ply\IsBot! or ply\GetNWBool "NMW AU Initialized"
 		ply
 	else
 		continue
@@ -434,15 +434,15 @@ GM.GetImposterCount = (_, count) -> math.floor(((count or _) - 1)/6) + 1
 -- @param highlight Should the entity be highlighted?
 -- @param color Optional color. Defaults to white.
 GM.SetUseHighlight = (entity, highlight = false, color = Color(255, 255, 255)) =>
-	entity\SetNW2Bool "NMW AU UseHighlight", highlight
+	entity\SetNWBool "NMW AU UseHighlight", highlight
 	if highlight
-		entity\SetNW2Vector "NMW AU HighlightColor", color\ToVector!
+		entity\SetNWVector "NMW AU HighlightColor", color\ToVector!
 
 --- Gets whether the entity should be highlighted.
 -- @param entity Entity.
 GM.ShouldHighlightEntity = (entity) =>
 	return false unless IsValid entity
-	return true if entity\GetNW2Bool "NMW AU UseHighlight"
+	return true if entity\GetNWBool "NMW AU UseHighlight"
 
 	return true if switch string.match entity\GetClass!, "[^_]*_(.+)"
 		when "task_button", "meeting_button", "vent", "sabotage_button"
@@ -455,7 +455,7 @@ GM.ShouldHighlightEntity = (entity) =>
 
 --- Returns whether the entity is a player body.
 -- @param entity Entity.
-GM.IsPlayerBody = (entity) => 0 < entity\GetNW2Int "NMW AU PlayerID"
+GM.IsPlayerBody = (entity) => 0 < entity\GetNWInt "NMW AU PlayerID"
 
 local logger
 logger = {

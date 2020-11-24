@@ -177,7 +177,7 @@ GM.Game_Start = =>
 			with ply.entity
 				\Freeze true
 				\SetColor ply.color
-				\SetNW2Int "NMW AU Meetings", @ConVarSnapshots.MeetingsPerPlayer\GetInt!
+				\SetNWInt "NMW AU Meetings", @ConVarSnapshots.MeetingsPerPlayer\GetInt!
 
 		-- Shuffle the player table one more time.
 		-- We don't want to broadcast the previous table

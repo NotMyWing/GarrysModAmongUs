@@ -400,8 +400,8 @@ net.Receive "NMW AU Flow", (len, ply) ->
 		-- Player wants to sync the game data.
 		--
 		when GAMEMODE.FlowTypes.RequestUpdate
-			if not ply\GetNW2Bool "NMW AU Initalized"
-				ply\SetNW2Bool "NMW AU Initialized", true
+			if not ply\GetNWBool "NMW AU Initalized"
+				ply\SetNWBool "NMW AU Initialized", true
 
 				if GAMEMODE.IsGameInProgress!
 					GAMEMODE\Net_UpdateGameData ply

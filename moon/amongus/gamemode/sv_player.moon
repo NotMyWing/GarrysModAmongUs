@@ -90,7 +90,7 @@ GM.Player_Kill = (victimTable, attackerTable) =>
 		\SetModel victimTable.entity\GetModel!
 		\SetColor victimTable.entity\GetColor!
 		\SetCollisionGroup COLLISION_GROUP_DEBRIS_TRIGGER
-		\SetNW2Int "NMW AU PlayerID", victimTable.id
+		\SetNWInt "NMW AU PlayerID", victimTable.id
 		\SetUseType SIMPLE_USE
 		\Spawn!
 		\Activate!
@@ -387,7 +387,7 @@ hook.Add "EntityTakeDamage", "NMW AU Damage", (target, dmg) ->
 hook.Add "PlayerUse", "NMW AU UseBody", (activator, ent) ->
 	playerTable = activator\GetAUPlayerTable!
 	if playerTable and GAMEMODE\IsGameInProgress!
-		bodyid = ent\GetNW2Int "NMW AU PlayerID"
+		bodyid = ent\GetNWInt "NMW AU PlayerID"
 		victim = GAMEMODE.GameData.Lookup_PlayerByID[bodyid]
 		if victim
 			GAMEMODE\Meeting_Start playerTable, victim.color

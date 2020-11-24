@@ -33,7 +33,7 @@ if SERVER
 
 	ENT.Use = (ply) =>
 		if SERVER
-			return if ply\GetNW2Int("NMW AU Meetings") <= 0
+			return if ply\GetNWInt("NMW AU Meetings") <= 0
 
 			time = GetGlobalFloat("NMW AU NextMeeting") - CurTime!
 
@@ -41,7 +41,7 @@ if SERVER
 
 			if GAMEMODE\Meeting_Start ply
 				@EmitSound "au/panel_emergencybutton.ogg", 60
-				ply\SetNW2Int "NMW AU Meetings", ply\GetNW2Int("NMW AU Meetings") - 1
+				ply\SetNWInt "NMW AU Meetings", ply\GetNWInt("NMW AU Meetings") - 1
 
 
 if CLIENT
@@ -63,7 +63,7 @@ if CLIENT
 			elseif time > 0
 				TRANSLATE("meetingButton.cooldown") math.floor time
 			else
-				TRANSLATE("meetingButton.default") LocalPlayer!\Nick!, LocalPlayer!\GetNW2Int "NMW AU Meetings"
+				TRANSLATE("meetingButton.default") LocalPlayer!\Nick!, LocalPlayer!\GetNWInt "NMW AU Meetings"
 
 		if @__nextGarrysModIsDumbCheck and CurTime! > @__nextGarrysModIsDumbCheck
 			@__nextGarrysModIsDumbCheck = @__nextGarrysModIsDumbCheck + 10

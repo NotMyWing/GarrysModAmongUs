@@ -5,31 +5,31 @@ taskTable = {
 
 	Type: GM.TaskType.Long
 	Time: 10
-	CanUse: => not IsValid(@GetActivationButton!\GetNW2Entity "Scanning") and
+	CanUse: => not IsValid(@GetActivationButton!\GetNWEntity "Scanning") and
 		30 > @GetAssignedPlayer!.entity\GetPos!\Distance @GetActivationButton!\GetPos!
-	
+
 	Advance: (btn, scan) =>
 		if scan
-			btn\SetNW2Entity "Scanning", nil
+			btn\SetNWEntity "Scanning", nil
 			@SetCompleted true
 
 	OnUse: (btn) =>
 		@Base.OnUse @, btn
 
-		if not IsValid btn\GetNW2Entity "Scanning"
-			btn\SetNW2Entity "Scanning", @GetAssignedPlayer!.entity
-			btn\SetNW2Float "Completion", CurTime! + @Time
+		if not IsValid btn\GetNWEntity "Scanning"
+			btn\SetNWEntity "Scanning", @GetAssignedPlayer!.entity
+			btn\SetNWFloat "Completion", CurTime! + @Time
 
 			handle = "medbay #{@GetID!}"
 			GAMEMODE.GameData.Timers[handle]
 			timer.Create handle, @Time, 1, ->
 				if IsValid(btn) and IsValid(@GetAssignedPlayer!.entity) and
-					@GetAssignedPlayer!.entity == btn\GetNW2Entity "Scanning"
+					@GetAssignedPlayer!.entity == btn\GetNWEntity "Scanning"
 						@Advance btn, true
-	
+
 	OnCancel: (btn) =>
-		if @GetAssignedPlayer!.entity == btn\GetNW2Entity "Scanning"
-			btn\SetNW2Entity "Scanning", nil
+		if @GetAssignedPlayer!.entity == btn\GetNWEntity "Scanning"
+			btn\SetNWEntity "Scanning", nil
 }
 
 if CLIENT
@@ -53,11 +53,11 @@ if CLIENT
 
 					submitted = false
 					.Think = ->
-						time = @GetActivationButton!\GetNW2Float("Completion") or (CurTime! + @Time)
+						time = @GetActivationButton!\GetNWFloat("Completion") or (CurTime! + @Time)
 						\SetText string.format "We scanning boiz, %d s.", math.max 0, time - CurTime!
 						if (time - CurTime!) < 0 and not submitted
 							submitted = true
-							base\Submit!					
+							base\Submit!
 
 			\Popup!
 
