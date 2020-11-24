@@ -8,10 +8,8 @@ taskTable = {
 	CanUse: => not IsValid(@GetActivationButton!\GetNWEntity "Scanning") and
 		30 > @GetAssignedPlayer!.entity\GetPos!\Distance @GetActivationButton!\GetPos!
 
-	Advance: (btn, scan) =>
-		if scan
-			btn\SetNWEntity "Scanning", nil
-			@SetCompleted true
+	-- We don't need the base class' "Advance" method.
+	Advance: =>
 
 	OnUse: (btn) =>
 		@Base.OnUse @, btn
@@ -25,7 +23,8 @@ taskTable = {
 			timer.Create handle, @Time, 1, ->
 				if IsValid(btn) and IsValid(@GetAssignedPlayer!.entity) and
 					@GetAssignedPlayer!.entity == btn\GetNWEntity "Scanning"
-						@Advance btn, true
+						btn\SetNWEntity "Scanning", nil
+						@SetCompleted true
 
 	OnCancel: (btn) =>
 		if @GetAssignedPlayer!.entity == btn\GetNWEntity "Scanning"
