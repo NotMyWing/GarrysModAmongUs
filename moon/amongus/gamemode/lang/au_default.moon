@@ -184,3 +184,24 @@ with GM.Lang\Get "en"
 	["connected.disconnected"] = "%s has left the game!"
 
 	["chat.noTalkingDuringGame"] = "You cannot talk during the game!"
+
+	inspectSample = {
+		eta:           "ETA %d."
+		addingReagent: "ADDING REAGENT."
+		oneMore:       "1 MORE."
+		testComplete:  "TEST COMPLETE."
+		pressToStart:  "PRESS TO START  -->"
+		selectAnomaly: "SELECT ANOMALY."
+		hello:         "HELLO."
+		badResult:     "BAD RESULT."
+		thankYou:      "THANK YOU!"
+		randomText: table.Random {
+			"YOU DON'T NEED TO WAIT."
+			"GO DO SOMETHING ELSE."
+			"TAKE A BREAK."
+			"GO GRAB A COFFEE."
+		}
+	}
+
+	for key, value in pairs inspectSample
+		["tasks.inspectSample.#{key}"] = value
