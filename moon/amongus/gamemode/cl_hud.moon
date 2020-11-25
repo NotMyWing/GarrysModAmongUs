@@ -2,9 +2,7 @@
 -- Interfaces the HUD things. Responsible for everything Derma-related.
 -- @module cl_hud
 
-include "vgui/vgui_task_base.lua"
-include "vgui/vgui_sabotage_base.lua"
-include "vgui/vgui_gui_base.lua"
+include "vgui/vgui_ui_bases.lua"
 include "vgui/vgui_map_base.lua"
 include "vgui/vgui_task_placeholder.lua"
 include "vgui/vgui_crewmate.lua"
