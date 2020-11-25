@@ -141,49 +141,8 @@ map = {
 				if .Resolution
 					@SetResolution .Resolution
 
-	Popup: =>
-		return if @__opened or @__opening or @__closing
-
-		@__opened = true
-		@__opening = true
-
-		@MakePopup!
-		@SetKeyboardInputEnabled false
-
-		@SetPos 0, ScrH!
-		@MoveTo 0, 0, 0.2, nil, nil, ->
-			@__opening = false
-
-			if @OnOpen
-				@OnOpen!
-
-		@SetAlpha 0
-		@AlphaTo 255, 0.1, 0.01
-
-		surface.PlaySound "au/panel_genericappear.ogg"
-
-	Close: (forced = false) =>
-		return if not forced and (not @__opened or @__opening or @__closing)
-
-		@__opened = false
-		@__closing = true
-
-		@AlphaTo 0, 0.1
-		@MoveTo 0, ScrH!, 0.1, 0, -1, ->
-			@__closing = false
-			surface.PlaySound "au/panel_genericdisappear.ogg"
-			@SetMouseInputEnabled false
-
-			if @OnClose
-				@OnClose!
-
-	Think: =>
-		if gui.IsGameUIVisible!
-			gui.HideGameUI!
-			@Close true
-
 	Paint: =>
 
 }
 
-vgui.Register "AmongUsMapBase", map, "DPanel"
+vgui.Register "AmongUsMapBase", map, "AmongUsVGUIBase"

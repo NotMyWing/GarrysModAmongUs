@@ -10,7 +10,9 @@ vgui.Register "AmongUsVGUIBase", {
 		@SetZPos 30002
 		@SetSize ScrW!, ScrH!
 		@SetPos 0, ScrH!
+		@SetDeleteOnClose true
 
+		@__isOpened = false
 		@__closeButton = with @Add "DImageButton"
 			\SetText ""
 			\SetMaterial ASSETS.close
@@ -37,8 +39,13 @@ vgui.Register "AmongUsVGUIBase", {
 						@Close!
 
 	--- Makes the UI pop up.
-	Popup: =>
+	Popup: (force = false) =>
+		return false if @__isOpened
+		return false if not force and @__isAnimating
+		@__isOpened = true
+
 		@MakePopup!
+		@SetVisible true
 		@AlphaTo 255, 0.1, 0.01
 		surface.PlaySound @GetAppearSound!
 
@@ -46,12 +53,21 @@ vgui.Register "AmongUsVGUIBase", {
 		if currentY == 0
 			@SetPos currentX, 1
 
+		@__isAnimating = true
 		@MoveTo 0, 0, 0.2, nil, nil, ->
-			if @OnClose
-				@OnClose!
+			@__isAnimating = false
+
+			if @OnOpen
+				@OnOpen!
+
+		return true
 
 	--- Closes the UI.
-	Close: =>
+	Close: (force = false) =>
+		return false unless @__isOpened
+		return false if not force and @__isAnimating
+		@__isOpened = false
+
 		@AlphaTo 0, 0.1
 		surface.PlaySound @GetDisappearSound!
 
@@ -59,11 +75,19 @@ vgui.Register "AmongUsVGUIBase", {
 		if currentY == ScrH!
 			@SetPos currentX, currentY - 1
 
+		@__isAnimating = true
 		@MoveTo 0, ScrH!, 0.1, nil, nil, ->
+			@__isAnimating = false
+
 			if @OnClose
 				@OnClose!
 
-			@Remove!
+			if @GetDeleteOnClose!
+				@Remove!
+			else
+				@SetVisible false
+
+		return true
 
 	--- Handles mouse clicks.
 	OnMousePressed: (keyCode) =>
@@ -80,9 +104,9 @@ vgui.Register "AmongUsVGUIBase", {
 
 	--- Closes the UI when Escape is pressed.
 	Think: =>
-		if gui.IsGameUIVisible!
+		if @__isOpened and gui.IsGameUIVisible!
 			gui.HideGameUI!
-			@Close!
+			@Close true
 
 	--- Tells the server that the player is no longer using the UI.
 	OnRemove: => GAMEMODE\Net_SendCloseVGUI!
@@ -100,6 +124,10 @@ vgui.Register "AmongUsVGUIBase", {
 	--- Gets the close button.
 	GetCloseButton: => @__closeButton
 
+	--- Sets whether the panel should be deleted on close.
+	SetDeleteOnClose: (value) => @__deleteOnClose = value
+	GetDeleteOnClose: => @__deleteOnClose or false
+
 	Paint: =>
 
 }, "DPanel"
@@ -114,7 +142,14 @@ vgui.Register "AmongUsSabotageBase", {
 		if @__sabotage
 			if not @__closed and not @__sabotage\GetActive!
 				@__closed = true
-				@Close!
+				@Close true
+
+	Submit: (data = 0, autoClose = true) =>
+		GAMEMODE\Net_SendSubmitSabotage data
+
+		if autoClose
+			@NewAnimation 0, 2, 0, ->
+				@Close true
 
 	SetSabotage: (value) => @__sabotage = value
 	GetSabotage: => @__sabotage
@@ -130,6 +165,6 @@ vgui.Register "AmongUsTaskBase", {
 
 		if autoClose
 			@NewAnimation 0, 2, 0, ->
-				@Close!
+				@Close true
 
 }, "AmongUsVGUIBase"

@@ -154,7 +154,7 @@ GM.HUD_OpenMap = =>
 --- Closes the map. Simple as that.
 GM.HUD_CloseMap = =>
 	if IsValid(GAMEMODE.Hud) and IsValid(GAMEMODE.Hud.Map)
-		GAMEMODE.Hud.Map\Close!
+		return GAMEMODE.Hud.Map\Close!
 
 MAT_TASK = Material "au/gui/map/task.png", "smooth"
 
@@ -230,7 +230,7 @@ GM.HUD_CreateTaskCompletePopup = =>
 GM.HUD_CloseVGUI = =>
 	if IsValid @Hud.CurrentVGUI
 		if @Hud.CurrentVGUI.Close
-			@Hud.CurrentVGUI\Close!
+			@Hud.CurrentVGUI\Close true
 		else
 			@Hud.CurrentVGUI\Remove!
 
@@ -381,7 +381,10 @@ hook.Add "ScoreboardShow", "NMW AU Map", ->
 
 	return true if GAMEMODE\HUD_OpenMap!
 
-hook.Add "ScoreboardHide", "NMW AU Map", -> GAMEMODE\HUD_CloseMap!
+hook.Add "ScoreboardHide", "NMW AU Map", ->
+	GAMEMODE\HUD_CloseMap!
+
+	return nil
 
 concommand.Add "au_debug_eject_test", ->
 	if IsValid GAMEMODE.Hud.Eject

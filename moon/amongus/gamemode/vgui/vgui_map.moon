@@ -1,6 +1,9 @@
 return vgui.RegisterTable {
 	__tracking: {}
 
+	Init: =>
+		@SetDeleteOnClose false
+
 	SetupFromManifest: (manifest) =>
 		@BaseClass.SetupFromManifest @, manifest
 
@@ -100,5 +103,9 @@ return vgui.RegisterTable {
 					(position.y - pos.y) / (baseW * scale) * size * resolution - h/2
 			else
 				@UnTrack entity
+
+	Popup: =>
+		if @BaseClass.Popup @
+			@SetKeyboardInputEnabled false
 
 }, "AmongUsMapBase"
