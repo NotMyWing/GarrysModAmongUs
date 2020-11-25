@@ -24,8 +24,9 @@ base.Setup = (content) =>
 			.DoClick = ->
 				@Close!
 
-base.OnMousePressed = =>
-	@wasPressed = true
+base.OnMousePressed = (keyCode) =>
+	if MOUSE_LEFT == keyCode
+		@wasPressed = true
 
 base.OnMouseReleased = =>
 	if @wasPressed
