@@ -146,38 +146,47 @@ GM.Colors = {
 --
 -- Using one channel guarantees the lack of race conditions.
 -- Besides, polluting the game with tens of random network strings is just bad.
-GM.FlowTypes = {
-	GameStart: 1
-	Countdown: 2
-	KillRequest: 3
-	BroadcastDead: 4
-	KillCooldown: 5
-	GameState: 6
-	GameOver: 7
-	Meeting: 8
-	OpenDiscuss: 9
-	Eject: 10
-	MeetingVote: 11
-	MeetingEnd: 12
-	NotifyVent: 13
-	VentAnim: 14
-	VentRequest: 15
-	RequestUpdate: 16
-	TasksUpdateData: 17
-	TasksSubmit: 18
-	GameChatNotification: 19
-	CloseVGUI: 20
-	TasksUpdateCount: 21
-	NotifyKilled: 22
-	KillCooldownPause: 23
-	OpenVGUI: 24
-	SabotageData: 25
-	SabotageRequest: 26
-	SabotageSubmit: 27
-	UNUSED2: 28
-	ConVarSnapshots: 29
-	ConnectDisconnect: 30
-}
+GM.FlowTypes = { value, i for i, value in ipairs {
+	"RequestUpdate"
+
+	"GameStart"
+	"GameState"
+	"GameOver"
+	"GameCountdown"
+	"GameChatNotification"
+
+	"BroadcastDead"
+
+	"KillRequest"
+	"KillCooldown"
+	"KillCooldownPause"
+
+	"MeetingStart"
+	"MeetingOpenDiscuss"
+	"MeetingVote"
+	"MeetingEnd"
+	"MeetingEject"
+
+	"NotifyKilled"
+	"NotifyVent"
+
+	"VentAnim"
+	"VentRequest"
+
+	"TasksUpdateData"
+	"TasksSubmit"
+	"TasksUpdateCount"
+
+	"CloseVGUI"
+	"OpenVGUI"
+
+	"SabotageData"
+	"SabotageRequest"
+	"SabotageSubmit"
+
+	"ConVarSnapshots"
+	"ConnectDisconnect"
+}}
 
 GM.FlowSize = math.ceil math.log table.Count(GM.FlowTypes) + 1, 2
 

@@ -123,7 +123,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	--
 	-- Display a countdown.
 	--
-	when GAMEMODE.FlowTypes.Countdown
+	when GAMEMODE.FlowTypes.GameCountdown
 		if IsValid GAMEMODE.Hud
 			GAMEMODE\HUD_Countdown net.ReadDouble!
 
@@ -207,7 +207,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	-- Meeting 1/4.
 	-- Display the splash and the screen itself, after a short delay.
 	--
-	when GAMEMODE.FlowTypes.Meeting
+	when GAMEMODE.FlowTypes.MeetingStart
 		if IsValid GAMEMODE.Hud.Meeting
 			GAMEMODE.Hud.Meeting\Remove!
 
@@ -223,7 +223,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	-- Unlocks voting.
 	-- Reading the caller is kind of redundant, but whatever.
 	--
-	when GAMEMODE.FlowTypes.OpenDiscuss
+	when GAMEMODE.FlowTypes.MeetingOpenDiscuss
 		caller = GAMEMODE.GameData.Lookup_PlayerByID[net.ReadUInt 8]
 		GAMEMODE.Hud.Meeting\OpenDiscuss caller
 
@@ -267,7 +267,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	-- Eject animation.
 	-- Prints the reason.
 	--
-	when GAMEMODE.FlowTypes.Eject
+	when GAMEMODE.FlowTypes.MeetingEject
 		if IsValid GAMEMODE.Hud.Meeting
 			GAMEMODE.Hud.Meeting\Close!
 

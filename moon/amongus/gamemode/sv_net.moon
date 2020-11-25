@@ -23,7 +23,7 @@ GM.Net_BroadcastGameState = =>
 -- @param time Absolute time based on CurTime().
 GM.Net_BroadcastCountdown = (time) =>
 	net.Start "NMW AU Flow"
-	net.WriteUInt @FlowTypes.Countdown, @FlowSize
+	net.WriteUInt @FlowTypes.GameCountdown, @FlowSize
 	net.WriteDouble time
 	net.Broadcast!
 
@@ -31,7 +31,7 @@ GM.Net_BroadcastCountdown = (time) =>
 -- @param playerTable Meeting caller.
 GM.Net_BroadcastDiscuss = (playerTable) =>
 	net.Start "NMW AU Flow"
-	net.WriteUInt @FlowTypes.OpenDiscuss, @FlowSize
+	net.WriteUInt @FlowTypes.MeetingOpenDiscuss, @FlowSize
 	net.WriteUInt playerTable.id, 8
 	net.Broadcast!
 
@@ -40,7 +40,7 @@ GM.Net_BroadcastDiscuss = (playerTable) =>
 -- @param playerTable The ejected player. Optional.
 GM.Net_BroadcastEject = (reason, playerTable) =>
 	net.Start "NMW AU Flow"
-	net.WriteUInt @FlowTypes.Eject, @FlowSize
+	net.WriteUInt @FlowTypes.MeetingEject, @FlowSize
 	net.WriteUInt (reason or 0), 4
 	if playerTable
 		net.WriteBool true
@@ -68,7 +68,7 @@ GM.Net_BroadcastEject = (reason, playerTable) =>
 -- @param playerTable Meeting caller.
 GM.Net_BroadcastMeeting = (playerTable, bodyColor) =>
 	net.Start "NMW AU Flow"
-	net.WriteUInt @FlowTypes.Meeting, @FlowSize
+	net.WriteUInt @FlowTypes.MeetingStart, @FlowSize
 	net.WriteUInt playerTable.id, 8
 	if bodyColor
 		net.WriteBool true
