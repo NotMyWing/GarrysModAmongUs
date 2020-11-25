@@ -244,20 +244,25 @@ splash.DisplayPlayers = (reason) =>
 				mdl_size = size * 0.5
 
 				-- Helper function that creates player model containers.
-				create_mdl = (parent, color) ->
+				create_mdl = (parent, playerTable) ->
 					return with mdl = parent\Add "DModelPanel"
 						size = (math.min @GetTall!, @GetWide!) * 0.6
 						\SetSize mdl_size, size
-						\SetModel LocalPlayer!\GetModel!
 						\SetFOV 32
 						\SetCamPos \GetCamPos! - Vector 0, 0, 5
-						if color
-							\SetColor color
+
+						.Nickname = playerTable.nickname or "???"
+						\SetColor playerTable.color
+						\SetModel if IsValid playerTable.entity
+							playerTable.entity\GetModel!
+						else
+							GAMEMODE\GetDefaultPlayerModel!
+
 						with \GetEntity!
 							\SetAngles Angle 0, 45, 0
 							\SetPos \GetPos! + Vector 0, 0, 10
-						.Think = ->
-							\SetAlpha @GetAlpha!
+
+						.Think = -> \SetAlpha @GetAlpha!
 						.LayoutEntity = ->
 
 						oldPaint = .Paint
@@ -320,9 +325,9 @@ splash.DisplayPlayers = (reason) =>
 
 					width_mod = 1
 					for i = 1, math.ceil #players / 2
-						with create_mdl leftBar
-							.Nickname = players[i].nickname
+						with create_mdl leftBar, players[i]
 							dead = GAMEMODE.GameData.DeadPlayers[players[i]]
+
 							\SetColor Color 0, 0, 0, dead and 127 or 255
 							color = players[i].color
 							if dead
@@ -346,8 +351,7 @@ splash.DisplayPlayers = (reason) =>
 					if #players ~= 1
 						width_mod = 1
 						for i = 1 + (math.ceil #players / 2), #players
-							with create_mdl rightBar
-								.Nickname = players[i].nickname
+							with create_mdl rightBar, players[i]
 								dead = GAMEMODE.GameData.DeadPlayers[players[i]]
 								\SetColor Color 0, 0, 0, dead and 127 or 255
 								color = players[i].color
@@ -372,8 +376,7 @@ splash.DisplayPlayers = (reason) =>
 						if GAMEMODE.GameData.DeadPlayers[localPlayerTable]
 							color.a = 127
 
-						with create_mdl middlePlayer, color
-							.Nickname = localPlayerTable.nickname
+						with create_mdl middlePlayer, localPlayerTable
 							\Dock FILL
 							\SetFOV 30
 

@@ -326,7 +326,11 @@ GM.Player_CloseVGUIsForEveryone = =>
 	@Net_BroadcastCloseVGUI!
 
 GM.PlayerSpawn = (ply) =>
-	ply\SetModel "models/kaesar/amongus/amongus.mdl"
+	defaultModel = @GetDefaultPlayerModel!
+
+	if nil == hook.Call "PlayerSetModel", @, ply
+		ply\SetModel defaultModel
+
 	with defaultSpeed = 200
 		ply\SetSlowWalkSpeed defaultSpeed
 		ply\SetWalkSpeed defaultSpeed

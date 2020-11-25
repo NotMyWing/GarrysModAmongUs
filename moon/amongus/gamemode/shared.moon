@@ -66,6 +66,9 @@ GM.ConVars =
 	WarmupTime:      CreateConVar "au_warmup_time"      , 60, flags, "", 0, 120
 	ForceAutoWarmup: CreateConVar "au_warmup_force_auto", 0 , flags, "", 0, 1
 
+	PlayerModel: CreateConVar "au_player_model", "models/kaesar/amongus/amongus.mdl",
+		flags, ""
+
 --- Enum of all colors players can get.
 -- @warning This isn't the best approach. Needs fixing.
 -- @table GM.Colors
@@ -456,6 +459,14 @@ GM.ShouldHighlightEntity = (entity) =>
 --- Returns whether the entity is a player body.
 -- @param entity Entity.
 GM.IsPlayerBody = (entity) => 0 < entity\GetNWInt "NMW AU PlayerID"
+
+--- Returns the default player model.
+GM.GetDefaultPlayerModel = =>
+	defaultModel = @ConVars.PlayerModel\GetString!
+	if nil == defaultModel or "" == defaultModel
+		defaultModel = @ConVars.PlayerModel\GetDefault!
+
+	return defaultModel
 
 local logger
 logger = {
