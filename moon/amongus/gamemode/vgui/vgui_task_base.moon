@@ -66,4 +66,9 @@ base.SetDisappearSound = (value) => @__disappearSound = value
 
 base.Paint = =>
 
+base.Think = =>
+	if gui.IsGameUIVisible!
+		gui.HideGameUI!
+		@Close!
+
 vgui.Register "AmongUsTaskBase", base, "DPanel"

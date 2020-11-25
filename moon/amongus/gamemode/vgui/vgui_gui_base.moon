@@ -52,6 +52,11 @@ base.Close = =>
 		surface.PlaySound @__disappearSound or "au/panel_genericdisappear.ogg"
 		@Remove!
 
+base.Think = =>
+	if gui.IsGameUIVisible!
+		gui.HideGameUI!
+		@Close!
+
 base.OnRemove = ->
 	GAMEMODE\Net_SendCloseVGUI!
 

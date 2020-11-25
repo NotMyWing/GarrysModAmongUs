@@ -59,6 +59,10 @@ base.Think = =>
 			@__closed = true
 			@Close!
 
+	if gui.IsGameUIVisible!
+		gui.HideGameUI!
+		@Close!
+
 base.SetSabotage = (value) =>
 	@__sabotage = value
 

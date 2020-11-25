@@ -162,8 +162,8 @@ map = {
 
 		surface.PlaySound "au/panel_genericappear.ogg"
 
-	Close: =>
-		return if not @__opened or @__opening or @__closing
+	Close: (forced = false) =>
+		return if not forced and (not @__opened or @__opening or @__closing)
 
 		@__opened = false
 		@__closing = true
@@ -176,6 +176,11 @@ map = {
 
 			if @OnClose
 				@OnClose!
+
+	Think: =>
+		if gui.IsGameUIVisible!
+			gui.HideGameUI!
+			@Close true
 
 	Paint: =>
 
