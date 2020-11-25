@@ -48,9 +48,6 @@ GM.HUD_Reset = =>
 	if IsValid @__splash
 		@__splash\Remove!
 
-	if IsValid(@Hud) and IsValid(@Hud.TaskScreen)
-		@Hud.TaskScreen\Close!
-
 	if IsValid @Hud
 		@Hud\Remove!
 
@@ -65,12 +62,6 @@ GM.HUD_Reset = =>
 GM.HUD_UpdateTaskAmount = (value) =>
 	if IsValid @Hud
 		@Hud\SetTaskbarValue value
-
---- Hides the current task screen.
--- Does absolutely nothing if there are no task screens shown.
-GM.HUD_HideTaskScreen = =>
-	if IsValid(@Hud) and IsValid(@Hud.TaskScreen)
-		@Hud.TaskScreen\Close!
 
 --- Opens the meeting screen.
 -- Plays the emergency meeting/body report animation.
@@ -157,11 +148,6 @@ GM.HUD_PlayKill = (killer, victim) =>
 -- Doesn't open anything if something else is on the screen.
 -- @return Has the map been opened?
 GM.HUD_OpenMap = =>
-	return if IsValid @Hud.Meeting
-	return if IsValid @Hud.TaskScreen
-	return if IsValid @Hud.Eject
-	return if IsValid @Hud.Splash
-
 	if GAMEMODE\IsGameInProgress! and IsValid(GAMEMODE.Hud) and IsValid(GAMEMODE.Hud.Map)
 		GAMEMODE.Hud.Map\Popup!
 
@@ -388,7 +374,15 @@ hook.Add "HUDPaintBackground", "NMW AU Hud", ->
 	if IsValid GAMEMODE.Hud
 		GAMEMODE.Hud\PaintManual!
 
-hook.Add "ScoreboardShow", "NMW AU Map", -> true if GAMEMODE\HUD_OpenMap!
+hook.Add "ScoreboardShow", "NMW AU Map", ->
+	return if IsValid GAMEMODE.Hud.Meeting
+	return if IsValid GAMEMODE.__splash
+
+	return true if IsValid GAMEMODE.Hud.Eject
+	return true if IsValid GAMEMODE.Hud.CurrentVGUI
+
+	return true if GAMEMODE\HUD_OpenMap!
+
 hook.Add "ScoreboardHide", "NMW AU Map", -> GAMEMODE\HUD_CloseMap!
 
 concommand.Add "au_debug_eject_test", ->
