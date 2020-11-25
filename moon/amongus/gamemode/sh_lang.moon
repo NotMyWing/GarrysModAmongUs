@@ -82,11 +82,11 @@ GM.Lang or= {
 		@__entryCache = {}
 
 		pathsToCheck = {
-			{ "amongus/gamemode/lang/", "LUA" }
+			{ "amongus/gamemode/lang", "LUA" }
 			if gamemode.FolderName ~= "amongus"
-				{ "#{gamemode.FolderName}/gamemode/lang/", "LUA" }
+				{ "#{gamemode.FolderName}/gamemode/lang", "LUA" }
 
-			{ "amongus/lang/", "LUA" }
+			{ "amongus/lang", "LUA" }
 		}
 
 		for pathToCheck in *pathsToCheck
@@ -95,7 +95,7 @@ GM.Lang or= {
 			continue unless pathToCheck
 
 			filePath, location = unpack pathToCheck
-			files = file.Find filePath .. "*.lua", location
+			files = file.Find "#{filePath}/*.lua", location
 
 			-- Sort files alphabetically.
 			table.sort files
@@ -105,7 +105,7 @@ GM.Lang or= {
 			-- Scan the provided directory for language files.
 			-- Include everything.
 			for fileName in *files
-				path = "lang/" .. fileName
+				path = "#{filePath}/#{fileName}"
 
 				if "lua" == string.sub fileName, -3, -1
 					if SERVER
