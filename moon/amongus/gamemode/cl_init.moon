@@ -50,6 +50,11 @@ GM.ConVarsDisplay = {
 	}
 }
 
+flags = bit.bor FCVAR_ARCHIVE, FCVAR_USERINFO
+GM.ClientSideConVars = {
+	PreferredColor: CreateConVar "au_preferred_color", 0, flags, "", 0, 128
+}
+
 hook.Add "InitPostEntity", "NMW AU Flash", ->
 	if not system.HasFocus!
 		system.FlashWindow!

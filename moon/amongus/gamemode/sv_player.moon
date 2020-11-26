@@ -449,3 +449,5 @@ hook.Add "PlayerSay", "NMW AU DeadChat", (ply) ->
 	return
 
 hook.Add "IsSpawnpointSuitable", "NMW AU SpawnSuitable", -> true
+
+hook.Add "ShowHelp", "NMW AU ShowHelp", (ply) -> GAMEMODE\Net_SendShowHelp ply

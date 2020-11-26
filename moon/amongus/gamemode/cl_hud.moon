@@ -15,6 +15,7 @@ VGUI_BLINK = include "vgui/vgui_blink.lua"
 VGUI_VENT = include "vgui/vgui_vent.lua"
 VGUI_KILL = include "vgui/vgui_kill.lua"
 VGUI_MAP = include "vgui/vgui_map.lua"
+VGUI_SHOWHELP = include "vgui/vgui_showhelp.lua"
 
 surface.CreateFont "NMW AU Button Tooltip", {
 	font: "Roboto"
@@ -150,6 +151,16 @@ GM.HUD_OpenMap = =>
 		GAMEMODE.Hud.Map\Popup!
 
 		return true
+
+--- Shows the F1 menu.
+GM.HUD_ShowHelp = =>
+	if not IsValid @ShowHelpMenu
+		@ShowHelpMenu = vgui.CreateFromTable VGUI_SHOWHELP
+
+	with @ShowHelpMenu
+		\ParentToHUD!
+		\Show!
+		\MakePopup!
 
 --- Closes the map. Simple as that.
 GM.HUD_CloseMap = =>

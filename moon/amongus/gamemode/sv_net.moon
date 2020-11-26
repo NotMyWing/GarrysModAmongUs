@@ -362,6 +362,12 @@ GM.Net_SendGameChatError = (playerTable) =>
 	net.WriteUInt @FlowTypes.GameChatNotification, @FlowSize
 	net.Send playerTable.entity
 
+--- Sends a ShowHelp ack.
+GM.Net_SendShowHelp = (ply) =>
+	net.Start "NMW AU Flow"
+	net.WriteUInt @FlowTypes.ShowHelp, @FlowSize
+	net.Send ply
+
 net.Receive "NMW AU Flow", (len, ply) ->
 	playerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
 

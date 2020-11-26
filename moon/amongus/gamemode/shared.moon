@@ -11,7 +11,7 @@ GM.Author 		= "NotMyWing and contributors, with assets by InnerSloth"
 GM.Email 		= "winwyv@gmail.com"
 GM.Website 		= "https://github.com/NotMyWing/GarrysModAmongUs"
 
-flags = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_GAMEDLL
+flags = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED
 
 --- Table of all ConVars the game mode is using.
 -- These are tracked and cannot be changed during the round.
@@ -186,6 +186,7 @@ GM.FlowTypes = { value, i for i, value in ipairs {
 
 	"ConVarSnapshots"
 	"ConnectDisconnect"
+	"ShowHelp"
 }}
 
 GM.FlowSize = math.ceil math.log table.Count(GM.FlowTypes) + 1, 2

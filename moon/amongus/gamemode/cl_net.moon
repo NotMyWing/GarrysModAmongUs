@@ -448,3 +448,10 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 
 	when GAMEMODE.FlowTypes.GameChatNotification
 		chat.AddText Color(220, 32, 32), "[Among Us] ", Color(255, 255, 0), tostring TRANSLATE "chat.noTalkingDuringGame"
+
+	--
+	-- The server has responded to our ShowHelp request.
+	-- Why is this not shared?
+	--
+	when GAMEMODE.FlowTypes.ShowHelp
+		GAMEMODE\HUD_ShowHelp!
