@@ -463,12 +463,16 @@ hud.SetupButtons = (state, impostor) =>
 			with \Add "DModelPanel"
 				\Dock FILL
 				\SetModel LocalPlayer!\GetModel!
-				\SetColor localPlayerTable.color
+
 				\SetFOV 36
 				\SetCamPos \GetCamPos! - Vector 0, 0, 18
 				with \GetEntity!
+					playerColor = localPlayerTable.color\ToVector!
+					.GetPlayerColor = -> playerColor
+
 					\SetAngles Angle 0, 45, 0
 					\SetPos \GetPos! - Vector 0, 0, 4
+
 				.LayoutEntity = ->
 
 				textColor = if GAMEMODE.GameData.Imposters[localPlayerTable]

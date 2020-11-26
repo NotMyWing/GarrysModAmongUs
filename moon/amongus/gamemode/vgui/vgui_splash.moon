@@ -251,17 +251,19 @@ splash.DisplayPlayers = (reason) =>
 						\SetFOV 32
 						\SetCamPos \GetCamPos! - Vector 0, 0, 5
 
-						.Nickname = playerTable.nickname or "???"
-						\SetColor playerTable.color
 						\SetModel if IsValid playerTable.entity
 							playerTable.entity\GetModel!
 						else
 							GAMEMODE\GetDefaultPlayerModel!
 
 						with \GetEntity!
+							playerColor = playerTable.color\ToVector!
+							.GetPlayerColor = -> playerColor
+
 							\SetAngles Angle 0, 45, 0
 							\SetPos \GetPos! + Vector 0, 0, 10
 
+						.Nickname = playerTable.nickname or "???"
 						.Think = -> \SetAlpha @GetAlpha!
 						.LayoutEntity = ->
 

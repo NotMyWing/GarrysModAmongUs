@@ -176,7 +176,7 @@ GM.Game_Start = =>
 
 			with ply.entity
 				\Freeze true
-				\SetColor ply.color
+				\SetPlayerColor ply.color\ToVector!
 				\SetNWInt "NMW AU Meetings", @ConVarSnapshots.MeetingsPerPlayer\GetInt!
 
 		-- Shuffle the player table one more time.

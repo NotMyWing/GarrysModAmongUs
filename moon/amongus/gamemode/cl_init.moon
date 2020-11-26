@@ -120,9 +120,11 @@ hook.Add "CreateClientsideRagdoll", "test", (owner, rag) ->
 
 GM.CreateVentAnim = (ply, pos, appearing) =>
 	with ventAnim = ents.CreateClientside "vent_jump"
+		playerColor = ply\GetAUPlayerTable!.color\ToVector!
+		.GetPlayerColor = -> playerColor
+
 		\SetPos pos
 		\SetModel ply\GetModel!
-		\SetColor ply\GetColor!
 		.Appearing = appearing
 		\Spawn!
 		\Activate!

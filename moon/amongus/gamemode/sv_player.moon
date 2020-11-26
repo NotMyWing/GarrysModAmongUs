@@ -85,10 +85,12 @@ GM.Player_Kill = (victimTable, attackerTable) =>
 		victimTable.entity\GetPos!\Distance attackerTable.entity\GetPos!
 
 	with corpse = ents.Create "prop_ragdoll"
+		playerColor = victimTable.color\ToVector!
+		.GetPlayerColor = -> playerColor
+
 		\SetPos victimTable.entity\GetPos!
 		\SetAngles victimTable.entity\GetAngles!
 		\SetModel victimTable.entity\GetModel!
-		\SetColor victimTable.entity\GetColor!
 		\SetCollisionGroup COLLISION_GROUP_DEBRIS_TRIGGER
 		\SetNWInt "NMW AU PlayerID", victimTable.id
 		\SetUseType SIMPLE_USE
