@@ -70,73 +70,43 @@ GM.ConVars =
 		flags, ""
 
 --- Enum of all colors players can get.
--- @warning This isn't the best approach. Needs fixing.
 -- @table GM.Colors
 GM.Colors = {
-	Color 0, 0, 0
-	Color 0, 0, 255
-	Color 0, 21, 68
-	Color 0, 71, 84
-	Color 0, 95, 57
-	Color 0, 100, 1
-	Color 0, 118, 255
-	Color 0, 125, 181
-	Color 0, 143, 156
-	Color 0, 155, 255
-	Color 0, 174, 126
-	Color 0, 185, 23
-	Color 0, 255, 0
-	Color 0, 255, 120
-	Color 0, 255, 198
-	Color 1, 0, 103
-	Color 1, 208, 255
-	Color 1, 255, 254
-	Color 14, 76, 161
-	Color 38, 52, 0
-	Color 67, 0, 44
-	Color 95, 173, 78
-	Color 98, 14, 0
-	Color 104, 61, 59
-	Color 106, 130, 108
-	Color 107, 104, 130
-	Color 117, 68, 177
-	Color 119, 77, 0
-	Color 120, 130, 49
-	Color 122, 71, 130
-	Color 126, 45, 210
-	Color 133, 169, 0
-	Color 144, 251, 146
-	Color 145, 208, 203
-	Color 149, 0, 58
-	Color 150, 138, 232
-	Color 152, 255, 82
-	Color 158, 0, 142
-	Color 164, 36, 0
-	Color 165, 255, 210
-	Color 167, 87, 64
-	Color 181, 0, 255
-	Color 187, 136, 0
-	Color 189, 198, 255
-	Color 189, 211, 147
-	Color 190, 153, 112
-	Color 194, 140, 159
-	Color 213, 255, 0
-	Color 222, 255, 116
-	Color 229, 111, 254
-	Color 232, 94, 190
-	Color 254, 137, 0
-	Color 255, 0, 0
-	Color 255, 0, 86
-	Color 255, 0, 246
-	Color 255, 2, 157
-	Color 255, 110, 65
-	Color 255, 116, 163
-	Color 255, 147, 126
-	Color 255, 166, 254
-	Color 255, 177, 103
-	Color 255, 219, 102
-	Color 255, 229, 2
-	Color 255, 238, 232
+	Color 255, 39, 39
+	Color 255, 137, 18
+	Color 255, 255, 26
+	Color 149, 255, 26
+	Color 0, 230, 76
+	Color 0, 250, 250
+	Color 51, 51, 255
+	Color 197, 26, 255
+	Color 255, 39, 145
+	Color 128, 70, 31
+	Color 250, 250, 250
+	Color 128, 128, 128
+	Color 20, 20, 20
+
+	Color 255, 107, 107
+	Color 255, 166, 77
+	Color 255, 255, 115
+	Color 179, 255, 102
+	Color 98, 245, 147
+	Color 128, 255, 255
+	Color 102, 102, 255
+	Color 223, 128, 255
+	Color 255, 114, 164
+	Color 173, 107, 61
+
+	Color 179, 18, 18
+	Color 207, 103, 0
+	Color 191, 191, 0
+	Color 98, 183, 0
+	Color 0, 115, 38
+	Color 0, 169, 169
+	Color 28, 28, 140
+	Color 143, 0, 143
+	Color 178, 0, 89
+	Color 74, 41, 18
 }
 
 --- Enum of all flow types.
