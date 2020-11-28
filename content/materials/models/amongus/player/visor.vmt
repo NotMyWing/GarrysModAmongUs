@@ -1,0 +1,20 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/amongus/player/amongus"
+	"$bumpmap" "models/amongus/player/normal"
+
+	"$lightwarptexture" "models/amongus/player/lightwarptexture"
+
+	"$phong" "1"
+	"$phongboost"	"24"
+	"$phongalbedotint" "1"
+	"$phongexponenttexture" "models/amongus/player/phong_exp"
+	"$phongfresnelranges"	"[0 0 1]"
+
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[0.05 0.05 0.05]"
+
+	"$rimlight"               "1"
+	"$rimlightexponent"       "3"
+	"$rimlightboost"          "4"
+}

@@ -1,0 +1,7 @@
+"UnlitGeneric"
+{
+	"$basetexture" "models/amongus/player/black"
+	"$bumpmap" "models/amongus/player/normal"
+
+	"$model" "1"
+}
