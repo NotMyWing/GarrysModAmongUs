@@ -18,7 +18,7 @@ soundScriptReplacements = {
 	MetalVent: "metal"
 	Tile: "tile"
 	Glass: "glass"
-	Compute: "plastic"
+	Computer: "plastic"
 	Concrete: "tile"
 	Gravel: "dirt"
 	Sand: "snow"
