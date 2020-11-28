@@ -64,7 +64,7 @@
 @SolidClass base(Origin, RenderFields, Targetname, AUTaskButton) = func_sabotage_button :
 	"Sabotage button. Pretty much the same thing as task button, but not quite."
 [
-	sabotagename(string) "Sabotage Name" : : "The internal name of the sabotage this button is associated with"
+	sabotagename(string) : "Sabotage Name" : : "The internal name of the sabotage this button is associated with"
 ]
 
 @SolidClass base(func_sabotage_button, prop_static_base) = prop_sabotage_button :
