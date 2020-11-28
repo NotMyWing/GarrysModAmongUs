@@ -85,15 +85,15 @@ GM.Player_Kill = (victimTable, attackerTable) =>
 		victimTable.entity\GetPos!\Distance attackerTable.entity\GetPos!
 
 	with corpse = ents.Create "prop_ragdoll"
-		playerColor = victimTable.color\ToVector!
-		.GetPlayerColor = -> playerColor
-
 		\SetPos victimTable.entity\GetPos!
 		\SetAngles victimTable.entity\GetAngles!
 		\SetModel victimTable.entity\GetModel!
 		\SetCollisionGroup COLLISION_GROUP_DEBRIS_TRIGGER
-		\SetNWInt "NMW AU PlayerID", victimTable.id
 		\SetUseType SIMPLE_USE
+
+		-- Garbage-tier workaround because NW vars are not accessible in OnEntityCreated.
+		\SetDTInt 15, victimTable.id
+
 		\Spawn!
 		\Activate!
 		\PhysWake!

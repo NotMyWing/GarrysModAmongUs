@@ -280,7 +280,7 @@ GM.Game_Restart = =>
 
 	-- Spawn, prepare and spread players around.
 	for index, ply in ipairs players
-		ply\SetColor @Colors[math.floor(#@Colors / #players) * index]
+		ply\SetColor Color 255, 255, 255, 255
 		ply\SetRenderMode RENDERGROUP_OPAQUE
 
 		ply\UnSpectate!

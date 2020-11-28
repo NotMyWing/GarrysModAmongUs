@@ -439,7 +439,11 @@ GM.ShouldHighlightEntity = (entity) =>
 
 --- Returns whether the entity is a player body.
 -- @param entity Entity.
-GM.IsPlayerBody = (entity) => 0 < entity\GetNWInt "NMW AU PlayerID"
+GM.IsPlayerBody = (entity) => 0 < entity\GetDTInt 15
+
+--- Returns the player table associated with the corpse. Can be nil.
+-- @param entity Entity.
+GM.GetPlayerTableFromCorpse = (entity) => @GameData.Lookup_PlayerByID[entity\GetDTInt 15]
 
 --- Returns the default player model.
 GM.GetDefaultPlayerModel = =>

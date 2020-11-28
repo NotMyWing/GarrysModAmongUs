@@ -166,3 +166,11 @@ hook.Add "OnSpawnMenuOpen", "NMW AU RequestKill", ->
 			\Net_KillRequest .KillHighlight
 
 	return
+
+hook.Add "OnEntityCreated", "NMW AU PaintRagdolls", (ent) ->
+	if IsValid(ent) and ent\IsRagdoll!
+		playerTable = GAMEMODE\GetPlayerTableFromCorpse ent
+
+		if playerTable
+			playerColor = playerTable.color\ToVector!
+			ent.GetPlayerColor = -> playerColor
