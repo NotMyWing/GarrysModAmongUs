@@ -234,6 +234,7 @@ return vgui.RegisterTable {
 										container.img\Show!
 										if false == dry
 											GetConVar("au_preferred_color")\SetInt i
+											GAMEMODE\Net_UpdateMyColor!
 
 										selected = container
 

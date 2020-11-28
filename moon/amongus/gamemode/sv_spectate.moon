@@ -51,6 +51,11 @@ hook.Add "PlayerSpawn", "NMW AU Spec", (ply) ->
 		if GAMEMODE\IsGameInProgress!
 			GAMEMODE\Player_Hide ply
 			GAMEMODE\Spectate_CycleMode ply
+		else
+			preferred = math.floor math.min #GAMEMODE.Colors,
+				math.max 1, ply\GetInfoNum "au_preferred_color", 1
+
+			ply\SetPlayerColor GAMEMODE.Colors[preferred]\ToVector!
 
 		GAMEMODE\Net_BroadcastConnectDisconnect ply\Nick!, true, GAMEMODE\IsGameInProgress!
 

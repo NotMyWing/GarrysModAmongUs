@@ -166,17 +166,12 @@ GM.Game_Start = =>
 
 		imposterCount = math.min GAMEMODE.ConVarSnapshots.ImposterCount\GetInt!, @GetImposterCount #initializedPlayers
 		for index, ply in ipairs @GameData.PlayerTables
-			-- Give the player a color.
-			-- TO-DO: make customizable.
-			ply.color = @Colors[math.floor(#@Colors / #@GameData.PlayerTables) * index]
-
 			-- Make the first N players imposters.
 			if index <= imposterCount
 				@GameData.Imposters[ply] = true
 
 			with ply.entity
 				\Freeze true
-				\SetPlayerColor ply.color\ToVector!
 				\SetNWInt "NMW AU Meetings", @ConVarSnapshots.MeetingsPerPlayer\GetInt!
 
 		-- Shuffle the player table one more time.
@@ -187,6 +182,44 @@ GM.Game_Start = =>
 			memo[a] = memo[a] or math.random!
 			memo[b] = memo[b] or math.random!
 			memo[a] > memo[b]
+
+		-- Assign colors to players in rounds.
+		colorRounds = math.ceil #@GameData.PlayerTables / #@Colors
+		for round = 1, colorRounds
+			colors = [color for color in *@Colors]
+
+			lowerBound = 1 + (round - 1) * #@Colors
+			upperBound = round * #@Colors
+			slicedPlayers = [ply for ply in *@GameData.PlayerTables[lowerBound, upperBound]]
+
+			-- Sort by time.
+			table.sort slicedPlayers, (a, b) ->
+				a.entity\TimeConnected! < b.entity\TimeConnected!
+
+			assigned = {}
+
+			-- Assign preferred colors first
+			for ply in *slicedPlayers
+				preferred = math.floor math.min #@Colors,
+					math.max 0, ply.entity\GetInfoNum "au_preferred_color", 0
+
+				if preferred ~= 0
+					ply.color = colors[preferred]
+					ply.entity\SetPlayerColor ply.color\ToVector!
+
+					colors[preferred] = nil
+					assigned[ply] = true
+
+			-- Iterate again, assigning random colors to the rest of the players.
+			for ply in *slicedPlayers
+				continue if assigned[ply]
+
+				color, id = table.Random colors
+
+				ply.color = color
+				ply.entity\SetPlayerColor ply.color\ToVector!
+
+				colors[id] = nil
 
 		-- Broadcast the important stuff that players must know about the game.
 		@SetGameInProgress true

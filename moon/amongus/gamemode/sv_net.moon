@@ -411,6 +411,11 @@ net.Receive "NMW AU Flow", (len, ply) ->
 
 				if GAMEMODE.IsGameInProgress!
 					GAMEMODE\Net_UpdateGameData ply
+				else
+					preferred = math.floor math.min #GAMEMODE.Colors,
+						math.max 1, ply\GetInfoNum "au_preferred_color", 1
+
+					ply\SetPlayerColor GAMEMODE.Colors[preferred]\ToVector!
 
 				GAMEMODE\Net_UpdateGameState ply
 
@@ -441,6 +446,16 @@ net.Receive "NMW AU Flow", (len, ply) ->
 		when GAMEMODE.FlowTypes.SabotageSubmit
 			if playerTable
 				GAMEMODE\Sabotage_Submit playerTable, net.ReadUInt 32
+
+		--
+		-- Player has submitted a sabotage.
+		--
+		when GAMEMODE.FlowTypes.UpdateMyColor
+			return if GAMEMODE\IsGameInProgress!
+			preferred = math.floor math.min #GAMEMODE.Colors,
+				math.max 1, ply\GetInfoNum "au_preferred_color", 1
+
+			ply\SetPlayerColor GAMEMODE.Colors[preferred]\ToVector!
 
 --- Sets whether the game is in progress.
 -- @bool state You guessed it again.

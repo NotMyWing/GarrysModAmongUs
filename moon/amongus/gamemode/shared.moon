@@ -157,6 +157,7 @@ GM.FlowTypes = { value, i for i, value in ipairs {
 	"ConVarSnapshots"
 	"ConnectDisconnect"
 	"ShowHelp"
+	"UpdateMyColor"
 }}
 
 GM.FlowSize = math.ceil math.log table.Count(GM.FlowTypes) + 1, 2

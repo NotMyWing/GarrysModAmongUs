@@ -63,6 +63,11 @@ GM.Net_SendSubmitSabotage = (data = 0) =>
 	net.WriteUInt data, 32
 	net.SendToServer!
 
+GM.Net_UpdateMyColor = =>
+	net.Start "NMW AU Flow"
+	net.WriteUInt @FlowTypes.UpdateMyColor, @FlowSize
+	net.SendToServer!
+
 net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	--
 	-- Define player tables and other necessary game data.
