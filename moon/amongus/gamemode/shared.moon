@@ -66,7 +66,7 @@ GM.ConVars =
 	WarmupTime:      CreateConVar "au_warmup_time"      , 60, flags, "", 0, 120
 	ForceAutoWarmup: CreateConVar "au_warmup_force_auto", 0 , flags, "", 0, 1
 
-	PlayerModel: CreateConVar "au_player_model", "models/kaesar/amongus/amongus.mdl",
+	PlayerModel: CreateConVar "au_player_model", "models/amongus/player/player.mdl",
 		flags, ""
 
 --- Enum of all colors players can get.
