@@ -6,6 +6,7 @@ include "vgui/vgui_ui_bases.lua"
 include "vgui/vgui_map_base.lua"
 include "vgui/vgui_task_placeholder.lua"
 include "vgui/vgui_crewmate.lua"
+include "vgui/vgui_doutlinedlabel.lua"
 
 VGUI_HUD = include "vgui/vgui_hud.lua"
 VGUI_MEETING = include "vgui/vgui_meeting.lua"

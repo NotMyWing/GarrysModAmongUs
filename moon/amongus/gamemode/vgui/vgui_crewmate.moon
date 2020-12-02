@@ -6,38 +6,8 @@ CREW_LAYERS = {
 COLOR_WHITE = Color 255, 255, 255
 
 vgui.Register "AmongUsCrewmate", {
-	Init: =>
-		-- A slightly unreadable chunk of garbage code
-		-- responsible for layering the crewmate sprite.
-		layers = {}
-		for i = 1, 2
-			with layers[i] = @Add "DPanel"
-				\SetZPos i
-				\Dock FILL
-
-				image = CREW_LAYERS[i]
-				.Paint = (_, w, h) ->
-					newWidth, newHeight = GAMEMODE.Render.FitMaterial image, w, h
-
-					surface.SetMaterial image
-					surface.SetDrawColor .Color or COLOR_WHITE
-
-					render.PushFilterMag TEXFILTER.ANISOTROPIC
-					render.PushFilterMin TEXFILTER.ANISOTROPIC
-
-					surface.DrawTexturedRectUV w/2 - newWidth/2, h/2 - newHeight/2,
-						newWidth, newHeight,
-						@__flipX and 1 or 0, @__flipY and 1 or 0,
-						@__flipX and 0 or 1, @__flipY and 0 or 1
-
-					render.PopFilterMag!
-					render.PopFilterMin!
-
-		@__coloredLayer = layers[1]
-		@__coloredLayer.Color = COLOR_WHITE
-
-	SetColor: (value) => @__coloredLayer.Color = value
-	GetColor: => @__coloredLayer.Color
+	SetColor: (value) => @__color = value
+	GetColor: => @__color or COLOR_WHITE
 
 	SetFlipX: (value) => @__flipX = value
 	GetFlipX: => @__flipX or false
@@ -45,7 +15,23 @@ vgui.Register "AmongUsCrewmate", {
 	SetFlipY: (value) => @__flipY = value
 	GetFlipY: => @__flipY or false
 
-	Paint: ->
+	Paint: (w, h) =>
+		newWidth, newHeight = GAMEMODE.Render.FitMaterial CREW_LAYERS[1], w, h
+
+		render.PushFilterMag TEXFILTER.ANISOTROPIC
+		render.PushFilterMin TEXFILTER.ANISOTROPIC
+
+		for i = 1, 2
+			surface.SetMaterial CREW_LAYERS[i]
+			surface.SetDrawColor i == 1 and @GetColor! or COLOR_WHITE
+
+			surface.DrawTexturedRectUV w/2 - newWidth/2, h/2 - newHeight/2,
+				newWidth, newHeight,
+				@__flipX and 1 or 0, @__flipY and 1 or 0,
+				@__flipX and 0 or 1, @__flipY and 0 or 1
+
+		render.PopFilterMag!
+		render.PopFilterMin!
 
 }, "DPanel"
 

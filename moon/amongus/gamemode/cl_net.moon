@@ -240,9 +240,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		voter = GAMEMODE.GameData.Lookup_PlayerByID[net.ReadUInt 8]
 		if voter
 			remaining = net.ReadUInt 8
-			GAMEMODE.Hud.Meeting\ApplyVote voter
-			if remaining > 0
-				chat.AddText Color(0, 255, 0), TRANSLATE("vote.voted") voter.nickname, remaining
+			GAMEMODE.Hud.Meeting\ApplyVote voter, remaining
 
 	--
 	-- Meeting 3/4.
