@@ -393,10 +393,9 @@ hook.Add "EntityTakeDamage", "NMW AU Damage", (target, dmg) ->
 hook.Add "PlayerUse", "NMW AU UseBody", (activator, ent) ->
 	playerTable = activator\GetAUPlayerTable!
 	if playerTable and GAMEMODE\IsGameInProgress!
-		bodyid = ent\GetNWInt "NMW AU PlayerID"
-		victim = GAMEMODE.GameData.Lookup_PlayerByID[bodyid]
-		if victim
-			GAMEMODE\Meeting_Start playerTable, victim.color
+		victimTable = GAMEMODE\GetPlayerTableFromCorpse ent
+		if victimTable
+			GAMEMODE\Meeting_Start playerTable, victimTable.color
 
 	return
 
