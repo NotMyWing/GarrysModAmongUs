@@ -13,17 +13,17 @@ surface.CreateFont "NMW AU Map Labels", {
 COLOR_OUTLINE = Color 0, 0, 0, 160
 
 map = {
-	__baseMatWidth: 0
-	__baseMatHeight: 0
-	__color: Color 255, 255, 255
-	__position: Vector 0, 0, 0
-	__scale: 1
-	__labels: {}
-	__overlayMatWidth: 1024
-	__overlayMatHeight: 1024
-	__resolution: 1
-
 	Init: =>
+		@__baseMatWidth = 0
+		@__baseMatHeight = 0
+		@__color = Color 255, 255, 255
+		@__position = Vector 0, 0, 0
+		@__scale = 1
+		@__labels = {}
+		@__overlayMatWidth = 1024
+		@__overlayMatHeight = 1024
+		@__resolution = 1
+
 		@SetZPos 30000
 		@SetSize ScrW!, ScrH!
 
