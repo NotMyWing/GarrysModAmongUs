@@ -24,6 +24,12 @@ surface.CreateFont "NMW AU Button Tooltip", {
 	weight: 550
 }
 
+surface.CreateFont "NMW AU Version", {
+	font: "Roboto"
+	size: ScreenScale 10
+	weight: 550
+}
+
 --- Makes the player's screen fade in and out.
 -- In-built screenfades are impractical to use.
 -- @param duration Duration. One second by default.
@@ -291,10 +297,16 @@ ASSETS = {
 }
 
 HIGHLIGHT_MATRIX = Matrix!
+COLOR_WHITE_VERSION = Color 255, 255, 255, 32
 COLOR_WHITE = Color 255, 255, 255
 COLOR_BLACK = Color 0, 0, 0, 160
 
 hook.Add "HUDPaintBackground", "NMW AU Hud", ->
+	if GAMEMODE.ClientSideConVars.DrawVersion\GetBool!
+		draw.SimpleText GMAU_VERSION, "NMW AU Version",
+			ScrW! * 0.99, ScrH! * 0.01, COLOR_WHITE_VERSION,
+			TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP
+
 	if GAMEMODE\IsGameInProgress!
 		if IsValid GAMEMODE.UseHighlight
 			color = GAMEMODE\GetHighlightColor GAMEMODE.UseHighlight

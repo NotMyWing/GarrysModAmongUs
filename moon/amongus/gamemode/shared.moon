@@ -2,6 +2,8 @@
 -- Defines the game mode metadata fields, enums and exports some useful things.
 -- @module shared
 
+export GMAU_VERSION = "EARLY ALPHA BUILD. EXPECT BUGS."
+
 export GAMEMODE = GAMEMODE or GM
 
 AddCSLuaFile()

@@ -52,7 +52,8 @@ GM.ConVarsDisplay = {
 
 flags = bit.bor FCVAR_ARCHIVE, FCVAR_USERINFO
 GM.ClientSideConVars = {
-	PreferredColor: CreateConVar "au_preferred_color", 0, flags, "", 0, 128
+	PreferredColor: CreateConVar "au_preferred_color"  , 0, flags, "", 0, 128
+	DrawVersion:    CreateConVar "au_debug_drawversion", 1, flags, "", 0, 1
 }
 
 hook.Add "InitPostEntity", "NMW AU Flash", ->
