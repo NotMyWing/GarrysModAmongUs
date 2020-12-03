@@ -40,6 +40,7 @@ return vgui.RegisterTable {
 			size: buttonHeight * 0.45
 			weight: 550
 			outline: true
+			antialias: false
 		}
 
 		-- Create the tab list.

@@ -4,35 +4,30 @@ surface.CreateFont "NMW AU Countdown", {
 	font: "Roboto"
 	size: ScreenScale 20
 	weight: 550
-	outline: true
 }
 
 surface.CreateFont "NMW AU Cooldown", {
 	font: "Roboto"
 	size: ScrH! * 0.125
 	weight: 550
-	outline: true
 }
 
 surface.CreateFont "NMW AU Taskbar", {
 	font: "Roboto"
 	size: ScrH! * 0.026
 	weight: 550
-	outline: true
 }
 
 surface.CreateFont "NMW AU Start Subtext", {
 	font: "Roboto"
 	size: ScreenScale 10
 	weight: 500
-	outline: true
 }
 
 surface.CreateFont "NMW AU ConVar List", {
 	font: "Roboto"
 	size: ScrH! * 0.023
 	weight: 550
-	outline: true
 }
 
 hud = {}
@@ -70,6 +65,8 @@ hud.SetTaskbarValue = (value) =>
 
 		@taskbar\SizeTo refW * value, refH, 2, 0.1
 
+COLOR_OUTLINE = Color 0, 0, 0, 160
+
 hud.SetupButtons = (state, impostor) =>
 	localPlayerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
 
@@ -91,7 +88,7 @@ hud.SetupButtons = (state, impostor) =>
 			green = Color 32, 255, 32
 			.Paint = ->
 				surface.SetFont "NMW AU Taskbar"
-				_, tH = surface.GetTextSize "A"
+				tW, tH = surface.GetTextSize "A"
 
 				conVars = GAMEMODE\IsGameCommencing! and GAMEMODE.ConVarSnapshots or GAMEMODE.ConVars
 				i = 0
@@ -116,8 +113,9 @@ hud.SetupButtons = (state, impostor) =>
 						if value
 							i += 1
 
-							draw.SimpleText "#{TRANSLATE("cvar." .. conVarName)}: #{value}", "NMW AU ConVar List",
-								0, (i - 1) * tH * 1.05 + (categoryId - 1) * tH * 1.05, GAMEMODE\IsGameCommencing! and green or white
+							draw.SimpleTextOutlined "#{TRANSLATE("cvar." .. conVarName)}: #{value}", "NMW AU ConVar List",
+								tW * 0.1, (i - 1) * tH * 1.05 + (categoryId - 1) * tH * 1.05, GAMEMODE\IsGameCommencing! and green or white,
+								TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 2, COLOR_OUTLINE
 
 		-- Round overlay.
 		@roundOverlay = with @Add "DPanel"
@@ -149,7 +147,7 @@ hud.SetupButtons = (state, impostor) =>
 						crewSize = 0.25 * \GetWide!
 
 						-- Imposter Count Container
-						with \Add "DLabel"
+						with \Add "DOutlinedLabel"
 							\Dock BOTTOM
 							\SetTall 0.5 * ScrH! * 0.125
 							\SetColor Color 255, 255, 255
@@ -163,18 +161,16 @@ hud.SetupButtons = (state, impostor) =>
 									\SetText tostring TRANSLATE("prepare.imposterCount") imposterCount
 
 						-- Count container.
-						with \Add "DPanel"
+						with \Add "Panel"
 							\DockPadding 0, 0, crewSize * 0.5, 0
 							\Dock TOP
 							\SetTall 0.5 * ScrH! * 0.125
-							.Paint = ->
 
 							-- Crewmate
-							with \Add "DPanel"
+							with \Add "Panel"
 								\SetSize crewSize, crewSize
 								\DockMargin crewSize * 0.25, 0, 0, 0
 								\Dock RIGHT
-								.Paint = ->
 
 								-- A slightly unreadable chunk of garbage code
 								-- responsible for layering the crewmate sprite.
@@ -186,7 +182,7 @@ hud.SetupButtons = (state, impostor) =>
 										\SetFlipX true
 
 							-- Label
-							with \Add "DLabel"
+							with \Add "DOutlinedLabel"
 								\SetFont "NMW AU Countdown"
 								\SetText "..."
 								\SetContentAlignment 6
@@ -216,7 +212,7 @@ hud.SetupButtons = (state, impostor) =>
 					\Dock RIGHT
 					.Paint = ->
 
-					with \Add "DLabel"
+					with \Add "DOutlinedLabel"
 						\SetTall 0.5 * ScrH! * 0.125
 						\Dock TOP
 						\SetText ""
@@ -231,7 +227,7 @@ hud.SetupButtons = (state, impostor) =>
 							else
 								TRANSLATE "prepare.warmup"
 
-					with \Add "DLabel"
+					with \Add "DOutlinedLabel"
 						\SetTall 0.5 * ScrH! * 0.125
 						\Dock BOTTOM
 						\SetText ""
@@ -300,15 +296,16 @@ hud.SetupButtons = (state, impostor) =>
 					\Dock FILL
 					.Paint = ->
 
-					@taskBarLabel = with \Add "DLabel"
+					@taskBarLabel = with \Add "DOutlinedLabel"
 						\SetColor Color 255, 255, 255
 						\SetZPos 1
 						\SetFont "NMW AU Taskbar"
 						\SetText "  " .. TRANSLATE "tasks.totalCompleted"
+						\SetContentAlignment 4
 
 						-- If there's a time limit, dock the timer to the right side.
 						if GAMEMODE\GetTimeLimit! > 0
-							with \Add "DLabel"
+							with \Add "Color(0, 0, 0, 160)"
 								\SetWide ScrW! * 0.08
 								\Dock RIGHT
 								\SetText "..."
@@ -368,7 +365,7 @@ hud.SetupButtons = (state, impostor) =>
 					surface.DrawRect 0, 0, tW, h
 
 					draw.SimpleTextOutlined text, "NMW AU Taskbar",
-						0, h/2, Color(255, 255, 255), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, Color(0, 0, 0, 64)
+						0, h/2, Color(255, 255, 255), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, COLOR_OUTLINE
 
 			@tasks = {}
 			@taskBox = with \Add "DPanel"
@@ -512,7 +509,7 @@ hud.SetupButtons = (state, impostor) =>
 
 					surface.DisableClipping true
 					draw.SimpleTextOutlined localPlayerTable.nickname or "", "NMW AU Taskbar",
-						w/2, -size * 0.1, textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, Color 0, 0, 0, 220
+						w/2, -size * 0.1, textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 2, COLOR_OUTLINE
 					surface.DisableClipping false
 
 --- Displays a countdown.
@@ -529,9 +526,9 @@ hud.Countdown = (time) =>
 
 		color = Color 255, 255, 255
 		.Paint = (_, w, h) ->
-			draw.DrawText TRANSLATE("hud.countdown")(math.floor math.max 0, @countdownTime - CurTime!),
+			draw.SimpleTextOutlined TRANSLATE("hud.countdown")(math.floor math.max 0, @countdownTime - CurTime!),
 				"NMW AU Countdown",
-				w * 0.5, h * 0.25, color, TEXT_ALIGN_CENTER
+				w * 0.5, h * 0.25, color, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 2, COLOR_OUTLINE
 
 			if @countdownTime - CurTime! <= 0
 				_\Remove!
@@ -582,7 +579,7 @@ hud.AddTaskEntry = =>
 				\OnBlink!
 
 			draw.SimpleTextOutlined text, "NMW AU Taskbar",
-				ScrW! * 0.0075, h/2, clr, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, Color(0, 0, 0, 64)
+				ScrW! * 0.0075, h/2, clr, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, COLOR_OUTLINE
 
 hud.Think = =>
 	if IsValid @roundOverlay

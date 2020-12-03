@@ -141,6 +141,8 @@ splash.DisplayShush = =>
 					surface.DrawTexturedRect 0, 0, w, h
 					surface.DisableClipping false
 
+COLOR_OUTLINE = Color 0, 0, 0, 160
+
 splash.DisplayPlayers = (reason) =>
 	localPlayerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
 
@@ -287,7 +289,7 @@ splash.DisplayPlayers = (reason) =>
 								render.PushFilterMin TEXFILTER.ANISOTROPIC
 
 								draw.SimpleTextOutlined .Nickname or "", "NMW AU Splash Nickname",
-									w/2, h/2 + w * 0.875, clr, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 2, Color 0, 0, 0
+									w/2, h/2 + w * 0.875, clr, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 16, COLOR_OUTLINE
 
 								render.PopFilterMag!
 								render.PopFilterMin!

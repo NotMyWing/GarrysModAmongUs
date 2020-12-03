@@ -4,7 +4,6 @@ surface.CreateFont "NMW AU Vent Text", {
 	font: "Roboto"
 	size: ScrW! * 0.017
 	weight: 500
-	outline: true
 }
 
 vent = {}
@@ -30,7 +29,7 @@ vent.ShowVents = (vents) =>
 			\Dock TOP
 			.Paint = ->
 
-			with button = \Add "DLabel"
+			with button = \Add "DOutlinedLabel"
 				\SetFont "NMW AU Vent Text"
 				\SetColor Color 255, 255, 255
 				\SetText i
@@ -45,7 +44,7 @@ vent.ShowVents = (vents) =>
 			else
 				0
 
-			with label = \Add "DLabel"
+			with label = \Add "DOutlinedLabel"
 				\SetFont "NMW AU Vent Text"
 				\SetColor Color 255, 255, 255
 				\SetSize size * labelAspect, size

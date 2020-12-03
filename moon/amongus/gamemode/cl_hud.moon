@@ -22,7 +22,6 @@ surface.CreateFont "NMW AU Button Tooltip", {
 	font: "Roboto"
 	size: ScreenScale 22
 	weight: 550
-	outline: true
 }
 
 --- Makes the player's screen fade in and out.
@@ -212,13 +211,12 @@ surface.CreateFont "NMW AU Task Complete", {
 	font: "Roboto"
 	size: ScrH! * 0.06
 	weight: 550
-	outline: true
 }
 
 --- Creates a "Task Complete!" popup.
 -- Animates it going from the bottom of the screen all the way to the top.
 GM.HUD_CreateTaskCompletePopup = =>
-	with @Hud\Add "DLabel"
+	with @Hud\Add "DOutlinedLabel"
 		\SetSize ScrW!, ScrH! * 0.08
 		\SetZPos 32000
 

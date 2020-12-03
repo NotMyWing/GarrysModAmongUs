@@ -8,8 +8,9 @@ surface.CreateFont "NMW AU Map Labels", {
 	font: "Roboto"
 	size: 0.025 * math.min ScrW!, ScrH!
 	weight: 550
-	outline: true
 }
+
+COLOR_OUTLINE = Color 0, 0, 0, 160
 
 map = {
 	__baseMatWidth: 0
@@ -64,7 +65,8 @@ map = {
 					x = label.Position.x * w
 					y = label.Position.y * h
 
-					draw.SimpleText tostring(TRANSLATE(label.Text)), "NMW AU Map Labels", x, y, white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER
+					draw.SimpleTextOutlined tostring(TRANSLATE(label.Text)), "NMW AU Map Labels", x, y, white,
+						TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 2, COLOR_OUTLINE
 
 				surface.SetAlphaMultiplier 1
 

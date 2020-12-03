@@ -4,14 +4,12 @@ surface.CreateFont "NMW AU Eject Text", {
 	font: "Roboto"
 	size: ScreenScale 20
 	weight: 550
-	outline: true
 }
 
 surface.CreateFont "NMW AU Eject Subtext", {
 	font: "Roboto"
 	size: ScreenScale 12
 	weight: 550
-	outline: true
 }
 
 MAT_STARRY = Material "au/gui/eject/starry.png", "noclamp smooth"
@@ -32,6 +30,8 @@ eject.Init = => with @
 	\NewAnimation 8, 0, -1, ->
 		\AlphaTo 0, 0.4, 0, ->
 			\Remove!
+
+COLOR_OUTLINE = Color 0, 0, 0, 160
 
 --- Writes text in the middle of the screen.
 -- Much like in the original game.
@@ -58,7 +58,8 @@ eject.WriteText = (text, subtext) =>
 		color = Color 255, 255, 255
 		.Text = ""
 		.Paint = (_, w, h) ->
-			draw.SimpleText .Text, "NMW AU Eject Text", w/2, h/2, color, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER
+			draw.SimpleText .Text, "NMW AU Eject Text", w/2, h/2, color,
+				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 2, COLOR_OUTLINE
 
 	if subtext
 		@ejectTextSubLabel = with @Add "DPanel"
@@ -72,7 +73,8 @@ eject.WriteText = (text, subtext) =>
 			color = Color 255, 255, 255
 			.Paint = (_, w, h) ->
 				if \GetAlpha! ~= 0
-					draw.SimpleText subtext, "NMW AU Eject Subtext", w/2, h/2, color, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER
+					draw.SimpleText subtext, "NMW AU Eject Subtext", w/2, h/2, color,
+						TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 2, COLOR_OUTLINE
 
 	i = 0
 	callback = ->
