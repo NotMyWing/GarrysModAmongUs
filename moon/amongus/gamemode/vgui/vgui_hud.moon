@@ -305,7 +305,7 @@ hud.SetupButtons = (state, impostor) =>
 
 						-- If there's a time limit, dock the timer to the right side.
 						if GAMEMODE\GetTimeLimit! > 0
-							with \Add "Color(0, 0, 0, 160)"
+							with \Add "DOutlinedLabel"
 								\SetWide ScrW! * 0.08
 								\Dock RIGHT
 								\SetText "..."
@@ -337,40 +337,68 @@ hud.SetupButtons = (state, impostor) =>
 
 	if localPlayerTable
 		-- The task list.
-		@taskBoxContainer = with @Add "DPanel"
+		@taskBoxContainer = with @Add "Panel"
+			local taskLabel
+
 			margin = ScrH! * 0.015
 			\DockMargin margin, 0, 0, 0
 			\SetWide ScrW! * 0.35
 			\Dock LEFT
-			.Paint = ->
 
-			with \Add "DPanel"
-				\SetTall ScrH! * 0.05
-				margin = ScrH! * 0.0075
+			-- Label container.
+			with \Add "Panel"
 				\Dock TOP
+				\SetTall ScrH! * 0.05
 
-				key = string.upper input.LookupBinding("gmod_undo") or "?"
-				text = "(#{key}) " .. tostring TRANSLATE if impostor
-					"hud.fakeTasks"
-				else
-					"hud.tasks"
+				taskLabel = with \Add "DOutlinedLabel"
+					\Dock LEFT
 
-				text = "  #{text}  "
+					key = string.upper input.LookupBinding("gmod_undo") or "?"
 
-				.Paint = (_, w, h) ->
-					surface.SetFont "NMW AU Taskbar"
-					tW = surface.GetTextSize text
+					text = "(#{key}) " .. tostring TRANSLATE if impostor
+						"hud.fakeTasks"
+					else
+						"hud.tasks"
 
-					surface.SetDrawColor 255, 255, 255, 16
-					surface.DrawRect 0, 0, tW, h
+					\SetText "  #{text}  "
 
-					draw.SimpleTextOutlined text, "NMW AU Taskbar",
-						0, h/2, Color(255, 255, 255), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, COLOR_OUTLINE
+					\SetFont "NMW AU Taskbar"
+					\SetContentAlignment 5
+
+					oldPaint = .Paint
+					.Paint = (w, h) =>
+						surface.SetDrawColor 255, 255, 255, 16
+						surface.DrawRect 0, 0, w, h
+						oldPaint @, w, h
+
+					\SizeToContentsX!
 
 			@tasks = {}
-			@taskBox = with \Add "DPanel"
+			@taskBox = with \Add "Panel"
 				\Dock FILL
-				.Paint = ->
+				padding = ScrW! * 0.005
+				\DockPadding padding, 0, 0, 0
+
+				.PerformLayout = ->
+					local max
+					for child in *\GetChildren!
+						sizeX = child\GetContentSize!
+						if not max or sizeX > max
+							max = sizeX
+
+					_, childHeight = \ChildrenSize!
+					.__maxWidth  = padding * 2 + (max or 0)
+					.__maxHeight = childHeight
+
+				\InvalidateLayout!
+
+				.Paint = (_, w, h) ->
+					surface.SetDrawColor 255, 255, 255, 16
+					labelW, labelH = taskLabel\GetSize!
+
+					surface.DrawRect 0, 0,
+						.__maxWidth or 0, .__maxHeight
+
 
 		-- Use/report button. Content-aware.
 		with @use = @buttons\Add "DPanel"
@@ -540,46 +568,55 @@ hud.HideTaskList = (state) =>
 		else
 			@taskBoxContainer\Show!
 
-hud.ToggleTaskList = =>
+hud.ToggleTaskList = (value = not @taskBox.__hiding) =>
 	if IsValid @taskBox
-		if @taskBox\IsVisible!
-			@taskBox\Hide!
-		else
+		@taskBox.__hiding = value
+
+		if not @taskBox.__hiding
 			@taskBox\Show!
+			@taskBox\AlphaTo 255, 0.1, 0
+		else
+			@taskBox\AlphaTo 0, 0.1, 0, ->
+				@taskBox\Hide!
+
+COLOR_WHITE = Color 255, 255, 255
 
 hud.AddTaskEntry = =>
-	return with @taskBox\Add "DPanel"
+	return with @taskBox\Add "DOutlinedLabel"
 		\SetTall ScrH! * 0.04
 		\Dock TOP
 
-		color = Color 255, 255, 255
-		.SetColor = (value) =>
-			color = value
+		\SetFont "NMW AU Taskbar"
 
 		blink = false
 		colorBlink = Color 255, 64, 64
 		.SetBlink = (value) =>
 			blink = value
 
-		text = ""
-		.SetText = (value) =>
-			text = value
+		\SetContentAlignment 4
 
+		.Think = ->
+
+		oldPaint = .Paint
 		.Paint = (_, w, h) ->
-			surface.SetDrawColor 255, 255, 255, 16
-			surface.DrawRect 0, 0, w, h
-
 			clr = if blink and math.floor((SysTime! * 4) % 2) == 0
 				colorBlink
 			else
-				color
+				COLOR_WHITE
 
-			if .OnBlink and clr ~= .__oldColor
+			if clr ~= .__oldColor
 				.__oldColor = clr
-				\OnBlink!
+				\SetColor clr
 
-			draw.SimpleTextOutlined text, "NMW AU Taskbar",
-				ScrW! * 0.0075, h/2, clr, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, 2, COLOR_OUTLINE
+				if .OnBlink
+					\OnBlink!
+
+			oldPaint _, w, h
+
+		oldSetText = .SetText
+		.SetText = (...) =>
+			oldSetText @, ...
+			@InvalidateParent!
 
 hud.Think = =>
 	if IsValid @roundOverlay

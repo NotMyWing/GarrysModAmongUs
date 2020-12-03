@@ -17,6 +17,10 @@ vgui.Register "DOutlinedLabel", {
 	SetColor: (value) => @__color = value
 	GetColor: => @__color or DEFAULT_COLOR
 
+	GetContentSize: =>
+		surface.SetFont @GetFont!
+		surface.GetTextSize @GetText!
+
 	SetContentAlignment: (alignment) =>
 		@__verticalAlignment = switch alignment
 			when 7, 8, 9
