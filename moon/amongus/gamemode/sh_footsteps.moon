@@ -5,7 +5,7 @@ GAMEMODE.Logger.Info("Replacing footstep sounds...")
 basedir = "au/footsteps"
 
 soundScriptReplacements = {
-	Default: "dirt"
+	Default: "tile"
 	SolidMetal: "metal"
 	Dirt: "dirt"
 	Mud: "snow"
