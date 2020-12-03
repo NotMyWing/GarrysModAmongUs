@@ -2,12 +2,19 @@ local FOG_ENABLED
 FOG_MUL = 0
 
 if CLIENT
-	export FOG_SPHERE = FOG_SPHERE or ClientsideModel "models/holograms/sphere.mdl", RENDERGROUP_TRANSLUCENT
-	FOG_SPHERE\SetNoDraw true
-	FOG_SPHERE\SetRenderMode RENDERMODE_TRANSCOLOR
+	colorModifyParams = {
+		"$pp_colour_addr": 0
+		"$pp_colour_addg": 0
+		"$pp_colour_addb": 0
+		"$pp_colour_brightness": 0
+		"$pp_colour_contrast": 1
+		"$pp_colour_colour": 1
+		"$pp_colour_mulr": 0
+		"$pp_colour_mulg": 0
+		"$pp_colour_mulb": 0
+	}
 
-	-- God, I hate this so much.
-	hook.Add "PostDrawTranslucentRenderables", "NMW AU Sabotage Fog", ->
+	hook.Add "RenderScreenspaceEffects", "NMW AU Sabotage Fog Sharpen", ->
 		-- Modulate the fog if it's enabled.
 		if FOG_ENABLED and FOG_MUL < 1
 			FOG_MUL = math.min 1, FOG_MUL + FrameTime! * 0.3
@@ -15,32 +22,10 @@ if CLIENT
 			FOG_MUL = math.max 0, FOG_MUL - FrameTime! * 0.5
 
 		if FOG_MUL ~= 0 and not GAMEMODE.GameData.Imposters[GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]]
-			with FOG_SPHERE
-				\SetPos LocalPlayer!\EyePos!
-				\SetupBones!
-
-				-- Initialize the bone matrix and make it follow the player angles.
-				m = \GetBoneMatrix 0
-				m\SetAngles LocalPlayer!\EyeAngles!
-
-				-- Prevent the engine from casting shadows/light.
-				render.SuppressEngineLighting true
-				render.SetColorModulation 0, 0, 0
-
-				-- Draw the actual spheres.
-				layers = 80
-				for i = 1, layers
-					render.SetBlend FOG_MUL * (i/layers) * 0.3
-
-					m\SetScale (i/layers) * 32 * Vector -1, -1, -1
-					\SetBoneMatrix 0, m
-
-					\DrawModel!
-
-				-- Restore everything.
-				render.SetBlend 1
-				render.SetColorModulation 1, 1, 1
-				render.SuppressEngineLighting false
+			colorModifyParams["$pp_colour_colour"] = 1 - (0.5 * FOG_MUL)
+			colorModifyParams["$pp_colour_contrast"] = 1 - (0.75 * FOG_MUL)
+			DrawColorModify colorModifyParams
+			DrawSharpen 1 * FOG_MUL, 3 * FOG_MUL
 comms = {
 	Init: (data) =>
 		@Base.Init @, data
