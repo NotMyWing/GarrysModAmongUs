@@ -277,6 +277,9 @@ return vgui.RegisterTable {
 				.Show = (this) ->
 					oldShow this
 
+					-- The entirety of this section is not yet implemented.
+					return if oldAdmin
+
 					newAdmin = LocalPlayer!\IsAdmin!
 					return if newAdmin == oldAdmin
 					oldAdmin = newAdmin
@@ -316,7 +319,7 @@ return vgui.RegisterTable {
 										.Paint = (_, w, h) ->
 											draw.RoundedBox cornerRadiusBase * 1.5, 0, 0, w, h, entryColor
 
-										element = if not LocalPlayer!\IsAdmin!
+										element = if LocalPlayer!\IsAdmin! and LocalPlayer!\GetNWBool "NMW AU Host"
 											-- Show the admin stuffs to admins.
 											switch type
 												when "Int", "Time", "Mod"

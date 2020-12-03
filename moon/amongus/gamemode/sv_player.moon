@@ -343,8 +343,11 @@ GM.PlayerSpawn = (ply) =>
 	ply\SetTeam 1
 	ply\SetNoCollideWithTeammates true
 
+
 hook.Add "PlayerInitialSpawn", "NMW AU AutoPilot", (ply) -> with GAMEMODE
 	oldAutoPilot = \IsOnAutoPilot!
+
+	ply\SetNWBool("NMW AU Host", true) if ply\IsListenServerHost!
 
 	if oldAutoPilot
 		newAutoPilot = true
