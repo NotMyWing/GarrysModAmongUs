@@ -2,8 +2,8 @@ TRANSLATE = GM.Lang.GetEntry
 
 surface.CreateFont "NMW AU Vent Text", {
 	font: "Roboto"
-	size: ScrW! * 0.017
-	weight: 500
+	size: ScrW! * 0.014
+	weight: 550
 }
 
 vent = {}
@@ -23,38 +23,42 @@ ASSETS = {
 vent.ShowVents = (vents) =>
 	size = ScrW! * 0.025
 	for i, vent in ipairs vents
-		with item = @Add "DPanel"
+		with item = @Add "Panel"
 			\SetTall size
 			\DockMargin 0, size * 0.1, 0, 0
 			\Dock TOP
-			.Paint = ->
 
-			with button = \Add "DOutlinedLabel"
-				\SetFont "NMW AU Vent Text"
-				\SetColor Color 255, 255, 255
-				\SetText i
-				\SetContentAlignment 5
-				\SetWide size
+			with button = \Add "DImage"
 				\Dock RIGHT
-				.Image = ASSETS.button
-				.Paint = GAMEMODE.Render.DermaFitImage
+				\SetWide size
+				\SetMaterial ASSETS.button
+
+				with \Add "DOutlinedLabel"
+					\Dock FILL
+
+					\SetFont "NMW AU Vent Text"
+					\SetColor Color 255, 255, 255
+					\SetText i
+					\SetContentAlignment 5
 
 			labelAspect = if texture = ASSETS.label\GetTexture "$basetexture"
 				texture\GetMappingWidth! / texture\GetMappingHeight!
 			else
 				0
 
-			with label = \Add "DOutlinedLabel"
-				\SetFont "NMW AU Vent Text"
-				\SetColor Color 255, 255, 255
-				\SetSize size * labelAspect, size
-				\DockMargin 0, 0, size * 0.1, 0
-				\SetText tostring TRANSLATE vent
-				\SetContentAlignment 5
+			with label = \Add "DImage"
 				\Dock RIGHT
-				.Image = ASSETS.label
-				.Paint = GAMEMODE.Render.DermaFitImage
+				\DockMargin 0, 0, size * 0.1, 0
+				\SetSize size * labelAspect, size
+				\SetMaterial ASSETS.label
 
+				with \Add "DOutlinedLabel"
+					\Dock FILL
+
+					\SetFont "NMW AU Vent Text"
+					\SetColor Color 255, 255, 255
+					\SetText tostring TRANSLATE vent
+					\SetContentAlignment 5
 vent.Think = =>
 	if not GAMEMODE or not GAMEMODE.GameData.Vented
 		@Remove!
