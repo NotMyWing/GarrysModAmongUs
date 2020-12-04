@@ -31,6 +31,8 @@ ASSETS = {
 SHUT_TIME = 3
 ROTATION_MATRIX = Matrix!
 
+COLOR_OUTLINE = Color 0, 0, 0, 160
+
 --- Displays the crewmate shhing at you.
 splash.DisplayShush = =>
 	@SetAlpha 0
@@ -140,8 +142,6 @@ splash.DisplayShush = =>
 					surface.SetMaterial ASSETS.no_shh
 					surface.DrawTexturedRect 0, 0, w, h
 					surface.DisableClipping false
-
-COLOR_OUTLINE = Color 0, 0, 0, 160
 
 splash.DisplayPlayers = (reason) =>
 	localPlayerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]
@@ -331,9 +331,7 @@ splash.DisplayPlayers = (reason) =>
 							dead = GAMEMODE.GameData.DeadPlayers[players[i]]
 
 							\SetColor Color 0, 0, 0, dead and 127 or 255
-							color = players[i].color
-							if dead
-								color.a = 127
+							color = Color 255, 255, 255, dead and 127 or 255
 
 							\ColorTo color, displayTime / 4, 0.5
 							\Dock RIGHT
@@ -355,9 +353,7 @@ splash.DisplayPlayers = (reason) =>
 							with create_mdl rightBar, players[i]
 								dead = GAMEMODE.GameData.DeadPlayers[players[i]]
 								\SetColor Color 0, 0, 0, dead and 127 or 255
-								color = players[i].color
-								if dead
-									color.a = 127
+								color = Color 255, 255, 255, dead and 127 or 255
 
 								\ColorTo color, displayTime / 4, 0.5
 								\Dock LEFT
