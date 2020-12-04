@@ -1,0 +1,24 @@
+{
+	"title": "Among Us for Garry's Mod",
+	"type": "gamemode",
+	"tags": [
+		"cartoon",
+		"fun"
+	],
+	"ignore": [
+		".editorconfig",
+		".git/*",
+		".gitignore",
+		"content/*",
+		"gulpfile.js",
+		"LICENSE*",
+		"maps/*",
+		"moon/*",
+		"node_modules/*",
+		"package*.json",
+		"README.md",
+		"resource/fonts/*",
+		"src/*",
+		"tools/*"
+	]
+}
