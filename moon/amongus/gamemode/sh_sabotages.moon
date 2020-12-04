@@ -74,7 +74,7 @@ else
 			not @GameData.Vented[playerTable] and
 			IsValid playerTable.entity
 
-				_, usable = GAMEMODE\TracePlayer playerTable.entity
+				usable = GAMEMODE\TracePlayer playerTable.entity, @TracePlayerFilter.Usable
 				return if @ShouldHighlightEntity usable
 
 				if instance = @GameData.Sabotages[id]

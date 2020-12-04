@@ -94,16 +94,70 @@ hook.Add "Tick", "NMW AU KeyBinds", ->
 	-- screw implicit returns man
 	return
 
-hook.Add "Tick", "NMW AU Highlight", ->
-	oldHighlight = GAMEMODE.UseHighlight
 
-	if IsValid(LocalPlayer!) and LocalPlayer!\IsPlaying!
-		killable, usable = GAMEMODE\TracePlayer LocalPlayer!
-		GAMEMODE.KillHighlight = killable
-		GAMEMODE.UseHighlight = GAMEMODE\ShouldHighlightEntity(usable) and usable
-	else
-		GAMEMODE.KillHighlight = nil
+local nextTickCheck
+hook.Add "Tick", "NMW AU Highlight", ->
+	-- Operate at ~20 op/s. We don't need this to be any faster
+	-- since TracePlayer can potentially be terribly inefficient.
+	-- Realistically this shouldn't ever be a problem.
+	-- Ha-ha.
+	-- Unless...?
+	return unless SysTime! >= (nextTickCheck or 0)
+	nextTickCheck = SysTime! + (1/20)
+
+	localPlayer = LocalPlayer!
+	playerTable = IsValid(localPlayer) and localPlayer\GetAUPlayerTable!
+
+	-- Wait, it's all invalid?
+	if not playerTable
 		GAMEMODE.UseHighlight = nil
+		GAMEMODE.ReportHighlight = nil
+
+		-- Always has been.
+		return
+
+	usable, reportable = GAMEMODE\TracePlayer playerTable
+
+	oldHighlight = GAMEMODE.UseHighlight
+	GAMEMODE.UseHighlight = GAMEMODE\ShouldHighlightEntity(usable) and usable
+	GAMEMODE.ReportHighlight = reportable
+
+	-- Determine the closest player if imposter.
+	if playerTable and playerTable.entity\IsImposter!
+		local closest, min
+		for target in *player.GetAll!
+			targetTable = target\GetAUPlayerTable!
+
+			-- Bail if no table.
+			continue if not targetTable or not targetTable.entity
+
+			-- Bail if imposter.
+			continue if target\IsImposter!
+
+			-- Bail if dead or dormant.
+			-- Both are basically the same thing, but it's better to be on the safe side.
+			continue if target\IsDormant! or target\IsDead!
+
+			currentDist = target\GetPos!\DistToSqr localPlayer\EyePos! + localPlayer\GetAimVector! * 32
+
+			if not closest or currentDist < min
+				closest = target
+				min = currentDist
+
+		if closest
+			-- Do the expensive math to see if the closest target is actually within the kill radius.
+			-- Please note that spoofing this check will not actually grant you the ability
+			-- to kill anyone on the map regardless of the distance.
+			-- This is purely visual stuff.
+			radius = GAMEMODE.BaseUseRadius * GAMEMODE.ConVarSnapshots.KillDistanceMod\GetFloat!
+			closest = nil if radius * radius <
+				(closest\NearestPoint localPlayer\GetPos!)\DistToSqr(
+					localPlayer\NearestPoint closest\GetPos!)
+
+		GAMEMODE.KillHighlight = closest
+	else
+		-- Should probably not do that.
+		GAMEMODE.KillHighlight = nil
 
 	if GAMEMODE.Hud
 		if GAMEMODE.UseHighlight ~= oldHighlight

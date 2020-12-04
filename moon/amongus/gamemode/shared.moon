@@ -214,6 +214,13 @@ GM.VentNotifyReason = {
 	Move: 3
 }
 
+--- Enum of TracePlayer filters.
+GM.TracePlayerFilter = {
+	None: 0
+	Usable: 1
+	Reportable: 2
+}
+
 GM.SplashScreenTime = 8
 GM.BaseUseRadius = 96
 
@@ -234,23 +241,6 @@ GM.GetAlivePlayers = =>
 	return players
 
 GM.Util = {}
-
---- Sorts the table of entities based on how close an entity is to the specified one.
--- While this function returns a table, it mutates
--- the input table as well. It only returns it back
--- for the sake of your convenience.
--- @param tbl Table of entities.
--- @param entity Entity we're sorting agaist.
--- @return The sorted table.
-GM.Util.SortByDistance = (tbl, destination) ->
-	memo = {}
-	table.sort tbl, (a, b) ->
-		memo[a] or= (a\GetPos! - destination)\Length!
-		memo[b] or= (b\GetPos! - destination)\Length!
-
-		return memo[a] > memo[b]
-
-	return tbl
 
 --- Shuffles the table.
 -- While this function returns a table, it mutates
@@ -276,46 +266,83 @@ GM.Util.FindEntsByTaskName = (taskname, first = false) ->
 				if first
 					return t
 
---- Finds a pair of the closest interactable and killable entities
+--- Finds a pair of the closest interactable and reportable
 -- within the reach of the player in question.
--- @param ply The player ENTITY.
--- @return The closest killable entity. Nullable.
+-- Prioritizes hightlightable entities.
+-- @param ply The player.
+-- @param filter Optional filter.
 -- @return The closest usable entity. Nullable.
-GM.TracePlayer = (ply) =>
+-- @return The closest reportable entity. Nullable.
+GM.TracePlayer = (playerTable, filter = 0) =>
+	startTime = SysTime!
 	return unless @IsGameInProgress!
 
+	-- Fetch the player table if we haven't been provided one.
+	if "Player" == type playerTable
+		playerTable = playerTable\GetAUPlayerTable!
+
+	-- Bail if the player table is invalid, or if the player is in a vent.
+	return if not playerTable or
+		(SERVER and @GameData.Vented[playerTable]) or
+		(CLIENT and @GameData.Vented)
+
+	ply = playerTable.entity
+
 	startPos = ply\EyePos!
-	entities = ents.FindInSphere startPos, @BaseUseRadius * @ConVarSnapshots.KillDistanceMod\GetFloat!
+	entities = ents.FindInSphere startPos, @BaseUseRadius
 
-	usable = {}
-	highlightable = {}
-	killable = {}
-
-	playerTable = ply\GetAUPlayerTable!
-	return if not playerTable or (SERVER and @GameData.Vented[playerTable]) or (CLIENT and @GameData.Vented)
+	-- Define all three classes of entities this function can possibly report.
+	local usable, highlightable, reportable
+	distMemo = {}
 
 	for ent in *entities
+		-- Simply check if the entity isn't the player.
 		continue if ent == ply
+
+		-- Check if the entity is in PVS.
+		-- This is the only check that can't be done on the client, unfortunately.
 		continue if SERVER and not ply\TestPVS ent
 
-		otherPlayerTable = @GameData.Lookup_PlayerByEntity[ent]
+		-- Calculate the nearest point to the cursor.
+		if not distMemo[ent]
+			nearestPoint = ent\NearestPoint startPos
+			distMemo[ent] = nearestPoint\DistToSqr ply\EyePos! + ply\GetAimVector! * 32
 
-		isKillable = otherPlayerTable and ent\IsPlayer! and not ent\IsDormant! and @GameData.Imposters[playerTable] and
-			not @GameData.Imposters[otherPlayerTable] and not @GameData.DeadPlayers[otherPlayerTable]
+		isBody = @IsPlayerBody ent
 
-		isUsable = not isKillable and not ent\IsPlayer!
-		isHightlightable = isUsable and @ShouldHighlightEntity ent
-		-- Skip checking if we found at least one highlightable entity.
-		continue if #highlightable > 0 and not isHightlightable
+		-- Store if body.
+		if isBody and (filter == @TracePlayerFilter.None or filter == @TracePlayerFilter.Reportable)
+			reportable = ent if not reportable or distMemo[ent] > distMemo[reportable]
+			continue
+
+		-- Bail if the filter is set to target bodies.
+		elseif filter == @TracePlayerFilter.Reportable
+			continue
+
+		isUsable = not isBody and not ent\IsPlayer!
+		continue if not isUsable
+
+		isHightlightable = @ShouldHighlightEntity ent
+
+		-- If we found a highlightable entity already and the current entity isn't highlightable,
+		-- then bail since there's no point in checking it.
+		if highlightable and not isHightlightable
+			continue
+
+		-- Return if the current found entity is farther than the last stored.
+		otherDist = distMemo[highlightable or usable]
+		continue if otherDist and otherDist < distMemo[ent]
 
 		-- No point entities. No view models.
 		continue if not ent\GetModel! or ent\GetModelRadius! == 0
 
+		entClass = ent\GetClass!
+
 		-- Don't match triggers.
-		continue if string.match ent\GetClass!, "^trigger_"
+		continue if string.match entClass, "^trigger_"
 
 		-- Task buttons.
-		if ent\GetClass! == "func_task_button" or ent\GetClass! == "prop_task_button"
+		if entClass == "func_task_button" or entClass == "prop_task_button"
 			name = ent\GetTaskName!
 
 			-- Quite simply just bail out if the player is an imposter.
@@ -336,21 +363,21 @@ GM.TracePlayer = (ply) =>
 					not @GameData.MyTasks[name]\CanUse!
 
 		-- Prevent dead players from being able to target corpses.
-		continue if ent\GetClass! == "prop_ragdoll" and @GameData.DeadPlayers[playerTable]
+		continue if entClass == "prop_ragdoll" and @GameData.DeadPlayers[playerTable]
 
 		-- Prevent regular players from using vents.
-		continue if (ent\GetClass! == "func_vent" or ent\GetClass! == "prop_vent") and not @GameData.Imposters[playerTable]
+		continue if (entClass == "func_vent" or entClass == "prop_vent") and not @GameData.Imposters[playerTable]
 
 		-- Only highlight sabotage buttons when they're active, and the player isn't dead.
-		if (ent\GetClass! == "func_sabotage_button" or ent\GetClass! == "prop_sabotage_button")
+		if (entClass == "func_sabotage_button" or entClass == "prop_sabotage_button")
 			continue if @GameData.DeadPlayers[ply] or not @GameData.SabotageButtons[ent]
 
 		-- Only highlight doors when requested by sabotages.
-		if (ent\GetClass! == "func_door" or ent\GetClass! == "func_door_rotating")
+		if (entClass == "func_door" or entClass == "func_door_rotating")
 			continue if @GameData.DeadPlayers[ply] or not @GameData.SabotageButtons[ent]
 
 		-- Only hightlight meeting buttons when the cooldown has passed.
-		if (ent\GetClass! == "func_meeting_button" or ent\GetClass! == "prop_meeting_button")
+		if (entClass == "func_meeting_button" or entClass == "prop_meeting_button")
 			continue if @IsMeetingDisabled!
 			continue if 0 >= ply\GetNWInt "NMW AU Meetings"
 
@@ -358,23 +385,22 @@ GM.TracePlayer = (ply) =>
 
 			continue if time > 0
 
-		if isKillable
-			table.insert killable, ent
+		if isHightlightable
+			highlightable = ent
 
-		elseif isUsable
-			nearestPoint = ent\NearestPoint startPos
-			if nearestPoint\Distance(ply\GetPos!) <= @BaseUseRadius
-				table.insert isHightlightable and highlightable or usable, ent
+		usable = ent
 
-	lookPos = ply\EyePos! + ply\GetAimVector! * 32
+	export LAST_TRACE_PLAYER_TIME = 1000 * (SysTime! - startTime)
 
-	-- Prioritize highlightable entities.
-	usable = #highlightable > 0 and highlightable or usable
+	return switch filter
+		when @TracePlayerFilter.Reportable
+			reportable
 
-	GAMEMODE.Util.SortByDistance usable, lookPos
-	GAMEMODE.Util.SortByDistance killable, lookPos
+		when @TracePlayerFilter.Usable
+			usable
 
-	return killable[#killable], usable[#usable]
+		else
+			usable, reportable
 
 --- Returns whether the game is progress.
 -- @return You guessed it.

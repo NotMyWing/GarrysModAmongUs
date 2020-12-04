@@ -49,7 +49,7 @@ hud.Init = =>
 	hook.Add "OnScreenSizeChanged", "NMW AU Hud Size", ->
 		@SetSize ScrW!, ScrH!
 
-	with @buttons = @Add "DPanel"
+	with @buttons = @Add "Panel"
 		\SetTall ScrH! * 0.19
 
 		margin = ScreenScale 5
@@ -57,7 +57,13 @@ hud.Init = =>
 		\Dock BOTTOM
 		\SetZPos -1
 
-		.Paint = ->
+	with @buttonsTwo = @Add "Panel"
+		\SetTall ScrH! * 0.19
+
+		margin = ScreenScale 5
+		\DockMargin margin * 3, margin, margin * 3, 0
+		\Dock BOTTOM
+		\SetZPos -1
 
 hud.SetTaskbarValue = (value) =>
 	if IsValid @taskbar
@@ -400,7 +406,7 @@ hud.SetupButtons = (state, impostor) =>
 						.__maxWidth or 0, .__maxHeight
 
 
-		-- Use/report button. Content-aware.
+		-- Use button. Content-aware.
 		with @use = @buttons\Add "DPanel"
 			\SetWide @buttons\GetTall!
 			\DockMargin 0, 0, ScreenScale(5), 0
@@ -415,15 +421,37 @@ hud.SetupButtons = (state, impostor) =>
 			.Paint = (_, w, h) ->
 				ent = GAMEMODE.UseHighlight
 				mat = @UseButtonOverride or if IsValid ent
-					if GAMEMODE\IsPlayerBody ent
-						MAT_BUTTONS.report
-					elseif ent\GetClass! == "prop_vent" or ent\GetClass! == "func_vent"
+					if ent\GetClass! == "prop_vent" or ent\GetClass! == "func_vent"
 						MAT_BUTTONS.vent
 
 				if not mat
 					mat = MAT_BUTTONS.use
 
 				-- Like, jesus christ man.
+				surface.SetDrawColor COLOR_BTN
+				surface.SetMaterial mat
+
+				render.PushFilterMag TEXFILTER.ANISOTROPIC
+				render.PushFilterMin TEXFILTER.ANISOTROPIC
+				surface.DrawTexturedRect 0, 0, w, h
+				render.PopFilterMag!
+				render.PopFilterMin!
+
+		-- Use button. Content-aware.
+		with @report = @buttonsTwo\Add "DPanel"
+			\SetWide @buttonsTwo\GetTall!
+			\DockMargin 0, 0, ScreenScale(5), 0
+			\Dock RIGHT
+
+			.Think = =>
+				if IsValid GAMEMODE.ReportHighlight
+					\SetAlpha 255
+				else
+					\SetAlpha 32
+
+			mat = MAT_BUTTONS.report
+			.Paint = (_, w, h) ->
+				-- Here we are again.
 				surface.SetDrawColor COLOR_BTN
 				surface.SetMaterial mat
 

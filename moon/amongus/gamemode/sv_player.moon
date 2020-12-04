@@ -67,6 +67,9 @@ GM.Player_Kill = (victimTable, attackerTable) =>
 	-- Bail if one of the players is invalid. The game mode will handle the killing internally.
 	return unless (IsValid(victimTable.entity) and IsValid(victimTable.entity))
 
+	-- Bail if not in the PVS.
+	return unless victimTable.entity\TestPVS(attackerTable.entity) and
+		attackerTable.entity\TestPVS(victimTable.entity)
 
 	-- Bail if one of the players is dead.
 	return if @GameData.DeadPlayers[attackerTable] or @GameData.DeadPlayers[victimTable]
@@ -81,8 +84,11 @@ GM.Player_Kill = (victimTable, attackerTable) =>
 	return if @GameData.KillCooldownRemainders[attackerTable]
 
 	-- Bail if the attacker is too far.
-	return if (@BaseUseRadius * @ConVarSnapshots.KillDistanceMod\GetFloat!) <
-		victimTable.entity\GetPos!\Distance attackerTable.entity\GetPos!
+	-- A fairly sophisticated check.
+	radius = (@BaseUseRadius * @ConVarSnapshots.KillDistanceMod\GetFloat!)
+	return if radius * radius <
+		(victimTable.entity\NearestPoint attackerTable.entity\GetPos!)\DistToSqr(
+			attackerTable.entity\NearestPoint victimTable.entity\GetPos!)
 
 	with corpse = ents.Create "prop_ragdoll"
 		\SetPos victimTable.entity\GetPos!
@@ -392,28 +398,30 @@ hook.Add "CanPlayerSuicide", "NMW AU Suicide", -> false
 hook.Add "EntityTakeDamage", "NMW AU Damage", (target, dmg) ->
 	dmg\ScaleDamage 0
 
--- Handle body reports.
-hook.Add "PlayerUse", "NMW AU UseBody", (activator, ent) ->
-	playerTable = activator\GetAUPlayerTable!
-	if playerTable and GAMEMODE\IsGameInProgress!
-		victimTable = GAMEMODE\GetPlayerTableFromCorpse ent
-		if victimTable
-			GAMEMODE\Meeting_Start playerTable, victimTable.color
-
-	return
-
 hook.Add "FindUseEntity", "NMW AU FindUse", (ply, default) ->
-	_, usable = GAMEMODE\TracePlayer ply
+	usable = GAMEMODE\TracePlayer ply, GAMEMODE.TracePlayerFilter.Usable
 
-	return usable or false
+	return IsValid(usable) and usable or false
 
--- Handle unvent requests.
-hook.Add "KeyPress", "NMW AU UnVent", (ply, key) ->
+hook.Add "KeyPress", "NMW AU KeyPress", (ply, key) ->
+	-- Handle unvent requests.
 	if key == IN_USE
 		@ = GAMEMODE
 		playerTable = @GameData.Lookup_PlayerByEntity[ply]
 		if @GameData.Imposters[playerTable] and @GameData.Vented[playerTable] and (@GameData.VentCooldown[playerTable] or 0) <= CurTime!
 			@Player_UnVent playerTable
+
+	-- Handle body reports.
+	if key == IN_RELOAD
+		playerTable = ply\GetAUPlayerTable!
+		return unless playerTable and GAMEMODE\IsGameInProgress!
+
+		body = GAMEMODE\TracePlayer ply, GAMEMODE.TracePlayerFilter.Reportable
+
+		if victimTable = GAMEMODE\GetPlayerTableFromCorpse body
+			GAMEMODE\Meeting_Start playerTable, victimTable.color
+
+	return
 
 hook.Add "PlayerSpray", "NMW AU DeadSpray", (ply) ->
 	return if GAMEMODE.ConVarSnapshots.DeadChat\GetBool! or not GAMEMODE\IsGameInProgress!

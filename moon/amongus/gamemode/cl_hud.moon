@@ -340,7 +340,7 @@ hook.Add "HUDPaintBackground", "NMW AU Hud", ->
 				render.ClearStencil!
 				render.SetStencilEnable false
 
-		-- Iterate through the two possible entity types we can interact with.
+		-- Iterate through the three possible entity types we can interact with.
 		for highlight in *{
 			{
 				button: input.LookupBinding "use"
@@ -349,6 +349,10 @@ hook.Add "HUDPaintBackground", "NMW AU Hud", ->
 			{
 				button: input.LookupBinding "menu"
 				entity: GAMEMODE.KillHighlight
+			}
+			{
+				button: input.LookupBinding "reload"
+				entity: GAMEMODE.ReportHighlight
 			}
 		}
 			if IsValid highlight.entity
