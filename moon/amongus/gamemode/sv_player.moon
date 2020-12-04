@@ -103,11 +103,11 @@ GM.Player_Kill = (victimTable, attackerTable) =>
 		\Spawn!
 		\Activate!
 		\PhysWake!
-		if bone = \TranslatePhysBoneToBone 5
-			\ManipulateBoneScale bone, Vector 0, 0, 0
 
 		if IsValid attackerTable.entity
-			if phys = \GetPhysicsObject!
+			phys = \GetPhysicsObject!
+
+			if IsValid phys
 				phys\SetVelocity (victimTable.entity\GetPos! - attackerTable.entity\GetPos!)\GetNormalized! * 250
 
 			attackerTable.entity\SetPos victimTable.entity\GetPos!
