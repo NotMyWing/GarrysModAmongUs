@@ -6,9 +6,16 @@ include "sh_gamedata.lua"
 include "sh_lang.lua"
 include "meta/sh_player.lua"
 
+-- Only include resources manually if the workshop ID is unset.
+if GAMEMODE.WorkshopID
+	resource.AddWorkshop tostring GAMEMODE.WorkshopID
+	GAMEMODE.Logger.Info "Adding addon ##{GAMEMODE.WorkshopID} as a workshop dependency"
+else
+	include "sv_resources.lua"
+	GAMEMODE.Logger.Info "Adding the resources manually since the workshop ID is not set"
+
 include "sv_net.lua"
 include "sv_spectate.lua"
-include "sv_resources.lua"
 include "sv_player.lua"
 include "sv_meeting.lua"
 include "sv_game.lua"

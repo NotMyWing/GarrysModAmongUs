@@ -13,6 +13,10 @@ GM.Author 		= "NotMyWing and contributors, with assets by InnerSloth"
 GM.Email 		= "winwyv@gmail.com"
 GM.Website 		= "https://github.com/NotMyWing/GarrysModAmongUs"
 
+-- TO-DO: should be changed via CI/CD.
+GM.Version = "manual-build"
+GM.WorkshopID = nil
+
 flags = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED
 
 --- Table of all ConVars the game mode is using.
