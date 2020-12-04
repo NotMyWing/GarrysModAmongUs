@@ -56,9 +56,13 @@ reactor = {
 				\SetColor Color 255, 230, 0
 				\SetText "..."
 				\SetBlink true
-				.Think = ->
+
+				oldThink = .Think
+				.Think = (this) ->
 					time = math.max 0, @GetMeltdownTime! - CurTime!
 					\SetText GAMEMODE.Lang.GetEntry("tasks.reactorSabotaged") time, @GetSubmits!, #@GetActivationButtons!
+
+					oldThink this
 
 	OnButtonUse: (playerTable, button) =>
 		if SERVER

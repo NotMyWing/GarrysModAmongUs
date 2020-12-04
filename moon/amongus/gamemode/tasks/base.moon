@@ -345,7 +345,8 @@ else
 				completed = Color 0, 221, 0
 				progress = Color 255, 255, 0
 
-				.Think = ->
+				oldThink = .Think
+				.Think = (this) ->
 					local text
 					local color
 
@@ -383,6 +384,8 @@ else
 					if color and color ~= .__oldColor
 						\SetColor color
 						.__oldColor = color
+
+					oldThink this
 
 taskBase.__index = {}
 

@@ -605,39 +605,47 @@ hud.ToggleTaskList = (value = not @taskBox.__hiding) =>
 				@taskBox\Hide!
 
 COLOR_WHITE = Color 255, 255, 255
+COLOR_BLINK = Color 255, 64, 64
 
 hud.AddTaskEntry = =>
 	return with @taskBox\Add "DOutlinedLabel"
-		\SetTall ScrH! * 0.04
 		\Dock TOP
 
+		\SetTall ScrH! * 0.04
+		\SetContentAlignment 4
 		\SetFont "NMW AU Taskbar"
 
-		blink = false
-		colorBlink = Color 255, 64, 64
+		-- Self-descriptive.
+		shouldBlink = false
 		.SetBlink = (value) =>
-			blink = value
+			shouldBlink = value
 
-		\SetContentAlignment 4
+		-- Shim SetColor so we can manipulate the actual color the way we want.
+		-- Used primarily for making the task label blink.
+		local oldColor
+		referenceColor = COLOR_WHITE
+		oldSetColor    = .SetColor
+		.SetColor = (clr) =>
+			referenceColor = clr
 
-		.Think = ->
-
-		oldPaint = .Paint
-		.Paint = (_, w, h) ->
-			clr = if blink and math.floor((SysTime! * 4) % 2) == 0
-				colorBlink
+		-- Override think for important stuff.
+		.Think = (this) ->
+			-- If we should blink, blink.
+			clr = if shouldBlink and math.floor((SysTime! * 4) % 2) == 0
+				COLOR_BLINK
 			else
-				COLOR_WHITE
+				referenceColor
 
-			if clr ~= .__oldColor
-				.__oldColor = clr
-				\SetColor clr
+			-- If the color has been changed, let the panel know.
+			if clr ~= oldColor
+				oldColor = clr
+				oldSetColor this, clr
 
 				if .OnBlink
 					\OnBlink!
 
-			oldPaint _, w, h
-
+		-- Gotta call InvalidateParent since changing the text
+		-- changes the entry width.
 		oldSetText = .SetText
 		.SetText = (...) =>
 			oldSetText @, ...
