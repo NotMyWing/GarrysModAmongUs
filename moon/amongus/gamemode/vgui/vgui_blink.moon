@@ -14,4 +14,4 @@ blink.Blink = (duration, delay = 0.25, pre = 0.1) => with @
 		\AlphaTo 0, math.max(0, duration - delay), delay, ->
 			\Remove!
 
-return vgui.RegisterTable blink, "DPanel"
+return vgui.RegisterTable blink, "Panel"

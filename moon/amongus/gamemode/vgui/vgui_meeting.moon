@@ -77,7 +77,7 @@ ROTATION_MATRIX = Matrix!
 -- I had fun coming up with this one.
 meeting.PlayBackground = (callback) =>
 	local rot, shrinkAnim
-	with bg = @Add "DPanel"
+	with bg = @Add "Panel"
 		\SetSize @GetWide!, @GetTall!
 		\SetPos 0, 0
 
@@ -383,7 +383,7 @@ meeting.OpenDiscuss = (caller) =>
 							children[1]\Remove!
 
 						-- Container.
-						with container = \Add "DPanel"
+						with container = \Add "Panel"
 							\Dock TOP
 							\DockMargin chatLineDockMargin / 4, 0,
 								chatLineDockMargin or 0, shadowOffset * 2
@@ -428,7 +428,7 @@ meeting.OpenDiscuss = (caller) =>
 							not GAMEMODE.GameData.DeadPlayers[playerTable]) and itemColor or itemColorDead
 
 						-- Container.
-						with container = \Add "DPanel"
+						with container = \Add "Panel"
 							\Dock TOP
 							\DockMargin dock == RIGHT and chatLineDockMargin or 0, 0,
 								dock == LEFT and chatLineDockMargin or 0, shadowOffset * 2
@@ -636,7 +636,7 @@ meeting.OpenDiscuss = (caller) =>
 					\SetAlpha 0
 
 					-- "Skipped Voting" icon.
-					with \Add "DPanel"
+					with \Add "Panel"
 						\SetWide headerHeight
 						\Dock LEFT
 						.Image = MAT_MEETING_TABLET.skipped
@@ -740,14 +740,14 @@ meeting.OpenDiscuss = (caller) =>
 							\SetSize voteItemWidth, voteItemHeight
 
 							-- Shadow.
-							with \Add "DPanel"
+							with \Add "Panel"
 								\SetPos voteItemShadowOffset, voteItemShadowOffset
 								\SetSize voteItemInnerSizeX , voteItemInnerSizeY
 
 								.Paint = (_, w, h) -> draw.RoundedBox 16, 0, 0, w, h, shadowColor
 
 							-- Vote item.
-							@__voteItems[playerTable.id] = with playerItem = \Add "DPanel"
+							@__voteItems[playerTable.id] = with playerItem = \Add "Panel"
 								\SetSize voteItemInnerSizeX, voteItemInnerSizeY
 
 								.Paint = (_, w, h) ->
@@ -800,7 +800,7 @@ meeting.OpenDiscuss = (caller) =>
 									-- Disables clipping and because of that ends up looking slightly off.
 									-- But it's better than SetPos'ing the thing constantly.
 									-- Or is it?
-									playerItem.voted = with \Add "DPanel"
+									playerItem.voted = with \Add "Panel"
 										\SetAlpha 0
 
 										.Paint = (_) ->
@@ -862,7 +862,7 @@ meeting.OpenDiscuss = (caller) =>
 												\AlignRight playerIconMargin
 
 	-- The two crewmates talking animation you see before the meeting screen appears.
-	with discussAnim = @Add "DPanel"
+	with discussAnim = @Add "Panel"
 		size = 0.8 * math.min @GetTall!, @GetWide!
 		\SetSize size, size
 		\SetPos @GetWide!/2 - size/2, @GetTall!/2 - size/2
@@ -950,7 +950,7 @@ meeting.OpenDiscuss = (caller) =>
 
 	-- And finally, something simple.
 	-- The "Discuss!" text.
-	with discussText = @Add "DPanel"
+	with discussText = @Add "Panel"
 		size = 0.8 * math.min @GetTall!, @GetWide!
 		\SetSize size, size * 0.3
 		\SetPos @GetWide!/2 - size/2, -size * 0.2
@@ -1031,19 +1031,17 @@ meeting.StartEmergency = (playerTable, bodyColor) =>
 		surface.PlaySound "au/alarm_emergencymeeting.ogg"
 
 	@PlayBackground ->
-		with emergency_caller = @Add "DPanel"
+		with emergency_caller = @Add "Panel"
 			size = 0.7 * math.min @GetTall!, @GetWide!
 
 			\SetSize size, size
 			\SetPos @GetWide!/2 - size/2, @GetTall!/2 - size/2
 			\AlphaTo 0, 0.1, 3, ->
 				\Remove!
-			.Paint = ->
 
-			with upper = emergency_caller\Add "DPanel"
+			with upper = emergency_caller\Add "Panel"
 				\SetTall size/2
 				\Dock TOP
-				.Paint = ->
 
 				\InvalidateParent true
 
@@ -1054,7 +1052,7 @@ meeting.StartEmergency = (playerTable, bodyColor) =>
 					MAT_EMERGENCY_LAYERS
 
 				for i = #pics - 2, 1, -1
-					with layers[i] = upper\Add "DPanel"
+					with layers[i] = upper\Add "Panel"
 						\SetSize size / 2, size / 2
 						\CenterHorizontal!
 						\SetZPos (#pics + 1) - i
@@ -1067,7 +1065,7 @@ meeting.StartEmergency = (playerTable, bodyColor) =>
 					layers[2].Color = playerTable.color
 					layers[4].Color = playerTable.color
 
-			with lower = emergency_caller\Add "DPanel"
+			with lower = emergency_caller\Add "Panel"
 				\SetTall size/2
 				\Dock BOTTOM
 				.Image = if bodyColor
@@ -1108,6 +1106,4 @@ meeting.Close = => with @
 meeting.OnRemove = =>
 	gui.EnableScreenClicker false
 
-meeting.Paint = =>
-
-return vgui.RegisterTable meeting, "DPanel"
+return vgui.RegisterTable meeting, "Panel"

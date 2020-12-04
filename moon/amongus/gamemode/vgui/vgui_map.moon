@@ -9,12 +9,11 @@ return vgui.RegisterTable {
 
 		innerPanel = @GetInnerPanel!
 		if manifest.Sabotages
-			with @sabotageOverlay = innerPanel\Add "DPanel"
+			with @sabotageOverlay = innerPanel\Add "Panel"
 				w, h = innerPanel\GetSize!
 				\SetSize w, h
 				\SetZPos 30000
 				\Hide!
-				.Paint = ->
 
 				buttonSize = 0.085 * math.min w, h
 				for id, sabotage in ipairs manifest.Sabotages

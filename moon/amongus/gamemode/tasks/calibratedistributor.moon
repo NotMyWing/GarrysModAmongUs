@@ -12,14 +12,13 @@ if CLIENT
 		base = vgui.Create "AmongUsTaskBase"
 
 		with base
-			\Setup with vgui.Create "DPanel"
+			\Setup with vgui.Create "Panel"
 				max_size = ScrH! * 0.7
 
 				height = max_size
 				width = max_size
 
 				\SetSize width, height
-				.Paint = ->
 
 				colors = {
 					Color 255, 211, 58
@@ -57,12 +56,11 @@ if CLIENT
 				reset!
 
 				for i = 1, 3
-					with left\Add "DPanel"
+					with left\Add "Panel"
 						\Dock TOP
 						\SetTall height / 3
-						.Paint = ->
 
-						with \Add "DPanel"
+						with \Add "Panel"
 							\SetWide height / 3
 							\Dock LEFT
 
@@ -140,17 +138,16 @@ if CLIENT
 
 								surface.DisableClipping false
 
-					with right\Add "DPanel"
+					with right\Add "Panel"
 						\Dock TOP
 						\SetTall height / 3
-						.Paint = ->
 
 						padding = height * 0.025
-						with \Add "DPanel"
+						with \Add "Panel"
 							\Dock TOP
 							\DockPadding padding, padding, padding, padding
 							\SetTall height / 6
-							.Paint = ->
+
 							with \Add "DPanel"
 								\Dock FILL
 
@@ -158,7 +155,7 @@ if CLIENT
 								\DockPadding innerPadding, innerPadding, innerPadding, innerPadding
 								\SetBackgroundColor Color 16, 16, 16
 
-								with \Add "DPanel"
+								with \Add "Panel"
 									\Dock FILL
 									.Paint = (_, w, h) ->
 										w *= if ringSubmit[i]
@@ -173,11 +170,11 @@ if CLIENT
 										surface.SetDrawColor colors[i]
 										surface.DrawRect 0, 0, w, h
 
-						with \Add "DPanel"
+						with \Add "Panel"
 							\Dock BOTTOM
 							\DockPadding padding * 1.25, padding * 1.25, padding * 1.25, padding * 3
 							\SetTall height / 6
-							.Paint = ->
+
 							with \Add "DButton"
 								\SetText ""
 								\Dock FILL

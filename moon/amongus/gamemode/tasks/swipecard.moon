@@ -29,7 +29,7 @@ if CLIENT
 		base = vgui.Create "AmongUsTaskBase"
 
 		with base
-			\Setup with container = vgui.Create "DPanel"
+			\Setup with container = vgui.Create "Panel"
 				local ledGreen
 				local ledRed
 				local label
@@ -37,7 +37,6 @@ if CLIENT
 				max_size = 0.7 * math.min ScrH!, ScrW!
 
 				\SetSize max_size + max_size * (190 * 2 / 900), max_size
-				.Paint = ->
 
 				with background = \Add "DImage"
 					\SetSize max_size, max_size

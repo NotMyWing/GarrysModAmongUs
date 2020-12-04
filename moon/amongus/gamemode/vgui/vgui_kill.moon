@@ -11,7 +11,7 @@ ROTATION_MATRIX = Matrix!
 return vgui.RegisterTable {
 	PlayBackground: (callback) =>
 		local shrinkAnim, rot
-		with bg = @Add "DPanel"
+		with bg = @Add "Panel"
 			\SetSize @GetWide!, @GetTall!
 			\SetPos 0, 0
 
@@ -75,4 +75,4 @@ return vgui.RegisterTable {
 
 	Paint: ->
 
-}, "DPanel"
+}, "Panel"

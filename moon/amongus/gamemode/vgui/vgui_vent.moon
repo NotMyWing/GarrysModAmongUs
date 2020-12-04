@@ -63,6 +63,4 @@ vent.Think = =>
 	if not GAMEMODE or not GAMEMODE.GameData.Vented
 		@Remove!
 
-vent.Paint = ->
-
-return vgui.RegisterTable vent, "DPanel"
+return vgui.RegisterTable vent, "Panel"

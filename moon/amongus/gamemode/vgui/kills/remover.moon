@@ -18,7 +18,7 @@ remover.Play = (killer, victim) =>
 	crewmates = {}
 
 	for i = 1, 2
-		table.insert crewmates, with @Add "DPanel"
+		table.insert crewmates, with @Add "Panel"
 			size = h * 0.4
 			newW, newH = GAMEMODE.Render.FitMaterial ASSETS.crewmate[1], size, size
 
@@ -84,7 +84,7 @@ remover.Play = (killer, victim) =>
 								}
 
 								-- Create a toolgun halo around the victim's head
-								with crewmates[2]\Add "DPanel"
+								with crewmates[2]\Add "Panel"
 									size = math.min crewmates[2]\GetSize!
 									\SetSize size, size
 
@@ -112,7 +112,7 @@ remover.Play = (killer, victim) =>
 											\Remove!
 
 								-- Create a beam between the victim's head and the toolgun.
-								with @Add "DPanel"
+								with @Add "Panel"
 									size = 0.9 * math.min crewmates[2]\GetSize!
 
 									newW, newH = GAMEMODE.Render.FitMaterial ASSETS.beam[1], size, size
@@ -167,6 +167,4 @@ remover.Play = (killer, victim) =>
 										\MoveTo w * 0.35, h * 0.5, 0.25
 										\AlphaTo 0, 0.1
 
-remover.Paint = ->
-
-return vgui.RegisterTable remover, "DPanel"
+return vgui.RegisterTable remover, "Panel"

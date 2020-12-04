@@ -184,7 +184,7 @@ GM.HUD_TrackTaskOnMap = (entity, track = true) =>
 			if track
 				size = 0.06 * math.min ScrW!, ScrH!
 
-				\Track entity, with vgui.Create "DPanel"
+				\Track entity, with vgui.Create "Panel"
 					\SetSize size, size
 					.Paint = (_, w, h) ->
 						return if GAMEMODE\GetCommunicationsDisabled! and

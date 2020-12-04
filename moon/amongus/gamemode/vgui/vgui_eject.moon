@@ -50,7 +50,7 @@ eject.WriteText = (text, subtext) =>
 	if IsValid @ejectTextSubLabel
 		@ejectTextLabel\Remove!
 
-	@ejectTextLabel = with @Add "DPanel"
+	@ejectTextLabel = with @Add "Panel"
 		\SetContentAlignment 5
 		\SetPos 0, @GetTall!/2 - (ScreenScale 22)/2
 		\SetSize @GetWide!, ScreenScale 22
@@ -62,7 +62,7 @@ eject.WriteText = (text, subtext) =>
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 2, COLOR_OUTLINE
 
 	if subtext
-		@ejectTextSubLabel = with @Add "DPanel"
+		@ejectTextSubLabel = with @Add "Panel"
 			x, y = @ejectTextLabel\GetPos!
 			\SetPos x, y + @ejectTextLabel\GetTall!
 
@@ -116,7 +116,7 @@ eject.Eject = (reason, ply, confirm = false, imposter = false, remaining = 0, to
 	else
 		-- However if we are, print the name and optionally the role of the ejected person.
 		-- Create and animate a crewmate sprite flying across the screen.
-		with crewmate = \Add "DPanel"
+		with crewmate = \Add "Panel"
 			size = 0.15 * math.min @GetTall!, @GetWide!
 			\SetSize size, size
 			\SetPos -size, @GetTall!/2 - size/2
@@ -182,4 +182,4 @@ eject.Paint = (w, h) => with @
 		scale *= 2
 		alpha *= 0.5
 
-return vgui.RegisterTable eject, "DPanel"
+return vgui.RegisterTable eject, "Panel"

@@ -34,7 +34,7 @@ if CLIENT
 		base = vgui.Create "AmongUsTaskBase"
 
 		with base
-			\Setup with parent = vgui.Create "DPanel"
+			\Setup with parent = vgui.Create "Panel"
 				max_size = ScrH! * 0.7
 				\SetSize max_size, max_size
 				.Paint = (_, w, h) ->
@@ -47,11 +47,10 @@ if CLIENT
 
 				pad = max_size * (28/506)
 				\DockPadding pad, pad, pad, pad
-				with innerPanel = \Add "DPanel"
+				with innerPanel = \Add "Panel"
 					local label
 
 					\Dock FILL
-					.Paint = ->
 					\SetMouseInputEnabled true
 					.OnMousePressed = ->
 						surface.PlaySound SOUNDS.fire

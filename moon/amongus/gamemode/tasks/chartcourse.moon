@@ -27,7 +27,7 @@ if CLIENT
 				activated = {}
 
 				treshold = 0.1
-				with \Add "DPanel"
+				with \Add "Panel"
 					margin = max_size * 0.05
 					\DockMargin margin, margin, margin, margin
 					\Dock FILL

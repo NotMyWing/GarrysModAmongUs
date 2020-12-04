@@ -150,7 +150,7 @@ if CLIENT
 
 			with base
 				\SetSabotage @
-				\Setup with vgui.Create "DPanel"
+				\Setup with vgui.Create "Panel"
 					max_size = ScrH! * 0.5
 
 					\SetSize max_size * 0.6, max_size
@@ -178,12 +178,11 @@ if CLIENT
 						surface.DisableClipping false
 
 					buttonSize = 0.275 * math.min \GetSize!
-					with \Add "DPanel"
+					with \Add "Panel"
 						\SetSize 3 * buttonSize, 5.5 * buttonSize
 						\Center!
-						.Paint = ->
 
-						with \Add "DPanel"
+						with \Add "Panel"
 							\Dock TOP
 							\SetTall 1 * buttonSize
 							\DockMargin 0, 0, 0, buttonSize * 0.5
@@ -192,10 +191,10 @@ if CLIENT
 								draw.SimpleText current, "NMW AU O2 Keypad", w * 0.05, h/2, Color(255, 255, 255), nil, TEXT_ALIGN_CENTER
 
 						for j = 1, 3
-							with \Add "DPanel"
+							with \Add "Panel"
 								\Dock TOP
 								\SetTall 1 * buttonSize
-								.Paint = ->
+
 								for i = 1, 3
 									with \Add "DButton"
 										\SetWide buttonSize
@@ -206,10 +205,9 @@ if CLIENT
 											if #current < 5
 												current ..= \GetText!
 
-						with \Add "DPanel"
+						with \Add "Panel"
 							\Dock TOP
 							\SetTall 1 * buttonSize
-							.Paint = ->
 
 							-- Clear
 							with \Add "DButton"

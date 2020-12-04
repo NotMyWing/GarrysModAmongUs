@@ -145,7 +145,7 @@ if CLIENT
 					\SetMaterial ASSETS.base
 					\SetMouseInputEnabled true
 
-					sliderArea = with \Add "DPanel"
+					sliderArea = with \Add "Panel"
 						sliderAreaPosX   = (356  / 500) * panelWidth
 						sliderAreaPosY   = (24  / 500)  * panelHeight
 						sliderAreaWidth  = (124 / 500)  * panelWidth

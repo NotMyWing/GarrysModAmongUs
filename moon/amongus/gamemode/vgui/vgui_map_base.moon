@@ -27,7 +27,7 @@ map = {
 		@SetZPos 30000
 		@SetSize ScrW!, ScrH!
 
-		@__innerPanel = with @Add "DPanel"
+		@__innerPanel = with @Add "Panel"
 			size = 0.8 * math.min ScrH!, ScrW!
 			\SetSize size, size
 			\Center!

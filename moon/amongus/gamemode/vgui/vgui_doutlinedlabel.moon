@@ -70,4 +70,4 @@ vgui.Register "DOutlinedLabel", {
 			color, @__horizontalAlignment, @__verticalAlignment,
 			outlineRadius, outlineColor
 
-}, "DPanel"
+}, "Panel"

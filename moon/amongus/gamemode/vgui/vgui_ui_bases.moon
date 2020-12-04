@@ -130,7 +130,7 @@ vgui.Register "AmongUsVGUIBase", {
 
 	Paint: =>
 
-}, "DPanel"
+}, "Panel"
 
 ------------------------
 --  SABOTAGE UI BASE  --

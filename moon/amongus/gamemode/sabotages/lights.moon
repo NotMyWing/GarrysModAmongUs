@@ -111,27 +111,25 @@ if CLIENT
 
 			with base
 				\SetSabotage @
-				\Setup with vgui.Create "DPanel"
+				\Setup with vgui.Create "Panel"
 					max_size = ScrH! * 0.7
 
 					\SetSize max_size, max_size * 0.325
 					\SetBackgroundColor Color 64, 64, 64
 
 					for i = 1, 2
-						with \Add "DPanel"
+						with \Add "Panel"
 							margin = ScrH! * 0.01
 							\DockMargin margin * 4, 0, margin * 4, margin * 4
 							\SetTall ScrH! * 0.05
 							\Dock BOTTOM
-							.Paint = ->
 
-							with \Add "DPanel"
+							with \Add "Panel"
 								\SetTall ScrH! * 0.05
-								.Paint = ->
 
 								for j = 1, 5
 									if i == 2
-										with \Add "DPanel"
+										with \Add "Panel"
 											\SetWide ScrH! * 0.05
 											\DockMargin 0, 0, ScrH! * 0.05, 0
 											\Dock LEFT

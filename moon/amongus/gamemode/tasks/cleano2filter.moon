@@ -44,7 +44,7 @@ if CLIENT
 				for i = 1, (taskTable.Count + 1) - state
 					pressed = true
 					rot = math.random -20, 20
-					with \Add "DPanel"
+					with \Add "Panel"
 						\SetSize max_size * 0.25, max_size * 0.25
 						\SetPos math.random(max_size * 0.25, max_size * 0.75), math.random(max_size * 0.25, max_size * 0.75)
 						velocity = 0.005 * Vector math.random(-100, 100), math.random(-100, 100)

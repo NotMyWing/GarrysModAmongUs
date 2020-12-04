@@ -27,14 +27,13 @@ if CLIENT
 
 				currentStep = 1
 				for j = 1, rows
-					with \Add "DPanel"
+					with \Add "Panel"
 						\SetTall max_size / 5
 						\Dock TOP
 						for i = 1, #buttons/rows
-							with \Add "DPanel"
+							with \Add "Panel"
 								\SetWide max_size / 5
 								\Dock LEFT
-								.Paint = ->
 
 								with btn = \Add "DButton"
 									\SetText ""

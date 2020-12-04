@@ -46,7 +46,7 @@ return vgui.RegisterTable {
 		-- Create the tab list.
 		-- The list of many tabs.
 		local tabList
-		tabList = with @Add "DPanel"
+		tabList = with @Add "Panel"
 			-- Set up the visuals.
 			outerColor = Color 32, 48, 48
 			innerColor = Color 170, 200, 170
@@ -175,7 +175,7 @@ return vgui.RegisterTable {
 			tabList\AddTab "color", with vgui.Create "Panel"
 				\Dock FILL
 
-				modelViewContainer = with \Add "DPanel"
+				modelViewContainer = with \Add "Panel"
 					\SetWide modelViewWidth
 					\Dock LEFT
 					.Paint = roundedPaint
@@ -349,7 +349,7 @@ return vgui.RegisterTable {
 																conVar\GetBool! and buttonSelColor or buttonColor
 										else
 											-- Show the non-admin stuffs to non-admins.
-											with \Add "DPanel"
+											with \Add "Panel"
 												.Paint = (_, w, h) ->
 													inProgress = (GAMEMODE\IsGameCommencing! or GAMEMODE\IsGameInProgress!)
 													conVars = inProgress and
@@ -444,7 +444,7 @@ return vgui.RegisterTable {
 										\AlphaTo 255, 1
 
 									for contributor in *result
-										with \Add "DPanel"
+										with \Add "Panel"
 											\SetTall contributorHeight
 											\Dock TOP
 											\DockMargin 0, 0, 0, contributorHeight * 0.2
@@ -480,7 +480,7 @@ return vgui.RegisterTable {
 						\SetWrap true
 						\SetAutoStretchVertical true
 
-					with \Add "DPanel"
+					with \Add "Panel"
 						\SetTall contributorHeight
 						\Dock TOP
 						\DockMargin 0, contributorHeight * 0.25, 0, contributorHeight * 0.2

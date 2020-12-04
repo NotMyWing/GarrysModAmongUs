@@ -84,7 +84,7 @@ hud.SetupButtons = (state, impostor) =>
 
 	if state == GAMEMODE.GameState.Preparing
 		-- The convar list.
-		with @Add "DPanel"
+		with @Add "Panel"
 			m = ScrW! * 0.01
 			\DockMargin m, m, m, m
 			\SetWide ScrW! * 0.35
@@ -124,30 +124,28 @@ hud.SetupButtons = (state, impostor) =>
 								TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP, 2, COLOR_OUTLINE
 
 		-- Round overlay.
-		@roundOverlay = with @Add "DPanel"
+		@roundOverlay = with @Add "Panel"
 			nextCheck = 0
 			local initializedPlayers
 
 			\SetZPos 30001
 			\SetSize ScrW!, ScrH! * 0.125
 			\SetPos 0, ScrH! * 0.75
-			.Paint = ->
+
 			.Think = ->
 				if GAMEMODE.ConVarSnapshots and SysTime! > nextCheck
 					nextCheck = SysTime! + 0.5
 					initializedPlayers = GAMEMODE\GetFullyInitializedPlayers!
 
-			with \Add "DPanel"
+			with \Add "Panel"
 				margin = ScrW! * 0.25
 				\DockMargin margin, 0, margin, 0
 				\Dock FILL
-				.Paint = ->
 
 				-- Right
-				with \Add "DPanel"
+				with \Add "Panel"
 					\SetWide 0.5 * ScrW! * 0.25
 					\Dock RIGHT
-					.Paint = ->
 
 					if GAMEMODE.MapManifest
 						crewSize = 0.25 * \GetWide!
@@ -213,10 +211,9 @@ hud.SetupButtons = (state, impostor) =>
 											red
 
 				-- Middle
-				with \Add "DPanel"
+				with \Add "Panel"
 					\SetWide ScrW! * 0.25
 					\Dock RIGHT
-					.Paint = ->
 
 					with \Add "DOutlinedLabel"
 						\SetTall 0.5 * ScrH! * 0.125
@@ -265,14 +262,13 @@ hud.SetupButtons = (state, impostor) =>
 		return
 
 	-- The task bar. A clustertruck of panels.
-	with @Add "DPanel"
+	with @Add "Panel"
 		\SetTall ScrH! * 0.09
 		\Dock TOP
 		pad = ScrH! * 0.015
 		\DockPadding pad, pad, pad, pad
-		.Paint = ->
 
-		with \Add "DPanel"
+		with \Add "Panel"
 			\SetWide ScrW! * 0.35
 			\Dock LEFT
 
@@ -283,7 +279,7 @@ hud.SetupButtons = (state, impostor) =>
 			.Paint = (_, w, h) ->
 				draw.RoundedBox 6, 0, 0, w, h, outerColor
 
-			with \Add "DPanel"
+			with \Add "Panel"
 				\Dock FILL
 
 				pad = ScrH! * 0.008
@@ -298,9 +294,8 @@ hud.SetupButtons = (state, impostor) =>
 
 					draw.RoundedBox 4, pad, pad, w - pad*2, h - pad*2, taskBarOuterColor
 
-				with \Add "DPanel"
+				with \Add "Panel"
 					\Dock FILL
-					.Paint = ->
 
 					@taskBarLabel = with \Add "DOutlinedLabel"
 						\SetColor Color 255, 255, 255
@@ -328,7 +323,7 @@ hud.SetupButtons = (state, impostor) =>
 
 									\SetText string.FormattedTime(time, "%02i:%02i") .. "  "
 
-					with @taskbar = \Add "DPanel"
+					with @taskbar = \Add "Panel"
 						taskBarInnerColor = Color 68, 216, 68
 
 						.Paint = (_, w, h) ->
@@ -407,7 +402,7 @@ hud.SetupButtons = (state, impostor) =>
 
 
 		-- Use button. Content-aware.
-		with @use = @buttons\Add "DPanel"
+		with @use = @buttons\Add "Panel"
 			\SetWide @buttons\GetTall!
 			\DockMargin 0, 0, ScreenScale(5), 0
 			\Dock RIGHT
@@ -438,7 +433,7 @@ hud.SetupButtons = (state, impostor) =>
 				render.PopFilterMin!
 
 		-- Use button. Content-aware.
-		with @report = @buttonsTwo\Add "DPanel"
+		with @report = @buttonsTwo\Add "Panel"
 			\SetWide @buttonsTwo\GetTall!
 			\DockMargin 0, 0, ScreenScale(5), 0
 			\Dock RIGHT
@@ -463,7 +458,7 @@ hud.SetupButtons = (state, impostor) =>
 
 		-- Kill button for imposerts. Content-aware.
 		if impostor
-			with @kill = @buttons\Add "DPanel"
+			with @kill = @buttons\Add "Panel"
 				\SetWide @buttons\GetTall!
 				\DockMargin 0, 0, ScreenScale(5), 0
 				\Dock RIGHT
@@ -499,6 +494,8 @@ hud.SetupButtons = (state, impostor) =>
 								"NMW AU Cooldown", w * 0.5, h * 0.15, Color(255,255,255,255), TEXT_ALIGN_CENTER
 
 		-- The player icon!
+		-- for some reason this thing wants to be DPanel
+		-- why??
 		with @playerIcon = @buttons\Add "DPanel"
 			\SetWide @buttons\GetTall!
 			\Dock LEFT
@@ -576,7 +573,7 @@ hud.Countdown = (time) =>
 	if IsValid @countdown
 		@countdown\Remove!
 
-	with @countdown = @Add "DPanel"
+	with @countdown = @Add "Panel"
 		\SetSize @GetWide!, @GetTall! * 0.1
 		\SetPos 0, @GetTall! * 0.7
 
@@ -699,6 +696,4 @@ hud.Think = =>
 
 			@__oldCommsSabotaged = commsSabotaged
 
-hud.Paint = ->
-
-return vgui.RegisterTable hud, "DPanel"
+return vgui.RegisterTable hud, "Panel"

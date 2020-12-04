@@ -90,7 +90,7 @@ if CLIENT
 							else
 								470/504
 
-							with indicator = \Add "DPanel"
+							with indicator = \Add "Panel"
 								\SetSize indicatorWidth * width, indicatorHeight * height
 								\SetPos xOffset * width, yOffset * height
 
@@ -217,7 +217,7 @@ if CLIENT
 
 											oldInside = inside
 
-							wire = with \Add "DPanel"
+							wire = with \Add "Panel"
 								\SetSize wireWidth, wireHeight
 								\SetPos xOffset, yOffset
 								if j == 1

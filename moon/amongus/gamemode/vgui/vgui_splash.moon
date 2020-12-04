@@ -37,7 +37,7 @@ splash.DisplayShush = =>
 	@AlphaTo 255, 0.25
 
 	-- The spinning background, yo.
-	with background = @Add "DPanel"
+	with background = @Add "Panel"
 		size = math.min ScrW!, ScrH! * 0.8
 		\SetSize size, size
 		\SetPos (ScrW! / 2) - (size / 2), (ScrH! / 2) - (size / 2)
@@ -64,7 +64,7 @@ splash.DisplayShush = =>
 			cam.PopModelMatrix!
 
 		-- The crewmate sprite.
-		with \Add "DPanel"
+		with \Add "Panel"
 			bg_size = background\GetTall!
 			crew_size = bg_size * 0.735
 
@@ -85,7 +85,7 @@ splash.DisplayShush = =>
 					surface.DrawTexturedRect shrink, shrink, w - shrink * 2, h - shrink * 2
 
 		-- The hand sprite.
-		with \Add "DPanel"
+		with \Add "Panel"
 			bg_size = background\GetTall!
 			hand_size = bg_size * 0.45
 
@@ -122,7 +122,7 @@ splash.DisplayShush = =>
 				cam.PopModelMatrix!
 
 		-- The "SHHHHHH" text.
-		with \Add "DPanel"
+		with \Add "Panel"
 			bg_size = background\GetTall!
 			shh_size = bg_size * 0.7
 
@@ -154,10 +154,10 @@ splash.DisplayPlayers = (reason) =>
 	@AlphaTo 0, 0.25, displayTime, ->
 		@Remove!
 
-	with @crewmate_screen = @Add "DPanel"
+	with @crewmate_screen = @Add "Panel"
 		\SetSize @GetWide!, @GetTall!
 		\SetAlpha 0
-		.Paint = ->
+
 		\AlphaTo 255, 0.25, 0, ->
 			-- Are we an imposter, son?
 			imposter = GAMEMODE.GameData.Imposters[localPlayerTable]
@@ -216,13 +216,12 @@ splash.DisplayPlayers = (reason) =>
 
 			-- This is dumb, but whatever.
 			-- I'm basically using this as a timer.
-			placeholder = with \Add "DPanel"
+			placeholder = with \Add "Panel"
 				\SetAlpha 0
 				\AlphaTo 255, displayTime / 4, 0.5
-				.Paint = ->
 
 			-- Create a bar to contain all players.
-			with playerBar = \Add "DPanel"
+			with playerBar = \Add "Panel"
 				size = (math.min @GetTall!, @GetWide!) * 0.4
 				\SetSize @GetWide!, size
 				\SetPos 0, @GetTall! * 0.15 + @GetTall!/2 - \GetTall!/2
@@ -322,10 +321,9 @@ splash.DisplayPlayers = (reason) =>
 					\GetWide!/2
 
 				-- Left side of the screen. Contains the first half of players.
-				with leftBar = \Add "DPanel"
+				with leftBar = \Add "Panel"
 					\SetWide barWidth
 					\Dock LEFT
-					.Paint = ->
 
 					width_mod = 1
 					for i = 1, math.ceil #players / 2
@@ -347,10 +345,9 @@ splash.DisplayPlayers = (reason) =>
 						width_mod *= 0.75
 
 				-- Right side of the screen. Contains the other half of players.
-				with rightBar = \Add "DPanel"
+				with rightBar = \Add "Panel"
 					\SetWide barWidth
 					\Dock RIGHT
-					.Paint = ->
 
 					if #players ~= 1
 						width_mod = 1
@@ -373,9 +370,9 @@ splash.DisplayPlayers = (reason) =>
 
 				-- Now, if we're relevant, put us in the midle.
 				if localPlayerTable and (not reason or (reason and victory))
-					with middlePlayer = playerBar\Add "DPanel"
+					with middlePlayer = playerBar\Add "Panel"
 						\Dock FILL
-						.Paint = ->
+
 						color = localPlayerTable.color
 						if GAMEMODE.GameData.DeadPlayers[localPlayerTable]
 							color.a = 127
@@ -399,4 +396,4 @@ splash.Paint = (w, h) =>
 	surface.SetDrawColor 0, 0, 0, 255
 	surface.DrawRect 0, 0, w, h
 
-return vgui.RegisterTable splash, "DPanel"
+return vgui.RegisterTable splash, "Panel"

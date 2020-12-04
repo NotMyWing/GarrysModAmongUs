@@ -33,6 +33,6 @@ vgui.Register "AmongUsCrewmate", {
 		render.PopFilterMag!
 		render.PopFilterMin!
 
-}, "DPanel"
+}, "Panel"
 
 return

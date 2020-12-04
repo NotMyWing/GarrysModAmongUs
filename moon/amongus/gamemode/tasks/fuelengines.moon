@@ -98,7 +98,7 @@ if CLIENT
 								finished = true
 								base\Submit!
 
-				with \Add "DPanel"
+				with \Add "Panel"
 					margin = ScrH! * 0.01
 					\DockMargin margin * 4, 0, margin * 4, margin * 2
 					\Dock FILL

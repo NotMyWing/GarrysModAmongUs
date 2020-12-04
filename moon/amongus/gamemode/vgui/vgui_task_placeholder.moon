@@ -37,7 +37,7 @@ placeholder.Init = =>
 		\Dock BOTTOM
 		.DoClick = -> @GetParent!\Submit!
 
-	with @Add "DPanel"
+	with @Add "Panel"
 		\Dock FILL
 
 		clr = Color 255, 255, 255
@@ -47,4 +47,4 @@ placeholder.Init = =>
 			draw.SimpleTextOutlined string.format("%ds", time), "NMW AU PlaceholderText",
 				w/2, h/2, clr, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 2, Color 0, 0, 0, 32
 
-vgui.Register "AmongUsTaskPlaceholder", placeholder, "DPanel"
+vgui.Register "AmongUsTaskPlaceholder", placeholder, "Panel"
