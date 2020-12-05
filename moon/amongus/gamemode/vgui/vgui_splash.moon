@@ -369,7 +369,7 @@ splash.DisplayPlayers = (reason) =>
 					with middlePlayer = playerBar\Add "Panel"
 						\Dock FILL
 						with create_mdl middlePlayer, localPlayerTable
-							dead = dead = GAMEMODE.GameData.DeadPlayers[localPlayerTable]
+							dead = GAMEMODE.GameData.DeadPlayers[localPlayerTable]
 							\SetColor Color 255, 255, 255, dead and 127 or 255
 							\Dock FILL
 							\SetFOV 30
