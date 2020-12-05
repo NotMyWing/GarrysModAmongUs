@@ -75,10 +75,10 @@ GM.Player_Kill = (victimTable, attackerTable) =>
 	return if @GameData.DeadPlayers[attackerTable] or @GameData.DeadPlayers[victimTable]
 
 	-- Bail if the attacker is not an imposter, or if the target is an imposter.
-	return unless @GameData.Imposters[attackerTable] or @GameData.Imposters[victimTable]
+	return if not @GameData.Imposters[attackerTable] or @GameData.Imposters[victimTable]
 
 	-- Bail if player has a cooldown.
-	return if @GameData.KillCooldowns[attackerTable] > CurTime!
+	return if (@GameData.KillCooldowns[attackerTable] or 0) > CurTime!
 
 	-- Bail if the kill cooldown is paused
 	return if @GameData.KillCooldownRemainders[attackerTable]
