@@ -6,6 +6,7 @@ GM.Game_GameOver = (reason) =>
 	@Player_CloseVGUIsForEveryone!
 	@Net_BroadcastDead!
 	@Net_BroadcastGameOver reason
+	@Sabotage_ForceEndAll!
 
 	handle = "gameOver"
 
