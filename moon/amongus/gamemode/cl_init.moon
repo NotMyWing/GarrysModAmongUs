@@ -103,7 +103,15 @@ hook.Add "Tick", "NMW AU Highlight", ->
 	-- Ha-ha.
 	-- Unless...?
 	return unless SysTime! >= (nextTickCheck or 0)
-	nextTickCheck = SysTime! + (1/20)
+
+	-- Don't trace while the meeting is in progress.
+	if GAMEMODE\IsMeetingInProgress!
+		GAMEMODE.UseHighlight = nil
+		GAMEMODE.ReportHighlight = nil
+		GAMEMODE.Kill = nil
+
+		nextTickCheck = SysTime! + 1
+		return
 
 	localPlayer = LocalPlayer!
 	playerTable = IsValid(localPlayer) and localPlayer\GetAUPlayerTable!
@@ -112,9 +120,13 @@ hook.Add "Tick", "NMW AU Highlight", ->
 	if not playerTable
 		GAMEMODE.UseHighlight = nil
 		GAMEMODE.ReportHighlight = nil
+		GAMEMODE.Kill = nil
 
+		nextTickCheck = SysTime! + 1
 		-- Always has been.
 		return
+
+	nextTickCheck = SysTime! + (1/20)
 
 	usable, reportable = GAMEMODE\TracePlayer playerTable
 
@@ -123,7 +135,7 @@ hook.Add "Tick", "NMW AU Highlight", ->
 	GAMEMODE.ReportHighlight = reportable
 
 	-- Determine the closest player if imposter.
-	if playerTable and playerTable.entity\IsImposter!
+	if playerTable and playerTable.entity\IsImposter! and not playerTable.entity\IsDead!
 		local closest, min
 		for target in *player.GetAll!
 			targetTable = target\GetAUPlayerTable!

@@ -316,6 +316,9 @@ GM.TracePlayer = (playerTable, filter = 0) =>
 
 		-- Store if body.
 		if isBody and (filter == @TracePlayerFilter.None or filter == @TracePlayerFilter.Reportable)
+			-- Only return the body if the player isn't dead.
+			continue if @GameData.DeadPlayers[playerTable]
+
 			reportable = ent if not reportable or distMemo[ent] > distMemo[reportable]
 			continue
 
@@ -372,16 +375,17 @@ GM.TracePlayer = (playerTable, filter = 0) =>
 		-- Prevent regular players from using vents.
 		continue if (entClass == "func_vent" or entClass == "prop_vent") and not @GameData.Imposters[playerTable]
 
-		-- Only highlight sabotage buttons when they're active, and the player isn't dead.
+		-- Only highlight sabotage buttons when they're active, and when the player isn't dead.
 		if (entClass == "func_sabotage_button" or entClass == "prop_sabotage_button")
-			continue if @GameData.DeadPlayers[ply] or not @GameData.SabotageButtons[ent]
+			continue if @GameData.DeadPlayers[playerTable] or not @GameData.SabotageButtons[ent]
 
 		-- Only highlight doors when requested by sabotages.
 		if (entClass == "func_door" or entClass == "func_door_rotating")
-			continue if @GameData.DeadPlayers[ply] or not @GameData.SabotageButtons[ent]
+			continue if @GameData.DeadPlayers[playerTable] or not @GameData.SabotageButtons[ent]
 
-		-- Only hightlight meeting buttons when the cooldown has passed.
+		-- Only hightlight meeting buttons when the cooldown has passed, and when the player isn't dead.
 		if (entClass == "func_meeting_button" or entClass == "prop_meeting_button")
+			continue if @GameData.DeadPlayers[playerTable]
 			continue if @IsMeetingDisabled!
 			continue if 0 >= ply\GetNWInt "NMW AU Meetings"
 
