@@ -56,8 +56,9 @@ AddCSLuaFile "sh_convarsnapshots.lua"
 AddCSLuaFile "sh_manifest.lua"
 AddCSLuaFile "sh_footsteps.lua"
 
-concommand.Add "au_debug_restart", ->
-	GAMEMODE\Game_Restart!
+concommand.Add "au_debug_restart", (ply) ->
+	if ply\IsAdmin!
+		GAMEMODE\Game_Restart!
 
 hook.Add "Initialize", "NMW AU Initialize", ->
 	MsgN!
