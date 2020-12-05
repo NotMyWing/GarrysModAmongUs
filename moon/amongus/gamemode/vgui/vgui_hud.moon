@@ -591,8 +591,11 @@ hud.HideTaskList = (state) =>
 		else
 			@taskBoxContainer\Show!
 
-hud.ToggleTaskList = (value = not @taskBox.__hiding) =>
+hud.ToggleTaskList = (value) =>
 	if IsValid @taskBox
+		if value == nil
+			value = not @taskBox.__hiding
+
 		@taskBox.__hiding = value
 
 		if not @taskBox.__hiding
@@ -606,6 +609,8 @@ COLOR_WHITE = Color 255, 255, 255
 COLOR_BLINK = Color 255, 64, 64
 
 hud.AddTaskEntry = =>
+	return unless IsValid @taskBox
+
 	return with @taskBox\Add "DOutlinedLabel"
 		\Dock TOP
 
