@@ -1,3 +1,5 @@
+DISCUSS_SPLASH_TIME = 3
+
 skipPlaceholder = { id: 0 }
 
 GM.Meeting_Start = (playerTable, bodyColor) =>
@@ -67,10 +69,11 @@ GM.Meeting_Start = (playerTable, bodyColor) =>
 				\SetAngles point\GetAngles!
 				\SetEyeAngles point\GetAngles!
 
-		@Net_BroadcastDiscuss playerTable
+		time = @ConVarSnapshots.VotePreTime\GetInt! + DISCUSS_SPLASH_TIME
+		@Net_BroadcastDiscuss playerTable, SysTime! + time
 
 		-- Wait for the meeting to start.
-		timer.Create handle, @ConVarSnapshots.VotePreTime\GetInt! + 3, 1, ->
+		timer.Create handle, time, 1, ->
 			@GameData.Voting = true
 			table.Empty @GameData.Votes
 			table.Empty @GameData.VotesMap
@@ -150,9 +153,17 @@ GM.Meeting_End = =>
 	handle = "meeting"
 
 	voteTable, reason, ejected = @Meeting_FinalizeVotes!
-	@Net_BroadcastMeetingEnd voteTable
 
-	timer.Create handle, @ConVarSnapshots.VotePostTime\GetInt!, 1, ->
+	-- Calculate the extra time.
+	maxVotes = 0
+	for vote in *voteTable
+		voteCount = #vote.votes
+		maxVotes = voteCount if voteCount > maxVotes
+
+	time = @ConVarSnapshots.VotePostTime\GetInt! + (math.min(8, maxVotes) * 0.5 - .1)
+	@Net_BroadcastMeetingEnd voteTable, SysTime! + time
+
+	timer.Create handle, time, 1, ->
 		@Net_BroadcastEject reason, ejected
 
 		if ejected

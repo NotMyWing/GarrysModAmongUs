@@ -10,8 +10,12 @@ surface.CreateFont "NMW AU Meeting Chat", {
 	font: "Roboto"
 	size: ScreenScale 12
 	weight: 550
-	antialias: false
-	outline: true
+}
+
+surface.CreateFont "NMW AU Meeting Chat Nickname", {
+	font: "Roboto"
+	size: ScreenScale 14
+	weight: 550
 }
 
 surface.CreateFont "NMW AU Meeting Title", {
@@ -128,8 +132,9 @@ meeting.DisableAllButtons = =>
 			voteItem\SetEnabled false
 
 meeting.CanIVote = =>
-	GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!] and
-		not GAMEMODE.GameData.DeadPlayers[LocalPlayer!]
+	localPlayer = LocalPlayer!
+	return IsValid(localPlayer) and localPlayer\GetAUPlayerTable! and
+		not localPlayer\IsDead!
 
 --- Purges all existing confirms.
 meeting.PurgeConfirms = =>
@@ -206,11 +211,16 @@ STATES = {
 	proceeding: 3
 }
 
-meeting.OpenDiscuss = (caller) =>
+meeting.OpenDiscuss = (caller, time) =>
 	@__voteItems = {}
 	@__currentState = STATES.begins
-	@__currentAnimation = @NewAnimation DISCUSS_SPLASH_TIME +
-		GAMEMODE.ConVarSnapshots.VotePreTime\GetInt!, 0, 0, ->
+
+	-- Wait for the discuss splash to disappear.
+	@NewAnimation DISCUSS_SPLASH_TIME, 0, 0, ->
+		@__megaphoneAnimation = @NewAnimation 2, 0, 0
+		@__kilAnimation = @NewAnimation 0.35, 0, 0
+
+	@__currentAnimation = @NewAnimation time - SysTime!, 0, 0, ->
 			-- Un-darken all buttons.
 			for id, voteItem in pairs @__voteItems
 				voteItem\SetEnabled true
@@ -243,6 +253,7 @@ meeting.OpenDiscuss = (caller) =>
 
 		-- Popup.
 		\MakePopup!
+		\SetKeyboardInputEnabled false
 		gui.EnableScreenClicker true
 
 		-- Paint the sprite.
@@ -251,297 +262,309 @@ meeting.OpenDiscuss = (caller) =>
 
 		-- Optionally, paint the shatter overlay if the player is dead.
 		if LocalPlayer!\IsDead!
-			.PaintOver = (_, w, h) ->
-				surface.SetMaterial MAT_MEETING_TABLET.shatter
-				surface.SetDrawColor COLOR_WHITE
+			with \Add "DImage"
+				\SetSize tabletWidth, tabletHeight
+				\SetMaterial MAT_MEETING_TABLET.shatter
+				\SetMouseInputEnabled false
+				\SetKeyboardInputEnabled false
+				\SetZPos 80
 
-				render.PushFilterMag TEXFILTER.ANISOTROPIC
-				render.PushFilterMin TEXFILTER.ANISOTROPIC
-				surface.DrawTexturedRect 0, 0, w, h
-				render.PopFilterMag!
-				render.PopFilterMin!
+		innerPanelSizeX = (733 / 856) * tabletWidth
+		innerPanelSizeY = (506 / 590) * tabletHeight
+		innerPanelPosX  = (37  / 856) * tabletWidth
+		innerPanelPosY  = (37  / 856) * tabletWidth
+		innerPanelMargin = maxSize * 0.015
+
+		headerHeight      = tabletHeight * 0.12
+		footerMarginRight = headerHeight * 0.5
+		chatButtonMargin  = headerHeight * 0.05
+
+		-- Chat overlay.
+		@__chatOverlay = with \Add "DImage"
+			local textInput, chatArea
+
+			chatOverlaySizeX, chatOverlaySizeY = GAMEMODE.Render.FitMaterial MAT_MEETING_TABLET.chatOverlay,
+				innerPanelSizeX, innerPanelSizeY
+
+			chatOverlayInnerSizeX = 0.975 * chatOverlaySizeX
+			chatOverlayInnerSizeY = 0.975 * chatOverlaySizeY
+			\SetPos innerPanelPosX + chatOverlaySizeX / 2 - chatOverlayInnerSizeX / 2,
+				innerPanelPosY + chatOverlaySizeY / 2 - chatOverlayInnerSizeY / 2
+
+			chatOverlayInnerPadding = 0.0075 * chatOverlayInnerSizeX
+
+			\SetMouseInputEnabled true
+			\SetSize chatOverlayInnerSizeX, chatOverlayInnerSizeY
+			\SetZPos 90
+
+			\SetMaterial MAT_MEETING_TABLET.chatOverlay
+
+			\SetAlpha 0
+			\Hide!
+
+			toggled = false
+			.Toggle = ->
+				toggled = not toggled
+				if toggled
+					@SetKeyboardInputEnabled true
+					\Show!
+
+					-- Scroll to the last child.
+					\NewAnimation 0, 0, 0, ->
+						textInput\RequestFocus!
+
+						chatAreaChildren = chatArea\GetCanvas!\GetChildren!
+						lastChild = chatAreaChildren[#chatAreaChildren]
+						if IsValid lastChild
+							chatArea\ScrollToChild lastChild
+
+				\AlphaTo toggled and 255 or 0, 0.1, nil, ->
+					if not toggled
+						@SetKeyboardInputEnabled false
+						\Hide!
+
+			-- Inner area.
+			innerArea = with \Add "EditablePanel"
+				\DockPadding chatOverlayInnerPadding, chatOverlayInnerPadding,
+					chatOverlayInnerPadding, chatOverlayInnerPadding
+
+				innerChatAreaPosX =  (8   / 700) * chatOverlayInnerSizeX
+				innerChatAreaPosY =  (8   / 486) * chatOverlayInnerSizeY
+				innerChatAreaSizeX = (636 / 700) * chatOverlayInnerSizeX
+				innerChatAreaSizeY = (480 / 486) * chatOverlayInnerSizeY
+
+				\SetPos  innerChatAreaPosX , innerChatAreaPosX
+				\SetSize innerChatAreaSizeX, innerChatAreaSizeY
+
+				-- Chat messages area.
+				chatArea = with \Add "DScrollPanel"
+					\Dock FILL
+					\DockMargin 0, 0, 0, chatOverlayInnerPadding
+
+				-- Input box.
+				textInput = with \Add "DTextEntry"
+					\DockMargin 0, 0, 0, chatOverlayInnerPadding
+					\SetTall ScreenScale 15
+					\Dock BOTTOM
+
+					\SetFont "NMW AU Meeting Chat"
+					\SetTextColor Color 0, 0, 0
+
+					.OnEnter = ->
+						RunConsoleCommand "say", \GetValue!
+						\SetText ""
+
+						-- Scroll to the last child.
+						\NewAnimation 0, 0, 0, ->
+							\RequestFocus!
+
+							chatAreaChildren = chatArea\GetCanvas!\GetChildren!
+							lastChild = chatAreaChildren[#chatAreaChildren]
+							if IsValid lastChild
+								chatArea\ScrollToChild lastChild
+
+			playerIconWidth  = tabletHeight * 0.07
+			playerIconMargin = tabletHeight * 0.01
+
+			shadowOffset = tabletHeight * 0.006
+			with chatArea\GetCanvas!
+				\DockPadding shadowOffset, shadowOffset,
+					shadowOffset * 2, shadowOffset * 2
+
+			shadowColor   = Color 0, 0, 0, 100
+			itemColor     = Color 255, 255, 255
+			itemColorDead = Color 220, 220, 220
+
+			chatLineDockMargin = tabletHeight * 0.2
+
+			paintVoteElement = (w, h) =>
+				scissorX1, scissorY1 = chatArea\LocalToScreen 0, 0
+				scissorX2 = scissorX1 + chatArea\GetWide!
+				scissorY2 = scissorY1 + chatArea\GetTall!
+
+				render.SetScissorRect scissorX1, scissorY1, scissorX2, scissorY2, true
+				surface.DisableClipping true
+				draw.RoundedBox 16, shadowOffset, shadowOffset, w, h, shadowColor
+				surface.DisableClipping false
+				render.SetScissorRect 0, 0, 0, 0, false
+
+				draw.RoundedBox 16, 0, 0, w, h, @Color or itemColor
+
+			-- Push new vote message to the chat overlay.
+			.PushVote = (_, playerTable, remaining) ->
+				with chatArea
+					children = \GetCanvas!\GetChildren!
+					if #children > 20
+						children[1]\Remove!
+
+					-- Container.
+					with container = \Add "Panel"
+						\Dock TOP
+						\DockMargin chatLineDockMargin / 4, 0,
+							chatLineDockMargin or 0, shadowOffset * 2
+
+						\SetAlpha 0
+
+						.Paint = paintVoteElement
+
+						if playerTable
+							-- Crewmate icon.
+							with \Add "AmongUsCrewmate"
+								\Dock LEFT
+								margin = playerIconMargin * 0.6
+								\DockMargin margin, margin,
+									margin, margin
+
+								\SetWide playerIconWidth * 0.6
+								\SetColor playerTable.color
+
+						-- Text label.
+						with \Add "DOutlinedLabel"
+							\Dock FILL
+							\DockMargin shadowOffset, shadowOffset, shadowOffset, shadowOffset
+							\SetColor Color 64, 220, 64
+
+							\SetFont "NMW AU Meeting Chat"
+							\SetText tostring TRANSLATE("vote.voted") (playerTable and playerTable.nickname) or "???", remaining
+							\SetContentAlignment 4
+
+						\SetTall 0.6 * (2 * playerIconMargin + playerIconWidth)
+						\AlphaTo 255, 0.1
+
+			.PushMessage = (_, dock, playerTable, msg, voted = false) ->
+				with chatArea
+					local nicknameLabel, textLabel
+
+					children = \GetCanvas!\GetChildren!
+					if #children > 20
+						children[1]\Remove!
+
+					targetColor = (playerTable and IsValid(playerTable.entity) and
+						not GAMEMODE.GameData.DeadPlayers[playerTable]) and itemColor or itemColorDead
+
+					-- Container.
+					with container = \Add "Panel"
+						\Dock TOP
+						\DockMargin dock == RIGHT and chatLineDockMargin or 0, 0,
+							dock == LEFT and chatLineDockMargin or 0, shadowOffset * 2
+
+						\SetAlpha 0
+
+						.Color = targetColor
+						.Paint = paintVoteElement
+
+						if playerTable
+							-- Crewmate icon container.
+							with \Add "Panel"
+								\Dock LEFT
+								\SetWide playerIconWidth
+								\DockMargin playerIconMargin, playerIconMargin,
+									playerIconMargin, playerIconMargin
+
+								-- Crewmate icon.
+								with \Add "AmongUsCrewmate"
+									\Dock TOP
+									\SetSize playerIconWidth, playerIconWidth
+									\SetColor playerTable.color
+
+									if targetColor ~= itemColor or voted
+										-- Optional "modifier"-kind-of icon.
+										with \Add "DImage"
+											\SetMaterial if voted
+												MAT_MEETING_TABLET.voted
+											else
+												MAT_MEETING_TABLET.dead
+
+											\Dock FILL
+											\DockMargin playerIconWidth * 0.02, playerIconWidth * 0.48,
+												playerIconWidth * 0.48, playerIconWidth * 0.02
+
+						-- Nickname label.
+						nicknameLabel = with \Add "DOutlinedLabel"
+							\Dock TOP
+							\DockMargin shadowOffset, shadowOffset, shadowOffset, shadowOffset
+
+							\SetColor if GAMEMODE.GameData.Imposters[playerTable]
+								Color 255, 0, 0
+							else
+								Color 255, 255, 255
+
+							\SetFont "NMW AU Meeting Chat Nickname"
+							\SetText playerTable.nickname
+							\SetTall ScreenScale 14
+							\SetContentAlignment 4
+
+						-- Text label.
+						textLabel = with \Add "DLabel"
+							\SetColor Color 0, 0, 0
+							\SetFont "NMW AU Meeting Chat"
+							\SetText msg
+							\SetWrap true
+							\SetAutoStretchVertical true
+
+						-- https://youtu.be/z-JRdRXiNv4
+						\NewAnimation 0, 0, 0, -> \NewAnimation 0, 0, 0, ->
+							with textLabel
+								\SetWide nicknameLabel\GetWide!
+								\AlignLeft nicknameLabel\GetPos!
+								\MoveBelow nicknameLabel
+								\InvalidateLayout true
+
+							\NewAnimation 0, 0, 0, ->
+								\SizeToChildren false, true
+
+								\AlphaTo 255, 0.1
+								\NewAnimation 0, 0, 0, ->
+									\SetTall \GetTall! + shadowOffset * 0.5
+									chatArea\ScrollToChild container
+
+			handle = "NMW AU MeetingChat"
+
+			-- Append the chat text.
+			hook.Add "OnPlayerChat", handle, (ply, text) ->
+				if not IsValid chatArea
+					hook.Remove "OnPlayerChat", handle
+					return
+
+				playerTable = IsValid(ply) and ply\GetAUPlayerTable!
+
+				-- Sub the text if too long.
+				textLen = #text
+				text = string.sub text or "", 1, 100
+				if #text > 100
+					text ..= "..."
+
+				@__chatButton\Bump!
+				\PushMessage ply == LocalPlayer! and RIGHT or LEFT, playerTable,
+					text, @__voted[playerTable]
+
+			-- Close the chat overlay when clicked off.
+			hook.Add "VGUIMousePressed", handle, (panel, mouseCode) ->
+				if not IsValid chatArea
+					hook.Remove "VGUIMousePressed", handle
+					return
+
+				if mouseCode == MOUSE_FIRST and toggled and
+					panel ~= @__chatButton and not panel\HasParent innerArea
+						\Toggle!
+
+			-- We don't want the default chat to be drawn.
+			hook.Add "HUDShouldDraw", handle, (element) ->
+				if not IsValid chatArea
+					hook.Remove "HUDShouldDraw", handle
+					return
+
+				return false if element == "CHudChat"
+
+			.OnRemove = ->
+				hook.Remove "OnPlayerChat"    , handle
+				hook.Remove "VGUIMousePressed", handle
+				hook.Remove "HUDShouldDraw"   , handle
 
 		-- Create the inner panel.
 		with innerPanel = \Add "EditablePanel"
-			innerPanelSizeX = (733 / 856) * tabletWidth
-			innerPanelSizeY = (506 / 590) * tabletHeight
-			innerPanelPosX  = (37  / 856) * tabletWidth
-			innerPanelPosY  = (37  / 856) * tabletWidth
-			innerPanelMargin = maxSize * 0.015
-
 			\SetSize innerPanelSizeX , innerPanelSizeY
 			\SetPos  innerPanelPosX  , innerPanelPosY
-
-			headerHeight = tabletHeight * 0.12
-
-			footerMarginRight = headerHeight * 0.5
-			chatButtonMargin  = headerHeight * 0.05
-
-			-- Chat overlay.
-			@__chatOverlay = with innerPanel\Add "DImage"
-				local textInput
-
-				chatOverlaySizeX, chatOverlaySizeY = GAMEMODE.Render.FitMaterial MAT_MEETING_TABLET.chatOverlay,
-					innerPanelSizeX, innerPanelSizeY
-
-				chatOverlayInnerSizeX = 0.975 * chatOverlaySizeX
-				chatOverlayInnerSizeY = 0.975 * chatOverlaySizeY
-				\SetPos chatOverlaySizeX / 2 - chatOverlayInnerSizeX / 2,
-					chatOverlaySizeY / 2 - chatOverlayInnerSizeY / 2
-
-				chatOverlayInnerPadding = 0.0075 * chatOverlayInnerSizeX
-
-				\SetSize chatOverlayInnerSizeX, chatOverlayInnerSizeY
-				\SetZPos 90
-				\SetMouseInputEnabled true
-				\SetKeyboardInputEnabled true
-
-				\SetMaterial MAT_MEETING_TABLET.chatOverlay
-
-				\SetAlpha 0
-				\Hide!
-
-				toggled = false
-				.Toggle = ->
-					toggled = not toggled
-					if toggled
-						\Show!
-						\NewAnimation 0, 0, 0, ->
-							textInput\RequestFocus!
-
-					\AlphaTo toggled and 255 or 0, 0.1, nil, ->
-						if not toggled
-							\Hide!
-
-				local chatArea
-
-				-- Inner area.
-				innerArea = with \Add "EditablePanel"
-					\DockPadding chatOverlayInnerPadding, chatOverlayInnerPadding,
-						chatOverlayInnerPadding, chatOverlayInnerPadding
-
-					innerChatAreaPosX =  (8   / 700) * chatOverlayInnerSizeX
-					innerChatAreaPosY =  (8   / 486) * chatOverlayInnerSizeY
-					innerChatAreaSizeX = (636 / 700) * chatOverlayInnerSizeX
-					innerChatAreaSizeY = (480 / 486) * chatOverlayInnerSizeY
-
-					\SetPos  innerChatAreaPosX , innerChatAreaPosX
-					\SetSize innerChatAreaSizeX, innerChatAreaSizeY
-
-					-- Chat messages area.
-					chatArea = with \Add "DScrollPanel"
-						\Dock FILL
-						\DockMargin 0, 0, 0, chatOverlayInnerPadding
-
-					-- Input box.
-					textInput = with \Add "DTextEntry"
-						\DockMargin 0, 0, 0, chatOverlayInnerPadding
-						\SetTall ScreenScale 15
-						\Dock BOTTOM
-
-						\SetFont "NMW AU Meeting Chat"
-						\SetTextColor Color 255, 255, 255
-
-						.OnEnter = ->
-							RunConsoleCommand "say", \GetValue!
-							\SetText ""
-							\NewAnimation 0, 0, 0, ->
-								\RequestFocus!
-
-				playerIconWidth  = tabletHeight * 0.07
-				playerIconMargin = tabletHeight * 0.01
-
-				shadowOffset = tabletHeight * 0.006
-				with chatArea\GetCanvas!
-					\DockPadding shadowOffset, shadowOffset,
-						shadowOffset * 2, shadowOffset * 2
-
-				shadowColor   = Color 0, 0, 0, 100
-				itemColor     = Color 255, 255, 255
-				itemColorDead = Color 220, 220, 220
-
-				chatLineDockMargin = tabletHeight * 0.2
-
-				paintVoteElement = (w, h) =>
-					scissorX1, scissorY1 = chatArea\LocalToScreen 0, 0
-					scissorX2 = scissorX1 + chatArea\GetWide!
-					scissorY2 = scissorY1 + chatArea\GetTall!
-
-					render.SetScissorRect scissorX1, scissorY1, scissorX2, scissorY2, true
-					surface.DisableClipping true
-					draw.RoundedBox 16, shadowOffset, shadowOffset, w, h, shadowColor
-					surface.DisableClipping false
-					render.SetScissorRect 0, 0, 0, 0, false
-
-					draw.RoundedBox 16, 0, 0, w, h, @Color or itemColor
-
-				-- Push new vote message to the chat overlay.
-				.PushVote = (_, playerTable, remaining) ->
-					with chatArea
-						children = \GetCanvas!\GetChildren!
-						if #children > 20
-							children[1]\Remove!
-
-						-- Container.
-						with container = \Add "Panel"
-							\Dock TOP
-							\DockMargin chatLineDockMargin / 4, 0,
-								chatLineDockMargin or 0, shadowOffset * 2
-
-							\SetAlpha 0
-
-							.Paint = paintVoteElement
-
-							if playerTable
-								-- Crewmate icon.
-								with \Add "AmongUsCrewmate"
-									\Dock LEFT
-									margin = playerIconMargin * 0.6
-									\DockMargin margin, margin,
-										margin, margin
-
-									\SetWide playerIconWidth * 0.6
-									\SetColor playerTable.color
-
-							-- Text label.
-							with \Add "DLabel"
-								\Dock FILL
-								\DockMargin shadowOffset, shadowOffset, shadowOffset, shadowOffset
-								\SetColor Color 64, 220, 64
-
-								\SetFont "NMW AU Meeting Chat"
-								\SetText tostring TRANSLATE("vote.voted") playerTable.nickname, remaining
-								\SetContentAlignment 4
-
-							\SetTall 0.6 * (2 * playerIconMargin + playerIconWidth)
-							\AlphaTo 255, 0.1
-
-				.PushMessage = (_, dock, playerTable, msg, voted = false) ->
-					with chatArea
-						local nicknameLabel, textLabel
-
-						children = \GetCanvas!\GetChildren!
-						if #children > 20
-							children[1]\Remove!
-
-						targetColor = (playerTable and IsValid(playerTable.entity) and
-							not GAMEMODE.GameData.DeadPlayers[playerTable]) and itemColor or itemColorDead
-
-						-- Container.
-						with container = \Add "Panel"
-							\Dock TOP
-							\DockMargin dock == RIGHT and chatLineDockMargin or 0, 0,
-								dock == LEFT and chatLineDockMargin or 0, shadowOffset * 2
-
-							\SetAlpha 0
-
-							.Color = targetColor
-							.Paint = paintVoteElement
-
-							if playerTable
-								-- Crewmate icon container.
-								with \Add "Panel"
-									\Dock LEFT
-									\SetWide playerIconWidth
-									\DockMargin playerIconMargin, playerIconMargin,
-										playerIconMargin, playerIconMargin
-
-									-- Crewmate icon.
-									with \Add "AmongUsCrewmate"
-										\Dock TOP
-										\SetSize playerIconWidth, playerIconWidth
-										\SetColor playerTable.color
-
-										if targetColor ~= itemColor or voted
-											-- Optional "modifier"-kind-of icon.
-											with \Add "DImage"
-												\SetMaterial if voted
-													MAT_MEETING_TABLET.voted
-												else
-													MAT_MEETING_TABLET.dead
-
-												\Dock FILL
-												\DockMargin playerIconWidth * 0.02, playerIconWidth * 0.48,
-													playerIconWidth * 0.48, playerIconWidth * 0.02
-
-							-- Nickname label.
-							nicknameLabel = with \Add "DLabel"
-								\Dock TOP
-								\DockMargin shadowOffset, shadowOffset, shadowOffset, shadowOffset
-
-								\SetColor if GAMEMODE.GameData.Imposters[playerTable]
-									Color 255, 0, 0
-								else
-									Color 255, 255, 255
-
-								\SetFont "NMW AU Meeting Chat"
-								\SetText playerTable.nickname
-								\SizeToContents!
-
-							-- Text label.
-							textLabel = with \Add "DLabel"
-								\SetColor itemColor
-								\SetFont "NMW AU Meeting Chat"
-								\SetText msg
-								\SetWrap true
-								\SetAutoStretchVertical true
-
-							-- https://youtu.be/z-JRdRXiNv4
-							\NewAnimation 0, 0, 0, -> \NewAnimation 0, 0, 0, ->
-								with textLabel
-									\SetWide nicknameLabel\GetWide!
-									\AlignLeft nicknameLabel\GetPos!
-									\MoveBelow nicknameLabel
-									\InvalidateLayout true
-
-								\NewAnimation 0, 0, 0, ->
-									\SizeToChildren false, true
-
-									\AlphaTo 255, 0.1
-									chatArea\ScrollToChild container
-
-				handle = "NMW AU MeetingChat"
-
-				-- Append the chat text.
-				hook.Add "OnPlayerChat", handle, (ply, text) ->
-					if not IsValid chatArea
-						hook.Remove "OnPlayerChat", handle
-						return
-
-					playerTable = IsValid(ply) and ply\GetAUPlayerTable!
-
-					-- Sub the text if too long.
-					textLen = #text
-					text = string.sub text or "", 1, 100
-					if #text > 100
-						text ..= "..."
-
-					@__chatButton\Bump!
-					\PushMessage ply == LocalPlayer! and RIGHT or LEFT, playerTable,
-						text, @__voted[playerTable]
-
-				-- Close the chat overlay when clicked off.
-				hook.Add "VGUIMousePressed", handle, (panel, mouseCode) ->
-					if not IsValid chatArea
-						hook.Remove "VGUIMousePressed", handle
-						return
-
-					if mouseCode == MOUSE_FIRST and toggled and
-						panel ~= @__chatButton and not panel\HasParent innerArea
-							\Toggle!
-
-				-- We don't want the default chat to be drawn.
-				hook.Add "HUDShouldDraw", handle, (element) ->
-					if not IsValid chatArea
-						hook.Remove "HUDShouldDraw", handle
-						return
-
-					return false if element == "CHudChat"
-
-				.OnRemove = ->
-					hook.Remove "OnPlayerChat"    , handle
-					hook.Remove "VGUIMousePressed", handle
-					hook.Remove "HUDShouldDraw"   , handle
 
 			-- Header.
 			-- Contains the "Who is the Imposter?" label and some buttons.
@@ -631,8 +654,9 @@ meeting.OpenDiscuss = (caller) =>
 					) .. " " -- yea
 
 				-- Prepare the post-vote are that we can add voter icons to.
-				@__skipArea = with \Add "Panel"
+				with @__skipArea = \Add "Panel"
 					\Dock FILL
+					\InvalidateParent true
 					\SetAlpha 0
 
 					-- "Skipped Voting" icon.
@@ -643,10 +667,12 @@ meeting.OpenDiscuss = (caller) =>
 						.Paint = GAMEMODE.Render.DermaFitImage
 
 					-- The actual output.
-					.output = with \Add "Panel"
+					with .output = \Add "Panel"
+						verticalMargin = @__skipArea\GetTall! / 3.75
+						\DockMargin headerHeight * 0.05, verticalMargin,
+							0, verticalMargin
+
 						\Dock FILL
-						\DockMargin headerHeight * 0.05, headerHeight * 0.125,
-							0, headerHeight * 0.125
 
 				-- Bogus skip button.
 				@__voteItems[0] = with skipButton = \Add "DButton"
@@ -670,6 +696,7 @@ meeting.OpenDiscuss = (caller) =>
 					.Paint = GAMEMODE.Render.DermaFitImage
 
 					.DoClick = ->
+						return unless @CanIVote!
 						return if IsValid skipButton.confirm
 
 						surface.PlaySound "au/votescreen_avote.ogg"
@@ -753,6 +780,49 @@ meeting.OpenDiscuss = (caller) =>
 								.Paint = (_, w, h) ->
 									draw.RoundedBox 16, 0, 0, w, h, itemColor
 
+									if @__megaphoneAnimation
+										-- Let's enter the cringe zone.
+										-- This entire chunk of code is responsible for animating
+										-- the megaphone akin to the base game.
+										--
+										-- We need to disable clipping there, but luckily not for too long.
+										if playerTable == caller
+											value = (@__megaphoneAnimation.EndTime - SysTime!) /
+												(@__megaphoneAnimation.EndTime - @__megaphoneAnimation.StartTime)
+
+											value = math.Clamp value, 0, 1
+
+											if value == 1
+												return
+
+											mWidth, mHeight = GAMEMODE.Render.FitMaterial MAT_MEETING_TABLET.megaphone, w, h
+
+											if value ~= 0
+												surface.DisableClipping true
+
+												ltsx, ltsy = _\LocalToScreen 0, 0
+												v = Vector ltsx + w - mWidth * 1.25 + mWidth / 2, ltsy + h / 2, 0
+
+												with ROTATION_MATRIX
+													\Identity!
+													\Translate v
+													\Rotate Angle 0, (math.sin(math.rad(CurTime! * 1600))) * 24 * value, 0
+													\Translate -v
+
+												cam.PushModelMatrix ROTATION_MATRIX, true
+
+											expW = mWidth  * value
+											expH = mHeight * value
+
+											surface.SetMaterial MAT_MEETING_TABLET.megaphone
+											surface.SetDrawColor 255, 255, 255, 255 * (1 - value)
+											surface.DrawTexturedRect w - mWidth * 1.25 - expW/2, -expH/2,
+												mWidth + expW, mHeight + expH
+
+											if value ~= 0
+												cam.PopModelMatrix!
+												surface.DisableClipping false
+
 								.SetDark = (state) =>
 									return if state and not IsValid(playerTable.entity) or
 										GAMEMODE.GameData.DeadPlayers[playerTable]
@@ -777,10 +847,12 @@ meeting.OpenDiscuss = (caller) =>
 									-- Create the red cross overlay if the player is kil.
 									if not IsValid(playerTable.entity) or GAMEMODE.GameData.DeadPlayers[playerTable]
 										.PaintOver = (_, w, h) ->
-											value = if @__currentState == STATES.begins
-												math.min 1, math.max 0, (@__currentAnimation.StartTime + 0.4 - SysTime!) / 0.4
-											else
-												0
+											return unless @__kilAnimation
+
+											value = (@__kilAnimation.EndTime - SysTime!) /
+												(@__kilAnimation.EndTime - @__kilAnimation.StartTime)
+
+											value = math.Clamp value, 0, 1
 
 											return if value == 1
 
@@ -837,29 +909,29 @@ meeting.OpenDiscuss = (caller) =>
 										\Dock BOTTOM
 										\SetTall voteItemInnerSizeY / 2
 
-								if @CanIVote!
-									-- Button overlay.
-									with playerItem.button = \Add "DButton"
-										-- No visuals please.
-										\SetText ""
+								-- Button overlay.
+								with playerItem.button = \Add "DButton"
+									-- No visuals please.
+									\SetText ""
 
-										\SetSize voteItemInnerSizeX, voteItemInnerSizeY
-										\SetEnabled false
+									\SetSize voteItemInnerSizeX, voteItemInnerSizeY
+									\SetEnabled false
 
-										.Paint = (w, h) =>
-											surface.SetAlphaMultiplier @GetAlpha! / 255
-											draw.RoundedBox 16, 0, 0, w, h, shadowColor
-											surface.SetAlphaMultiplier 1
+									.Paint = (w, h) =>
+										surface.SetAlphaMultiplier @GetAlpha! / 255
+										draw.RoundedBox 16, 0, 0, w, h, shadowColor
+										surface.SetAlphaMultiplier 1
 
-										.DoClick = (this) ->
-											return if IsValid playerItem.confirm
+									.DoClick = (this) ->
+										return unless @CanIVote!
+										return if IsValid playerItem.confirm
 
-											surface.PlaySound "au/votescreen_avote.ogg"
+										surface.PlaySound "au/votescreen_avote.ogg"
 
-											playerItem.confirm = with @CreateConfirm this\GetTall! - playerIconMargin * 2, playerTable.id
-												\SetParent this
-												\CenterVertical!
-												\AlignRight playerIconMargin
+										playerItem.confirm = with @CreateConfirm this\GetTall! - playerIconMargin * 2, playerTable.id
+											\SetParent this
+											\CenterVertical!
+											\AlignRight playerIconMargin
 
 	-- The two crewmates talking animation you see before the meeting screen appears.
 	with discussAnim = @Add "Panel"
@@ -874,6 +946,7 @@ meeting.OpenDiscuss = (caller) =>
 			\Remove!
 
 		\MakePopup!
+		\SetKeyboardInputEnabled false
 
 		.Paint = (_, w, h) ->
 			if not _.circle
@@ -962,6 +1035,7 @@ meeting.OpenDiscuss = (caller) =>
 			\Remove!
 
 		\MakePopup!
+		\SetKeyboardInputEnabled false
 
 		.Image = MAT_DISCUSS.text
 		.Paint = GAMEMODE.Render.DermaFitImage
@@ -981,11 +1055,9 @@ meeting.ApplyVote = (playerTable, remaining) =>
 
 --- Ends the vote.
 -- @param results The table of results.
-meeting.End = (results = {}) =>
+meeting.End = (results = {}, time = 0) =>
 	@__currentState = STATES.proceeding
-	@__currentAnimation = @NewAnimation GAMEMODE.ConVarSnapshots.VotePostTime\GetInt! -
-		-- oooh yeah
-		(LocalPlayer!\Ping! / 1000), 0, 0
+	@__currentAnimation = @NewAnimation time - SysTime!, 0, 0
 
 	@DisableAllButtons!
 	@PurgeConfirms!
@@ -999,13 +1071,12 @@ meeting.End = (results = {}) =>
 
 			continue unless IsValid outputPanel
 
-			crewMargin = outputPanel\GetTall! * 0.1
+			crewMargin = outputPanel\GetTall! * 0.05
 			-- Display a mini-crewmate icon for each player that voted against this person.
 			for i, voter in ipairs result.votes
 				with outputPanel\Add "Panel"
 					\Dock LEFT
-					\DockMargin crewMargin, crewMargin,
-						crewMargin, crewMargin
+					\DockMargin 0, 0, 0, crewMargin
 
 					\SetWide outputPanel\GetTall!
 

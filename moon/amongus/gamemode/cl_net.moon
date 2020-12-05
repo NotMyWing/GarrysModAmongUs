@@ -230,7 +230,8 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	--
 	when GAMEMODE.FlowTypes.MeetingOpenDiscuss
 		caller = GAMEMODE.GameData.Lookup_PlayerByID[net.ReadUInt 8]
-		GAMEMODE.Hud.Meeting\OpenDiscuss caller
+		time = net.ReadDouble!
+		GAMEMODE.Hud.Meeting\OpenDiscuss caller, time
 
 	--
 	-- Meeting 2/4.
@@ -263,7 +264,9 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 
 				table.insert results, t
 
-			GAMEMODE.Hud.Meeting\End results
+			time = net.ReadDouble!
+
+			GAMEMODE.Hud.Meeting\End results, time
 
 	--
 	-- Meeting 4/4.

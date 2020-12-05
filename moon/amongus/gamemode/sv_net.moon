@@ -29,10 +29,11 @@ GM.Net_BroadcastCountdown = (time) =>
 
 --- Notifies the players that they should open their meeting tablets.
 -- @param playerTable Meeting caller.
-GM.Net_BroadcastDiscuss = (playerTable) =>
+GM.Net_BroadcastDiscuss = (playerTable, time) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.MeetingOpenDiscuss, @FlowSize
 	net.WriteUInt playerTable.id, 8
+	net.WriteDouble time
 	net.Broadcast!
 
 --- Notifies the players that they should open their meeting tablets.
@@ -90,7 +91,7 @@ GM.Net_BroadcastVote = (playerTable, remaining) =>
 
 --- Notifies the players about the meeting results.
 -- @param results Meeting/voting results.
-GM.Net_BroadcastMeetingEnd = (results) =>
+GM.Net_BroadcastMeetingEnd = (results, time) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.MeetingEnd, @FlowSize
 	net.WriteUInt #results, 8
@@ -99,6 +100,8 @@ GM.Net_BroadcastMeetingEnd = (results) =>
 		net.WriteUInt #result.votes, 8
 		for _, voter in pairs result.votes
 			net.WriteUInt voter.id, 8
+
+	net.WriteDouble time
 
 	net.Broadcast!
 
