@@ -166,7 +166,6 @@ GM.Meeting_End = =>
 			if timer.Exists "timelimit"
 				timer.UnPause "timelimit"
 
-			@Sabotage_RefreshAllCooldowns!
 			@SetMeetingInProgress false
 
 			hook.Call "GMAU MeetingEnd"
