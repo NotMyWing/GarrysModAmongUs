@@ -1,10 +1,9 @@
 node_modules/
-moon/itc/
-gamemodes/**/*.lua
-gamemodes/amongus/content
+dest/
 downloaded/
 lua/
 
 doc
 
 desktop.ini
+*.gma

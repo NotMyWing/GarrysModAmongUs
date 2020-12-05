@@ -17,11 +17,32 @@ function lastRunIgnoreErrors(task) {
 	}
 }
 
+const MATERIAL_GLOBS = [
+	'src/materials/**/*',
+	'!src/materials/**/*.svg',
+];
+
+const SOUND_GLOBS = [
+	'src/sound/**/*',
+];
+
+const MODEL_GLOBS = [
+	'src/models/**/*',
+];
+
+const MISC_GAMEMODE_ASSET_GLOBS = [
+	'src/gamemodes/amongus/*',
+];
+
+const METADATA_GLOBS = [
+	'src/addon.json',
+];
+
 /**
  * Cleans the build.
  */
 function clean() {
-	return del(['gamemodes/**/*.lua', 'gamemodes/amongus/content']);
+	return del(['dest/**/*']);
 }
 clean.description = "Cleans the build.";
 
@@ -30,21 +51,21 @@ clean.description = "Cleans the build.";
  * Minifies lua files.
  */
 function lua() {
-	return gulp.src('moon/**/*.lua', { since: lastRunIgnoreErrors(lua) })
+	return gulp.src('src/**/*.lua', { since: lastRunIgnoreErrors(lua) })
 		.pipe(minifyLua())
-		.pipe(gulp.dest('gamemodes'));
+		.pipe(gulp.dest('dest', { mode: 0777 }));
 }
-lua.description = "Minifies lua files.";
+lua.description = "Copies and minifies lua files.";
 
 
 /**
  * Compiles moonscript files.
  */
 function moon() {
-	return gulp.src('moon/**/*.moon', { since: lastRunIgnoreErrors(moon) })
+	return gulp.src('src/**/*.moon', { since: lastRunIgnoreErrors(moon) })
 		.pipe(compileMoonscript())
 		// .pipe(minifyLua())
-		.pipe(gulp.dest('gamemodes'));
+		.pipe(gulp.dest('dest', { mode: 0777 }));
 }
 moon.description = "Compiles moonscript files.";
 
@@ -61,49 +82,89 @@ scripts.description = "Builds the gamemode scripts.";
  */
 function watchScripts() {
 	return gulp.watch(
-		['moon/**/*.lua', 'moon/**/*.moon']
+		['src/**/*.lua', 'src/**/*.moon']
 		, scripts
 	)
 }
 watchScripts.displayName = "watch-scripts";
-watchScripts.description = "Watches lua files and compiles changes.";
+watchScripts.description = "Watches lua and moon files and compiles changes.";
 
 
 /**
  * Renders SVG assets.
  */
 function svg() {
-	return gulp.src('content/**/*.svg', { since: lastRunIgnoreErrors(svg) })
+	return gulp.src('src/**/*.svg', { since: lastRunIgnoreErrors(svg) })
 		//.pipe(svgmin())
 		.pipe(renderSvg())
-		.pipe(gulp.dest('gamemodes/amongus/content'));
+		.pipe(gulp.dest('dest', { mode: 0777 }));
 }
 svg.description = "Renders SVG assets.";
-
 
 /**
  * Copies materials.
  */
 function materials() {
-	return gulp.src(['content/**/*', '!content/**/*.svg'], { since: lastRunIgnoreErrors(materials) })
-		.pipe(gulp.dest('gamemodes/amongus/content'));
+	return gulp.src(MATERIAL_GLOBS, { since: lastRunIgnoreErrors(materials) })
+		.pipe(gulp.dest('dest/materials/', { mode: 0777 }));
 }
 materials.description = "Copies materials.";
 
+/**
+ * Copies sound files.
+ */
+function sound() {
+	return gulp.src(SOUND_GLOBS, { since: lastRunIgnoreErrors(materials) })
+		.pipe(gulp.dest('dest/sound/', { mode: 0777 }));
+}
+materials.description = "Copies sound files.";
+
+/**
+ * Copies model files.
+ */
+function model() {
+	return gulp.src(MODEL_GLOBS, { since: lastRunIgnoreErrors(materials) })
+		.pipe(gulp.dest('dest/models/', { mode: 0777 }));
+}
+materials.description = "Copies model files.";
+
+/**
+ * Copies misc gamemode asset files.
+ */
+function miscGamemodeAssets() {
+	return gulp.src(MISC_GAMEMODE_ASSET_GLOBS, { since: lastRunIgnoreErrors(materials) })
+		.pipe(gulp.dest('dest/gamemodes/amongus', { mode: 0777 }));
+}
+materials.description = "Copies misc gamemode asset files.";
+
+/**
+ * Copies metadata files.
+ */
+function metadata() {
+	return gulp.src(METADATA_GLOBS, { since: lastRunIgnoreErrors(materials) })
+		.pipe(gulp.dest('dest', { mode: 0777 }));
+}
+materials.description = "Copies metadata files.";
 
 /**
  * Generates and moves assets.
  */
-const assets = gulp.parallel(materials, svg);
+const assets = gulp.parallel(materials, sound, svg, model, miscGamemodeAssets, metadata);
 assets.description = "Generates and copies assets.";
 
 
 /**
- * Watches lua files and compiles changes.
+ * Watches asset files and compiles/copies changes.
  */
 function watchAssets() {
 	return gulp.watch(
-		['content/**/*']
+		[
+			...MATERIAL_GLOBS,
+			...SOUND_GLOBS,
+			...MODEL_GLOBS,
+			...MISC_GAMEMODE_ASSET_GLOBS,
+			...METADATA_GLOBS,
+		]
 		, assets
 	)
 }
