@@ -49,20 +49,18 @@ hud.Init = =>
 	hook.Add "OnScreenSizeChanged", "NMW AU Hud Size", ->
 		@SetSize ScrW!, ScrH!
 
-	with @buttons = @Add "Panel"
-		\SetTall ScrH! * 0.19
+	margin = ScreenScale 5
 
-		margin = ScreenScale 5
-		\DockMargin margin * 3, margin, margin * 3, margin
-		\Dock BOTTOM
+	with @buttons = @Add "Panel"
+		\SetSize ScrW! - margin * 6, ScrH! * 0.19
+		\AlignLeft margin * 3
+		\AlignBottom margin
 		\SetZPos -1
 
 	with @buttonsTwo = @Add "Panel"
-		\SetTall ScrH! * 0.19
-
-		margin = ScreenScale 5
-		\DockMargin margin * 3, margin, margin * 3, 0
-		\Dock BOTTOM
+		\SetSize ScrW! - margin * 6, ScrH! * 0.19
+		\AlignLeft margin * 3
+		\AlignBottom margin * 2 + ScrH! * 0.19
 		\SetZPos -1
 
 hud.SetTaskbarValue = (value) =>

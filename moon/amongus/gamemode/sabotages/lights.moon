@@ -26,6 +26,7 @@ if CLIENT
 			colorModifyParams["$pp_colour_contrast"] = 1 - (0.75 * FOG_MUL)
 			DrawColorModify colorModifyParams
 			DrawSharpen 1 * FOG_MUL, 3 * FOG_MUL
+
 comms = {
 	Init: (data) =>
 		@Base.Init @, data
@@ -96,7 +97,7 @@ if CLIENT
 
 			with base
 				\SetSabotage @
-				\Setup with vgui.Create "Panel"
+				\Setup with vgui.Create "DPanel"
 					max_size = ScrH! * 0.7
 
 					\SetSize max_size, max_size * 0.325

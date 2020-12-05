@@ -154,7 +154,7 @@ if CLIENT
 
 			with base
 				\SetSabotage @
-				\Setup with vgui.Create "Panel"
+				\Setup with vgui.Create "DPanel"
 					max_size = ScrH! * 0.5
 
 					\SetSize max_size * 0.6, max_size

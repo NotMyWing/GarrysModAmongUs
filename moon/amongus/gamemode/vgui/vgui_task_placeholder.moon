@@ -47,4 +47,4 @@ placeholder.Init = =>
 			draw.SimpleTextOutlined string.format("%ds", time), "NMW AU PlaceholderText",
 				w/2, h/2, clr, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 2, Color 0, 0, 0, 32
 
-vgui.Register "AmongUsTaskPlaceholder", placeholder, "Panel"
+vgui.Register "AmongUsTaskPlaceholder", placeholder, "DPanel"
