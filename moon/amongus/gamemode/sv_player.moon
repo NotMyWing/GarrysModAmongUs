@@ -417,6 +417,7 @@ hook.Add "KeyPress", "NMW AU KeyPress", (ply, key) ->
 		return unless playerTable and GAMEMODE\IsGameInProgress!
 
 		body = GAMEMODE\TracePlayer ply, GAMEMODE.TracePlayerFilter.Reportable
+		return unless IsValid body
 
 		if victimTable = GAMEMODE\GetPlayerTableFromCorpse body
 			GAMEMODE\Meeting_Start playerTable, victimTable.color
