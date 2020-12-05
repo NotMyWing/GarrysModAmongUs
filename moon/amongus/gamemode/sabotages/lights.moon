@@ -21,11 +21,64 @@ if CLIENT
 		elseif not FOG_ENABLED and FOG_MUL > 0
 			FOG_MUL = math.max 0, FOG_MUL - FrameTime! * 0.5
 
-		if FOG_MUL ~= 0 and not GAMEMODE.GameData.Imposters[GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!]]
+		if FOG_MUL ~= 0 and not LocalPlayer!\IsImposter!
 			colorModifyParams["$pp_colour_colour"] = 1 - (0.5 * FOG_MUL)
 			colorModifyParams["$pp_colour_contrast"] = 1 - (0.75 * FOG_MUL)
 			DrawColorModify colorModifyParams
 			DrawSharpen 1 * FOG_MUL, 3 * FOG_MUL
+
+	MAX_DISTANCE  = math.pow 128, 2
+	MIN_DISTANCE  = math.pow 64, 2
+	DISTANCE_DIFF = MAX_DISTANCE - MIN_DISTANCE
+
+	valueMemo = {}
+
+	-- Make the players fade with distance.
+	-- Store the value for other hooks.
+	hook.Add "PrePlayerDraw", "NMW AU Sabotage Fog", (ply) ->
+		if FOG_MUL > 0 and not LocalPlayer!\IsImposter!
+			distance = math.Clamp ply\GetPos!\DistToSqr(LocalPlayer!\GetPos!),
+				MIN_DISTANCE, MAX_DISTANCE
+
+			value = 1 - FOG_MUL * (1 - ((MAX_DISTANCE - distance) / DISTANCE_DIFF))
+
+			valueMemo[ply] = value
+
+			-- Don't draw at all if too far.
+			if value == 0
+				return true
+
+			render.SetBlend value
+
+	-- Restore the blend.
+	hook.Add "PostPlayerDraw", "NMW AU Sabotage Fog", (ply) ->
+		if FOG_MUL > 0 and not LocalPlayer!\IsImposter!
+			render.SetBlend 1
+
+	-- Hide the nicknames when the sabotage is active.
+	hook.Add "GMAU CalcNicknames", "NMW AU Sabotage Fog", (calc) ->
+		if FOG_MUL > 0 and not LocalPlayer!\IsImposter!
+			return true if (valueMemo[calc.player] or 1) <= 0
+
+	-- Override the rendering of corpse models.
+	corpseRenderOverride = =>
+		isImposter = LocalPlayer!\IsImposter!
+
+		if FOG_MUL > 0 and not isImposter
+			distance = math.Clamp @GetPos!\DistToSqr(LocalPlayer!\GetPos!),
+				MIN_DISTANCE, MAX_DISTANCE
+
+			value = 1 - FOG_MUL * (1 - ((MAX_DISTANCE - distance) / DISTANCE_DIFF))
+			render.SetBlend value
+
+		@DrawModel!
+
+		render.SetBlend 1 if FOG_MUL > 0 and not isImposter
+
+	-- Track all newly-created ragdolls
+	hook.Add "OnEntityCreated", "NMW AU Sabotage Fog Corpse", (ent) ->
+		if IsValid(ent) and GAMEMODE\IsPlayerBody(ent)
+			ent.RenderOverride = corpseRenderOverride
 
 comms = {
 	Init: (data) =>
