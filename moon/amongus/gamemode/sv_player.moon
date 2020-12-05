@@ -36,6 +36,7 @@ GM.Player_SetDead = (playerTable) =>
 		color.a = 90
 		playerTable.entity\SetColor color
 		playerTable.entity\SetRenderMode RENDERMODE_TRANSCOLOR
+		playerTable.entity\SetMoveType MOVETYPE_NOCLIP
 
 		-- Hide the player for alive players.
 		-- Unhide the player for dead players, and the other way around.
@@ -462,3 +463,7 @@ hook.Add "PlayerSay", "NMW AU DeadChat", (ply) ->
 hook.Add "IsSpawnpointSuitable", "NMW AU SpawnSuitable", -> true
 
 hook.Add "ShowHelp", "NMW AU ShowHelp", (ply) -> GAMEMODE\Net_SendShowHelp ply
+
+hook.Add "PlayerNoClip", "NMW AU NoClip", (ply) ->
+	if ply\IsDead!
+		return true

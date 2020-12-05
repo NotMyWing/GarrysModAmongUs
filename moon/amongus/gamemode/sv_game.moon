@@ -287,6 +287,7 @@ GM.Game_Restart = =>
 		ply\UnSpectate!
 		ply\Freeze false
 		ply\Spawn!
+		ply\SetMoveType MOVETYPE_WALK
 
 		if #spawns ~= 0
 			point = spawns[((index - 1) % #spawns) + 1]
