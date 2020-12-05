@@ -32,6 +32,13 @@ GM.Meeting_Start = (playerTable, bodyColor) =>
 
 	@GameData.Timers[handle] = true
 	timer.Create handle, 3, 1, ->
+		-- Call janitors to get rid of the bodies.
+		bodies = ents.FindByClass "prop_ragdoll"
+		for body in *bodies
+			continue unless @IsPlayerBody body
+
+			body\Remove!
+
 		-- Try find meeting start positions.
 		spawns = ents.FindByClass "info_player_meeting"
 		if #spawns == 0
