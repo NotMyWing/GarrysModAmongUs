@@ -156,10 +156,10 @@ GM.Game_Start = =>
 		table.sort @GameData.PlayerTables, (a, b) ->
 			-- I use this for testing.
 			-- Ignore.
-			-- if not a.entity\IsBot!
-			--	memo[a] = 1
-			-- if not b.entity\IsBot!
-			--	memo[b] = 1
+			if not a.entity\IsBot!
+				memo[a] = 1
+			if not b.entity\IsBot!
+				memo[b] = 1
 
 			memo[a] = memo[a] or math.random!
 			memo[b] = memo[b] or math.random!
