@@ -201,9 +201,9 @@ GM.Game_Start = =>
 			-- Assign preferred colors first
 			for ply in *slicedPlayers
 				preferred = math.floor math.min #@Colors,
-					math.max 0, ply.entity\GetInfoNum "au_preferred_color", 0
+					math.max 1, ply.entity\GetInfoNum "au_preferred_color", 1
 
-				if preferred ~= 0
+				if preferred ~= 0 and colors[preferred]
 					ply.color = colors[preferred]
 					ply.entity\SetPlayerColor ply.color\ToVector!
 
