@@ -69,6 +69,6 @@ function generateChangeLog(cb) {
 
 module.exports = [
 	rewriteVersion,
-	//zipGamemode,
-	//generateChangeLog
+	zipGamemode,
+	generateChangeLog
 ]
