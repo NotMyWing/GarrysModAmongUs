@@ -3,7 +3,6 @@ dist: focal
 # Only the main branch and tags
 branches:
   only:
-    - master
     - /^v\d+\.\d+\.\d+.*$/
 
 language: node_js

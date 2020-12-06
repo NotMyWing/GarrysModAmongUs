@@ -19,7 +19,7 @@ function rewriteVersion(cb) {
 					}
 
 					if (process.env.WORKSHOP_ID) {
-						contents = contents.replace("{{CI_WORSHOP_ID}}", process.env.WORKSHOP_ID);
+						contents = contents.replace("{{CI_WORKSHOP_ID}}", process.env.WORKSHOP_ID);
 					}
 
 					file.contents = Buffer.from(contents);
