@@ -677,7 +677,8 @@ hud.Think = =>
 				-- Wipe the task list and add a blinker.
 				-- Mess with the taskbar text.
 				if commsSabotaged
-					@__commsBlinker = with @AddTaskEntry!
+					@__commsBlinker = GAMEMODE\HUD_AddTaskEntry!
+					if IsValid @__commsBlinker then with @__commsBlinker
 						\SetColor Color 255, 230, 0
 						\SetText tostring TRANSLATE "tasks.commsSabotaged"
 						\SetBlink true

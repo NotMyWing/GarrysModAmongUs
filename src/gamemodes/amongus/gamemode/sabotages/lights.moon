@@ -102,7 +102,8 @@ comms = {
 				@SetActivationButtons btn
 				@SetLights GAMEMODE.Util.Shuffle { true, true, false, false, false }
 		else
-			@__taskEntry = with GAMEMODE\HUD_AddTaskEntry!
+			@__taskEntry = GAMEMODE\HUD_AddTaskEntry!
+			if IsValid @__taskEntry then with @__taskEntry
 				\SetColor Color 255, 230, 0
 				\SetText "..."
 				\SetBlink true

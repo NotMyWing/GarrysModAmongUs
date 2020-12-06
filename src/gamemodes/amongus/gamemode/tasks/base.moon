@@ -340,7 +340,8 @@ else
 			GAMEMODE\Net_SendSubmitTask data
 
 		.CreateTaskEntry = =>
-			@__taskEntry = with GAMEMODE\HUD_AddTaskEntry!
+			@__taskEntry = GAMEMODE\HUD_AddTaskEntry!
+			if IsValid @__taskEntry then with @__taskEntry
 				neutral = Color 255, 255, 255
 				completed = Color 0, 221, 0
 				progress = Color 255, 255, 0
