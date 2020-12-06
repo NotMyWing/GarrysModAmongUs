@@ -220,7 +220,7 @@ meeting.OpenDiscuss = (caller, time) =>
 		@__megaphoneAnimation = @NewAnimation 2, 0, 0
 		@__kilAnimation = @NewAnimation 0.35, 0, 0
 
-	@__currentAnimation = @NewAnimation time - SysTime!, 0, 0, ->
+	@__currentAnimation = @NewAnimation math.max(0, time - CurTime!), 0, 0, ->
 			-- Un-darken all buttons.
 			for id, voteItem in pairs @__voteItems
 				voteItem\SetEnabled true
@@ -1057,7 +1057,7 @@ meeting.ApplyVote = (playerTable, remaining) =>
 -- @param results The table of results.
 meeting.End = (results = {}, time = 0) =>
 	@__currentState = STATES.proceeding
-	@__currentAnimation = @NewAnimation time - SysTime!, 0, 0
+	@__currentAnimation = @NewAnimation math.max(0, time - CurTime!) - CurTime!, 0, 0
 
 	@DisableAllButtons!
 	@PurgeConfirms!

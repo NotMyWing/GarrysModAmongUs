@@ -70,7 +70,7 @@ GM.Meeting_Start = (playerTable, bodyColor) =>
 				\SetEyeAngles point\GetAngles!
 
 		time = @ConVarSnapshots.VotePreTime\GetInt! + DISCUSS_SPLASH_TIME
-		@Net_BroadcastDiscuss playerTable, SysTime! + time
+		@Net_BroadcastDiscuss playerTable, CurTime! + time
 
 		-- Wait for the meeting to start.
 		timer.Create handle, time, 1, ->
@@ -161,7 +161,7 @@ GM.Meeting_End = =>
 		maxVotes = voteCount if voteCount > maxVotes
 
 	time = @ConVarSnapshots.VotePostTime\GetInt! + (math.min(8, maxVotes) * 0.5 - .1)
-	@Net_BroadcastMeetingEnd voteTable, SysTime! + time
+	@Net_BroadcastMeetingEnd voteTable, CurTime! + time
 
 	timer.Create handle, time, 1, ->
 		@Net_BroadcastEject reason, ejected
