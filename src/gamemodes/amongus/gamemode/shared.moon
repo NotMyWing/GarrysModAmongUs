@@ -492,9 +492,9 @@ GM.GetDefaultPlayerModel = =>
 	return defaultModel
 
 GM.GetDefaultCorpseModel = =>
-	defaultCorpse = @ConVars.CorpseModel\GetString!
+	defaultCorpse = @ConVarSnapshots.CorpseModel\GetString!
 	if nil == defaultCorpse or "" == defaultCorpse
-		defaultCorpse = @ConVars.CorpseModel\GetDefault!
+		defaultCorpse = @ConVarSnapshots.CorpseModel\GetDefault!
 
 	return defaultCorpse
 
