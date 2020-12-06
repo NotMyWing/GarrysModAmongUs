@@ -1,0 +1,41 @@
+dist: focal
+
+# Only the main branch and tags
+branches:
+  only:
+    - master
+    - /^v\d+\.\d+\.\d+.*$/
+
+language: node_js
+node_js:
+  - 13
+
+# Install pre-requisites
+before_install:
+  - sudo apt-get install luarocks
+  - sudo luarocks install moonscript
+  - wget https://github.com/NotMyWing/gmad/releases/download/latest/gmad
+
+# Check if all necessary env. variables are set
+before_script:
+  - gulp travisChecks
+
+# Build the game mode and run post-build tasks.
+script:
+  - . .travis.sh
+
+deploy:
+  # Deploy release
+  - provider: releases
+    edge: true
+    skip_cleanup: true
+    token: "$GITHUB_TOKEN"
+    release_notes_file: dest/changelog.md
+    overwrite: true
+    file:
+      - ./dest/$DEST_ARCHIVE.zip
+      - ./dest/$DEST_ARCHIVE.gma
+
+    on:
+      tags: true
+      condition: $TAGGED_RELEASE = true

@@ -4,5 +4,9 @@
 	"tags": [
 		"cartoon",
 		"fun"
+	],
+	"ignore": [
+		"*.zip",
+		"changelog.md"
 	]
 }

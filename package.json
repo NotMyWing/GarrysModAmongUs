@@ -25,6 +25,9 @@
     "del": "^6.0.0",
     "gulp": "^4.0.2",
     "luamin": "^1.0.4",
-    "resvg-node": "^0.1.2"
+    "resvg-node": "^0.1.2",
+    "gulp-zip": "^5.0.2",
+    "mustache": "^4.1.0",
+    "through2": "^4.0.2"
   }
 }

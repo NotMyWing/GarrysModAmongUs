@@ -303,7 +303,7 @@ COLOR_BLACK = Color 0, 0, 0, 160
 
 hook.Add "HUDPaintBackground", "NMW AU Hud", ->
 	if GAMEMODE.ClientSideConVars.DrawVersion\GetBool!
-		draw.SimpleText GMAU_VERSION, "NMW AU Version",
+		draw.SimpleText "EARLY ALPHA BUILD. EXPECT BUGS.", "NMW AU Version",
 			ScrW! * 0.99, ScrH! * 0.01, COLOR_WHITE_VERSION,
 			TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP
 

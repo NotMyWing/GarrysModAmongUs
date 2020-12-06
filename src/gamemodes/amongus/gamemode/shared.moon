@@ -2,8 +2,6 @@
 -- Defines the game mode metadata fields, enums and exports some useful things.
 -- @module shared
 
-export GMAU_VERSION = "EARLY ALPHA BUILD. EXPECT BUGS."
-
 export GAMEMODE = GAMEMODE or GM
 
 AddCSLuaFile()
@@ -13,9 +11,11 @@ GM.Author 		= "NotMyWing and contributors, with assets by InnerSloth"
 GM.Email 		= "winwyv@gmail.com"
 GM.Website 		= "https://github.com/NotMyWing/GarrysModAmongUs"
 
--- TO-DO: should be changed via CI/CD.
-GM.Version = "manual-build"
-GM.WorkshopID = nil
+GM.Version    = "{{CI_GAMEMODE_VERSION}}"
+GM.WorkshopID = "{{CI_WORKSHOP_ID}}"
+
+GM.Version    = "manual-build" if GM.Version    == "{{" .. "CI_GAMEMODE_VERSION}}"
+GM.WorkshopID = nil            if GM.WorkshopID == "{{" .. "CI_WORKSHOP_ID}}"
 
 flags = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED
 

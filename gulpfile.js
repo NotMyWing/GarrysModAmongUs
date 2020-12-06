@@ -152,7 +152,6 @@ materials.description = "Copies metadata files.";
 const assets = gulp.parallel(materials, sound, svg, model, miscGamemodeAssets, metadata);
 assets.description = "Generates and copies assets.";
 
-
 /**
  * Watches asset files and compiles/copies changes.
  */
@@ -171,13 +170,11 @@ function watchAssets() {
 watchAssets.displayName = "watch-assets";
 watchAssets.description = "Watches assets.";
 
-
 /**
  * Builds everything.
  */
 const build = gulp.parallel(scripts, assets);
 build.description = "Builds everything.";
-
 
 /**
  * Cleans and builds the project, and then watches files for changes.
@@ -198,3 +195,13 @@ exports.watchScripts = watchScripts;
 exports.build = build;
 exports.watch = watch;
 exports.default = watch;
+
+const travisChecksTasks = require('./tools/travisChecks');
+exports.travisChecks = gulp.series(
+	...travisChecksTasks
+);
+
+const travisPostBuildTasks = require('./tools/travisPostBuild');
+exports.travisPostBuild = gulp.series(
+	...travisPostBuildTasks
+);
