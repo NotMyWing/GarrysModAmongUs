@@ -15,6 +15,7 @@ before_install:
   - sudo apt-get install luarocks
   - sudo luarocks install moonscript
   - wget https://github.com/NotMyWing/gmad/releases/download/latest/gmad
+  - sudo chmod 777 gmad
 
 # Check if all necessary env. variables are set
 before_script:
