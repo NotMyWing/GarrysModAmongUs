@@ -15,7 +15,7 @@ else
 	export TAGGED_RELEASE=false
 fi
 
-export DEST_ARCHIVE="${releaseName}"
+export DEST_ARCHIVE="$(echo $releaseName | tr '[:upper:]' '[:lower:]')"
 
 gulp build
 gulp travisPostBuild

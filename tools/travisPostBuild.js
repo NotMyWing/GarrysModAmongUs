@@ -1,6 +1,5 @@
 const gulp = require('gulp');
 const through = require('through2');
-const mustache = require('mustache');
 const zip = require('gulp-zip');
 const { getLastGitTag, getChangeLog } = require('./util');
 const { writeFileSync } = require('fs');
@@ -9,17 +8,21 @@ const { writeFileSync } = require('fs');
  * Rewrites the version in shared.lua.
  */
 function rewriteVersion(cb) {
-	const rules = {
-		CI_GAMEMODE_VERSION: process.env.TRAVIS_BRANCH,
-		CI_WORSHOP_ID      : process.env.WORKSHOP_ID
-	};
-
 	return gulp.src('dest/**/shared.lua')
 		.pipe(
 			through.obj((file, _, callback) => {
 				if (file.isBuffer()) {
-					const rendered = mustache.render(file.contents.toString(), rules);
-					file.contents = Buffer.from(rendered);
+					var contents = file.contents.toString();
+
+					if (process.env.TRAVIS_BRANCH) {
+						contents = contents.replace("{{CI_GAMEMODE_VERSION}}", process.env.TRAVIS_BRANCH);
+					}
+
+					if (process.env.WORKSHOP_ID) {
+						contents = contents.replace("{{CI_WORSHOP_ID}}", process.env.WORKSHOP_ID);
+					}
+
+					file.contents = Buffer.from(contents);
 				}
 				callback(null, file);
 			})
@@ -66,6 +69,6 @@ function generateChangeLog(cb) {
 
 module.exports = [
 	rewriteVersion,
-	zipGamemode,
-	generateChangeLog
+	//zipGamemode,
+	//generateChangeLog
 ]
