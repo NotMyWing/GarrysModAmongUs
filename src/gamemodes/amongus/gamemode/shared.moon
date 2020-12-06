@@ -74,6 +74,8 @@ GM.ConVars =
 
 	PlayerModel: CreateConVar "au_player_model", "models/amongus/player/player.mdl",
 		flags, ""
+	CorpseModel: CreateConVar "au_corpse_model", "models/amongus/player/corpse.mdl",
+		flags, ""
 
 --- Enum of all colors players can get.
 -- @table GM.Colors
@@ -488,6 +490,13 @@ GM.GetDefaultPlayerModel = =>
 		defaultModel = @ConVars.PlayerModel\GetDefault!
 
 	return defaultModel
+
+GM.GetDefaultCorpseModel = =>
+	defaultCorpse = @ConVars.CorpseModel\GetString!
+	if nil == defaultCorpse or "" == defaultCorpse
+		defaultCorpse = @ConVars.CorpseModel\GetDefault!
+
+	return defaultCorpse
 
 local logger
 logger = {

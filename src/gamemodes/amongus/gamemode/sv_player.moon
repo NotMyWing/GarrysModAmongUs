@@ -94,7 +94,7 @@ GM.Player_Kill = (victimTable, attackerTable) =>
 	with corpse = ents.Create "prop_ragdoll"
 		\SetPos victimTable.entity\GetPos!
 		\SetAngles victimTable.entity\GetAngles!
-		\SetModel "models/amongus/player/corpse.mdl"
+		\SetModel GAMEMODE\GetDefaultCorpseModel!
 		\SetCollisionGroup COLLISION_GROUP_DEBRIS_TRIGGER
 		\SetUseType SIMPLE_USE
 
