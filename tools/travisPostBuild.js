@@ -44,7 +44,8 @@ function zipGamemode() {
  */
 function generateChangeLog(cb) {
 	if (process.env.TAGGED_RELEASE == 'true') {
-		const tag = getLastGitTag(getLastGitTag());
+		const currentTag = getLastGitTag();
+		const tag = getLastGitTag(currentTag);
 
 		if (!tag) {
 			cb("Couldn't fetch the last Git tag");
@@ -56,9 +57,9 @@ function generateChangeLog(cb) {
 		}
 
 		if (changelog) {
-			changelog = `# Version ${tag}\nChanges since ${tag}:\n${changelog}`
+			changelog = `# Version ${currentTag}\nChanges since ${tag}:\n${changelog}`
 		} else {
-			changelog = `# Version ${tag}\nThere have been no changes since ${tag}.`
+			changelog = `# Version ${currentTag}\nThere have been no changes since ${tag}.`
 		}
 
 		writeFileSync('dest/changelog.md', changelog);
