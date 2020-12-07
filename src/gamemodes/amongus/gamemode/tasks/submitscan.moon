@@ -6,7 +6,7 @@ taskTable = {
 	Type: GM.TaskType.Long
 	Time: 10
 	CanUse: => not IsValid(@GetActivationButton!\GetNWEntity "Scanning") and
-		30 > @GetAssignedPlayer!.entity\GetPos!\Distance @GetActivationButton!\GetPos!
+		48 > @GetAssignedPlayer!.entity\GetPos!\Distance @GetActivationButton!\GetPos!
 
 	-- We don't need the base class' "Advance" method.
 	Advance: =>
@@ -19,12 +19,14 @@ taskTable = {
 			btn\SetNWFloat "Completion", CurTime! + @Time
 
 			handle = "medbay #{@GetID!}"
-			GAMEMODE.GameData.Timers[handle]
+			GAMEMODE.GameData.Timers[handle] = true
 			timer.Create handle, @Time, 1, ->
-				if IsValid(btn) and IsValid(@GetAssignedPlayer!.entity) and
-					@GetAssignedPlayer!.entity == btn\GetNWEntity "Scanning"
-						btn\SetNWEntity "Scanning", nil
+				if IsValid btn
+					assigned = @GetAssignedPlayer!.entity
+					if IsValid(assigned) and assigned == btn\GetNWEntity "Scanning"
 						@SetCompleted true
+
+					btn\SetNWEntity "Scanning", nil
 
 	OnCancel: (btn) =>
 		if @GetAssignedPlayer!.entity == btn\GetNWEntity "Scanning"
@@ -50,13 +52,12 @@ if CLIENT
 					\Dock FILL
 					\SizeToContents!
 
-					submitted = false
 					.Think = ->
 						time = @GetActivationButton!\GetNWFloat("Completion") or (CurTime! + @Time)
 						\SetText string.format "We scanning boiz, %d s.", math.max 0, time - CurTime!
-						if (time - CurTime!) < 0 and not submitted
-							submitted = true
+						if @GetCompleted!
 							base\Submit!
+							.Think = nil
 
 			\Popup!
 
