@@ -9,14 +9,14 @@ util.AddNetworkString "NMW AU Flow"
 GM.Net_UpdateGameState = (ply) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.GameState, @FlowSize
-	net.WriteUInt @GameData.State, 4
+	net.WriteUInt @GameData.State or 0, 4
 	net.Send ply
 
 --- Sends the game state update to everyone.
 GM.Net_BroadcastGameState = =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.GameState, @FlowSize
-	net.WriteUInt @GameData.State, 4
+	net.WriteUInt @GameData.State or 0, 4
 	net.Broadcast!
 
 --- Broadcasts a countdown.

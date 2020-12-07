@@ -60,7 +60,7 @@ concommand.Add "au_debug_restart", (ply) ->
 	if ply\IsAdmin!
 		GAMEMODE\Game_Restart!
 
-hook.Add "Initialize", "NMW AU Initialize", ->
+GM.Initialize = =>
 	MsgN!
 	GAMEMODE.Logger.Info "Thanks for installing Among Us for Garry's Mod!"
 	GAMEMODE.Logger.Info "Brought to you by NotMyWing and contributors"

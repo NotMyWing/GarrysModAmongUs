@@ -180,11 +180,11 @@ GM.TaskType = {
 
 --- Enum of game states.
 -- @warning This is probably redundant?
--- @field Preparing 1
--- @field Playing 2
+-- @field Preparing 0
+-- @field Playing 1
 GM.GameState = {
-	Preparing: 1
-	Playing: 2
+	Preparing: 0
+	Playing: 1
 }
 
 --- Enum of all reasons why a round can end.

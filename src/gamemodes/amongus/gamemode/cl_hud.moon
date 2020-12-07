@@ -287,11 +287,6 @@ GM.HUD_InitializeImposterMap = =>
 		@Hud.Map\SetColor Color 200, 20, 20
 		@Hud.Map\EnableSabotageOverlay!
 
-hook.Add "Initialize", "Init Hud", ->
-	GAMEMODE\HUD_Reset!
-
-	return
-
 ASSETS = {
 	btn: Material "au/gui/floatingbutton.png", "smooth"
 }

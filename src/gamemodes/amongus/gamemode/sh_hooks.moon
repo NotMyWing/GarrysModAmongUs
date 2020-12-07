@@ -1,6 +1,10 @@
 hook.Add "Move", "NMW AU Move", (ply, mvd) ->
 	@ = GAMEMODE
 
+	-- No hud? Have we not loaded the game mode yet?
+	-- How are we moving then???
+	return if CLIENT and not (IsValid(@Hud) or IsValid(@GameData))
+
 	playerTable = @GameData.Lookup_PlayerByEntity[ply]
 	isAlive = not GAMEMODE.GameData.DeadPlayers[playerTable]
 
