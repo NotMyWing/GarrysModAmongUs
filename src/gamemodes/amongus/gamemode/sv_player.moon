@@ -29,8 +29,9 @@ GM.Player_UnhideEveryone = =>
 -- @param ply Player entity.
 GM.Player_HideForAlivePlayers = (ply) =>
 	for otherPly in *player.GetAll!
+		continue if ply == otherPly
+
 		otherPlayerTable = otherPly\GetAUPlayerTable!
-		continue if otherPlayerTable == playerTable
 
 		if not otherPlayerTable or @GameData.DeadPlayers[otherPlayerTable]
 			ply\SetPreventTransmit otherPly, false
