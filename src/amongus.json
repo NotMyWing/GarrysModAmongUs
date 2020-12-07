@@ -1,0 +1,143 @@
+{
+	"amongus": {
+		"base": "base",
+		"title": "Among Us",
+		"maps":	"^au_",
+		"menusystem": 1,
+		"settings": [
+			{
+				"name": "au_max_imposters",
+				"text": "Maximum Imposters (1-10)",
+				"help": "The maximum number of imposters. The actual number of imposters per game is calculated using the formula (num_players - 1) / 6 + 1.",
+				"type": "Numeric",
+				"default": 1
+			}, {
+				"name": "au_min_players",
+				"text": "Minimum Players (3-128)",
+				"help": "The minimum number of players necessary for a game to begin.",
+				"type": "Numeric",
+				"default": 3
+			}, {
+				"name": "au_kill_cooldown",
+				"text": "Kill Cooldown (1-60)",
+				"help": "How long imposters must wait between kills, in seconds.",
+				"type": "Numeric",
+				"default": 20
+			}, {
+				"name": "au_killdistance_mod",
+				"text": "Kill Distance Multiplier (1-3)",
+				"help": "Multiplier for imposters' kill range. Can have decimals.",
+				"type": "Numeric",
+				"default": 1
+			}, {
+				"name": "au_confirm_ejects",
+				"text": "Confirm Ejects",
+				"help": "Should an ejected player's role be revealed?",
+				"type": "CheckBox",
+				"default": 1
+			}, {
+				"name": "au_dead_chat",
+				"text": "Dead Chat",
+				"help": "Should dead players be able to talk to one another?",
+				"type": "CheckBox",
+				"default": 0
+			}, {
+				"name": "au_game_chat",
+				"text": "Game Chat",
+				"help": "Should players be able to talk during the game?",
+				"type": "CheckBox",
+				"default": 0
+			}, {
+				"name": "au_time_limit",
+				"text": "Time Limit (0-1200)",
+				"help": "How long until crewmates win by default, in seconds. Set to 0 to disable entirely.",
+				"type": "Numeric",
+				"default": 600
+			}, {
+				"name": "au_countdown",
+				"text": "Countdown (1-10)",
+				"help": "How long the pre-round countdown lasts, in seconds.",
+				"type": "Numeric",
+				"default": 5
+			}, {
+				"name": "au_warmup_force_auto",
+				"text": "Warmup Force Auto",
+				"help": "Should autopoilot be enabled even if admins are online?",
+				"type": "CheckBox",
+				"default": 0
+			}, {
+				"name": "au_warmup_time",
+				"text": "Warmup Time (0-120)",
+				"help": "How long to wait before starting a new round, in seconds.",
+				"type": "Numeric",
+				"default": 60
+			}, {
+				"name": "au_meeting_cooldown",
+				"text": "Meeting Cooldown (1-60)",
+				"help": "How long players must wait before calling a meeting.",
+				"type": "Numeric",
+				"default": 20
+			}, {
+				"name": "au_meeting_available",
+				"text": "Meeting Available (1-5)",
+				"help": "How many meetings a player can call.",
+				"type": "Numeric",
+				"default": 2
+			}, {
+				"name": "au_meeting_vote_time",
+				"text": "Meeting Vote Time (1-90)",
+				"help": "How long players have to vote during a meeting, in seconds.",
+				"type": "Numeric",
+				"default": 30
+			}, {
+				"name": "au_meeting_vote_pre_time",
+				"text": "Meeting Vote Pre-time (1-60)",
+				"help": "How long players have to discuss events before voting, in seconds.",
+				"type": "Numeric",
+				"default": 15
+			}, {
+				"name": "au_meeting_vote_post_time",
+				"text": "Meeting Vote Post-time (1-20)",
+				"help": "How long after all votes are cast should players have to discuss?",
+				"type": "Numeric",
+				"default": 5
+			}, {
+				"name": "au_tasks_short",
+				"text": "Tasks Short (0-5)",
+				"help": "How many short tasks to give each player.",
+				"type": "Numeric",
+				"default": 2
+			}, {
+				"name": "au_tasks_long",
+				"text": "Tasks Long (0-5)",
+				"help": "How many long tasks to give each player.",
+				"type": "Numeric",
+				"default": 1
+			}, {
+				"name": "au_tasks_common",
+				"text": "Tasks Common (0-5)",
+				"help": "How many common tasks to give to all players.",
+				"type": "Numeric",
+				"default": 1
+			}, {
+				"name": "au_tasks_enable_visual",
+				"text": "Tasks Enable Visual",
+				"help": "Should tasks produce visual effects?",
+				"type": "CheckBox",
+				"default": 0
+			}, {
+				"name": "au_debug_bot_tasks",
+				"text": "Debug Bot Tasks",
+				"help": "Should bots be assigned tasks?",
+				"type": "CheckBox",
+				"default": 0
+			}, {
+				"name": "au_debug_bot_vote",
+				"text": "Debug Bot Vote",
+				"help": "Should bots cast votes in meetings?",
+				"type": "CheckBox",
+				"default": 0
+			}
+		]
+	}
+}

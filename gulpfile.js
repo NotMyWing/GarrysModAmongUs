@@ -4,6 +4,7 @@ const del = require('del');
 const renderSvg = require('./tools/resvg');
 const minifyLua = require('./tools/luamin');
 const compileMoonscript = require('./tools/moonscript');
+const compileKeyValue = require('./tools/keyValue');
 
 const lastRunCache = new Map();
 function lastRunIgnoreErrors(task) {
@@ -32,6 +33,10 @@ const MODEL_GLOBS = [
 
 const MISC_GAMEMODE_ASSET_GLOBS = [
 	'src/gamemodes/amongus/*',
+];
+
+const GAMEMODE_TEXT_FILE_GLOBS = [
+	'src/amongus.json'
 ];
 
 const METADATA_GLOBS = [
@@ -147,9 +152,19 @@ function metadata() {
 materials.description = "Copies metadata files.";
 
 /**
+ * Creates amongus.txt
+ */
+function gamemodeTextFile() {
+	return gulp.src(GAMEMODE_TEXT_FILE_GLOBS, { since: lastRunIgnoreErrors(materials) })
+		.pipe(compileKeyValue())
+		.pipe(gulp.dest('dest/gamemodes/amongus', { mode: 0777 }));
+}
+materials.description = "Creates amongus.txt";
+
+/**
  * Generates and moves assets.
  */
-const assets = gulp.parallel(materials, sound, svg, model, miscGamemodeAssets, metadata);
+const assets = gulp.parallel(materials, sound, svg, model, miscGamemodeAssets, gamemodeTextFile, metadata);
 assets.description = "Generates and copies assets.";
 
 /**
@@ -163,6 +178,7 @@ function watchAssets() {
 			...MODEL_GLOBS,
 			...MISC_GAMEMODE_ASSET_GLOBS,
 			...METADATA_GLOBS,
+			GAMEMODE_TEXT_FILE,
 		]
 		, assets
 	)

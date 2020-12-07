@@ -1,7 +1,0 @@
-"amongus"
-{
-	"base"		"base"
-	"title"		"Among Us"
-	"maps"		"^au_"
-	"menusystem"	"1"
-}
