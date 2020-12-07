@@ -34,7 +34,7 @@ deploy:
     overwrite: true
     file:
       - ./dest/$DEST_ARCHIVE.zip
-      - ./dest/$DEST_ARCHIVE.gma
+      - ./dest/$DEST_GMA.gma
 
     on:
       tags: true
