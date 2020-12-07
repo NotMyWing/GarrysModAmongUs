@@ -355,6 +355,9 @@ GM.TracePlayer = (playerTable, filter = 0) =>
 			-- Quite simply just bail out if the player is an imposter.
 			continue if @GameData.Imposters[playerTable]
 
+			-- Bail if the meeting is in progress.
+			continue if @IsMeetingInProgress!
+
 			if SERVER
 				-- Bail out if the player doesn't have this task, or if it's not the current button,
 				-- or if the button doesn't consent.
@@ -378,6 +381,7 @@ GM.TracePlayer = (playerTable, filter = 0) =>
 		-- Only highlight sabotage buttons when they're active, and when the player isn't dead.
 		if (entClass == "func_sabotage_button" or entClass == "prop_sabotage_button")
 			continue if @GameData.DeadPlayers[playerTable] or not @GameData.SabotageButtons[ent]
+			continue if @IsMeetingInProgress!
 
 		-- Only highlight doors when requested by sabotages.
 		if (entClass == "func_door" or entClass == "func_door_rotating")
@@ -387,6 +391,7 @@ GM.TracePlayer = (playerTable, filter = 0) =>
 		if (entClass == "func_meeting_button" or entClass == "prop_meeting_button")
 			continue if @GameData.DeadPlayers[playerTable]
 			continue if @IsMeetingDisabled!
+			continue if @IsMeetingInProgress!
 			continue if 0 >= ply\GetNWInt "NMW AU Meetings"
 
 			time = GetGlobalFloat("NMW AU NextMeeting") - CurTime!
