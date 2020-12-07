@@ -165,7 +165,7 @@ hook.Add "PostPlayerDraw", "NMW AU Nicknames", (ply) ->
 	pos += ply\GetPos! + Vector -pos.x, -pos.y, 2
 
 	-- Calculate the text angle.
-	angle = (pos - LocalPlayer!\GetPos!)\Angle!
+	angle = (pos - EyePos!)\Angle!
 	angle = Angle angle.p, angle.y, 0
 	angle.y += 10 * math.sin CurTime!
 
