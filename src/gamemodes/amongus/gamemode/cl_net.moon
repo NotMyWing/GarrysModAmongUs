@@ -125,12 +125,16 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		if imposter
 			GAMEMODE\HUD_InitializeImposterMap!
 
+		system.FlashWindow!
+
 	--
 	-- Display a countdown.
 	--
 	when GAMEMODE.FlowTypes.GameCountdown
 		if IsValid GAMEMODE.Hud
 			GAMEMODE\HUD_Countdown net.ReadDouble!
+
+			system.FlashWindow!
 
 	--
 	-- Read dead people. This gets sent before the meeting.
@@ -223,6 +227,8 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		GAMEMODE\HUD_DisplayMeeting caller, bodyColor
 		GAMEMODE\HUD_HideTaskList true
 
+		system.FlashWindow!
+
 	--
 	-- Meeting 2/4.
 	-- Unlocks voting.
@@ -233,6 +239,8 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		time = net.ReadDouble!
 		GAMEMODE.Hud.Meeting\OpenDiscuss caller, time
 
+		system.FlashWindow!
+
 	--
 	-- Meeting 2/4.
 	-- Makes an "I Voted" icon pop up above the voter.
@@ -242,6 +250,8 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		if voter
 			remaining = net.ReadUInt 8
 			GAMEMODE.Hud.Meeting\ApplyVote voter, remaining
+
+			system.FlashWindow!
 
 	--
 	-- Meeting 3/4.
@@ -267,6 +277,8 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 			time = net.ReadDouble!
 
 			GAMEMODE.Hud.Meeting\End results, time
+
+			system.FlashWindow!
 
 	--
 	-- Meeting 4/4.
@@ -295,6 +307,8 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 
 		GAMEMODE\HUD_DisplayEject reason, ply, confirm, imposter, remaining, total
 		GAMEMODE\HUD_HideTaskList false
+
+		system.FlashWindow!
 
 	--
 	-- React to game states.
@@ -326,6 +340,8 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 				GAMEMODE.GameData.Imposters[ply] = true
 
 		GAMEMODE\HUD_DisplayGameOver reason
+
+		system.FlashWindow!
 
 	--
 	-- Update the task data.
@@ -391,6 +407,8 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		if killerPlayerTable and localPlayerTable
 			GAMEMODE\HUD_PlayKill killerPlayerTable, localPlayerTable
 			GAMEMODE.GameData.DeadPlayers[localPlayerTable] = true
+
+		system.FlashWindow!
 
 	--
 	-- The server has paused our kill cooldown.
