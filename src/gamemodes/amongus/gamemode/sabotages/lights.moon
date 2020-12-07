@@ -15,13 +15,21 @@ if CLIENT
 	}
 
 	hook.Add "RenderScreenspaceEffects", "NMW AU Sabotage Fog Sharpen", ->
+		localPlayerTable = LocalPlayer!\GetAUPlayerTable!
+
+		shouldPaint = localPlayerTable and
+			not LocalPlayer!\IsImposter! and not LocalPlayer!\IsDead! and
+			not false == hook.Call "GMAU Lights ShouldFade", nil, ply
+
+		isFogEnabled = shouldPaint and GetGlobalBool "NMW AU LightsOff"
+
 		-- Modulate the fog if it's enabled.
-		if FOG_ENABLED and FOG_MUL < 1
+		if isFogEnabled and FOG_MUL < 1
 			FOG_MUL = math.min 1, FOG_MUL + FrameTime! * 0.3
-		elseif not FOG_ENABLED and FOG_MUL > 0
+		elseif not isFogEnabled and FOG_MUL > 0
 			FOG_MUL = math.max 0, FOG_MUL - FrameTime! * 0.5
 
-		if FOG_MUL ~= 0 and not LocalPlayer!\IsImposter!
+		if FOG_MUL ~= 0 and shouldPaint
 			colorModifyParams["$pp_colour_colour"] = 1 - (0.5 * FOG_MUL)
 			colorModifyParams["$pp_colour_contrast"] = 1 - (0.75 * FOG_MUL)
 			DrawColorModify colorModifyParams
@@ -36,7 +44,13 @@ if CLIENT
 	-- Make the players fade with distance.
 	-- Store the value for other hooks.
 	hook.Add "PrePlayerDraw", "NMW AU Sabotage Fog", (ply) ->
-		if FOG_MUL > 0 and not LocalPlayer!\IsImposter!
+		localPlayerTable = LocalPlayer!\GetAUPlayerTable!
+
+		shouldPaint = localPlayerTable and
+			not LocalPlayer!\IsImposter! and not LocalPlayer!\IsDead! and
+			not false == hook.Call "GMAU Lights ShouldFade", nil, ply
+
+		if FOG_MUL > 0 and shouldPaint
 			distance = math.Clamp ply\GetPos!\DistToSqr(LocalPlayer!\GetPos!),
 				MIN_DISTANCE, MAX_DISTANCE
 
@@ -48,32 +62,44 @@ if CLIENT
 			if value == 0
 				return true
 
+			ply.__fogBlend = render.GetBlend!
 			render.SetBlend value
 
 	-- Restore the blend.
 	hook.Add "PostPlayerDraw", "NMW AU Sabotage Fog", (ply) ->
-		if FOG_MUL > 0 and not LocalPlayer!\IsImposter!
-			render.SetBlend 1
+		if ply.__fogBlend
+			render.SetBlend ply.__fogBlend
+
+			ply.__fogBlend = nil
 
 	-- Hide the nicknames when the sabotage is active.
 	hook.Add "GMAU CalcNicknames", "NMW AU Sabotage Fog", (calc) ->
+		return if false == hook.Call "GMAU Lights ShouldFade", nil, ply
+
 		if FOG_MUL > 0 and not LocalPlayer!\IsImposter!
 			return true if (valueMemo[calc.player] or 1) <= 0
 
 	-- Override the rendering of corpse models.
 	corpseRenderOverride = =>
-		isImposter = LocalPlayer!\IsImposter!
+		return if false == hook.Call "GMAU Lights ShouldFade", nil, ply
 
-		if FOG_MUL > 0 and not isImposter
+		local oldBlend
+		shouldPaint = localPlayerTable and
+			not LocalPlayer!\IsImposter! and not LocalPlayer!\IsDead! and
+			not false == hook.Call "GMAU Lights ShouldFade", nil, ply
+
+		if FOG_MUL > 0 and not shouldPaint
 			distance = math.Clamp @GetPos!\DistToSqr(LocalPlayer!\GetPos!),
 				MIN_DISTANCE, MAX_DISTANCE
 
 			value = 1 - FOG_MUL * (1 - ((MAX_DISTANCE - distance) / DISTANCE_DIFF))
+
+			oldBlend = render.GetBlend!
 			render.SetBlend value
 
 		@DrawModel!
 
-		render.SetBlend 1 if FOG_MUL > 0 and not isImposter
+		render.SetBlend oldBlend if oldBlend
 
 	-- Track all newly-created ragdolls
 	hook.Add "OnEntityCreated", "NMW AU Sabotage Fog Corpse", (ent) ->
@@ -92,6 +118,7 @@ comms = {
 	OnStart: =>
 		@Base.OnStart @
 		if SERVER
+			SetGlobalBool "NMW AU LightsOff", true
 			local btn
 			for ent in *ents.GetAll!
 				if ent.GetSabotageName and ent\GetSabotageName! == @GetHandler!
@@ -101,6 +128,7 @@ comms = {
 			if btn
 				@SetActivationButtons btn
 				@SetLights GAMEMODE.Util.Shuffle { true, true, false, false, false }
+
 		else
 			@__taskEntry = GAMEMODE\HUD_AddTaskEntry!
 			if IsValid @__taskEntry then with @__taskEntry
@@ -109,8 +137,6 @@ comms = {
 				\SetBlink true
 				.OnBlink = ->
 					\SetText GAMEMODE.Lang.GetEntry("tasks.lightsSabotaged") 100 * (1 - FOG_MUL)
-
-			FOG_ENABLED = true
 
 	OnButtonUse: (playerTable, button) =>
 		if SERVER
@@ -131,10 +157,10 @@ comms = {
 		@Base.OnEnd @
 		if SERVER
 			@SetActivationButtons!
+			SetGlobalBool "NMW AU LightsOff", false
+
 		elseif IsValid @__taskEntry
 			@__taskEntry\Remove!
-
-			FOG_ENABLED = nil
 
 	SetLights: (value) =>
 		@__lights = value
