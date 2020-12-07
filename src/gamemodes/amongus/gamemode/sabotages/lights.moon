@@ -19,15 +19,15 @@ if CLIENT
 
 		shouldPaint = localPlayerTable and
 			not LocalPlayer!\IsImposter! and not LocalPlayer!\IsDead! and
-			not false == hook.Call "GMAU Lights ShouldFade", nil, ply
+			not false ~= hook.Call "GMAU Lights ShouldFade", nil, ply
 
-		isFogEnabled = shouldPaint and GetGlobalBool "NMW AU LightsOff"
+		isFogEnabled = GetGlobalBool "NMW AU LightsOff"
 
 		-- Modulate the fog if it's enabled.
 		if isFogEnabled and FOG_MUL < 1
-			FOG_MUL = math.min 1, FOG_MUL + FrameTime! * 0.3
+			FOG_MUL = math.min 1, FOG_MUL + FrameTime! * 0.4
 		elseif not isFogEnabled and FOG_MUL > 0
-			FOG_MUL = math.max 0, FOG_MUL - FrameTime! * 0.5
+			FOG_MUL = math.max 0, FOG_MUL - FrameTime! * 0.6
 
 		if FOG_MUL ~= 0 and shouldPaint
 			colorModifyParams["$pp_colour_colour"] = 1 - (0.5 * FOG_MUL)
@@ -48,7 +48,7 @@ if CLIENT
 
 		shouldPaint = localPlayerTable and
 			not LocalPlayer!\IsImposter! and not LocalPlayer!\IsDead! and
-			not false == hook.Call "GMAU Lights ShouldFade", nil, ply
+			not false ~= hook.Call "GMAU Lights ShouldFade", nil, ply
 
 		if FOG_MUL > 0 and shouldPaint
 			distance = math.Clamp ply\GetPos!\DistToSqr(LocalPlayer!\GetPos!),
@@ -86,7 +86,7 @@ if CLIENT
 		local oldBlend
 		shouldPaint = localPlayerTable and
 			not LocalPlayer!\IsImposter! and not LocalPlayer!\IsDead! and
-			not false == hook.Call "GMAU Lights ShouldFade", nil, ply
+			not false ~= hook.Call "GMAU Lights ShouldFade", nil, ply
 
 		if FOG_MUL > 0 and not shouldPaint
 			distance = math.Clamp @GetPos!\DistToSqr(LocalPlayer!\GetPos!),
