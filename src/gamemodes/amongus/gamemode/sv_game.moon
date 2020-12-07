@@ -12,7 +12,6 @@ GM.Game_GameOver = (reason) =>
 
 	@GameData.Timers[handle] = true
 	timer.Create handle, @SplashScreenTime - 1, 1, ->
-		@SetGameInProgress false
 		@Game_Restart!
 
 GM.Game_CheckWin = (reason) =>
@@ -63,13 +62,14 @@ GM.Game_CleanUp = (soft) =>
 
 	@PurgeGameData!
 
-	@SetGameInProgress false
-	@SetCommunicationsDisabled false
-
 	@Player_UnhideEveryone!
 	@Net_BroadcastCountdown 0
 
 	@SetGameCommencing false
+	@SetGameInProgress false
+	@SetMeetingDisabled false
+	@SetMeetingInProgress false
+	@SetCommunicationsDisabled false
 
 	timer.Remove "NMW AU CheckWin"
 

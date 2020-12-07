@@ -108,7 +108,7 @@ hook.Add "Tick", "NMW AU Highlight", ->
 	if GAMEMODE\IsMeetingInProgress!
 		GAMEMODE.UseHighlight = nil
 		GAMEMODE.ReportHighlight = nil
-		GAMEMODE.Kill = nil
+		GAMEMODE.KillHighlight = nil
 
 		nextTickCheck = SysTime! + 1
 		return
@@ -120,7 +120,7 @@ hook.Add "Tick", "NMW AU Highlight", ->
 	if not playerTable
 		GAMEMODE.UseHighlight = nil
 		GAMEMODE.ReportHighlight = nil
-		GAMEMODE.Kill = nil
+		GAMEMODE.KillHighlight = nil
 
 		nextTickCheck = SysTime! + 1
 		-- Always has been.
@@ -205,6 +205,8 @@ hook.Add "InitPostEntity", "NWM AU RequestUpdate", ->
 	net.Start "NMW AU Flow"
 	net.WriteUInt GAMEMODE.FlowTypes.RequestUpdate, GAMEMODE.FlowSize
 	net.SendToServer!
+
+	return
 
 hook.Add "CreateMove", "NMW AU KillScreenMove", (cmd) ->
 	if IsValid(GAMEMODE.Hud) and IsValid(GAMEMODE.Hud.Kill)
