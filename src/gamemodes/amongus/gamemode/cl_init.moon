@@ -219,12 +219,12 @@ hook.Add "CreateMove", "NMW AU KillScreenMove", (cmd) ->
 hook.Add "OnPlayerChat", "NMW AU DeadSay", (ply, text) ->
 	return unless ply\IsValid!
 
-	ghostColor, ghostText = if ply.IsDead and ply\IsDead!
+	prefixColor, prefixText = if ply.IsDead and ply\IsDead!
 		Color(255, 0, 0), "(GHOST CHAT) "
-	elseif not ply\GetAUPlayerTable!
+	elseif not ply\GetAUPlayerTable! and IsValid(ply) and ply\GetObserverMode! > 0
 		Color(64, 220, 64), "(SPECTATOR) "
 
-	chat.AddText ghostColor, ghostText, ply\GetPlayerColor!\ToColor! or ply\GetColor!, ply\Nick!,
+	chat.AddText prefixColor, prefixText, ply\GetPlayerColor!\ToColor! or ply\GetColor!, ply\Nick!,
 		Color(255, 255, 255), ": ", ply\IsDead! and Color(220, 220, 220), text
 
 	return true
