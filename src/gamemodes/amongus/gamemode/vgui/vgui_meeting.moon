@@ -1059,7 +1059,7 @@ meeting.ApplyVote = (playerTable, remaining) =>
 -- @param results The table of results.
 meeting.End = (results = {}, time = 0) =>
 	@__currentState = STATES.proceeding
-	@__currentAnimation = @NewAnimation math.max(0, time - CurTime!) - CurTime!, 0, 0
+	@__currentAnimation = @NewAnimation math.max(0, time - CurTime!), 0, 0
 
 	@DisableAllButtons!
 	@PurgeConfirms!
