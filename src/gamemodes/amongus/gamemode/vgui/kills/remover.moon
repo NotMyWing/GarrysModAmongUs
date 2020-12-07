@@ -79,8 +79,8 @@ remover.Play = (killer, victim) =>
 							if layer == 1
 								crewmates[2].SpriteBatch = ASSETS.corpseStand
 								surface.PlaySound table.Random {
-									"weapons/airboat/airboat_gun_lastshot1.ogg"
-									"weapons/airboat/airboat_gun_lastshot2.ogg"
+									"weapons/airboat/airboat_gun_lastshot1.wav"
+									"weapons/airboat/airboat_gun_lastshot2.wav"
 								}
 
 								-- Create a toolgun halo around the victim's head
