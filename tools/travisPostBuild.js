@@ -56,9 +56,9 @@ function generateChangeLog(cb) {
 		}
 
 		if (changelog) {
-			changelog = `Changes since ${tag}:\n${changelog}`
+			changelog = `# Version ${tag}\nChanges since ${tag}:\n${changelog}`
 		} else {
-			changelog = `There have been no changes since ${tag}`
+			changelog = `# Version ${tag}\nThere have been no changes since ${tag}.`
 		}
 
 		writeFileSync('dest/changelog.md', changelog);
