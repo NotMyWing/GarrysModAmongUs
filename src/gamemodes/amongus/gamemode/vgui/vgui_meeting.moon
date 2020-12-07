@@ -431,7 +431,7 @@ meeting.OpenDiscuss = (caller, time) =>
 						\SetTall 0.6 * (2 * playerIconMargin + playerIconWidth)
 						\AlphaTo 255, 0.1
 
-			.PushMessage = (_, dock, playerTable, msg, voted = false) ->
+			.PushMessage = (_, dock, ply, msg) ->
 				with chatArea
 					local nicknameLabel, textLabel
 
@@ -439,8 +439,11 @@ meeting.OpenDiscuss = (caller, time) =>
 					if #children > 20
 						children[1]\Remove!
 
+					playerTable = IsValid(ply) and ply\GetAUPlayerTable! or nil
 					targetColor = (playerTable and IsValid(playerTable.entity) and
 						not GAMEMODE.GameData.DeadPlayers[playerTable]) and itemColor or itemColorDead
+
+					voted = playerTable and @__voted[playerTable] or false
 
 					-- Container.
 					with container = \Add "Panel"
@@ -459,7 +462,7 @@ meeting.OpenDiscuss = (caller, time) =>
 								\Dock LEFT
 								\SetWide playerIconWidth
 								\DockMargin playerIconMargin, playerIconMargin,
-									playerIconMargin, playerIconMargin
+									0, playerIconMargin
 
 								-- Crewmate icon.
 								with \Add "AmongUsCrewmate"
@@ -482,7 +485,7 @@ meeting.OpenDiscuss = (caller, time) =>
 						-- Nickname label.
 						nicknameLabel = with \Add "DOutlinedLabel"
 							\Dock TOP
-							\DockMargin shadowOffset, shadowOffset, shadowOffset, shadowOffset
+							\DockMargin shadowOffset + playerIconMargin, shadowOffset, shadowOffset, shadowOffset
 
 							\SetColor if GAMEMODE.GameData.Imposters[playerTable]
 								Color 255, 0, 0
@@ -490,7 +493,9 @@ meeting.OpenDiscuss = (caller, time) =>
 								Color 255, 255, 255
 
 							\SetFont "NMW AU Meeting Chat Nickname"
-							\SetText playerTable.nickname
+							\SetText playerTable and playerTable.nickname or
+								(IsValid(ply) and ply\Nick! or "Console")
+
 							\SetTall ScreenScale 14
 							\SetContentAlignment 4
 
@@ -526,8 +531,6 @@ meeting.OpenDiscuss = (caller, time) =>
 					hook.Remove "OnPlayerChat", handle
 					return
 
-				playerTable = IsValid(ply) and ply\GetAUPlayerTable!
-
 				-- Sub the text if too long.
 				textLen = #text
 				text = string.sub text or "", 1, 100
@@ -535,8 +538,7 @@ meeting.OpenDiscuss = (caller, time) =>
 					text ..= "..."
 
 				@__chatButton\Bump!
-				\PushMessage ply == LocalPlayer! and RIGHT or LEFT, playerTable,
-					text, @__voted[playerTable]
+				\PushMessage ply == LocalPlayer! and RIGHT or LEFT, ply, text
 
 			-- Close the chat overlay when clicked off.
 			hook.Add "VGUIMousePressed", handle, (panel, mouseCode) ->

@@ -24,6 +24,20 @@ GM.Player_UnhideEveryone = =>
 	for ply in *player.GetAll!
 		@Player_Unhide ply
 
+--- Hides the player for alive players.
+-- Unhides the player for dead players and spectators, and the other way around.
+-- @param ply Player entity.
+GM.Player_HideForAlivePlayers = (ply) =>
+	for otherPly in *player.GetAll!
+		otherPlayerTable = otherPly\GetAUPlayerTable!
+		continue if otherPlayerTable == playerTable
+
+		if not otherPlayerTable or @GameData.DeadPlayers[otherPlayerTable]
+			ply\SetPreventTransmit otherPly, false
+			otherPly\SetPreventTransmit ply, false
+		else
+			ply\SetPreventTransmit otherPly, true
+
 --- Sets the player as dead.
 -- @param playerTable Player table.
 GM.Player_SetDead = (playerTable) =>
@@ -38,18 +52,10 @@ GM.Player_SetDead = (playerTable) =>
 		playerTable.entity\SetRenderMode RENDERMODE_TRANSCOLOR
 		playerTable.entity\SetMoveType MOVETYPE_NOCLIP
 
-		-- Hide the player for alive players.
-		-- Unhide the player for dead players, and the other way around.
-		for otherPlayerTable in *@GameData.PlayerTables
-			continue if otherPlayerTable == playerTable or not IsValid(otherPlayerTable.entity)
-
-			if @GameData.DeadPlayers[otherPlayerTable]
-				playerTable.entity\SetPreventTransmit otherPlayerTable.entity, false
-				otherPlayerTable.entity\SetPreventTransmit playerTable.entity, false
-			else
-				playerTable.entity\SetPreventTransmit otherPlayerTable.entity, true
+		@Player_HideForAlivePlayers playerTable.entity
 
 	@GameData.DeadPlayers[playerTable] = true
+	@Net_BroadcastDeadToGhosts!
 
 --- Attempts to get the person killed.
 -- If instead you just want to mark the player as dead,
@@ -119,7 +125,6 @@ GM.Player_Kill = (victimTable, attackerTable) =>
 
 	@Net_SendNotifyKilled victimTable, attackerTable
 	@Player_CloseVGUI victimTable
-	@Net_BroadcastDeadToGhosts!
 
 	@Game_CheckWin!
 
@@ -350,7 +355,6 @@ GM.PlayerSpawn = (ply) =>
 	ply\SetTeam 1
 	ply\SetNoCollideWithTeammates true
 
-
 hook.Add "PlayerInitialSpawn", "NMW AU AutoPilot", (ply) -> with GAMEMODE
 	oldAutoPilot = \IsOnAutoPilot!
 
@@ -442,9 +446,12 @@ shutYourUp = (listener, talker) ->
 
 		return false if playerTable and not talker\IsDead!
 
+	talkerTable   = talker\GetAUPlayerTable!
+	listenerTable = listener\GetAUPlayerTable!
+
 	-- If talker is dead, only display the message to other dead players.
 	return false if not GAMEMODE.ConVarSnapshots.DeadChat\GetBool! and
-		(talker\IsDead! and not listener\IsDead!)
+		((talker\IsDead! or not talkerTable) and not (listener\IsDead! or not listenerTable))
 
 hook.Add "PlayerCanHearPlayersVoice", "NMW AU DeadChat", shutYourUp
 hook.Add "PlayerCanSeePlayersChat", "NMW AU DeadChat", (_, _, a, b) -> shutYourUp a, b
@@ -452,9 +459,9 @@ hook.Add "PlayerCanSeePlayersChat", "NMW AU DeadChat", (_, _, a, b) -> shutYourU
 hook.Add "PlayerSay", "NMW AU DeadChat", (ply) ->
 	-- Suppress and notify if the player is trying to talk during the game.
 	if not GAMEMODE.ConVarSnapshots.GameChat\GetBool! and GAMEMODE\IsGameInProgress! and not GAMEMODE\IsMeetingInProgress!
-		playerTable = ply\GetAUPlayerTable!
+		playerTable = IsValid(ply) and ply\GetAUPlayerTable!
 
-		if playerTable and not ply\IsDead!
+		if playerTable
 			GAMEMODE\Net_SendGameChatError playerTable
 			return ""
 

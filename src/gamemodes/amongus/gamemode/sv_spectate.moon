@@ -49,7 +49,7 @@ hook.Add "PlayerSpawn", "NMW AU Spec", (ply) ->
 	if not GAMEMODE.__specInitialized[ply]
 		GAMEMODE.__specInitialized[ply] = true
 		if GAMEMODE\IsGameInProgress!
-			GAMEMODE\Player_Hide ply
+			GAMEMODE\Player_HideForAlivePlayers ply
 			GAMEMODE\Spectate_CycleMode ply
 		else
 			preferred = math.floor math.min #GAMEMODE.Colors,
