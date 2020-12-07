@@ -1,66 +1,91 @@
 return vgui.RegisterTable {
-	__tracking: {}
-
 	Init: =>
+		@__tracking = {}
 		@SetDeleteOnClose false
 
-	SetupFromManifest: (manifest) =>
-		@BaseClass.SetupFromManifest @, manifest
+		oldPopup = @Popup
+		@Popup = (...) =>
+			if oldPopup and oldPopup @, ...
+				@SetKeyboardInputEnabled false
 
-		innerPanel = @GetInnerPanel!
-		if manifest.Sabotages
-			with @sabotageOverlay = innerPanel\Add "Panel"
-				w, h = innerPanel\GetSize!
-				\SetSize w, h
-				\SetZPos 30000
-				\Hide!
+		oldThink = @Think
+		@Think = (...) =>
+			oldThink and oldThink @, ...
 
-				buttonSize = 0.085 * math.min w, h
-				for id, sabotage in ipairs manifest.Sabotages
-					if sabotage.UI
-						with \Add "DImageButton"
-							\SetMaterial sabotage.UI.Icon
-							\SetSize buttonSize, buttonSize
-							\SetPos w * sabotage.UI.Position.x - buttonSize/2, h * sabotage.UI.Position.y - buttonSize/2
-							.DoClick = ->
-								GAMEMODE\Net_SabotageRequest id
+			size = math.max @GetInnerPanel!\GetSize!
+			baseW, baseH = @GetBackgroundMaterialSize!
+			resolution = @GetResolution!
+			scale = @GetScale!
+			position = @GetPosition!
 
-							.Think = ->
-								instance = GAMEMODE.GameData.Sabotages[id]
+			for entity, element in pairs @__tracking
+				if IsValid(entity) and IsValid(element)
+					pos = entity\GetPos!
+					w, h = element\GetSize!
 
-								if instance
-									enabled = \IsEnabled!
-									canSetOff = not GAMEMODE\IsMeetingInProgress! and
-										not IsValid(GAMEMODE.UseHighlight) and
-										not GAMEMODE.GameData.Vented and
-										instance\CanStart!
+					element\SetPos (pos.x - position.x) / (baseW * scale) * size * resolution - w/2,
+						(position.y - pos.y) / (baseW * scale) * size * resolution - h/2
+				else
+					@UnTrack entity
 
-									if enabled and not canSetOff
-										\SetEnabled false
-									elseif not enabled and canSetOff
-										\SetEnabled true
+		oldSetupFromManifest = @SetupFromManifest
+		@SetupFromManifest = (manifest) =>
+			oldSetupFromManifest and oldSetupFromManifest @, manifest
 
-							with \Add "DLabel"
-								\Dock FILL
-								\SetContentAlignment 5
-								\SetText "..."
-								\SetFont "NMW AU Map Labels"
-								\SetColor Color 255, 255, 255
+			innerPanel = @GetInnerPanel!
+			if manifest.Sabotages
+				with @sabotageOverlay = innerPanel\Add "Panel"
+					w, h = innerPanel\GetSize!
+					\SetSize w, h
+					\SetZPos 30000
+					\Hide!
+
+					buttonSize = 0.085 * math.min w, h
+					for id, sabotage in ipairs manifest.Sabotages
+						if sabotage.UI
+							with \Add "DImageButton"
+								\SetMaterial sabotage.UI.Icon
+								\SetSize buttonSize, buttonSize
+								\SetPos w * sabotage.UI.Position.x - buttonSize/2, h * sabotage.UI.Position.y - buttonSize/2
+								.DoClick = ->
+									GAMEMODE\Net_SabotageRequest id
+
 								.Think = ->
 									instance = GAMEMODE.GameData.Sabotages[id]
-									if instance
-										if instance\GetActive!
-											\SetText "!"
-										else
-											time = if instance\GetCooldownOverride! ~= 0
-												instance\GetCooldownOverride!
-											else
-												instance\GetNextUse! - CurTime!
 
-											if not instance\GetDisabled! and time > 0
-												\SetText math.floor time
+									if instance
+										enabled = \IsEnabled!
+										canSetOff = not GAMEMODE\IsMeetingInProgress! and
+											not IsValid(GAMEMODE.UseHighlight) and
+											not GAMEMODE.GameData.Vented and
+											instance\CanStart!
+
+										if enabled and not canSetOff
+											\SetEnabled false
+										elseif not enabled and canSetOff
+											\SetEnabled true
+
+								with \Add "DLabel"
+									\Dock FILL
+									\SetContentAlignment 5
+									\SetText "..."
+									\SetFont "NMW AU Map Labels"
+									\SetColor Color 255, 255, 255
+									.Think = ->
+										instance = GAMEMODE.GameData.Sabotages[id]
+										if instance
+											if instance\GetActive!
+												\SetText "!"
 											else
-												\SetText ""
+												time = if instance\GetCooldownOverride! ~= 0
+													instance\GetCooldownOverride!
+												else
+													instance\GetNextUse! - CurTime!
+
+												if not instance\GetDisabled! and time > 0
+													\SetText math.floor time
+												else
+													\SetText ""
 
 	Track: (entity, element, track = true) =>
 		if IsValid entity
@@ -83,28 +108,5 @@ return vgui.RegisterTable {
 	EnableSabotageOverlay: =>
 		if IsValid @sabotageOverlay
 			@sabotageOverlay\Show!
-
-	Think: =>
-		@BaseClass.Think and @BaseClass.Think @
-
-		size = math.max @GetInnerPanel!\GetSize!
-		baseW, baseH = @GetBackgroundMaterialSize!
-		resolution = @GetResolution!
-		scale = @GetScale!
-		position = @GetPosition!
-
-		for entity, element in pairs @__tracking
-			if IsValid(entity) and IsValid(element)
-				pos = entity\GetPos!
-				w, h = element\GetSize!
-
-				element\SetPos (pos.x - position.x) / (baseW * scale) * size * resolution - w/2,
-					(position.y - pos.y) / (baseW * scale) * size * resolution - h/2
-			else
-				@UnTrack entity
-
-	Popup: =>
-		if @BaseClass.Popup @
-			@SetKeyboardInputEnabled false
 
 }, "AmongUsMapBase"
