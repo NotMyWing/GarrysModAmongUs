@@ -28,6 +28,7 @@ flags = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED
 -- @field KillDistanceMod (Number) Kill distance multiplier.
 -- @field ConfirmEjects (Bool) Should the ejects be confirmed?
 -- @field AllTalk (Bool) Should players be able to talk without restrictions?
+-- @field TaskbarUpdates (Integer) When should the taskbar be updated?
 -- @field MeetingCooldown (Integer) Meeting cooldown.
 -- @field MeetingsPerPlayer (Integer) How many meetings a crewmate can call.
 -- @field VoteTime (Integer) How long the voting lasts.
@@ -49,6 +50,7 @@ GM.ConVars =
 	KillDistanceMod: CreateConVar "au_killdistance_mod", 1 , flags, "", 1, 3
 	ConfirmEjects:   CreateConVar "au_confirm_ejects"  , 1 , flags, "", 0, 1
 	AllTalk:         GetConVar "sv_alltalk"
+	TaskbarUpdates:  CreateConVar "au_taskbar_updates" , 0 , flags, "", 0, 2
 
 	MeetingCooldown:   CreateConVar "au_meeting_cooldown"      , 20, flags, "", 1, 60
 	MeetingsPerPlayer: CreateConVar "au_meeting_available"     , 2 , flags, "", 1, 5

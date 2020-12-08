@@ -25,6 +25,7 @@ GM.ConVarsDisplay = {
 			{ "Time" , "TimeLimit"       }
 			{ "Mod"  , "KillDistanceMod" }
 			{ "Bool" , "AllTalk"         }
+			{ "Select" , "TaskbarUpdates"  }
 		}
 	}
 	{
