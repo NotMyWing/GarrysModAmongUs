@@ -398,6 +398,9 @@ meeting.OpenDiscuss = (caller, time) =>
 			-- Push new vote message to the chat overlay.
 			.PushVote = (_, playerTable, remaining) ->
 				with chatArea
+					shouldScroll = chatArea\GetTall! + chatArea\GetVBar!\GetScroll! >
+						chatArea\GetCanvas!\GetTall! - (chatArea\GetTall! / 4)
+
 					children = \GetCanvas!\GetChildren!
 					if #children > GAMEMODE.ClientSideConVars.MaxChatMessages\GetInt!
 						children[1]\Remove!
@@ -434,11 +437,16 @@ meeting.OpenDiscuss = (caller, time) =>
 							\SetContentAlignment 4
 
 						\SetTall 0.6 * (2 * playerIconMargin + playerIconWidth)
+
+						chatArea\ScrollToChild container if shouldScroll
 						\AlphaTo 255, 0.1
 
 			.PushMessage = (_, dock, ply, msg) ->
 				with chatArea
 					local nicknameLabel, textLabel
+
+					shouldScroll = chatArea\GetTall! + chatArea\GetVBar!\GetScroll! >
+						chatArea\GetCanvas!\GetTall! - (chatArea\GetTall! / 4)
 
 					children = \GetCanvas!\GetChildren!
 					if #children > GAMEMODE.ClientSideConVars.MaxChatMessages\GetInt!
@@ -523,9 +531,11 @@ meeting.OpenDiscuss = (caller, time) =>
 							\NewAnimation 0, 0, 0, ->
 								\SizeToChildren false, true
 
-								\AlphaTo 255, 0.1
 								\NewAnimation 0, 0, 0, ->
 									\SetTall \GetTall! + shadowOffset * 0.5
+									\AlphaTo 255, 0.1
+
+									chatArea\ScrollToChild container if shouldScroll
 
 			handle = "NMW AU MeetingChat"
 
