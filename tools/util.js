@@ -82,9 +82,21 @@ exports.getLastGitTag = getLastGitTag;
  * Generates a changelog based on the two provided Git refs.
  * @param {string} since Lower boundary Git ref.
  * @param {string} to Upper boundary Git ref.
+ * @param {string[]} dirs Optional scopes.
  */
-function getChangeLog(since = "HEAD", to = "HEAD") {
-	return exec(`git log --date="format:%d %b %Y" --pretty="* %s - **%an** (%ad)" ${since}..${to}`).toString().trim();
+function getChangeLog(since = "HEAD", to = "HEAD", dirs = undefined) {
+	const command = [
+		`git log`,
+		`--date="format:%d %b %Y"`,
+		`--pretty="* %s - **%an** (%ad)"`,
+		`${since}..${to}`
+	];
+
+	if (dirs) {
+		command.push("--", dirs.join(" -- "));
+	}
+
+	return exec(command.join(" ")).toString().trim();
 }
 
 exports.getChangeLog = getChangeLog;

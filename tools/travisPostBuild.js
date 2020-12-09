@@ -51,10 +51,7 @@ function generateChangeLog(cb) {
 			cb("Couldn't fetch the last Git tag");
 		}
 
-		var changelog = getChangeLog(tag);
-		if (!changelog) {
-			cb("Couldn't create a changelog")
-		}
+		var changelog = getChangeLog(tag, undefined, ["src"]);
 
 		if (changelog) {
 			changelog = `# Version ${currentTag}\nChanges since ${tag}:\n${changelog}`
