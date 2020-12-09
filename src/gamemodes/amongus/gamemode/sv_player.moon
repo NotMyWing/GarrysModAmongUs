@@ -431,38 +431,45 @@ hook.Add "KeyPress", "NMW AU KeyPress", (ply, key) ->
 	return
 
 hook.Add "PlayerSpray", "NMW AU DeadSpray", (ply) ->
-	return if GAMEMODE.ConVarSnapshots.DeadChat\GetBool! or not GAMEMODE\IsGameInProgress!
+	-- Bail if not playing, or if alltalk is enabled.
+	return unless GAMEMODE\IsGameInProgress!
+	return if GAMEMODE.ConVarSnapshots.AllTalk\GetBool!
 
-	playerTable = GAMEMODE.GameData.Lookup_PlayerByEntity[ply]
-
-	return not (playerTable and not GAMEMODE.GameData.DeadPlayers[playerTable])
+	-- Disable spraying if dead or spectator.
+	return true if not ply\GetAUPlayerTable! or ply\IsDead!
 
 shutYourUp = (listener, talker) ->
+	-- Bail if not playing, or if alltalk is enabled.
+	return unless GAMEMODE\IsGameInProgress!
+	return if GAMEMODE.ConVarSnapshots.AllTalk\GetBool!
+
 	-- Console message...?
 	return unless IsValid(listener) and IsValid(talker)
 
 	-- No talking during game, unless it's a meeting.
-	if not GAMEMODE.ConVarSnapshots.GameChat\GetBool! and GAMEMODE\IsGameInProgress! and not GAMEMODE\IsMeetingInProgress!
+	if not GAMEMODE\IsMeetingInProgress!
 		playerTable = talker\GetAUPlayerTable!
 
 		return false if playerTable and not talker\IsDead!
 
-	talkerTable   = talker\GetAUPlayerTable!
-	listenerTable = listener\GetAUPlayerTable!
-
-	-- If talker is dead, only display the message to other dead players.
-	return false if not GAMEMODE.ConVarSnapshots.DeadChat\GetBool! and
-		((talker\IsDead! or not talkerTable) and not (listener\IsDead! or not listenerTable))
+	-- If talker is dead or a spectator, only display the message to other dead players/spectators.
+	return false if ((talker\IsDead! or not talker\GetAUPlayerTable!) and
+		not (listener\IsDead! or not listener\GetAUPlayerTable!))
 
 hook.Add "PlayerCanHearPlayersVoice", "NMW AU DeadChat", shutYourUp
 hook.Add "PlayerCanSeePlayersChat", "NMW AU DeadChat", (_, _, a, b) -> shutYourUp a, b
 
 hook.Add "PlayerSay", "NMW AU DeadChat", (ply) ->
+	-- Bail if not playing, or if alltalk is enabled.
+	return unless GAMEMODE\IsGameInProgress!
+	return if GAMEMODE.ConVarSnapshots.AllTalk\GetBool!
+
 	-- Suppress and notify if the player is trying to talk during the game.
-	if not GAMEMODE.ConVarSnapshots.GameChat\GetBool! and GAMEMODE\IsGameInProgress! and not GAMEMODE\IsMeetingInProgress!
+	if not GAMEMODE\IsMeetingInProgress!
 		playerTable = IsValid(ply) and ply\GetAUPlayerTable!
 
-		if playerTable
+		-- ...unless he's dead/a spectator.
+		if (playerTable and not ply\IsDead!) or not playerTable
 			GAMEMODE\Net_SendGameChatError playerTable
 			return ""
 
