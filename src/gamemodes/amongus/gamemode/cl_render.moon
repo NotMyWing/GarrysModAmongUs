@@ -90,7 +90,7 @@ color_white = Color 255, 255, 255
 GM.GetHighlightColor = (entity) => if IsValid entity
 	return (entity\GetNWVector "NMW AU HighlightColor")\ToColor! if entity\GetNWBool "NMW AU UseHighlight"
 
-	hookResult = hook.Call "GMAU ShouldHighlight"
+	hookResult = hook.Call "GMAU ShouldHighlight", nil, entity
 	return color_white if hookResult == true
 	return hookResult if IsColor hookResult
 

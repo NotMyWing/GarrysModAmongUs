@@ -30,7 +30,7 @@ GM.Meeting_Start = (playerTable, bodyColor) =>
 	else
 		@Logger.Info "#{playerTable.nickname} has called a meeting"
 
-	hook.Call "GMAU MeetingStart", nil, bodyColor
+	hook.Call "GMAU MeetingStart", nil, playerTable.entity, bodyColor
 
 	@GameData.Timers[handle] = true
 	timer.Create handle, 3, 1, ->
@@ -168,12 +168,14 @@ GM.Meeting_End = =>
 
 		if ejected
 			@Logger.Info "#{ejected.nickname} has been ejected"
-			@Player_SetDead ejected
 		else
 			@Logger.Info "Nobody has been ejected during the meeting"
 
 		timer.Pause "NMW AU CheckWin"
 		timer.Create handle, 8, 1, ->
+			if ejected
+				@Player_SetDead ejected
+
 			for ply in *player.GetAll!
 				ply\Freeze false
 
@@ -186,7 +188,7 @@ GM.Meeting_End = =>
 
 			@SetMeetingInProgress false
 
-			hook.Call "GMAU MeetingEnd"
+			hook.Call "GMAU MeetingEnd", nil, reason, ejected
 
 GM.Meeting_ResetCooldown = =>
 	SetGlobalFloat "NMW AU NextMeeting", CurTime! + @ConVarSnapshots.MeetingCooldown\GetFloat!

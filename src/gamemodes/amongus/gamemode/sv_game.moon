@@ -8,8 +8,15 @@ GM.Game_GameOver = (reason) =>
 	@Net_BroadcastGameOver reason
 	@Sabotage_ForceEndAll!
 
-	handle = "gameOver"
+	-- Pack crewmates and imposters for the hook.
+	hookCrewmates, hookImposters = {}, {}
+	for ply in *@GameData.PlayerTables
+		table.insert (@GameData.Imposters[ply] and hookImposters or hookCrewmates),
+			ply.entity
 
+	hook.Call "GMAU GameEnd", nil, hookCrewmates, hookImposters
+
+	handle = "gameOver"
 	@GameData.Timers[handle] = true
 	timer.Create handle, @SplashScreenTime - 1, 1, ->
 		@Game_Restart!
@@ -48,7 +55,6 @@ GM.Game_CheckWin = (reason) =>
 
 	if reason
 		@Game_GameOver reason
-		hook.Call "GMAU GameEnd"
 
 		return true
 
@@ -271,7 +277,13 @@ GM.Game_Start = =>
 				-- Check if suddenly something went extremely wrong during the windup time.
 				@Game_CheckWin!
 
-				hook.Call "GMAU GameStart"
+				-- Pack crewmates and imposters for the hook.
+				hookCrewmates, hookImposters = {}, {}
+				for ply in *@GameData.PlayerTables
+					table.insert (@GameData.Imposters[ply] and hookImposters or hookCrewmates),
+						ply.entity
+
+				hook.Call "GMAU GameStart", nil, hookCrewmates, hookImposters
 
 GM.Game_Restart = =>
 	@Game_CleanUp!
