@@ -245,7 +245,7 @@ splash.DisplayPlayers = (reason) =>
 				mdl_size = size * 0.5
 
 				-- Helper function that creates player model containers.
-				create_mdl = (parent, playerTable) ->
+				create_mdl = (parent, playerTable, middle) ->
 					return with mdl = parent\Add "DModelPanel"
 						size = (math.min @GetTall!, @GetWide!) * 0.6
 						\SetSize mdl_size, size
@@ -287,8 +287,13 @@ splash.DisplayPlayers = (reason) =>
 								render.PushFilterMag TEXFILTER.ANISOTROPIC
 								render.PushFilterMin TEXFILTER.ANISOTROPIC
 
+								vPos = if middle
+									h/2 + w * 1.75
+								else
+									h/2 + w * 0.875
+
 								draw.SimpleTextOutlined .Nickname or "", "NMW AU Splash Nickname",
-									w/2, h/2 + w * 0.875, clr, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 16, COLOR_OUTLINE
+									w/2, vPos, clr, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 16, COLOR_OUTLINE
 
 								render.PopFilterMag!
 								render.PopFilterMin!
@@ -368,7 +373,7 @@ splash.DisplayPlayers = (reason) =>
 				if localPlayerTable and (not reason or (reason and victory))
 					with middlePlayer = playerBar\Add "Panel"
 						\Dock FILL
-						with create_mdl middlePlayer, localPlayerTable
+						with create_mdl middlePlayer, localPlayerTable, true
 							dead = GAMEMODE.GameData.DeadPlayers[localPlayerTable]
 							\SetColor Color 255, 255, 255, dead and 127 or 255
 							\Dock FILL
