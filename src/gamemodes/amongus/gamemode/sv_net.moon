@@ -273,6 +273,12 @@ GM.Net_BroadcastTaskCount = (count, total) =>
 	if @GetCommunicationsDisabled!
 		return
 
+	taskbar = @ConVarSnapshots.TaskbarUpdates\GetInt!
+
+	-- Don't broadcast if the taskbar is disabled
+	if (taskbar == 1 and not @IsMeetingInProgress!) or taskbar == 2
+		return
+
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.TasksUpdateCount, @FlowSize
 	net.WriteUInt count, 32

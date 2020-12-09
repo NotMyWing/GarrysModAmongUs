@@ -113,6 +113,8 @@ hud.SetupButtons = (state, impostor) =>
 								conVar\GetBool! and TRANSLATE("hud.cvar.enabled") or TRANSLATE("hud.cvar.disabled")
 							when "Mod"
 								"#{conVar\GetFloat!}x"
+							when "Select"
+								TRANSLATE("hud.cvar.#{conVarName}.#{conVar\GetInt!}")
 
 						if value
 							i += 1

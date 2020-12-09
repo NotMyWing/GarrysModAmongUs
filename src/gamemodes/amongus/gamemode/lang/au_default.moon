@@ -137,12 +137,17 @@ with GM.Lang\Get "en"
 	["hud.cvar.enabled"] = "Enabled"
 	["hud.cvar.time"] = "%d s."
 
+	["hud.cvar.au_taskbar_updates.0"] = "Always"
+	["hud.cvar.au_taskbar_updates.1"] = "Meetings"
+	["hud.cvar.au_taskbar_updates.2"] = "Never"
+
 	cvars = {
 		au_max_imposters:    "Max. Imposters"
 		au_kill_cooldown:    "Kill Cooldown"
 		au_time_limit:       "Time Limit"
 		au_killdistance_mod: "Kill Distance"
 		sv_alltalk:          "All Talk"
+		au_taskbar_updates:  "Taskbar Updates"
 
 		au_meeting_available: "Meetings per Player"
 		au_meeting_cooldown:  "Meeting Button Cooldown"

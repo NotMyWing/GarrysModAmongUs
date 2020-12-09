@@ -20,11 +20,12 @@ GM.ConVarsDisplay = {
 	{
 		Name: "General"
 		ConVars: {
-			{ "Int"  , "ImposterCount"   }
-			{ "Time" , "KillCooldown"    }
-			{ "Time" , "TimeLimit"       }
-			{ "Mod"  , "KillDistanceMod" }
-			{ "Bool" , "AllTalk"         }
+			{ "Int"    , "ImposterCount"   }
+			{ "Time"   , "KillCooldown"    }
+			{ "Time"   , "TimeLimit"       }
+			{ "Mod"    , "KillDistanceMod" }
+			{ "Bool"   , "AllTalk"         }
+			{ "Select" , "TaskbarUpdates"  }
 		}
 	}
 	{

@@ -347,6 +347,16 @@ return vgui.RegisterTable {
 																depressed and depressedPadding or 0           , depressed and depressedPadding or 0           ,
 																depressed and (w - depressedPadding * 2) or w , depressed and (h - depressedPadding * 2) or h ,
 																conVar\GetBool! and buttonSelColor or buttonColor
+												when "Select"
+													with \Add "DComboBox"
+														\SetConVar conVarName
+														\SetFont "NMW AU ShowHelp NumberWang"
+
+														for i = conVar\GetMin!, conVar\GetMax!, 1
+															\AddChoice TRANSLATE("hud.cvar.#{conVarName}.#{i}")!, i
+
+														.OnSelect = (_, i, v, d) ->
+															RunConsoleCommand conVarName, d
 										else
 											-- Show the non-admin stuffs to non-admins.
 											with \Add "Panel"
@@ -368,6 +378,8 @@ return vgui.RegisterTable {
 															conVar\GetBool! and TRANSLATE("hud.cvar.enabled") or TRANSLATE("hud.cvar.disabled")
 														when "Mod"
 															"#{conVar\GetFloat!}x"
+														when "Select"
+															TRANSLATE("hud.cvar.#{conVarName}.#{conVar\GetInt!}")
 
 													if value
 														draw.SimpleText value, "NMW AU ShowHelp Common",

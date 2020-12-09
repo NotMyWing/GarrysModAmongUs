@@ -24,6 +24,7 @@ GM.Meeting_Start = (playerTable, bodyColor) =>
 
 	@Net_BroadcastDead!
 	@Net_BroadcastMeeting playerTable, bodyColor
+	@Net_BroadcastTaskCount @GameData.CompletedTasks, @GameData.TotalTasks
 
 	if bodyColor
 		@Logger.Info "#{playerTable.nickname} has found a body! Calling a meeting"
