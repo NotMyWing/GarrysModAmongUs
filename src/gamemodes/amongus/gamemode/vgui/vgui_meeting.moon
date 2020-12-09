@@ -675,6 +675,28 @@ meeting.OpenDiscuss = (caller, time) =>
 							TRANSLATE("meeting.timer.ends") time
 					) .. " " -- yea
 
+				-- Holy color churn, Batman!
+				.GetColor = ->
+					return COLOR_WHITE unless @__currentState == STATES.ends
+					time = math.max 0, @__currentAnimation.EndTime - SysTime!
+					if time < 11
+						_, decTime = math.modf(time)
+						return Color 255, 255*decTime, 255*decTime
+
+				-- Hey, it could be worse.
+				lastPlayedSoundTime = -1
+				.Think = ->
+					return unless @__currentState == STATES.ends
+					time = math.max 0, @__currentAnimation.EndTime - SysTime!
+					if time < 11
+						intTime = math.modf(time)
+						if intTime ~= lastPlayedSoundTime
+							pitch = (20 * (5 - intTime)/5) + 110
+							print pitch
+							snd = CreateSound LocalPlayer!, "au/vote_timer.wav"
+							snd\PlayEx 1, pitch
+							lastPlayedSoundTime = intTime
+
 				-- Prepare the post-vote are that we can add voter icons to.
 				with @__skipArea = \Add "Panel"
 					\Dock FILL
