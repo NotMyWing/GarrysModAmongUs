@@ -313,11 +313,6 @@ meeting.OpenDiscuss = (caller, time) =>
 					\NewAnimation 0, 0, 0, ->
 						textInput\RequestFocus!
 
-						chatAreaChildren = chatArea\GetCanvas!\GetChildren!
-						lastChild = chatAreaChildren[#chatAreaChildren]
-						if IsValid lastChild
-							chatArea\ScrollToChild lastChild
-
 				\AlphaTo toggled and 255 or 0, 0.1, nil, ->
 					if not toggled
 						@SetKeyboardInputEnabled false
@@ -350,12 +345,22 @@ meeting.OpenDiscuss = (caller, time) =>
 					\SetFont "NMW AU Meeting Chat"
 					\SetTextColor Color 0, 0, 0
 
+					.OnFocusChanged = (_, state) ->
+						@SetKeyboardInputEnabled state
+
+					.OnMousePressed = (_, button) ->
+						return unless MOUSE_LEFT == button
+
+						@SetKeyboardInputEnabled true
+						\RequestFocus!
+
 					.OnEnter = ->
 						RunConsoleCommand "say", \GetValue!
 						\SetText ""
 
 						-- Scroll to the last child.
 						\NewAnimation 0, 0, 0, ->
+							@SetKeyboardInputEnabled true
 							\RequestFocus!
 
 							chatAreaChildren = chatArea\GetCanvas!\GetChildren!
@@ -394,7 +399,7 @@ meeting.OpenDiscuss = (caller, time) =>
 			.PushVote = (_, playerTable, remaining) ->
 				with chatArea
 					children = \GetCanvas!\GetChildren!
-					if #children > 20
+					if #children > GAMEMODE.ClientSideConVars.MaxChatMessages\GetInt!
 						children[1]\Remove!
 
 					-- Container.
@@ -436,7 +441,7 @@ meeting.OpenDiscuss = (caller, time) =>
 					local nicknameLabel, textLabel
 
 					children = \GetCanvas!\GetChildren!
-					if #children > 20
+					if #children > GAMEMODE.ClientSideConVars.MaxChatMessages\GetInt!
 						children[1]\Remove!
 
 					playerTable = IsValid(ply) and ply\GetAUPlayerTable! or nil
@@ -521,7 +526,6 @@ meeting.OpenDiscuss = (caller, time) =>
 								\AlphaTo 255, 0.1
 								\NewAnimation 0, 0, 0, ->
 									\SetTall \GetTall! + shadowOffset * 0.5
-									chatArea\ScrollToChild container
 
 			handle = "NMW AU MeetingChat"
 
@@ -550,18 +554,17 @@ meeting.OpenDiscuss = (caller, time) =>
 					panel ~= @__chatButton and not panel\HasParent innerArea
 						\Toggle!
 
-			-- We don't want the default chat to be drawn.
-			hook.Add "HUDShouldDraw", handle, (element) ->
-				if not IsValid chatArea
-					hook.Remove "HUDShouldDraw", handle
-					return
+			hook.Add "StartChat", handle, ->
+				\Toggle!
 
-				return false if element == "CHudChat"
+				return true
 
 			.OnRemove = ->
+				chat.Close!
+
 				hook.Remove "OnPlayerChat"    , handle
 				hook.Remove "VGUIMousePressed", handle
-				hook.Remove "HUDShouldDraw"   , handle
+				hook.Remove "StartChat"       , handle
 
 		-- Create the inner panel.
 		with innerPanel = \Add "EditablePanel"

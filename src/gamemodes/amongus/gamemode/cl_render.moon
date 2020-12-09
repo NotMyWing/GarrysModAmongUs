@@ -69,8 +69,10 @@ hide = {
 }
 
 hook.Add "HUDShouldDraw", "NMW AU HideHud", (element) ->
-	if hide[element]
-		false
+	return false if GAMEMODE\IsGameInProgress! and
+		GAMEMODE\IsMeetingInProgress! and "CHudChat" == element
+
+	return false if hide[element]
 
 hook.Add "CalcView", "NMW AU CalcView", ( ply, pos, angles, fov ) -> {
 	origin: ply\GetPos! + Vector 0, 0, 10
