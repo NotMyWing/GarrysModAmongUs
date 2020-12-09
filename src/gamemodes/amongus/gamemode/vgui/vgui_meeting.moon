@@ -70,6 +70,7 @@ MAT_MEETING_TABLET = {
 
 COLOR_WHITE = Color 255, 255, 255
 COLOR_BLACK = Color 0, 0, 0
+COLOR_GREY  = Color 128, 128, 128
 
 meeting = {}
 
@@ -1103,8 +1104,10 @@ meeting.End = (results = {}, time = 0) =>
 						\SetPos outputPanel\GetTall! * 0.1, outputPanel\GetTall! * 0.1
 						\SetFlipX true
 
-						playerTable = GAMEMODE.GameData.Lookup_PlayerByID[voter]
-						if playerTable
+						if voter == 0
+							\SetColor COLOR_GREY
+
+						elseif playerTable = GAMEMODE.GameData.Lookup_PlayerByID[voter]
 							\SetColor playerTable.color
 
 --- Starts the emergency.

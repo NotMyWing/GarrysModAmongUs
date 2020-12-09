@@ -107,8 +107,8 @@ GM.Meeting_Vote = (playerTable, target) =>
 		if not target
 			target = skipPlaceholder
 
-		@GameData.Votes[target] or= {}
-		table.insert @GameData.Votes[target], playerTable
+		@GameData.Votes[target.id] or= {}
+		table.insert @GameData.Votes[target.id], playerTable.id
 
 		countAlive = 0
 		for ply in *@GameData.PlayerTables
@@ -146,7 +146,7 @@ GM.Meeting_FinalizeVotes = =>
 		#voteTable[1].votes == #voteTable[2].votes
 
 	-- Skip.
-	return voteTable, @EjectReason.Skipped if voteTable[1].target.id == 0
+	return voteTable, @EjectReason.Skipped if voteTable[1].target == 0
 
 	return voteTable, @EjectReason.Vote, voteTable[1].target
 
@@ -155,11 +155,20 @@ GM.Meeting_End = =>
 
 	voteTable, reason, ejected = @Meeting_FinalizeVotes!
 
-	-- Calculate the extra time.
+	if ejected
+		ejected = @GameData.Lookup_PlayerByID[ejected]
+
+	-- Calculate the extra time and anonymize the votes if required.
+	shouldAnonymize = @ConVarSnapshots.VoteAnonymous\GetBool!
+
 	maxVotes = 0
 	for vote in *voteTable
 		voteCount = #vote.votes
 		maxVotes = voteCount if voteCount > maxVotes
+
+		if shouldAnonymize
+			for i = 1, voteCount
+				vote.votes[i] = 0
 
 	time = @ConVarSnapshots.VotePostTime\GetInt! + (math.min(8, maxVotes) * 0.5 - .1)
 	@Net_BroadcastMeetingEnd voteTable, CurTime! + time

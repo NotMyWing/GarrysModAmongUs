@@ -96,10 +96,11 @@ GM.Net_BroadcastMeetingEnd = (results, time) =>
 	net.WriteUInt @FlowTypes.MeetingEnd, @FlowSize
 	net.WriteUInt #results, 8
 	for _, result in pairs results
-		net.WriteUInt result.target.id, 8
+		net.WriteUInt result.target, 8
 		net.WriteUInt #result.votes, 8
-		for _, voter in pairs result.votes
-			net.WriteUInt voter.id, 8
+
+		for voterId in *result.votes
+			net.WriteUInt voterId, 8
 
 	net.WriteDouble time
 
@@ -408,8 +409,8 @@ net.Receive "NMW AU Flow", (len, ply) ->
 				target = if not skip
 					net.ReadUInt 8
 
-				target = GAMEMODE.GameData.Lookup_PlayerByID[target]
-				GAMEMODE\Meeting_Vote playerTable, target
+				if target = GAMEMODE.GameData.Lookup_PlayerByID[target]
+					GAMEMODE\Meeting_Vote playerTable, target
 
 		--
 		-- Player wants to sync the game data.

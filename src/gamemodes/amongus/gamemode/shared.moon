@@ -57,6 +57,7 @@ GM.ConVars =
 	VoteTime:          CreateConVar "au_meeting_vote_time"     , 30, flags, "", 1, 90
 	VotePreTime:       CreateConVar "au_meeting_vote_pre_time" , 15, flags, "", 1, 60
 	VotePostTime:      CreateConVar "au_meeting_vote_post_time", 5 , flags, "", 1, 20
+	VoteAnonymous:     CreateConVar "au_meeting_anonymous"     , 0 , flags, "", 0, 1
 
 	TasksShort:  CreateConVar "au_tasks_short"        , 2, flags, "", 0, 5
 	TasksLong:   CreateConVar "au_tasks_long"         , 1, flags, "", 0, 5
