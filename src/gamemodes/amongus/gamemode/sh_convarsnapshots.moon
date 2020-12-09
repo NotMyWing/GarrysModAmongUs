@@ -14,7 +14,9 @@ class ConVarSnapshotWrapper
 	new: (@__convar) =>
 		@__snapshot = {}
 		for accessor in *convarAccessors
-			@["Get#{accessor}"] = => @__snapshot[accessor] or (@__convar["Get#{accessor}"] @__convar)
+			@["Get#{accessor}"] = => @__snapshot[accessor] ~= nil and
+				(@__convar["Get#{accessor}"] @__convar) or
+				(@__snapshot[accessor])
 
 	TakeSnapshot: => with @__convar
 		for accessor in *convarAccessors
