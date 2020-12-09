@@ -80,7 +80,11 @@ GM.Game_CleanUp = (soft) =>
 	timer.Remove "NMW AU CheckWin"
 
 	if not soft
-		game.CleanUpMap!
+		game.CleanUpMap false, {
+			"env_soundscape"
+			"env_soundscape_proxy"
+			"env_soundscape_triggerable"
+		}
 
 GM.Game_Start = =>
 	-- Bail if the manifest is missing or malformed.
