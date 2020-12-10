@@ -142,7 +142,7 @@ if CLIENT
 
 					surface.CreateFont "NMW AU Meeting Button Text", {
 						font: "Roboto"
-						size: bubbleSizeY / 6
+						size: bubbleSizeY / 8
 						weight: 550
 					}
 
