@@ -339,7 +339,6 @@ hud.SetupButtons = (state, impostor) =>
 
 							@taskBarLabel\SetSize refW, refH
 
-	if localPlayerTable
 		-- The task list.
 		@taskBoxContainer = with @Add "Panel"
 			local taskLabel
@@ -403,7 +402,7 @@ hud.SetupButtons = (state, impostor) =>
 					surface.DrawRect 0, 0,
 						.__maxWidth or 0, .__maxHeight
 
-
+	if localPlayerTable
 		-- Use button. Content-aware.
 		with @use = @buttons\Add "Panel"
 			\SetWide @buttons\GetTall!
