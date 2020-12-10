@@ -246,6 +246,26 @@ return vgui.RegisterTable {
 				\InvalidateChildren!
 				\InvalidateLayout!
 
+			--------------------
+			--  SETTINGS TAB  --
+			--------------------
+			tabList\AddTab "settings", with vgui.Create "DScrollPanel"
+				\Dock FILL
+				.Paint = roundedPaint
+
+				\GetCanvas!\DockPadding separatorWidth, separatorWidth,
+					separatorWidth, separatorWidth
+
+				with \GetCanvas!
+					cvars = { "au_spectator_mode", "au_debug_drawversion" }
+					for cvar in *cvars
+						with \Add "DCheckBoxLabel"
+							\Dock TOP
+							\SetConVar cvar
+							\SetText tostring TRANSLATE "help.settings.#{cvar}"
+							\SetFont "NMW AU ShowHelp Common"
+							\SetTextColor Color 255, 255, 255
+
 			-----------------------
 			--  GAME CONVAR TAB  --
 			-----------------------
