@@ -131,12 +131,12 @@ GM.Player_Kill = (victimTable, attackerTable) =>
 
 --- Bumps the kill cooldown of a player.
 -- @param playerTable Player table.
-GM.Player_RefreshKillCooldown = (playerTable) =>
+GM.Player_RefreshKillCooldown = (playerTable, newValue) =>
 	if "Player" == type playerTable
 		playerTable = playerTable\GetAUPlayerTable!
 	return unless playerTable
 
-	cd = CurTime! + @ConVarSnapshots.KillCooldown\GetFloat!
+	cd = CurTime! + (newValue or @ConVarSnapshots.KillCooldown\GetFloat!)
 	@GameData.KillCooldowns[playerTable] = cd
 
 	if IsValid playerTable.entity

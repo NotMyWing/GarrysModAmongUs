@@ -242,7 +242,7 @@ GM.Game_Start = =>
 		-- Start the game after a dramatic pause.
 		-- Teleport players while they're staring at the splash screen.
 		timer.Create handle, 2, 1, ->
-			@Game_StartRound!
+			@Game_StartRound true
 
 			for ply in *@GameData.PlayerTables
 				if IsValid ply.entity
@@ -268,7 +268,7 @@ GM.Game_Start = =>
 						ply.entity\Freeze fal
 
 					if @GameData.Imposters[ply]
-						@Player_RefreshKillCooldown ply
+						@Player_RefreshKillCooldown ply, 10
 
 				@SetGameState @GameState.Playing
 
@@ -316,7 +316,7 @@ GM.Game_Restart = =>
 	@SetGameState @GameState.Preparing
 	hook.Call "GMAU Restart"
 
-GM.Game_StartRound = =>
+GM.Game_StartRound = (first = false) =>
 	spawns = ents.FindByClass "info_player_start"
 	if #spawns == 0
 		return error "Couldn't find any spawn positions"
@@ -338,9 +338,10 @@ GM.Game_StartRound = =>
 
 		body\Remove!
 
-	-- Refresh kill cooldowns.
-	for ply in pairs @GameData.Imposters
-		@Player_RefreshKillCooldown ply
+	if not first
+		-- Refresh kill cooldowns.
+		for ply in pairs @GameData.Imposters
+			@Player_RefreshKillCooldown ply, first and 10 or nil
 
 	@Meeting_ResetCooldown!
 
