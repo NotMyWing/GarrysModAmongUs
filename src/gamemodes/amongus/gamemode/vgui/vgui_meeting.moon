@@ -88,8 +88,12 @@ DISCUSS_SPLASH_TIME = 3
 
 ROTATION_MATRIX = Matrix!
 
-MEETING_TIMER_SOUND = CreateSound Entity(0), "au/vote_timer.wav"
-MEETING_TIMER_SOUND\SetSoundLevel 0
+export MEETING_TIMER_SOUND
+hook.Add "InitPostEntity", "NMW AU Meeting CreateSound", ->
+	MEETING_TIMER_SOUND = CreateSound Entity(0), "au/vote_timer.wav"
+	MEETING_TIMER_SOUND\SetSoundLevel 0
+
+	return
 
 --- Creates the famous pre-vote popup.
 -- I had fun coming up with this one.
@@ -687,8 +691,10 @@ meeting.OpenDiscuss = (caller, time) =>
 						intTime = math.modf time
 						if intTime ~= lastPlayedSoundTime
 							pitch = (20 * (5 - intTime)/5) + 110
-							-- MEETING_TIMER_SOUND\Stop!
-							MEETING_TIMER_SOUND\PlayEx 1, pitch
+
+							if MEETING_TIMER_SOUND
+								MEETING_TIMER_SOUND\PlayEx 1, pitch
+
 							lastPlayedSoundTime = intTime
 							\SetColor COLOR_WHITE
 							\ColorTo COLOR_RED, 0.75, 0
