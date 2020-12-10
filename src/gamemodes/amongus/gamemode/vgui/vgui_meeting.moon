@@ -66,11 +66,21 @@ MAT_MEETING_TABLET = {
 	chat: Material "au/gui/meeting/chat.png", "smooth"
 	chatOverlay: Material "au/gui/meeting/chatoverlay.png", "smooth"
 	chatbump: Material "au/gui/meeting/chatbump.png", "smooth"
+	chatIndicator: Material "au/gui/meeting/chat_indicator.png", "smooth"
+	chatIndicatorMute: Material "au/gui/meeting/chat_indicator_mute.png", "smooth"
+}
+
+STATES = {
+	begins: 1
+	ends: 2
+	proceeding: 3
 }
 
 COLOR_WHITE = Color 255, 255, 255
 COLOR_BLACK = Color 0, 0, 0
 COLOR_GREY  = Color 128, 128, 128
+COLOR_RED   = Color 255, 0, 0
+COLOR_GREEN = Color 0, 255, 0
 
 meeting = {}
 
@@ -134,7 +144,9 @@ meeting.DisableAllButtons = =>
 
 meeting.CanIVote = =>
 	localPlayer = LocalPlayer!
-	return IsValid(localPlayer) and localPlayer\GetAUPlayerTable! and
+	return @__currentState == STATES.ends and
+		IsValid(localPlayer) and
+		localPlayer\GetAUPlayerTable! and
 		not localPlayer\IsDead!
 
 --- Purges all existing confirms.
@@ -205,12 +217,6 @@ meeting.CreateConfirm = (height, id) =>
 		\AlphaTo 255, 0.15, 0
 
 COLOR_WHITE = Color 255, 255, 255
-
-STATES = {
-	begins: 1
-	ends: 2
-	proceeding: 3
-}
 
 meeting.OpenDiscuss = (caller, time) =>
 	@__voteItems = {}
@@ -849,8 +855,6 @@ meeting.OpenDiscuss = (caller, time) =>
 									return if state and not IsValid(playerTable.entity) or
 										GAMEMODE.GameData.DeadPlayers[playerTable]
 
-									@button\SetEnabled state
-
 								-- Player icon.
 								with \Add "AmongUsCrewmate"
 									\SetWide voteItemInnerSizeY
@@ -920,6 +924,25 @@ meeting.OpenDiscuss = (caller, time) =>
 										\SetFont "NMW AU Meeting Nickname"
 										\SetContentAlignment 4
 
+										oldPaint = .Paint
+										.Paint = (_, w, h) ->
+											oldPaint _, w, h
+
+											ply = playerTable.entity
+											return unless IsValid(ply) and (ply\IsSpeaking! or ply\IsMuted!)
+
+											contentSizeX, contentSizeY = \GetContentSize!
+
+											surface.SetDrawColor COLOR_WHITE
+
+											surface.SetMaterial if ply\IsMuted!
+												MAT_MEETING_TABLET.chatIndicatorMute
+											else
+												MAT_MEETING_TABLET.chatIndicator
+
+											surface.DrawTexturedRect contentSizeX + ScreenScale(4), h / 2 - contentSizeY / 2,
+												contentSizeY, contentSizeY
+
 									-- Output.
 									with playerItem.output = \Add "Panel"
 										\Dock BOTTOM
@@ -931,7 +954,6 @@ meeting.OpenDiscuss = (caller, time) =>
 									\SetText ""
 
 									\SetSize voteItemInnerSizeX, voteItemInnerSizeY
-									\SetEnabled false
 
 									.Paint = (w, h) =>
 										surface.SetAlphaMultiplier @GetAlpha! / 255
@@ -948,6 +970,26 @@ meeting.OpenDiscuss = (caller, time) =>
 											\SetParent this
 											\CenterVertical!
 											\AlignRight playerIconMargin
+
+									.DoRightClick = (this) ->
+										ply = playerTable.entity
+										return if not IsValid ply
+
+										with menu = DermaMenu!
+											RegisterDermaMenuForClose menu
+
+											-- Mute.
+											muteCallback = -> ply\SetMuted not ply\IsMuted!
+											with \AddOption "Mute", muteCallback
+												\SetChecked ply\IsMuted!
+
+											\AddSpacer!
+
+											-- Show profile.
+											\AddOption "Show Profile...", ->
+												ply\ShowProfile!
+
+											\Open!
 
 	-- The two crewmates talking animation you see before the meeting screen appears.
 	with discussAnim = @Add "Panel"
