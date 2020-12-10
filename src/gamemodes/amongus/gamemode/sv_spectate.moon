@@ -4,10 +4,12 @@ GM.Spectate_CycleEntity = (ply, delta = 0) =>
 	pool = {}
 	local cur, first
 	for otherPly in *player.GetAll!
-		if ply ~= otherPly and otherPly\Alive! and otherPly\GetObserverMode! > 0
+		if ply ~= otherPly and not otherPly\IsDead! and otherPly\GetObserverMode! == 0
 			table.insert pool, otherPly
 
 	@SpectateMap[ply] = (((@SpectateMap[ply] or 1) + delta - 1) % #pool) + 1
+	if @SpectateMap[ply] ~= @SpectateMap[ply]
+		@SpectateMap[ply] = 1
 
 	if ply\GetObserverMode! == OBS_MODE_ROAMING
 		ply\Spectate OBS_MODE_CHASE

@@ -401,6 +401,7 @@ hook.Add "HUDPaintBackground", "NMW AU Hud", ->
 hook.Add "ScoreboardShow", "NMW AU Map", ->
 	return if IsValid GAMEMODE.Hud.Meeting
 	return if IsValid GAMEMODE.__splash
+	return unless LocalPlayer!\GetAUPlayerTable!
 
 	return true if IsValid GAMEMODE.Hud.Eject
 	return true if IsValid GAMEMODE.Hud.CurrentVGUI

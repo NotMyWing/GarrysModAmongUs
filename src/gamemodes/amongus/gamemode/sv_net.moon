@@ -178,9 +178,8 @@ GM.Net_UpdateGameData = (ply) =>
 --- Updates everyone with the current game data.
 -- Don't call this unless you have a solid reason to.
 GM.Net_BroadcastGameStart = =>
-	for index, ply in ipairs @GameData.PlayerTables
-		if IsValid ply.entity
-			@Net_UpdateGameData ply.entity
+	for ply in *player.GetAll!
+		@Net_UpdateGameData ply
 
 --- Notifies the player that his kill cooldown has changed.
 -- @param playerTable An imposter.

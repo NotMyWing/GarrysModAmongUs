@@ -442,7 +442,7 @@ GM.IsOnAutoPilot = => GetGlobalBool "NMW AU AutoPilot"
 
 --- Returns a table of fully initialized players.
 GM.GetFullyInitializedPlayers = => return for ply in *player.GetAll!
-	if ply\IsBot! or ply\GetNWBool "NMW AU Initialized"
+	if ply\IsBot! or (ply\GetInfoNum("au_spectator_mode", 0) == 0 and ply\GetNWBool "NMW AU Initialized")
 		ply
 	else
 		continue
