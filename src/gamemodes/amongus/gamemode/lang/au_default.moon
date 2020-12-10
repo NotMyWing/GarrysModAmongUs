@@ -209,3 +209,16 @@ with GM.Lang\Get "en"
 
 	for key, value in pairs inspectSample
 		["tasks.inspectSample.#{key}"] = value
+
+	controls = {
+		"map": "Open the map / sabotage"
+		"kill": "Kill"
+		"use": "Use"
+		"report": "Report body"
+		"hideTasks": "Hide the task list"
+		"toggleNoClip": "Toggle ghost no-clip"
+		"showHelp": "This menu"
+	}
+
+	for key, value in pairs controls
+		["help.controls.#{key}"] = value

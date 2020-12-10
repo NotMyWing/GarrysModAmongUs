@@ -1,5 +1,6 @@
 MAT_ASSETS = {
 	close: Material "au/gui/closebutton.png", "smooth"
+	floatingButton: Material "au/gui/floatingbutton.png", "smooth"
 }
 
 TRANSLATE = GM.Lang.GetEntry
@@ -391,6 +392,72 @@ return vgui.RegisterTable {
 												entryHeight * 0.25, entryHeight * 0.2
 											element\Dock RIGHT
 											element\SetWide entryHeight * 3
+
+			--------------------
+			--  CONTROLS TAB  --
+			--------------------
+			tabList\AddTab "controls", with vgui.Create "DScrollPanel"
+				\Dock FILL
+				.Paint = roundedPaint
+
+				\GetCanvas!\DockPadding separatorWidth, separatorWidth,
+					separatorWidth, separatorWidth
+
+				controls = {
+					"+showscores": "map"
+					"+menu": "kill"
+					"+use": "use"
+					"+reload": "report"
+					"gmod_undo": "hideTasks"
+					"noclip": "toggleNoClip"
+					"gm_showhelp": "showHelp"
+				}
+
+				oldShow = .Show
+				.Show = (this) ->
+					oldShow this
+
+					with \GetCanvas!
+						\Clear!
+
+						for key, description in pairs controls
+							with \Add "Panel"
+								\SetTall buttonHeight
+								\Dock TOP
+								\DockMargin 0, 0, 0, buttonHeight * 0.15
+
+								pad = buttonHeight * 0.05
+								\DockPadding pad, pad, pad, pad
+
+								entryColor  = Color 255, 255, 255, 64
+								.Paint = (_, w, h) ->
+									draw.RoundedBox cornerRadiusBase * 1.5, 0, 0, w, h, entryColor
+
+								with \Add "DImage"
+									\Dock LEFT
+									\SetWide buttonHeight - pad * 2
+									\SetMaterial MAT_ASSETS.floatingButton
+
+									with \Add "DLabel"
+										\Dock FILL
+										\DockMargin 0, 0, 0, buttonHeight * 0.28
+
+										\SetFont "NMW AU ShowHelp Common"
+										\SetColor Color 255, 255, 255
+										\SetContentAlignment 5
+
+										\SetText string.upper input.LookupBinding(key) or "???"
+
+								with \Add "DLabel"
+									\Dock FILL
+									\DockMargin buttonHeight * 0.15, 0, 0, 0
+
+									\SetFont "NMW AU ShowHelp Common"
+									\SetColor Color 255, 255, 255
+									\SetContentAlignment 4
+
+									translatedDescription = tostring TRANSLATE "help.controls.#{description}"
+									\SetText "#{translatedDescription} (#{key})"
 
 			-------------------
 			--  CREDITS TAB  --
