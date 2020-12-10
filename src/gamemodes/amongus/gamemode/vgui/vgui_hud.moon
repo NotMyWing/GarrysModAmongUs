@@ -39,7 +39,9 @@ MAT_BUTTONS = {
 	vent: Material "au/gui/hudbuttons/vent.png"
 }
 
-COLOR_BTN = Color 255, 255, 255
+COLOR_WHITE = Color 255, 255, 255
+COLOR_BLACK = Color 0, 0, 0
+COLOR_BLINK = Color 255, 64, 64
 
 hud.Init = =>
 	@__oldCommsSabotaged = false
@@ -423,7 +425,7 @@ hud.SetupButtons = (state, impostor) =>
 					mat = MAT_BUTTONS.use
 
 				-- Like, jesus christ man.
-				surface.SetDrawColor COLOR_BTN
+				surface.SetDrawColor COLOR_WHITE
 				surface.SetMaterial mat
 
 				render.PushFilterMag TEXFILTER.ANISOTROPIC
@@ -447,7 +449,7 @@ hud.SetupButtons = (state, impostor) =>
 			mat = MAT_BUTTONS.report
 			.Paint = (_, w, h) ->
 				-- Here we are again.
-				surface.SetDrawColor COLOR_BTN
+				surface.SetDrawColor COLOR_WHITE
 				surface.SetMaterial mat
 
 				render.PushFilterMag TEXFILTER.ANISOTROPIC
@@ -477,7 +479,7 @@ hud.SetupButtons = (state, impostor) =>
 					else
 						32
 
-					surface.SetDrawColor COLOR_BTN.r, COLOR_BTN.g, COLOR_BTN.b, alpha
+					surface.SetDrawColor COLOR_WHITE.r, COLOR_WHITE.g, COLOR_WHITE.b, alpha
 					surface.DrawTexturedRect 0, 0, w, h
 
 					render.PopFilterMag!
@@ -490,8 +492,9 @@ hud.SetupButtons = (state, impostor) =>
 							math.max(0, GAMEMODE.GameData.KillCooldown - CurTime!)
 
 						if time > 0
-							draw.DrawText string.format("%d", math.ceil time),
-								"NMW AU Cooldown", w * 0.5, h * 0.15, Color(255,255,255,255), TEXT_ALIGN_CENTER
+							draw.SimpleTextOutlined string.format("%d", math.floor time),
+								"NMW AU Cooldown", w * 0.5, h * 0.5, COLOR_WHITE,
+								TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 4, COLOR_BLACK
 
 		-- The player icon!
 		-- for some reason this thing wants to be DPanel
@@ -606,9 +609,6 @@ hud.ToggleTaskList = (value) =>
 		else
 			@taskBox\AlphaTo 0, 0.1, 0, ->
 				@taskBox\Hide!
-
-COLOR_WHITE = Color 255, 255, 255
-COLOR_BLINK = Color 255, 64, 64
 
 hud.AddTaskEntry = =>
 	return unless IsValid @taskBox

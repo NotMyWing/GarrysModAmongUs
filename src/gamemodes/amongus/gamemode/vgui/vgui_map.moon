@@ -65,7 +65,8 @@ return vgui.RegisterTable {
 										elseif not enabled and canSetOff
 											\SetEnabled true
 
-								with \Add "DLabel"
+								with \Add "DOutlinedLabel"
+									\SetMouseInputEnabled false
 									\Dock FILL
 									\SetContentAlignment 5
 									\SetText "..."

@@ -11,6 +11,7 @@ surface.CreateFont "NMW AU Map Labels", {
 }
 
 COLOR_OUTLINE = Color 0, 0, 0, 160
+COLOR_WHITE   = Color 255, 255, 255
 
 map = {
 	Init: =>
@@ -31,8 +32,6 @@ map = {
 			size = 0.8 * math.min ScrH!, ScrW!
 			\SetSize size, size
 			\Center!
-
-			white = Color 255, 255, 255
 
 			.Paint = (_, w, h) ->
 				shouldFilter = @__baseMat or @__overlayMat
@@ -65,7 +64,7 @@ map = {
 					x = label.Position.x * w
 					y = label.Position.y * h
 
-					draw.SimpleTextOutlined tostring(TRANSLATE(label.Text)), "NMW AU Map Labels", x, y, white,
+					draw.SimpleTextOutlined tostring(TRANSLATE(label.Text)), "NMW AU Map Labels", x, y, COLOR_WHITE,
 						TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 2, COLOR_OUTLINE
 
 				surface.SetAlphaMultiplier 1
