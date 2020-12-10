@@ -216,3 +216,13 @@ with GM.Lang\Get "ru"
 
 	for key, value in pairs controls
 		["help.controls.#{key}"] = value
+
+	tabs = {
+		"color": "Цвет"
+		"game":  "Игра"
+		"controls": "Управление"
+		"about": "О режиме"
+	}
+
+	for key, value in pairs tabs
+		["help.tab.#{key}"] = value

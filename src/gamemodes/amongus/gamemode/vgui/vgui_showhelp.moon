@@ -107,7 +107,7 @@ return vgui.RegisterTable {
 					\DockMargin 0, 0, buttonMarginRight, 0
 					\SetWide buttonWidth
 
-					\SetText name
+					\SetText tostring TRANSLATE "help.tab.#{name}"
 					\SetFont "NMW AU ShowHelp Common"
 					\SetContentAlignment 5
 					\SetColor Color 255, 255, 255

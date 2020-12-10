@@ -222,3 +222,13 @@ with GM.Lang\Get "en"
 
 	for key, value in pairs controls
 		["help.controls.#{key}"] = value
+
+	tabs = {
+		"color": "Color"
+		"game":  "Game"
+		"controls": "Controls"
+		"about": "About"
+	}
+
+	for key, value in pairs tabs
+		["help.tab.#{key}"] = value
