@@ -153,6 +153,14 @@ color_crew = Color 255, 255, 255
 color_imposter = Color 255, 0, 0
 color_black = Color 0, 0, 0, 128
 
+surface.CreateFont "NMW AU Floating Nickames", {
+	font: "Roboto"
+	size: 135
+	weight: 550
+	outline: false
+	antialias: true
+}
+
 hook.Add "PostPlayerDraw", "NMW AU Nicknames", (ply) ->
 	-- Don't draw our nickname.
 	-- Don't draw ghost nicknames.
@@ -196,7 +204,7 @@ hook.Add "PostPlayerDraw", "NMW AU Nicknames", (ply) ->
 
 				offsetX = 2 * i
 				offsetY = 2 * j
-				draw.SimpleText ply\Nick!, "NMW AU Meeting Button",
+				draw.SimpleText ply\Nick!, "NMW AU Floating Nickames",
 					offsetX, offsetY, color_black, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER
 
 		color = if ply\IsImposter!
@@ -204,5 +212,5 @@ hook.Add "PostPlayerDraw", "NMW AU Nicknames", (ply) ->
 		else
 			color_crew
 
-		draw.SimpleText ply\Nick!, "NMW AU Meeting Button", 0, 0, color, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER
+		draw.SimpleText ply\Nick!, "NMW AU Floating Nickames", 0, 0, color, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER
 	cam.End3D2D!

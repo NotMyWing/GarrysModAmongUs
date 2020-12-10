@@ -467,6 +467,24 @@ net.Receive "NMW AU Flow", (len, ply) ->
 
 			ply\SetPlayerColor GAMEMODE.Colors[preferred]\ToVector!
 
+		--
+		-- Player has requested a meeting.
+		--
+		when GAMEMODE.FlowTypes.MeetingStart
+			return if GAMEMODE.GameData.CurrentVGUI[playerTable] ~= "meetingButton"
+			return if GAMEMODE.GameData.DeadPlayers[playerTable]
+			return if GAMEMODE\IsMeetingDisabled!
+			return if GAMEMODE\IsMeetingInProgress!
+			return if 0 >= ply\GetNWInt "NMW AU Meetings"
+
+			time = GetGlobalFloat("NMW AU NextMeeting") - CurTime!
+
+			return if time > 0
+
+			if GAMEMODE\Meeting_Start ply
+				ply\EmitSound "au/panel_emergencybutton.ogg", 0
+				ply\SetNWInt "NMW AU Meetings", ply\GetNWInt("NMW AU Meetings") - 1
+
 --- Sets whether the game is in progress.
 -- @bool state You guessed it again.
 GM.SetGameInProgress = (state) => SetGlobalBool "NMW AU GameInProgress", state

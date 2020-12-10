@@ -68,6 +68,11 @@ GM.Net_UpdateMyColor = =>
 	net.WriteUInt @FlowTypes.UpdateMyColor, @FlowSize
 	net.SendToServer!
 
+GM.Net_MeetingRequest = =>
+	net.Start "NMW AU Flow"
+	net.WriteUInt @FlowTypes.MeetingStart, @FlowSize
+	net.SendToServer!
+
 net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	--
 	-- Define player tables and other necessary game data.
@@ -431,10 +436,11 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	-- The server requested us to open a VGUI.
 	--
 	when GAMEMODE.FlowTypes.OpenVGUI
+		identifier = net.ReadString!
 		data = net.ReadTable! or {}
 
 		success, result = pcall ->
-			hook.Call "GMAU OpenVGUI", nil, data
+			hook.Call "GMAU OpenVGUI", nil, data, identifier
 
 		if not success
 			GAMEMODE.Logger.Error "Couldn't open VGUI! Error: #{result}"

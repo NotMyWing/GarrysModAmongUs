@@ -390,16 +390,9 @@ GM.TracePlayer = (playerTable, filter = 0) =>
 		if (entClass == "func_door" or entClass == "func_door_rotating")
 			continue if @GameData.DeadPlayers[playerTable] or not @GameData.SabotageButtons[ent]
 
-		-- Only hightlight meeting buttons when the cooldown has passed, and when the player isn't dead.
+		-- Only hightlight meeting buttons for alive players.
 		if (entClass == "func_meeting_button" or entClass == "prop_meeting_button")
 			continue if @GameData.DeadPlayers[playerTable]
-			continue if @IsMeetingDisabled!
-			continue if @IsMeetingInProgress!
-			continue if 0 >= ply\GetNWInt "NMW AU Meetings"
-
-			time = GetGlobalFloat("NMW AU NextMeeting") - CurTime!
-
-			continue if time > 0
 
 		if isHightlightable
 			highlightable = ent

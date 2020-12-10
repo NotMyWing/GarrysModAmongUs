@@ -1,14 +1,5 @@
 AddCSLuaFile!
 
-if CLIENT
-	surface.CreateFont "NMW AU Meeting Button", {
-		font: "Roboto"
-		size: ScrH! * 0.125
-		weight: 550
-		outline: false
-		antialias: true
-	}
-
 ENT.Base  = "base_anim"
 ENT.Type  = "anim"
 
@@ -32,95 +23,176 @@ if SERVER
 			@Model = value
 
 	ENT.Use = (ply) =>
-		if SERVER
-			return if ply\GetNWInt("NMW AU Meetings") <= 0
-
-			time = GetGlobalFloat("NMW AU NextMeeting") - CurTime!
-
-			return if time > 0
-
-			if GAMEMODE\Meeting_Start ply
-				@EmitSound "au/panel_emergencybutton.ogg", 60
-				ply\SetNWInt "NMW AU Meetings", ply\GetNWInt("NMW AU Meetings") - 1
-
+		GAMEMODE\Player_OpenVGUI ply, "meetingButton"
 
 if CLIENT
 	TRANSLATE = GAMEMODE.Lang.GetEntry
 
+	COLOR_BLACK = Color 0, 0, 0
+
+	ASSETS = {asset, Material("au/gui/meeting/button/#{asset}.png", "smooth") for asset in *{
+		"bg"
+		"bubble"
+		"button"
+		"frontoverlay"
+		"lidclosed"
+		"lidopen"
+	}}
+
 	ENT.Think = =>
-		return unless GAMEMODE\IsGameInProgress!
-
-		-- Translate the button text.
-		-- This has been moved to @Think because of the table churn.
-		-- We don't want to create multiple throwaway tables 60+ times per second.
-		-- Do we?
-		if not @__nextLineUpdate or CurTime! > @__nextLineUpdate
-			@__nextLineUpdate = CurTime! + 0.5
-			time = GetGlobalFloat("NMW AU NextMeeting") - CurTime!
-
-			@__textLines = if GAMEMODE\IsMeetingDisabled!
-				TRANSLATE("meetingButton.crisis")!
-			elseif time > 0
-				TRANSLATE("meetingButton.cooldown") math.floor time
-			else
-				TRANSLATE("meetingButton.default") LocalPlayer!\Nick!, LocalPlayer!\GetNWInt "NMW AU Meetings"
-
 		if @__nextGarrysModIsDumbCheck and CurTime! > @__nextGarrysModIsDumbCheck
 			@__nextGarrysModIsDumbCheck = @__nextGarrysModIsDumbCheck + 10
 
 			@SetRenderBounds @OBBMins!, @OBBMaxs!
 
-	COLOR_BLACK = Color 0, 0, 0, 128
-	ENT.DrawTranslucent = =>
-		@DrawModel!
+	hook.Add "GMAU OpenVGUI", "NMW AU Meeting Button", (payload, identifier) ->
+		return unless identifier == "meetingButton"
 
-		return unless GAMEMODE\IsGameInProgress!
-		return unless @__textLines
+		with base = vgui.Create "AmongUsVGUIBase"
+			\Setup with panel = vgui.Create "DImage"
+				local lidOpen, bubbleText
+				textLines = {}
 
-		-- Position the text above the highest point of the meeting button.
-		-- This might cause issues if the button doesn't have a collision model.
-		pos = @OBBMaxs!
-		pos += @GetPos! + Vector -pos.x, -pos.y, math.cos(CurTime! / 2) + 30
+				size = math.min ScrH!, ScrW!
 
-		-- Make the text face the player.
-		-- Additionaly, make it wiggle a little. Just for fun.
-		angle = (pos - LocalPlayer!\EyePos!)\Angle!
-		with angle
-			.p = 0
-			.y = angle.y + math.sin(CurTime!) * 10
-			.r = 0
+				\SetSize size, size
 
-			\RotateAroundAxis \Up!, -90
-			\RotateAroundAxis \Forward!, 90
+				\SetMaterial (GAMEMODE.MapManifest and
+					GAMEMODE.MapManifest.MeetingButtonBackground
+				) or ASSETS.bg
 
-		-- Fetch the line height.
-		-- Determine the total text height.
-		surface.SetFont "NMW AU Meeting Button"
-		_, lineHeight = surface.GetTextSize "A"
-		totalHeight = #@__textLines * lineHeight + #@__textLines - 1
+				lidClosedPosX  = (142 / 505) * size
+				lidClosedPosY  = (127 / 505) * size
+				lidClosedSizeX = (224 / 505) * size
+				lidClosedSizeY = (173 / 505) * size
 
-		-- Setup the 3D2D context.
-		cam.Start3D2D pos, angle, 0.075
-		do
-			for i, line in ipairs @__textLines
-				posX = 0
-				posY = -totalHeight/2 + (i - 1) * lineHeight + math.max 0, i - 2
+				lidOpenedPosX  = (324 / 505) * size
+				lidOpenedPosY  = (30  / 505) * size
+				lidOpenedSizeX = (148 / 505) * size
+				lidOpenedSizeY = (284 / 505) * size
 
-				-- Draw a "better" outline.
-				passes = 6
-				for i = -passes/2, passes/2
-					for j = -passes/2, passes/2
-						continue if i == 0 or j == 0
+				frontOverlayPosX  = (86  / 505) * size
+				frontOverlayPosY  = (239 / 505) * size
+				frontOverlaySizeX = (334 / 505) * size
+				frontOverlaySizeY = (113 / 505) * size
 
-						offsetX = 2 * i
-						offsetY = 2 * j
-						draw.SimpleText line.text, "NMW AU Meeting Button",
-							posX + offsetX, posY + offsetY, COLOR_BLACK, TEXT_ALIGN_CENTER
+				bubbleSizeX = (406 / 505) * size
+				bubbleSizeY = (204 / 505) * size
+				bubblePaddingSide  = (8  / 505) * size
+				bubblePaddingTop   = (96 / 505) * size
+				bubbleMarginBottom = (32 / 505) * size
 
-				-- Draw the actual text.
-				draw.SimpleText line.text, "NMW AU Meeting Button",
-					posX, posY,
-					line.color or Color(255, 255, 255),
-					TEXT_ALIGN_CENTER
+				buttonPosX  = (178 / 505) * size
+				buttonPosY  = (141 / 505) * size
+				buttonSizeX = (150 / 505) * size
+				buttonSizeY = (181 / 505) * size
+				buttonHitBoxSizeY = (138 / 505) * size
 
-		cam.End3D2D!
+				buttonJump = (16 / 505) * size
+
+				button = with \Add "DImage"
+					\SetSize buttonSizeX, buttonSizeY
+					\SetPos  buttonPosX , buttonPosY
+
+					\SetMaterial ASSETS.button
+
+					base.OnOpen = ->
+						return unless lidOpen\IsVisible!
+						\MoveTo buttonPosX, buttonPosY - buttonJump, 0.1, nil, nil, ->
+							\MoveTo buttonPosX, buttonPosY, 0.1
+
+				frontOverlay = with \Add "DImage"
+					\SetSize frontOverlaySizeX, frontOverlaySizeY
+					\SetPos  frontOverlayPosX , frontOverlayPosY
+
+					\SetMaterial ASSETS.frontoverlay
+
+				buttonHitBox = with \Add "DButton"
+					\SetSize buttonSizeX, buttonHitBoxSizeY
+					\SetPos button\GetPos!
+					\SetZPos 1
+
+					\SetText ""
+					.Paint = ->
+					.DoClick = -> GAMEMODE\Net_MeetingRequest! if lidOpen\IsVisible!
+
+				lidOpen = with \Add "DImage"
+					\SetSize lidOpenedSizeX, lidOpenedSizeY
+					\SetPos  lidOpenedPosX , lidOpenedPosY
+
+					\SetMaterial ASSETS.lidopen
+					\Hide!
+
+				lidClosed = with \Add "DImage"
+					\SetSize lidClosedSizeX, lidClosedSizeY
+					\SetPos  lidClosedPosX , lidClosedPosY
+
+					\SetMaterial ASSETS.lidclosed
+					\Hide!
+
+				bubble = with \Add "DImage"
+					\SetSize bubbleSizeX, bubbleSizeY
+					\CenterHorizontal!
+					\AlignBottom bubbleMarginBottom
+
+					\DockPadding bubblePaddingSide, bubblePaddingTop,
+						bubblePaddingSide, bubblePaddingSide
+
+					\SetMaterial ASSETS.bubble
+
+					surface.CreateFont "NMW AU Meeting Button Text", {
+						font: "Roboto"
+						size: bubbleSizeY / 6
+						weight: 550
+					}
+
+					bubbleText = with \Add "Panel"
+						\Dock FILL
+						.Paint = (_, w, h) ->
+							-- Fetch the line height.
+							-- Determine the total text height.
+							surface.SetFont "NMW AU Meeting Button Text"
+							_, lineHeight = surface.GetTextSize "A"
+							totalHeight = #textLines * lineHeight + #textLines - 1
+
+							for i, line in ipairs textLines
+								posX = w / 2
+								posY = h / 2 - totalHeight/2 + (i - 1) * lineHeight + math.max 0, i - 2
+
+								-- Draw the text.
+								draw.SimpleText line.text, "NMW AU Meeting Button Text",
+									posX, posY,
+									line.color or COLOR_BLACK,
+									TEXT_ALIGN_CENTER
+
+				.Think = =>
+					return unless GAMEMODE\IsGameInProgress!
+
+					-- Translate the button text.
+					-- This has been moved to @Think because of the table churn.
+					-- We don't want to create multiple throwaway tables 60+ times per second.
+					-- Do we?
+					if not @__nextLineUpdate or CurTime! > @__nextLineUpdate
+						@__nextLineUpdate = CurTime! + 0.5
+						time = GetGlobalFloat("NMW AU NextMeeting") - CurTime!
+
+						textLines = if GAMEMODE\IsMeetingDisabled!
+							lidClosed\Show!
+							lidOpen\Hide!
+							TRANSLATE("meetingButton.crisis")!
+
+						elseif time > 0
+							lidClosed\Show!
+							lidOpen\Hide!
+							TRANSLATE("meetingButton.cooldown") math.floor time
+
+						else
+							lidClosed\Hide!
+							lidOpen\Show!
+							TRANSLATE("meetingButton.default") LocalPlayer!\Nick!, LocalPlayer!\GetNWInt "NMW AU Meetings"
+
+			\Popup!
+
+			GAMEMODE\HUD_OpenVGUI base
+
+		return true
