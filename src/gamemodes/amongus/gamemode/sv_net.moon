@@ -409,8 +409,7 @@ net.Receive "NMW AU Flow", (len, ply) ->
 				target = if not skip
 					net.ReadUInt 8
 
-				if target = GAMEMODE.GameData.Lookup_PlayerByID[target]
-					GAMEMODE\Meeting_Vote playerTable, target
+				GAMEMODE\Meeting_Vote playerTable, GAMEMODE.GameData.Lookup_PlayerByID[target]
 
 		--
 		-- Player wants to sync the game data.

@@ -1,7 +1,5 @@
 DISCUSS_SPLASH_TIME = 3
 
-skipPlaceholder = { id: 0 }
-
 GM.Meeting_Start = (playerTable, bodyColor) =>
 	if "Player" == type playerTable
 		playerTable = playerTable\GetAUPlayerTable!
@@ -33,6 +31,7 @@ GM.Meeting_Start = (playerTable, bodyColor) =>
 
 	hook.Call "GMAU MeetingStart", nil, playerTable.entity, bodyColor
 
+	timer.Pause "NMW AU CheckWin"
 	@GameData.Timers[handle] = true
 	timer.Create handle, 3, 1, ->
 		-- Call janitors to get rid of the bodies.
@@ -75,7 +74,6 @@ GM.Meeting_Start = (playerTable, bodyColor) =>
 
 		-- Wait for the meeting to start.
 		timer.Create handle, time, 1, ->
-			@GameData.Voting = true
 			table.Empty @GameData.Votes
 			table.Empty @GameData.VotesMap
 
@@ -93,37 +91,67 @@ GM.Meeting_Start = (playerTable, bodyColor) =>
 
 						skip = math.random! > 0.8
 						rnd = table.Random @GetAlivePlayers!
-						@Meeting_Vote ply\GetAUPlayerTable!, not skip and rnd
+						@Meeting_Vote ply\GetAUPlayerTable!, not skip and rnd or nil
 
 			timer.Create handle, @ConVarSnapshots.VoteTime\GetInt!, 1, ->
 				@Meeting_End!
 
 	return true
 
-GM.Meeting_Vote = (playerTable, target) =>
-	if playerTable and @IsGameInProgress! and @GameData.Voting and not @GameData.VotesMap[playerTable] and not @GameData.DeadPlayers[playerTable]
-		@GameData.VotesMap[playerTable] = true
+GM.Meeting_Vote = (voter, target = 0) =>
+	-- Bail if the meeting isn't in progress.
+	return unless @IsGameInProgress!
+	return unless @IsMeetingInProgress!
 
-		if not target
-			target = skipPlaceholder
+	if "Player" == type voter
+		voter = voter\GetAUPlayerTable!
+	return unless voter
 
-		@GameData.Votes[target.id] or= {}
-		table.insert @GameData.Votes[target.id], playerTable.id
+	-- Bail if already voted.
+	return if @GameData.VotesMap[voter]
 
-		countAlive = 0
-		for ply in *@GameData.PlayerTables
-			if IsValid(ply.entity) and (not ply.entity\IsBot! or
-				(ply.entity\IsBot! and @ConVarSnapshots.MeetingBotVote\GetBool!)) and
-				not GAMEMODE.GameData.DeadPlayers[ply]
-					countAlive += 1
+	-- Bail if dead.
+	return if @GameData.DeadPlayers[voter]
 
-		voted = table.Count(@GameData.VotesMap)
+	-- If the provided target is a player, try getting the table.
+	if "Player" == type target
+		target = target\GetAUPlayerTable!
 
-		@Net_BroadcastVote playerTable, countAlive - voted
+	-- If the provided target is a player, retrieve the id.
+	if "table" == type target
+		target = target.id
 
-		if voted >= countAlive
-			timer.Destroy "meeting"
-			@Meeting_End!
+	-- If the provided target is a number, do a boundary check.
+	if "number" == type target
+		target = math.floor target
+
+		return unless target == 0 or @GameData.Lookup_PlayerByID[target]
+
+	-- Why are we still here?
+	return unless target
+
+	@GameData.VotesMap[voter] = true
+
+	-- Create a table for the target if doesn't exist and put our vote.
+	@GameData.Votes[target] or= {}
+	table.insert @GameData.Votes[target], voter.id
+
+	-- Count all alive players.
+	countAlive = 0
+	for ply in *@GameData.PlayerTables
+		if IsValid(ply.entity) and (not ply.entity\IsBot! or
+			(ply.entity\IsBot! and @ConVarSnapshots.MeetingBotVote\GetBool!)) and
+			not GAMEMODE.GameData.DeadPlayers[ply]
+				countAlive += 1
+
+	-- Count all current votes.
+	currentVotes = table.Count @GameData.VotesMap
+
+	-- Broadcast the vote. End the meeting if we have enough votes.
+	@Net_BroadcastVote voter, countAlive - currentVotes
+	if currentVotes >= countAlive
+		timer.Destroy "meeting"
+		@Meeting_End!
 
 GM.Meeting_FinalizeVotes = =>
 	voteTable = {}
@@ -132,8 +160,6 @@ GM.Meeting_FinalizeVotes = =>
 			:target
 			:votes
 		}
-
-	@GameData.Voting = false
 
 	table.sort voteTable, (a, b) ->
 		return #a.votes > #b.votes
@@ -160,7 +186,6 @@ GM.Meeting_End = =>
 
 	-- Calculate the extra time and anonymize the votes if required.
 	shouldAnonymize = @ConVarSnapshots.VoteAnonymous\GetBool!
-
 	maxVotes = 0
 	for vote in *voteTable
 		voteCount = #vote.votes
@@ -170,10 +195,12 @@ GM.Meeting_End = =>
 			for i = 1, voteCount
 				vote.votes[i] = 0
 
+	-- Calculate the total time and broadcast the end of the meeting.
 	time = @ConVarSnapshots.VotePostTime\GetInt! + (math.min(8, maxVotes) * 0.5 - .1)
 	@Net_BroadcastMeetingEnd voteTable, CurTime! + time
 
 	timer.Create handle, time, 1, ->
+		-- Wait {time} seconds, then broadcast the eject animation to the players.
 		@Net_BroadcastEject reason, ejected
 
 		if ejected
@@ -181,24 +208,27 @@ GM.Meeting_End = =>
 		else
 			@Logger.Info "Nobody has been ejected during the meeting"
 
-		timer.Pause "NMW AU CheckWin"
 		timer.Create handle, 8, 1, ->
+			-- The meeting is no longer in progress. Update variables and fire hooks.
+			@SetMeetingInProgress false
+			hook.Call "GMAU MeetingEnd", nil, reason, ejected
+
+			-- Actualy eject the most voted person.
 			if ejected
 				@Player_SetDead ejected
 
+			-- Check if someone has won.
+			return if @Game_CheckWin!
+
+			-- Unfreeze everyone.
 			for ply in *player.GetAll!
 				ply\Freeze false
 
-			if not @Game_CheckWin!
-				@Game_StartRound!
-
+			-- Restart the round and reset the timelimit timer if exists.
+			@Game_StartRound!
 			timer.UnPause "NMW AU CheckWin"
 			if timer.Exists "timelimit"
 				timer.UnPause "timelimit"
-
-			@SetMeetingInProgress false
-
-			hook.Call "GMAU MeetingEnd", nil, reason, ejected
 
 GM.Meeting_ResetCooldown = =>
 	SetGlobalFloat "NMW AU NextMeeting", CurTime! + @ConVarSnapshots.MeetingCooldown\GetFloat!
