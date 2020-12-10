@@ -229,11 +229,6 @@ meeting.OpenDiscuss = (caller, time) =>
 	@__voteItems = {}
 	@__currentState = STATES.begins
 
-	-- Wait for the discuss splash to disappear.
-	@NewAnimation DISCUSS_SPLASH_TIME, 0, 0, ->
-		@__megaphoneAnimation = @NewAnimation 2, 0, 0
-		@__kilAnimation = @NewAnimation 0.35, 0, 0
-
 	@__currentAnimation = @NewAnimation math.max(0, time - CurTime!), 0, 0, ->
 			-- Un-darken all buttons.
 			for id, voteItem in pairs @__voteItems
@@ -249,6 +244,15 @@ meeting.OpenDiscuss = (caller, time) =>
 			@__currentAnimation = @NewAnimation GAMEMODE.ConVarSnapshots.VoteTime\GetInt!, 0, 0
 
 	with @Add "EditablePanel"
+		-- Wait for the discuss splash to disappear.
+		@NewAnimation DISCUSS_SPLASH_TIME, 0, 0, ->
+			@__megaphoneAnimation = @NewAnimation 2, 0, 0
+			@__kilAnimation = @NewAnimation 0.35, 0, 0
+
+			-- Popup.
+			\MakePopup!
+			\SetKeyboardInputEnabled false
+
 		tabletWidth, tabletHeight = GAMEMODE.Render.FitMaterial MAT_MEETING_TABLET.tablet,
 			@GetWide!, @GetTall!
 
@@ -264,11 +268,6 @@ meeting.OpenDiscuss = (caller, time) =>
 		-- Animate the translucency.
 		\SetAlpha 0
 		\AlphaTo 255, 0.1, 0
-
-		-- Popup.
-		\MakePopup!
-		\SetKeyboardInputEnabled false
-		gui.EnableScreenClicker true
 
 		-- Paint the sprite.
 		.Image = MAT_MEETING_TABLET.tablet
@@ -1024,11 +1023,8 @@ meeting.OpenDiscuss = (caller, time) =>
 		\SetZPos 30
 		\SetAlpha 0
 		\AlphaTo 255, 0.1, 0
-		\AlphaTo 0, 0.1, 3, ->
+		\AlphaTo 0, 0.1, DISCUSS_SPLASH_TIME - 0.1, ->
 			\Remove!
-
-		\MakePopup!
-		\SetKeyboardInputEnabled false
 
 		.Paint = (_, w, h) ->
 			if not _.circle
@@ -1113,11 +1109,8 @@ meeting.OpenDiscuss = (caller, time) =>
 		\MoveTo @GetWide!/2 - size/2, @GetTall! * 0.15, 0.3, 0
 		\SetAlpha 0
 		\AlphaTo 255, 0.3, 0
-		\AlphaTo 0, 0.1, 3, ->
+		\AlphaTo 0, 0.1, DISCUSS_SPLASH_TIME - 0.1, ->
 			\Remove!
-
-		\MakePopup!
-		\SetKeyboardInputEnabled false
 
 		.Image = MAT_DISCUSS.text
 		.Paint = GAMEMODE.Render.DermaFitImage
