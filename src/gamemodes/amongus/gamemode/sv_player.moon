@@ -121,13 +121,15 @@ GM.Player_Kill = (victimTable, attackerTable) =>
 			attackerTable.entity\SetPos victimTable.entity\GetPos!
 
 	@Player_SetDead victimTable
-	@Net_KillNotify attackerTable
 	@Player_RefreshKillCooldown attackerTable
+	@Net_KillNotify attackerTable
 
-	@Net_SendNotifyKilled victimTable, attackerTable
 	@Player_CloseVGUI victimTable
 
-	@Game_CheckWin!
+	-- Check if the imposters have won.
+	-- Don't play the kill animation if they have.
+	if not @Game_CheckWin!
+		@Net_SendNotifyKilled victimTable, attackerTable
 
 --- Bumps the kill cooldown of a player.
 -- @param playerTable Player table.
