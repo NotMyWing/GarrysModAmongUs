@@ -202,8 +202,9 @@ hud.SetupButtons = (state, impostor) =>
 									if initializedPlayers
 										playerCount = #player.GetAll!
 										needed = GAMEMODE.ConVars.MinPlayers\GetInt!
+										maxPlayers = game.MaxPlayers!
 
-										\SetText "#{playerCount}/#{needed}"
+										\SetText "#{playerCount}/#{maxPlayers}"
 
 										\SetColor if playerCount > needed
 											white
