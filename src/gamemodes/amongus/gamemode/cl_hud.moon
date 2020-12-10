@@ -302,6 +302,11 @@ hook.Add "HUDPaintBackground", "NMW AU Hud", ->
 			ScrW! * 0.99, ScrH! * 0.01, COLOR_WHITE_VERSION,
 			TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP
 
+		if GAMEMODE.Version
+			draw.SimpleText "VERSION: #{string.upper GAMEMODE.Version}.", "NMW AU Version",
+				ScrW! * 0.99, ScrH! * 0.01 + ScreenScale(12), COLOR_WHITE_VERSION,
+				TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP
+
 	if GAMEMODE\IsGameInProgress!
 		if IsValid GAMEMODE.UseHighlight
 			color = GAMEMODE\GetHighlightColor GAMEMODE.UseHighlight
