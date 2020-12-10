@@ -359,9 +359,10 @@ GM.Net_BroadcastConnectDisconnect = (nickname, connected, spectator = false) =>
 -- @param playerTable Player table.
 -- @param id Sabotage ID.
 -- @param packet Data table.
-GM.Net_OpenVGUI = (playerTable, data) =>
+GM.Net_OpenVGUI = (playerTable, identifier, data) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.OpenVGUI, @FlowSize
+	net.WriteString identifier
 	net.WriteTable data
 	net.Send playerTable.entity
 

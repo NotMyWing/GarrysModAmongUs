@@ -315,21 +315,23 @@ GM.Player_CanOpenVGUI = (playerTable) =>
 -- or if his cooldown is paused by something, this will return false.
 --
 -- @param playerTable Player table.
--- @param vgui Identifier. Virtually anything. Preferably string.
+-- @param identifier Identifier. Strictly string.
 -- @param data Extra data to pass to the client.
 -- @param callback Optional callback to call when the GUI is closed.
-GM.Player_OpenVGUI = (playerTable, vgui, data = {}, callback) =>
+GM.Player_OpenVGUI = (playerTable, identifier, data = {}, callback) =>
+	assert "string" == type(identifier), "identifier must be string"
+
 	if "Player" == type playerTable
 		playerTable = playerTable\GetAUPlayerTable!
 	return unless playerTable
 
 	return false unless @Player_CanOpenVGUI playerTable
 
-	@GameData.CurrentVGUI[playerTable] = vgui
+	@GameData.CurrentVGUI[playerTable] = identifier
 	@Player_PauseKillCooldown playerTable
 
 	@GameData.VGUICallback[playerTable] = callback
-	@Net_OpenVGUI playerTable, data
+	@Net_OpenVGUI playerTable, identifier, data
 
 	return true
 
