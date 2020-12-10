@@ -88,6 +88,9 @@ DISCUSS_SPLASH_TIME = 3
 
 ROTATION_MATRIX = Matrix!
 
+MEETING_TIMER_SOUND = CreateSound Entity(0), "au/vote_timer.wav"
+MEETING_TIMER_SOUND\SetSoundLevel 0
+
 --- Creates the famous pre-vote popup.
 -- I had fun coming up with this one.
 meeting.PlayBackground = (callback) =>
@@ -649,7 +652,7 @@ meeting.OpenDiscuss = (caller, time) =>
 						@__chatOverlay\Toggle!
 
 			-- Footer.
-			with footer = innerPanel\Add "DOutlinedLabel"
+			with @__footer = innerPanel\Add "DOutlinedLabel"
 				\Dock BOTTOM
 				\DockMargin innerPanelMargin, 0,
 					footerMarginRight, 0
@@ -675,27 +678,20 @@ meeting.OpenDiscuss = (caller, time) =>
 							TRANSLATE("meeting.timer.ends") time
 					) .. " " -- yea
 
-				-- Holy color churn, Batman!
-				.GetColor = ->
-					return COLOR_WHITE unless @__currentState == STATES.ends
-					time = math.max 0, @__currentAnimation.EndTime - SysTime!
-					if time < 11
-						_, decTime = math.modf(time)
-						return Color 255, 255*decTime, 255*decTime
-
 				-- Hey, it could be worse.
 				lastPlayedSoundTime = -1
 				.Think = ->
 					return unless @__currentState == STATES.ends
 					time = math.max 0, @__currentAnimation.EndTime - SysTime!
 					if time < 11
-						intTime = math.modf(time)
+						intTime = math.modf time
 						if intTime ~= lastPlayedSoundTime
 							pitch = (20 * (5 - intTime)/5) + 110
-							print pitch
-							snd = CreateSound LocalPlayer!, "au/vote_timer.wav"
-							snd\PlayEx 1, pitch
+							-- MEETING_TIMER_SOUND\Stop!
+							MEETING_TIMER_SOUND\PlayEx 1, pitch
 							lastPlayedSoundTime = intTime
+							\SetColor COLOR_WHITE
+							\ColorTo COLOR_RED, 0.75, 0
 
 				-- Prepare the post-vote are that we can add voter icons to.
 				with @__skipArea = \Add "Panel"
@@ -1141,6 +1137,8 @@ meeting.End = (results = {}, time = 0) =>
 
 	@DisableAllButtons!
 	@PurgeConfirms!
+
+	@__footer\SetColor COLOR_WHITE
 
 	-- Always the skip button.
 	@__voteItems[0]\AlphaTo 0, 0.05
