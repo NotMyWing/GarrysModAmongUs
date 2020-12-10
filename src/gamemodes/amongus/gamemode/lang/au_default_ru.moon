@@ -123,6 +123,7 @@ with GM.Lang\Get "ru"
 		else
 			"%s Предателей среди " .. amongSubtext
 
+	["hud.sabotageAndKill"] = "Устраивай саботажи и убивай всех."
 	["hud.countdown"] = "Начало через %d"
 	["hud.tasks"] = "Задания:"
 	["hud.fakeTasks"] = "Фальшивые задания:"

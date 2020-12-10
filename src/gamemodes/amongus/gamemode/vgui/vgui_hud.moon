@@ -461,6 +461,10 @@ hud.SetupButtons = (state, impostor) =>
 
 		-- Kill button for imposerts. Content-aware.
 		if impostor
+			with @AddTaskEntry!
+				\SetText tostring TRANSLATE "hud.sabotageAndKill"
+				\SetColor Color 255, 0, 0
+
 			with @kill = @buttons\Add "Panel"
 				\SetWide @buttons\GetTall!
 				\DockMargin 0, 0, ScreenScale(5), 0

@@ -129,6 +129,7 @@ with GM.Lang\Get "en"
 		else
 			"There are %s Imposters among " .. amongSubtext
 
+	["hud.sabotageAndKill"] = "Sabotage and kill everyone."
 	["hud.countdown"] = "Starting in %d"
 	["hud.tasks"] = "Tasks:"
 	["hud.fakeTasks"] = "Fake Tasks:"
