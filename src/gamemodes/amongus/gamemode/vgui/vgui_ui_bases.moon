@@ -45,6 +45,8 @@ vgui.Register "AmongUsVGUIBase", {
 		@__isOpened = true
 
 		@MakePopup!
+		@SetKeyboardInputEnabled false
+
 		@SetVisible true
 		@AlphaTo 255, 0.1, 0.01
 		surface.PlaySound @GetAppearSound!
@@ -66,6 +68,8 @@ vgui.Register "AmongUsVGUIBase", {
 	Close: (force = false) =>
 		return false unless @__isOpened
 		return false if not force and @__isAnimating
+		@SetMouseInputEnabled false
+
 		@__isOpened = false
 
 		@AlphaTo 0, 0.1
