@@ -688,7 +688,7 @@ hud.Think = =>
 					\SetText "  " .. TRANSLATE "tasks.totalCompleted.sabotaged"
 					\SetColor Color 255, 64, 64
 
-					@SetTaskbarValue 0
+					@taskbar\AlphaTo 0, 1
 
 				-- Comms have been fixed.
 				-- Restore the task list and remove the blinker.
@@ -703,6 +703,8 @@ hud.Think = =>
 
 					\SetText "  " .. TRANSLATE "tasks.totalCompleted"
 					\SetColor Color 255, 255, 255
+
+					@taskbar\AlphaTo 255, 1
 
 			@__oldCommsSabotaged = commsSabotaged
 
