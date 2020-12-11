@@ -357,8 +357,10 @@ GM.Game_StopAutoPilotTimer = =>
 	if timer.Exists "NMW AU AutoPilot"
 		timer.Remove "NMW AU AutoPilot"
 
+
+
 hook.Add "KeyPress", "NMW AU GameStart", (ply, key) -> with GAMEMODE
-	if (ply\IsAdmin! or ply\IsListenServerHost!) and key == IN_JUMP
+	if ((CAMI.PlayerHasAccess ply, GAMEMODE.PRIV_START_ROUND) or ply\IsListenServerHost!) and key == IN_JUMP
 		-- Bail if the game is in progress.
 		return if \IsGameInProgress!
 
