@@ -158,7 +158,7 @@ GM.Game_Start = =>
 		-- Make everyone else spectators.
 		for ply in *player.GetAll!
 			if not @GameData.Lookup_PlayerByEntity[ply]
-				@Player_Hide ply
+				@Player_HideForAlivePlayers ply
 				@Spectate_CycleMode ply
 
 		-- Shuffle.
