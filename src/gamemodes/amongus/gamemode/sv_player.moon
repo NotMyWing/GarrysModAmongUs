@@ -360,6 +360,13 @@ GM.PlayerSpawn = (ply) =>
 	ply\SetTeam 1
 	ply\SetNoCollideWithTeammates true
 
+--- Returns a table of fully initialized players.
+GM.GetFullyInitializedPlayers = => return for ply in *player.GetAll!
+	if ply\IsBot! or (ply\GetInfoNum("au_spectator_mode", 0) == 0 and ply\GetNWBool "NMW AU Initialized")
+		ply
+	else
+		continue
+
 hook.Add "PlayerInitialSpawn", "NMW AU AutoPilot", (ply) -> with GAMEMODE
 	oldAutoPilot = \IsOnAutoPilot!
 

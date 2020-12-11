@@ -226,6 +226,7 @@ with GM.Lang\Get "en"
 
 	tabs = {
 		"color": "Color"
+		"settings": "Settings"
 		"game":  "Game"
 		"controls": "Controls"
 		"about": "About"
@@ -233,3 +234,11 @@ with GM.Lang\Get "en"
 
 	for key, value in pairs tabs
 		["help.tab.#{key}"] = value
+
+	settingsCvars = {
+		"au_spectator_mode": "Spectator mode"
+		"au_debug_drawversion": "Display the current version"
+	}
+
+	for key, value in pairs settingsCvars
+		["help.settings.#{key}"] = value

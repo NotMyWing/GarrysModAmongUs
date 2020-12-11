@@ -220,6 +220,7 @@ with GM.Lang\Get "ru"
 
 	tabs = {
 		"color": "Цвет"
+		"settings": "Настройки"
 		"game":  "Игра"
 		"controls": "Управление"
 		"about": "О режиме"
@@ -227,3 +228,11 @@ with GM.Lang\Get "ru"
 
 	for key, value in pairs tabs
 		["help.tab.#{key}"] = value
+
+	settingsCvars = {
+		"au_spectator_mode": "Режим наблюдателя"
+		"au_debug_drawversion": "Отображать версию в правом углу"
+	}
+
+	for key, value in pairs settingsCvars
+		["help.settings.#{key}"] = value
