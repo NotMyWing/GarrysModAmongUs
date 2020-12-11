@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="64"
+   height="64"
+   viewBox="0 0 64 64"
+   version="1.1"
+   id="svg8"
+   inkscape:version="1.0.1 (1.0.1+r74)"
+   sodipodi:docname="circle_button.svg">
+  <defs
+     id="defs2">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient1156">
+      <stop
+         style="stop-color:#adadad;stop-opacity:1;"
+         offset="0"
+         id="stop1152" />
+      <stop
+         style="stop-color:#adadad;stop-opacity:1"
+         offset="0.68219936"
+         id="stop1160" />
+      <stop
+         style="stop-color:#333233;stop-opacity:1"
+         offset="1"
+         id="stop1154" />
+    </linearGradient>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1156"
+       id="radialGradient1158"
+       cx="309"
+       cy="1084"
+       fx="309"
+       fy="1084"
+       r="18.5"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.017863,0,0,1.0178448,-282.51953,-1071.3441)" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="11.313708"
+     inkscape:cx="33.925537"
+     inkscape:cy="34.331056"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     units="px"
+     inkscape:snap-global="true"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:snap-smooth-nodes="true" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     id="layer1"
+     inkscape:groupmode="layer"
+     style="display:inline">
+    <ellipse
+       style="font-variation-settings:normal;display:inline;vector-effect:none;fill:#848584;fill-opacity:1;stroke:#313431;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000"
+       id="path1124"
+       cx="32.000137"
+       cy="31.999662"
+       rx="28.500164"
+       ry="28.499655" />
+    <circle
+       style="font-variation-settings:normal;display:inline;vector-effect:none;fill:url(#radialGradient1158);fill-opacity:1;stroke:#4f4d4f;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000"
+       id="circle1126"
+       cx="32.000137"
+       cy="31.999662"
+       r="17" />
+    <path
+       id="circle1132"
+       style="font-variation-settings:normal;display:inline;vector-effect:none;fill:#bfbfbf;fill-opacity:1;stroke:none;stroke-width:2.99999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000"
+       d="M 29.868986,7.6469345 A 21.86229,21.861899 0 0 0 8.006795,29.508714 21.86229,21.861899 0 0 0 8.8994202,35.693343 24.713895,24.713453 0 0 1 8.7562781,33.037378 24.713895,24.713453 0 0 1 33.469279,8.3228852 a 24.713895,24.713453 0 0 1 2.15103,0.095677 21.86229,21.861899 0 0 0 -5.751323,-0.7713228 z"
+       inkscape:transform-center-x="10.008482"
+       inkscape:transform-center-y="-10.148651" />
+    <path
+       id="path1150"
+       style="font-variation-settings:normal;display:inline;vector-effect:none;fill:#bfbfbf;fill-opacity:1;stroke:none;stroke-width:2.99999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:fill markers stroke;stop-color:#000000"
+       d="m 34.132641,56.352821 a 21.86229,21.861899 0 0 0 21.862191,-21.861779 21.86229,21.861899 0 0 0 -0.892625,-6.184629 24.713895,24.713453 0 0 1 0.143142,2.655965 24.713895,24.713453 0 0 1 -24.713001,24.714493 24.713895,24.713453 0 0 1 -2.15103,-0.09568 21.86229,21.861899 0 0 0 5.751323,0.771323 z"
+       inkscape:transform-center-x="-10.008478"
+       inkscape:transform-center-y="10.148649" />
+  </g>
+</svg>
