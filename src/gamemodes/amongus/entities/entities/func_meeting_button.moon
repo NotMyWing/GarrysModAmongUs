@@ -31,12 +31,12 @@ if CLIENT
 	COLOR_BLACK = Color 0, 0, 0
 
 	ASSETS = {asset, Material("au/gui/meeting/button/#{asset}.png", "smooth") for asset in *{
-		"bg"
+		"background"
 		"bubble"
 		"button"
-		"frontoverlay"
-		"lidclosed"
-		"lidopen"
+		"button_clip"
+		"lid_closed"
+		"lid_open"
 	}}
 
 	ENT.Think = =>
@@ -59,7 +59,7 @@ if CLIENT
 
 				\SetMaterial (GAMEMODE.MapManifest and
 					GAMEMODE.MapManifest.MeetingButtonBackground
-				) or ASSETS.bg
+				) or ASSETS.background
 
 				lidClosedPosX  = (142 / 505) * size
 				lidClosedPosY  = (127 / 505) * size
@@ -71,45 +71,45 @@ if CLIENT
 				lidOpenedSizeX = (148 / 505) * size
 				lidOpenedSizeY = (284 / 505) * size
 
-				frontOverlayPosX  = (86  / 505) * size
-				frontOverlayPosY  = (239 / 505) * size
-				frontOverlaySizeX = (334 / 505) * size
-				frontOverlaySizeY = (113 / 505) * size
-
 				bubbleSizeX = (406 / 505) * size
 				bubbleSizeY = (204 / 505) * size
 				bubblePaddingSide  = (8  / 505) * size
 				bubblePaddingTop   = (96 / 505) * size
 				bubbleMarginBottom = (32 / 505) * size
 
-				buttonPosX  = (178 / 505) * size
+				buttonPosX  = (166 / 505) * size
 				buttonPosY  = (141 / 505) * size
-				buttonSizeX = (150 / 505) * size
+				buttonSizeX = (172 / 505) * size
 				buttonSizeY = (181 / 505) * size
 				buttonHitBoxSizeY = (138 / 505) * size
+				buttonClip = (35 / 505) * size
 
 				buttonJump = (16 / 505) * size
 
-				button = with \Add "DImage"
+				button_clip = with \Add "Panel"
+					\SetSize buttonSizeX, buttonSizeY
+					\SetPos  buttonPosX , buttonPosY - buttonClip
+
+					button = with \Add "DImage"
+						\SetSize buttonSizeX, buttonSizeY
+						\SetPos  0 , buttonClip
+
+						\SetMaterial ASSETS.button
+
+						base.OnOpen = ->
+							return unless lidOpen\IsVisible!
+							\MoveTo 0, buttonClip - buttonJump, 0.1, nil, nil, ->
+								\MoveTo 0, buttonClip, 0.1
+
+				frontOverlay = with \Add "DImage"
 					\SetSize buttonSizeX, buttonSizeY
 					\SetPos  buttonPosX , buttonPosY
 
-					\SetMaterial ASSETS.button
-
-					base.OnOpen = ->
-						return unless lidOpen\IsVisible!
-						\MoveTo buttonPosX, buttonPosY - buttonJump, 0.1, nil, nil, ->
-							\MoveTo buttonPosX, buttonPosY, 0.1
-
-				frontOverlay = with \Add "DImage"
-					\SetSize frontOverlaySizeX, frontOverlaySizeY
-					\SetPos  frontOverlayPosX , frontOverlayPosY
-
-					\SetMaterial ASSETS.frontoverlay
+					\SetMaterial ASSETS.button_clip
 
 				buttonHitBox = with \Add "DButton"
 					\SetSize buttonSizeX, buttonHitBoxSizeY
-					\SetPos button\GetPos!
+					\SetPos buttonPosX , buttonPosY
 					\SetZPos 1
 
 					\SetText ""
@@ -120,14 +120,14 @@ if CLIENT
 					\SetSize lidOpenedSizeX, lidOpenedSizeY
 					\SetPos  lidOpenedPosX , lidOpenedPosY
 
-					\SetMaterial ASSETS.lidopen
+					\SetMaterial ASSETS.lid_open
 					\Hide!
 
 				lidClosed = with \Add "DImage"
 					\SetSize lidClosedSizeX, lidClosedSizeY
 					\SetPos  lidClosedPosX , lidClosedPosY
 
-					\SetMaterial ASSETS.lidclosed
+					\SetMaterial ASSETS.lid_closed
 					\Hide!
 
 				bubble = with \Add "DImage"
