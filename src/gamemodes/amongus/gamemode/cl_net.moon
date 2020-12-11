@@ -240,6 +240,8 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	-- Reading the caller is kind of redundant, but whatever.
 	--
 	when GAMEMODE.FlowTypes.MeetingOpenDiscuss
+		return unless IsValid GAMEMODE.Hud.Meeting
+
 		caller = GAMEMODE.GameData.Lookup_PlayerByID[net.ReadUInt 8]
 		time = net.ReadDouble!
 		GAMEMODE.Hud.Meeting\OpenDiscuss caller, time
@@ -251,6 +253,8 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	-- Makes an "I Voted" icon pop up above the voter.
 	--
 	when GAMEMODE.FlowTypes.MeetingVote
+		return unless IsValid GAMEMODE.Hud.Meeting
+
 		voter = GAMEMODE.GameData.Lookup_PlayerByID[net.ReadUInt 8]
 		if voter
 			remaining = net.ReadUInt 8
@@ -264,26 +268,27 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	-- Shows the results.
 	--
 	when GAMEMODE.FlowTypes.MeetingEnd
-		if IsValid GAMEMODE.Hud.Meeting
-			results = {}
-			resultsLength = net.ReadUInt 8
-			for i = 1, resultsLength
-				t = {
-					targetid: net.ReadUInt 8
-					votes: {}
-				}
-				numVoters = net.ReadUInt 8
+		return unless IsValid GAMEMODE.Hud.Meeting
 
-				for i = 1, numVoters
-					table.insert t.votes, net.ReadUInt 8
+		results = {}
+		resultsLength = net.ReadUInt 8
+		for i = 1, resultsLength
+			t = {
+				targetid: net.ReadUInt 8
+				votes: {}
+			}
+			numVoters = net.ReadUInt 8
 
-				table.insert results, t
+			for i = 1, numVoters
+				table.insert t.votes, net.ReadUInt 8
 
-			time = net.ReadDouble!
+			table.insert results, t
 
-			GAMEMODE.Hud.Meeting\End results, time
+		time = net.ReadDouble!
 
-			system.FlashWindow!
+		GAMEMODE.Hud.Meeting\End results, time
+
+		system.FlashWindow!
 
 	--
 	-- Meeting 4/4.
