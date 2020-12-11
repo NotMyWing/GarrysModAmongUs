@@ -117,8 +117,11 @@ GM.Meeting_Vote = (voter, target = 0) =>
 	if "Player" == type target
 		target = target\GetAUPlayerTable!
 
+	local targetTable
+
 	-- If the provided target is a player, retrieve the id.
 	if "table" == type target
+		targetTable = target
 		target = target.id
 
 	-- If the provided target is a number, do a boundary check.
@@ -126,6 +129,11 @@ GM.Meeting_Vote = (voter, target = 0) =>
 		target = math.floor target
 
 		return unless target == 0 or @GameData.Lookup_PlayerByID[target]
+
+	targetTable or= @GameData.Lookup_PlayerByID[target]
+
+	-- Bail if dead.
+	return if @GameData.DeadPlayers[targetTable]
 
 	-- Why are we still here?
 	return unless target

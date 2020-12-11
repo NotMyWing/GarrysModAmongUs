@@ -986,6 +986,7 @@ meeting.OpenDiscuss = (caller, time) =>
 									.DoClick = (this) ->
 										return unless @CanIVote!
 										return if IsValid playerItem.confirm
+										return if GAMEMODE.GameData.DeadPlayers[playerTable]
 
 										surface.PlaySound "au/votescreen_avote.ogg"
 
