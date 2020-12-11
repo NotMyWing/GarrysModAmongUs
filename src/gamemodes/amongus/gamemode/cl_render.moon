@@ -104,6 +104,7 @@ GM.GetHighlightColor = (entity) => if IsValid entity
 
 hook.Add "PreDrawHalos", "NMW AU Highlight", ->
 	return unless GAMEMODE\IsGameInProgress!
+	return unless IsValid(LocalPlayer!) and LocalPlayer!\GetAUPlayerTable!
 
 	-- Highlight sabotage buttons.
 	for btn in pairs GAMEMODE.GameData.SabotageButtons
