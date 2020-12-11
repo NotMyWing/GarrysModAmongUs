@@ -151,10 +151,13 @@ meeting.DisableAllButtons = =>
 
 meeting.CanIVote = =>
 	localPlayer = LocalPlayer!
+	localPlayerTable = localPlayer\GetAUPlayerTable!
+
 	return @__currentState == STATES.ends and
 		IsValid(localPlayer) and
-		localPlayer\GetAUPlayerTable! and
-		not localPlayer\IsDead!
+		localPlayerTable and
+		not localPlayer\IsDead! and
+		not @__voted[localPlayerTable]
 
 --- Purges all existing confirms.
 meeting.PurgeConfirms = =>
@@ -1122,6 +1125,9 @@ meeting.ApplyVote = (playerTable, remaining) =>
 	@__voted[playerTable] = true
 	@__chatButton\Bump!
 	@__chatOverlay\PushVote playerTable, remaining
+
+	if playerTable == LocalPlayer!\GetAUPlayerTable!
+		@PurgeConfirms!
 
 	if btn = @__voteItems[playerTable.id]
 		if playerTable.entity ~= LocalPlayer!
