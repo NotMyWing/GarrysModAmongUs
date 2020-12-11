@@ -220,6 +220,8 @@ hud.SetupButtons = (state, impostor) =>
 						.Think = ->
 							\SetText tostring if not GAMEMODE.MapManifest
 								TRANSLATE "prepare.invalidMap"
+							elseif GAMEMODE.ClientSideConVars.SpectatorMode\GetBool!
+								TRANSLATE "prepare.spectator"
 							elseif not GAMEMODE.ConVars.ForceAutoWarmup\GetBool! and LocalPlayer!\IsAdmin!
 								TRANSLATE "prepare.admin"
 							else
@@ -234,25 +236,23 @@ hud.SetupButtons = (state, impostor) =>
 						\SetColor Color 255, 255, 255
 
 						.Think = ->
-							if initializedPlayers
-								playerCount = #initializedPlayers
-								needed = GAMEMODE.ConVars.MinPlayers\GetInt!
+							needed = GAMEMODE.ConVars.MinPlayers\GetInt!
 
-								\SetText tostring if not GAMEMODE.MapManifest
-									TRANSLATE "prepare.invalidMap.subText"
-								elseif playerCount < needed
-									TRANSLATE "prepare.waitingForPlayers"
-								elseif not GAMEMODE.ConVars.ForceAutoWarmup\GetBool! and LocalPlayer!\IsAdmin!
-									TRANSLATE("prepare.pressToStart") string.upper input.LookupBinding("jump") or "???"
+							\SetText tostring if not GAMEMODE.MapManifest
+								TRANSLATE "prepare.invalidMap.subText"
+							elseif GAMEMODE\GetFullyInitializedPlayerCount! < needed
+								TRANSLATE "prepare.waitingForPlayers"
+							elseif not GAMEMODE.ConVars.ForceAutoWarmup\GetBool! and LocalPlayer!\IsAdmin!
+								TRANSLATE("prepare.pressToStart") string.upper input.LookupBinding("jump") or "???"
+							else
+								if not (GAMEMODE.ConVars.ForceAutoWarmup\GetBool! or GAMEMODE\IsOnAutoPilot!)
+									TRANSLATE "prepare.waitingForAdmin"
 								else
-									if not (GAMEMODE.ConVars.ForceAutoWarmup\GetBool! or GAMEMODE\IsOnAutoPilot!)
-										TRANSLATE "prepare.waitingForAdmin"
+									time = math.max 0, GetGlobalFloat("NMW AU AutoPilotTimer") - CurTime!
+									if time > 0
+										TRANSLATE("prepare.commencing") time
 									else
-										time = math.max 0, GetGlobalFloat("NMW AU AutoPilotTimer") - CurTime!
-										if time > 0
-											TRANSLATE("prepare.commencing") time
-										else
-											""
+										""
 
 		return
 

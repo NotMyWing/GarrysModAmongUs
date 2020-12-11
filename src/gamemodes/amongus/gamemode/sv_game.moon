@@ -380,8 +380,8 @@ hook.Add "KeyPress", "NMW AU GameStart", (ply, key) -> with GAMEMODE
 hook.Add "PlayerDisconnected", "NMW AU CheckWin", (ply) -> with GAMEMODE
 	initializedPlayers = \GetFullyInitializedPlayers!
 
-	if #initializedPlayers == 0
-		@Logger.Info "Everyone left. Stopping the game."
+	if (\IsGameInProgress! or \IsGameCommencing!) and #initializedPlayers <= 1
+		.Logger.Info "Everyone left. Stopping the game."
 		\Game_Restart!
 		return
 

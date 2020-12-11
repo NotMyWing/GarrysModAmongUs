@@ -169,6 +169,7 @@ with GM.Lang\Get "en"
 	["vote.voted"] = "%s has voted. %s remaining."
 
 	["prepare.admin"] = "You're an Admin!"
+	["prepare.spectator"] = "You're a Spectator."
 	["prepare.pressToStart"] = "Press [%s] to start the game."
 
 	["prepare.invalidMap"] = "Invalid Map!"

@@ -536,4 +536,4 @@ GM.SetOnAutoPilot = (newState) =>
 --- Sets the networked amount of fully initialized players.
 -- @return You guessed it again.
 GM.SetFullyInitializedPlayerCount = (newCount) =>
-	GetGlobalInt "NMW AU FullyInitializedPlayers", newCount
+	SetGlobalInt "NMW AU FullyInitializedPlayers", newCount

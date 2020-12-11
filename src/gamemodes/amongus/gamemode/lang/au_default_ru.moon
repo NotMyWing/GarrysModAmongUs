@@ -163,6 +163,7 @@ with GM.Lang\Get "ru"
 	["vote.voted"] = "%s проголосовал(а). Осталось %s."
 
 	["prepare.admin"] = "Ты Админ!"
+	["prepare.admin"] = "Ты Наблюдатель."
 	["prepare.pressToStart"] = "Нажми [%s] чтобы начать игру."
 
 	["prepare.invalidMap"] = "Неправильная карта!"
