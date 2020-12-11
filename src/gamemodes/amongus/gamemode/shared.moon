@@ -229,7 +229,7 @@ GM.TracePlayerFilter = {
 }
 
 GM.SplashScreenTime = 8
-GM.BaseUseRadius = 96
+GM.BaseUseRadius = 64
 
 --- Fetches all valid and alive players.
 -- This is only ever used once, and not for the gameplay reasons.
