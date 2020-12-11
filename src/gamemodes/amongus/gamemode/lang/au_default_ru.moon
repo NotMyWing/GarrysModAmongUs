@@ -150,6 +150,7 @@ with GM.Lang\Get "ru"
 		au_meeting_vote_pre_time:  "Время до голосования"
 		au_meeting_vote_post_time: "Время после голосования"
 		au_confirm_ejects:         "Роли выброшенных"
+		au_meeting_anonymous:      "Анонимное голосование"
 
 		au_tasks_short:  "Коротких задания"
 		au_tasks_long:   "Длинных заданий"

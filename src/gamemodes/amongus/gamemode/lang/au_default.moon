@@ -156,6 +156,7 @@ with GM.Lang\Get "en"
 		au_meeting_vote_pre_time:  "Pre-Voting Time"
 		au_meeting_vote_post_time: "Post-Voting Time"
 		au_confirm_ejects:         "Confirm Ejects"
+		au_meeting_anonymous: "Anonymous voting"
 
 		au_tasks_short:  "Short Tasks"
 		au_tasks_long:   "Long Tasks"

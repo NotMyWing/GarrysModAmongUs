@@ -37,6 +37,7 @@ GM.ConVarsDisplay = {
 			{ "Time" , "VotePreTime"       }
 			{ "Time" , "VotePostTime"      }
 			{ "Bool" , "ConfirmEjects"     }
+			{ "Bool" , "VoteAnonymous"     }
 		}
 	}
 	{
