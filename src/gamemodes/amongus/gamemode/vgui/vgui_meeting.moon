@@ -747,7 +747,7 @@ meeting.OpenDiscuss = (caller, time) =>
 						surface.PlaySound "au/votescreen_avote.ogg"
 
 						skipButton.confirm = with @CreateConfirm headerHeight * 0.9
-							\SetParent footer
+							\SetParent @__footer
 							\SetPos skipWidth * 0.2 + skipWidth, 0
 							\CenterVertical!
 
