@@ -127,17 +127,10 @@ hud.SetupButtons = (state, impostor) =>
 
 		-- Round overlay.
 		@roundOverlay = with @Add "Panel"
-			nextCheck = 0
-			local initializedPlayers
 
 			\SetZPos 30001
 			\SetSize ScrW!, ScrH! * 0.125
 			\SetPos 0, ScrH! * 0.75
-
-			.Think = ->
-				if GAMEMODE.ConVarSnapshots and SysTime! > nextCheck
-					nextCheck = SysTime! + 0.5
-					initializedPlayers = GAMEMODE\GetFullyInitializedPlayers!
 
 			with \Add "Panel"
 				margin = ScrW! * 0.25
@@ -161,10 +154,10 @@ hud.SetupButtons = (state, impostor) =>
 							\SetText ""
 							\SetFont "NMW AU Start Subtext"
 							.Think = ->
-								if initializedPlayers
-									imposterCount = math.min GAMEMODE.ConVars.ImposterCount\GetInt!, GAMEMODE\GetImposterCount #initializedPlayers
+								imposterCount = math.min GAMEMODE.ConVars.ImposterCount\GetInt!,
+									GAMEMODE\GetImposterCount GAMEMODE\GetFullyInitializedPlayerCount!
 
-									\SetText tostring TRANSLATE("prepare.imposterCount") imposterCount
+								\SetText tostring TRANSLATE("prepare.imposterCount") imposterCount
 
 						-- Count container.
 						with \Add "Panel"
@@ -199,19 +192,18 @@ hud.SetupButtons = (state, impostor) =>
 								white  = Color 255, 255, 255
 
 								.Think = ->
-									if initializedPlayers
-										playerCount = #player.GetAll!
-										needed = GAMEMODE.ConVars.MinPlayers\GetInt!
-										maxPlayers = game.MaxPlayers!
+									playerCount = GAMEMODE\GetFullyInitializedPlayerCount!
+									needed = GAMEMODE.ConVars.MinPlayers\GetInt!
+									maxPlayers = game.MaxPlayers!
 
-										\SetText "#{playerCount}/#{maxPlayers}"
+									\SetText "#{playerCount}/#{maxPlayers}"
 
-										\SetColor if playerCount > needed
-											white
-										elseif playerCount == needed
-											yellow
-										else
-											red
+									\SetColor if playerCount > needed
+										white
+									elseif playerCount == needed
+										yellow
+									else
+										red
 
 				-- Middle
 				with \Add "Panel"

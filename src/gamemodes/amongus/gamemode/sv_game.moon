@@ -418,9 +418,11 @@ timer.Create "NMW AU AutoPilotChecker", 0.25, 0, ->
 
 		return
 
-	initializedPlayers = GAMEMODE\GetFullyInitializedPlayers!
+	initializedPlayerCount = #GAMEMODE\GetFullyInitializedPlayers!
 	auto = GAMEMODE.ConVars.ForceAutoWarmup\GetBool! or GAMEMODE\IsOnAutoPilot!
-	enough = #initializedPlayers >= GAMEMODE.ConVars.MinPlayers\GetInt!
+	enough = initializedPlayerCount >= GAMEMODE.ConVars.MinPlayers\GetInt!
+
+	GAMEMODE\SetFullyInitializedPlayerCount initializedPlayerCount
 
 	if enough and auto and not timer.Exists "NMW AU AutoPilot"
 		GAMEMODE.Logger.Info "Starting the automated round management"

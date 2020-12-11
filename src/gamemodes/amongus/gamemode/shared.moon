@@ -440,15 +440,11 @@ GM.IsGameCommencing = => GetGlobalBool "NMW AU GameCommencing"
 -- @return You guessed it.
 GM.IsOnAutoPilot = => GetGlobalBool "NMW AU AutoPilot"
 
---- Returns a table of fully initialized players.
-GM.GetFullyInitializedPlayers = => return for ply in *player.GetAll!
-	if ply\IsBot! or (ply\GetInfoNum("au_spectator_mode", 0) == 0 and ply\GetNWBool "NMW AU Initialized")
-		ply
-	else
-		continue
-
 --- Gets the imposter count based on the provided number.
 GM.GetImposterCount = (_, count) -> math.floor(((count or _) - 1)/6) + 1
+
+--- Gets the count of fully initialized players from the server.
+GM.GetFullyInitializedPlayerCount = => GetGlobalInt "NMW AU FullyInitializedPlayers"
 
 --- Tells the game mode that the entity should be highlighted as usable.
 -- @param entity Entity to be highlighted.

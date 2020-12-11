@@ -532,3 +532,8 @@ GM.SetGameState = (newState) =>
 -- @return You guessed it again.
 GM.SetOnAutoPilot = (newState) =>
 	SetGlobalBool "NMW AU AutoPilot", newState
+
+--- Sets the networked amount of fully initialized players.
+-- @return You guessed it again.
+GM.SetFullyInitializedPlayerCount = (newCount) =>
+	GetGlobalInt "NMW AU FullyInitializedPlayers", newCount
