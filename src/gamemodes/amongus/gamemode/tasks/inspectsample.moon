@@ -44,14 +44,16 @@ if CLIENT
 
 	ASSETS = {asset, Material("au/gui/tasks/inspectsample/#{asset}.png", "smooth") for asset in *{
 		"background"
-		"button"
-		"circlebutton"
+		"square_button"
+		"circle_button"
+		"test_tube"
 		"fluid"
-		"glassback"
-		"glassfront"
-		"glassshelf"
-		"overlay"
-		"thing"
+		"rack_back"
+		"rack_front"
+		"shelf"
+		"bottom_panel"
+		"top_panel"
+		"nozzle"
 	}}
 
 	SOUNDS = {
@@ -69,41 +71,43 @@ if CLIENT
 				@shelfVisible = false
 				local shelf
 				failTime = 0
-				beakers = {}
+				testTubes = {}
 
 				max_size = ScrH! * 0.8
 
 				width, height = GAMEMODE.Render.FitMaterial ASSETS.background,
 					max_size, max_size
 
+				topPanelWidth, topPanelHeight = GAMEMODE.Render.FitMaterial ASSETS.top_panel, width, height
+				bottomPanelWidth, bottomPanelHeight = GAMEMODE.Render.FitMaterial ASSETS.bottom_panel, width, height
+				bottomPanelPosX = (width / 2) - (bottomPanelWidth / 2)
+				bottomPanelPosY = height - bottomPanelHeight + 1
+
 				\SetSize width, height
 				\SetMaterial ASSETS.background
 
 				-- That's a LOT of hard-coded things, man.
-				shelfPosX   = (8   / 506) * width
-				shelfPosY   = (160 / 502) * height
+				shelfWidth, shelfHeight = GAMEMODE.Render.FitMaterial ASSETS.shelf, 486 / 500 * width, height
 
-				shelfWidth  = (490 / 506) * width
-				shelfHeight = (225 / 502) * height
+				shelfPosX = (width / 2) - (shelfWidth / 2)
+				shelfPosY = 154 / 500 * height
 
-				fluidWidth   = (30  / 506) * width
-				fluidHeight  = (87  / 502) * height
-				fluidStartX  = (104 / 506) * width
-				fluidStartY  = (48  / 502) * height
-				fluidSpacing = (63  / 506) * width
+				testTubeSpacing = (64  / 490) * shelfWidth
+				testTubeWidth, testTubeHeight = GAMEMODE.Render.FitMaterial ASSETS.test_tube, 34 / 500 * width, height
+				testTubeStartX  = (shelfWidth / 2) - ((testTubeSpacing * 4 / 2) + (testTubeWidth / 2))
+				testTubeStartY = 0
 
-				thingWidth   = (41 / 506) * width
-				thingHeight  = (43 / 502) * height
-				thingOffsetX = (shelfPosX + fluidStartX + fluidWidth / 2) - thingWidth / 2
-				thingOffsetY = (58 / 502) * height
+				nozzleWidth, nozzleHeight = GAMEMODE.Render.FitMaterial ASSETS.nozzle, 38 / 504 * width, 40 / 504 * width
+				nozzleOffsetX = (width / 2) - ((testTubeSpacing * 4 / 2) + (nozzleWidth / 2))
+				nozzleOffsetY = topPanelHeight - (nozzleHeight * 0.1)
 
 				-- Top label.
 				-- Cannot be assigned text to.
 				with \Add "Panel"
-					labelPositionX = (155 / 506) * width
-					labelPositionY = (19  / 502) * height
-					labelWidth  = (197 / 506) * width
-					labelHeight = (20  / 502) * height
+					labelWidth  = (197 / 504) * topPanelWidth
+					labelHeight = (20  / 58 ) * topPanelHeight
+					labelPositionX = (topPanelWidth  / 2) - (labelWidth / 2)
+					labelPositionY = (topPanelHeight / 2) - (labelHeight / 2)
 
 					surface.CreateFont "NMW AU Inspect Top", {
 						font: "Lucida Console"
@@ -135,10 +139,10 @@ if CLIENT
 				-- Can be assigned text to.
 				local bottomLabel
 				with \Add "Panel"
-					labelPositionX = (114 / 506) * width
-					labelPositionY = (450 / 502) * height
-					labelWidth  = (278 / 506) * width
-					labelHeight = (28  / 502) * height
+					labelWidth  = (278 / 504) * bottomPanelWidth
+					labelHeight = (28  / 111 ) * bottomPanelHeight
+					labelPositionX = bottomPanelPosX + (bottomPanelWidth  / 2) - (labelWidth / 2)
+					labelPositionY = bottomPanelPosY + (78 / 111 * bottomPanelHeight) - (labelHeight / 2)
 
 					surface.CreateFont "NMW AU Inspect Bottom", {
 						font: "Lucida Console"
@@ -189,10 +193,10 @@ if CLIENT
 
 						\SetText tostring TRANSLATE "tasks.inspectSample.hello"
 
-				-- Paints beakers depending on the current anomaly value.
-				paintBeakersAnomaly = ->
+				-- Paints test tubes depending on the current anomaly value.
+				paintTestTubesAnomaly = ->
 					for i = 1, 5
-						beakers[i]\SetColor if i == @GetAnomaly!
+						testTubes[i]\SetColor if i == @GetAnomaly!
 							Color 255, 0, 0
 						else
 							Color 0, 0, 255
@@ -210,27 +214,27 @@ if CLIENT
 						shelf\MoveTo shelfPosX, shelfPosY, 1, 0.5, 0.3, ->
 							@shelfVisible = true
 
-						paintBeakersAnomaly!
+						paintTestTubesAnomaly!
 
 						.Think = nil
 
 				-- Let's create the shelf.
 				shelf = with \Add "DImage"
-					\SetMaterial ASSETS.glassshelf
+					\SetMaterial ASSETS.shelf
 					\SetSize shelfWidth, shelfHeight
 
 					-- If the task is in progress, hide the shelf.
 					if @GetCurrentStep! == 2 and (@GetTimeout! - CurTime! > 0)
 						setupCheckThink!
 
-						\SetPos shelfPosX, shelfPosY + shelfHeight * 1
+						\SetPos shelfPosX, bottomPanelPosY
 						@shelfVisible = false
 
 						bottomLabel\SetText tostring TRANSLATE "tasks.inspectSample.randomText"
 
 					-- Or, if the shelf isn't visible, pop it up.
 					elseif not @shelfVisible
-						\SetPos shelfPosX, shelfPosY + shelfHeight * 1
+						\SetPos shelfPosX, bottomPanelPosY
 						\MoveTo shelfPosX, shelfPosY, 1, 0.5, 0.3, ->
 							@shelfVisible = true
 
@@ -244,67 +248,80 @@ if CLIENT
 						\SetPos shelfPosX, shelfPosY
 						bottomLabel\SetText tostring TRANSLATE "tasks.inspectSample.pressToStart"
 
-					-- Glass, background.
+					-- Rack back.
 					with \Add "DImage"
 						\SetSize shelfWidth, shelfHeight
-						\SetMaterial ASSETS.glassback
+						\SetMaterial ASSETS.rack_back
 
-					-- Glass and beakers, front.
+
+					-- Create test tubes.
+					for i = 1, 5
+						with \Add "DImage"
+							\SetSize testTubeWidth, testTubeHeight
+							\SetPos testTubeStartX + (i - 1) * testTubeSpacing, 0
+							\SetMaterial ASSETS.test_tube
+
+					-- Create a fluid per test tube.
+					for i = 1, 5
+						table.insert testTubes, with \Add "DPanel"
+							\SetSize testTubeWidth, testTubeHeight
+							\SetPos testTubeStartX + (i - 1) * testTubeSpacing, 0
+
+							color = Color 255, 255, 255
+							.SetColor = (value) => color = value
+							.GetColor = => color
+
+							.Paint = (_, w, h) ->
+								surface.SetAlphaMultiplier 0.5
+								render.PushFilterMag TEXFILTER.ANISOTROPIC
+								render.PushFilterMin TEXFILTER.ANISOTROPIC
+
+								surface.SetMaterial ASSETS.fluid
+								surface.SetDrawColor color
+								surface.DrawTexturedRect 0, 0, w, h
+
+								render.PopFilterMin!
+								render.PopFilterMag!
+								surface.SetAlphaMultiplier 1
+
+					-- Create rack front.
 					with \Add "DImage"
 						\SetSize shelfWidth, shelfHeight
-						\SetMaterial ASSETS.glassfront
+						\SetMaterial ASSETS.rack_front
 
-						-- Create a fluid per beaker.
-						for i = 1, 5
-							table.insert beakers, with \Add "DPanel"
-								\SetSize fluidWidth, fluidHeight
-								\SetPos fluidStartX + (i - 1) * fluidSpacing, fluidStartY
-
-								color = Color 255, 255, 255
-								.SetColor = (value) => color = value
-								.GetColor = => color
-
-								.Paint = (_, w, h) ->
-									surface.SetAlphaMultiplier 0.5
-									render.PushFilterMag TEXFILTER.ANISOTROPIC
-									render.PushFilterMin TEXFILTER.ANISOTROPIC
-
-									surface.SetMaterial ASSETS.fluid
-									surface.SetDrawColor color
-									surface.DrawTexturedRect 0, 0, w, h
-
-									render.PopFilterMin!
-									render.PopFilterMag!
-									surface.SetAlphaMultiplier 1
-
-					-- Paint the beakers if the task in progress.
+					-- Paint the test tubes if the task in progress.
 					if @GetCurrentStep! == 2 and (@GetTimeout! - CurTime! < 0)
-						paintBeakersAnomaly!
+						paintTestTubesAnomaly!
 
-				-- Create the floating "thing".
-				-- I have no idea how it's called.
-				thing = with \Add "DImage"
-					\SetSize thingWidth   , thingHeight
-					\SetPos  thingOffsetX , thingOffsetY
-					\SetMaterial ASSETS.thing
+				-- Create the floating nozzle.
+				nozzle = with \Add "DImage"
+					\SetSize nozzleWidth   , nozzleHeight
+					\SetPos  nozzleOffsetX , nozzleOffsetY
+					\SetMaterial ASSETS.nozzle
 
-				-- Create the overlay.
+				-- Create the top panel.
 				with \Add "DImage"
-					\SetSize width, height
-					\SetMaterial ASSETS.overlay
+					\SetSize topPanelWidth, topPanelHeight
+					\SetMaterial ASSETS.top_panel
 
-				buttonPositionX = (406 / 506) * width
-				buttonPositionY = (449 / 502) * height
-				buttonSize      = (32  / 502) * height
+				-- Create the bottom panel.
+				with \Add "DImage"
+					\SetPos bottomPanelPosX, bottomPanelPosY
+					\SetSize bottomPanelWidth, bottomPanelHeight
+					\SetMaterial ASSETS.bottom_panel
+
+				buttonWidth, buttonHeight = GAMEMODE.Render.FitMaterial ASSETS.square_button, (32 / 500) * bottomPanelWidth, (32 / 500) * bottomPanelWidth
+				buttonPositionX = bottomPanelPosX + (418 / 500 * bottomPanelWidth ) - (buttonWidth  / 2)
+				buttonPositionY = bottomPanelPosY + (155 / 228 * bottomPanelHeight) - (buttonHeight / 2)
 
 				-- Create the start button.
 				with \Add "DImageButton"
 					\SetPos buttonPositionX, buttonPositionY
-					\SetSize buttonSize, buttonSize
+					\SetSize buttonWidth, buttonHeight
 
-					\SetMaterial ASSETS.button
+					\SetMaterial ASSETS.square_button
 
-					.DoClick = -> with thing
+					.DoClick = -> with nozzle
 						-- Bail if completed.
 						return if @GetCompleted!
 
@@ -348,20 +365,20 @@ if CLIENT
 							else
 								-- If beaker #step exists, then paint it blue.
 								-- Why am I null-checking this, again?
-								if beakers[step]
-									beakers[step]\SetColor Color 0, 0, 255
+								if testTubes[step]
+									testTubes[step]\SetColor Color 0, 0, 255
 									surface.PlaySound SOUNDS.liquid
 
 								-- Move onto the next beaker.
 								if step <= maxSteps - 2
-									\MoveTo currentX + fluidSpacing, currentY,
+									\MoveTo currentX + testTubeSpacing, currentY,
 										delayBetweenSteps, 0.1, -1, callback
 
 								-- Move back to the original position.
 								elseif step == maxSteps - 1
 									bottomLabel\SetText tostring TRANSLATE "tasks.inspectSample.randomText"
 
-									\MoveTo thingOffsetX, thingOffsetY, 1, 0.5, -1, callback
+									\MoveTo nozzleOffsetX, nozzleOffsetY, 1, 0.5, -1, callback
 
 								-- Hide the shelf.
 								elseif step == maxSteps
@@ -375,19 +392,19 @@ if CLIENT
 
 						callback!
 
-				-- Create circly buttons under the beakers.
-				circleSize    = (32 / 502) * height
+				-- Create circly buttons under the test tubes.
+				circleButtonWidth, circleButtonHeight = GAMEMODE.Render.FitMaterial ASSETS.circle_button, (32 / 500) * bottomPanelWidth, (32 / 500) * bottomPanelWidth
 
-				circleOffsetX = (shelfPosX + fluidStartX + fluidWidth / 2) - circleSize / 2
-				circleOffsetY = (406 / 502) * height
+				circleOffsetX = bottomPanelPosX + (width / 2) - ((testTubeSpacing * 4 / 2) + (circleButtonWidth / 2))
+				circleOffsetY = bottomPanelPosY + ((30 / 114) * bottomPanelHeight) - (circleButtonHeight / 2)
 
 				circleButtons = {}
 
 				for i = 1, 5
 					table.insert circleButtons, with \Add "DImageButton"
-						\SetMaterial ASSETS.circlebutton
-						\SetPos circleOffsetX + (i - 1) * fluidSpacing, circleOffsetY
-						\SetSize circleSize, circleSize
+						\SetMaterial ASSETS.circle_button
+						\SetPos circleOffsetX + (i - 1) * testTubeSpacing, circleOffsetY
+						\SetSize circleButtonWidth, circleButtonHeight
 
 						-- Handle the circly button press.
 						.DoClick = ->
@@ -420,8 +437,8 @@ if CLIENT
 									for circleButton in *circleButtons
 										circleButton\SetColor Color 255, 255, 255
 
-									-- Reset all beakers.
-									for beaker in *beakers
+									-- Reset all test tubes.
+									for beaker in *testTubes
 										beaker\SetColor Color 255, 255, 255
 
 									-- Unhide the shelf.

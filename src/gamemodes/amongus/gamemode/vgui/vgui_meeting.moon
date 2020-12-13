@@ -63,9 +63,9 @@ MAT_MEETING_TABLET = {
 	voted: Material "au/gui/meeting/voted.png", "smooth"
 	skipped: Material "au/gui/meeting/skipped.png", "smooth"
 	megaphone: Material "au/gui/meeting/megaphone.png", "smooth"
-	chat: Material "au/gui/meeting/chat.png", "smooth"
-	chatOverlay: Material "au/gui/meeting/chatoverlay.png", "smooth"
-	chatbump: Material "au/gui/meeting/chatbump.png", "smooth"
+	chat: Material "au/gui/meeting/chat_button.png", "smooth"
+	chatOverlay: Material "au/gui/meeting/chat_overlay.png", "smooth"
+	chatbump: Material "au/gui/meeting/chat_ping.png", "smooth"
 	chatIndicator: Material "au/gui/meeting/chat_indicator.png", "smooth"
 	chatIndicatorMute: Material "au/gui/meeting/chat_indicator_mute.png", "smooth"
 }
