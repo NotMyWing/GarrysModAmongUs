@@ -14,7 +14,7 @@ taskTable = {
 	OnUse: (btn) =>
 		@Base.OnUse @, btn
 
-		if not IsValid btn\GetNWEntity "Scanning"
+		if SERVER and not IsValid btn\GetNWEntity "Scanning"
 			btn\SetNWEntity "Scanning", @GetAssignedPlayer!.entity
 			btn\SetNWFloat "Completion", CurTime! + @Time
 
@@ -26,11 +26,11 @@ taskTable = {
 					if IsValid(assigned) and assigned == btn\GetNWEntity "Scanning"
 						@SetCompleted true
 
-					btn\SetNWEntity "Scanning", nil
+					btn\SetNWEntity "Scanning", Entity 0
 
 	OnCancel: (btn) =>
-		if @GetAssignedPlayer!.entity == btn\GetNWEntity "Scanning"
-			btn\SetNWEntity "Scanning", nil
+		if SERVER and @GetAssignedPlayer!.entity == btn\GetNWEntity "Scanning"
+			btn\SetNWEntity "Scanning", Entity 0
 }
 
 if CLIENT
