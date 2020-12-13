@@ -136,10 +136,11 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	-- Display a countdown.
 	--
 	when GAMEMODE.FlowTypes.GameCountdown
-		if IsValid GAMEMODE.Hud
-			GAMEMODE\HUD_Countdown net.ReadDouble!
+		return unless IsValid GAMEMODE.Hud
 
-			system.FlashWindow!
+		GAMEMODE\HUD_Countdown net.ReadDouble!
+
+		system.FlashWindow!
 
 	--
 	-- Read dead people. This gets sent before the meeting.
@@ -222,6 +223,8 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	-- Display the splash and the screen itself, after a short delay.
 	--
 	when GAMEMODE.FlowTypes.MeetingStart
+		return unless IsValid GAMEMODE.Hud
+
 		if IsValid GAMEMODE.Hud.Meeting
 			GAMEMODE.Hud.Meeting\Remove!
 
@@ -240,6 +243,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	-- Reading the caller is kind of redundant, but whatever.
 	--
 	when GAMEMODE.FlowTypes.MeetingOpenDiscuss
+		return unless IsValid GAMEMODE.Hud
 		return unless IsValid GAMEMODE.Hud.Meeting
 
 		caller = GAMEMODE.GameData.Lookup_PlayerByID[net.ReadUInt 8]
@@ -253,6 +257,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	-- Makes an "I Voted" icon pop up above the voter.
 	--
 	when GAMEMODE.FlowTypes.MeetingVote
+		return unless IsValid GAMEMODE.Hud
 		return unless IsValid GAMEMODE.Hud.Meeting
 
 		voter = GAMEMODE.GameData.Lookup_PlayerByID[net.ReadUInt 8]
@@ -268,6 +273,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	-- Shows the results.
 	--
 	when GAMEMODE.FlowTypes.MeetingEnd
+		return unless IsValid GAMEMODE.Hud
 		return unless IsValid GAMEMODE.Hud.Meeting
 
 		results = {}
@@ -296,6 +302,8 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	-- Prints the reason.
 	--
 	when GAMEMODE.FlowTypes.MeetingEject
+		return unless IsValid GAMEMODE.Hud
+
 		if IsValid GAMEMODE.Hud.Meeting
 			GAMEMODE.Hud.Meeting\Close!
 
@@ -341,6 +349,8 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	-- Reveal the imposters.
 	--
 	when GAMEMODE.FlowTypes.GameOver
+		return unless IsValid GAMEMODE.Hud
+
 		reason = net.ReadUInt 4
 
 		GAMEMODE.ImposterCount = net.ReadUInt 8
@@ -397,12 +407,15 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 		GAMEMODE.GameData.CompletedTasks = net.ReadUInt 32
 		GAMEMODE.GameData.TotalTasks = net.ReadUInt 32
 
+		return unless IsValid GAMEMODE.Hud
 		GAMEMODE\HUD_UpdateTaskAmount GAMEMODE.GameData.CompletedTasks / GAMEMODE.GameData.TotalTasks
 
 	--
 	-- The server wants us to close the task screen.
 	--
 	when GAMEMODE.FlowTypes.CloseVGUI
+		return unless IsValid GAMEMODE.Hud
+
 		GAMEMODE\HUD_CloseVGUI!
 
 	--
@@ -489,4 +502,6 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	-- Why is this not shared?
 	--
 	when GAMEMODE.FlowTypes.ShowHelp
+		return unless IsValid GAMEMODE.Hud
+
 		GAMEMODE\HUD_ShowHelp!
