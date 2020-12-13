@@ -108,7 +108,7 @@ with GM.Lang\Get "ru"
 	["meeting.timer.begins"]     = (time) -> string.format "Голосование через: %d с.", time
 	["meeting.timer.ends"]       = (time) -> string.format "До конца голосования: %d с.", time
 	["meeting.timer.proceeding"] = (time) -> string.format "Итоги через: %d с.", time
-	["meeting.header"] = "Кто же предатель?"
+	["meeting.header"] = "Кто же Предатель?"
 
 	["splash.victory"] = "Победа"
 	["splash.defeat"]  = "Поражение"
@@ -137,7 +137,7 @@ with GM.Lang\Get "ru"
 	["hud.cvar.au_taskbar_updates.2"] = "Никогда"
 
 	cvars = {
-		au_max_imposters:    "Макс. предателей"
+		au_max_imposters:    "Макс. Предателей"
 		au_kill_cooldown:    "Перезарядка убийства"
 		au_time_limit:       "Лимит времени"
 		au_killdistance_mod: "Дистанция убийства"
@@ -164,7 +164,7 @@ with GM.Lang\Get "ru"
 	["vote.voted"] = "%s проголосовал(а). Осталось %s."
 
 	["prepare.admin"] = "Ты Админ!"
-	["prepare.admin"] = "Ты Наблюдатель."
+	["prepare.spectator"] = "Ты Наблюдатель."
 	["prepare.pressToStart"] = "Нажми [%s] чтобы начать игру."
 
 	["prepare.invalidMap"] = "Неправильная карта!"
