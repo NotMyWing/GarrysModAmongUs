@@ -68,7 +68,6 @@ if CLIENT
 
 		with base
 			\Setup with vgui.Create "DImage"
-				@shelfVisible = false
 				local shelf
 				failTime = 0
 				testTubes = {}
