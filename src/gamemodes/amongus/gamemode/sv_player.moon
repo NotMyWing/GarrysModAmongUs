@@ -375,7 +375,7 @@ hook.Add "PlayerInitialSpawn", "NMW AU AutoPilot", (ply) -> with GAMEMODE
 	if oldAutoPilot
 		newAutoPilot = true
 		for ply in *player.GetAll!
-			if ply\IsAdmin! or ply\IsListenServerHost!
+			if CAMI.PlayerHasAccess ply, GAMEMODE.PRIV_START_ROUND or ply\IsListenServerHost!
 				newAutoPilot = false
 				break
 
@@ -396,7 +396,7 @@ hook.Add "PlayerDisconnected", "NMW AU AutoPilot", (ply) -> with GAMEMODE
 	if oldAutoPilot
 		newAutoPilot = false
 		for ply in *player.GetAll!
-			if ply\IsAdmin! or ply\IsListenServerHost!
+			if (CAMI.PlayerHasAccess ply, GAMEMODE.PRIV_START_ROUND) or ply\IsListenServerHost!
 				newAutoPilot = true
 				break
 

@@ -301,7 +301,7 @@ return vgui.RegisterTable {
 					-- The entirety of this section is not yet implemented.
 					return if oldAdmin
 
-					newAdmin = LocalPlayer!\IsAdmin!
+					newAdmin = CAMI.PlayerHasAccess LocalPlayer!, GAMEMODE.PRIV_CHANGE_SETTINGS
 					return if newAdmin == oldAdmin
 					oldAdmin = newAdmin
 
@@ -340,7 +340,7 @@ return vgui.RegisterTable {
 										.Paint = (_, w, h) ->
 											draw.RoundedBox cornerRadiusBase * 1.5, 0, 0, w, h, entryColor
 
-										element = if LocalPlayer!\IsAdmin! and LocalPlayer!\GetNWBool "NMW AU Host"
+										element = if (CAMI.PlayerHasAccess LocalPlayer!, GAMEMODE.PRIV_CHANGE_SETTINGS) and LocalPlayer!\GetNWBool "NMW AU Host"
 											-- Show the admin stuffs to admins.
 											switch type
 												when "Int", "Time", "Mod"

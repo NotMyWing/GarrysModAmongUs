@@ -13,6 +13,7 @@ include "sh_sabotages.lua"
 include "sh_convarsnapshots.lua"
 include "sh_manifest.lua"
 include "sh_footsteps.lua"
+include "sh_privileges.lua"
 
 cv = GM.ConVars
 

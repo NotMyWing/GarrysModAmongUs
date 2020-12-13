@@ -26,6 +26,7 @@ include "sh_sabotages.lua"
 include "sh_convarsnapshots.lua"
 include "sh_manifest.lua"
 include "sh_footsteps.lua"
+include "sh_privileges.lua"
 
 -- Obligatory client stuff
 AddCSLuaFile "sh_lang.lua"
@@ -55,9 +56,10 @@ AddCSLuaFile "cl_render.lua"
 AddCSLuaFile "sh_convarsnapshots.lua"
 AddCSLuaFile "sh_manifest.lua"
 AddCSLuaFile "sh_footsteps.lua"
+AddCSLuaFile "sh_privileges.lua"
 
 concommand.Add "au_debug_restart", (ply) ->
-	if ply\IsAdmin!
+	if CAMI.PlayerHasAccess ply, GAMEMODE.PRIV_RESTART_ROUND
 		GAMEMODE\Game_Restart!
 
 GM.Initialize = =>

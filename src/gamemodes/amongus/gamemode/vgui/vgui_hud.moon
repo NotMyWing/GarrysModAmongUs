@@ -222,7 +222,7 @@ hud.SetupButtons = (state, impostor) =>
 								TRANSLATE "prepare.invalidMap"
 							elseif GAMEMODE.ClientSideConVars.SpectatorMode\GetBool!
 								TRANSLATE "prepare.spectator"
-							elseif not GAMEMODE.ConVars.ForceAutoWarmup\GetBool! and LocalPlayer!\IsAdmin!
+							elseif not GAMEMODE.ConVars.ForceAutoWarmup\GetBool! and CAMI.PlayerHasAccess LocalPlayer!, GAMEMODE.PRIV_START_ROUND
 								TRANSLATE "prepare.admin"
 							else
 								TRANSLATE "prepare.warmup"
@@ -242,7 +242,7 @@ hud.SetupButtons = (state, impostor) =>
 								TRANSLATE "prepare.invalidMap.subText"
 							elseif GAMEMODE\GetFullyInitializedPlayerCount! < needed
 								TRANSLATE "prepare.waitingForPlayers"
-							elseif not GAMEMODE.ConVars.ForceAutoWarmup\GetBool! and LocalPlayer!\IsAdmin!
+							elseif not GAMEMODE.ConVars.ForceAutoWarmup\GetBool! and CAMI.PlayerHasAccess LocalPlayer!, GAMEMODE.PRIV_START_ROUND
 								TRANSLATE("prepare.pressToStart") string.upper input.LookupBinding("jump") or "???"
 							else
 								if not (GAMEMODE.ConVars.ForceAutoWarmup\GetBool! or GAMEMODE\IsOnAutoPilot!)
