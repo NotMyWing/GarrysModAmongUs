@@ -76,17 +76,20 @@ eject.WriteText = (text, subtext) =>
 					draw.SimpleText subtext, "NMW AU Eject Subtext", w/2, h/2, color,
 						TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 2, COLOR_OUTLINE
 
+	textLen = utf8.len(text)
 	i = 0
 	callback = ->
 		i += 1
 
-		@ejectTextLabel.Text ..= text[i]
+		char = utf8.GetChar(text, i)
 
-		if text[i] ~= "" and text[i] ~= " "
+		@ejectTextLabel.Text ..= char
+
+		if char ~= "" and char ~= " "
 			surface.PlaySound "au/eject_text.ogg"
 
-		if i ~= #text
-			@ejectTextLabel\NewAnimation 1.5/#text, 0, 0, callback
+		if i ~= textLen
+			@ejectTextLabel\NewAnimation 1.5/textLen, 0, 0, callback
 		elseif @ejectTextSubLabel
 			@ejectTextSubLabel\AlphaTo 255, 0.25, 1
 
