@@ -43,6 +43,11 @@ if CLIENT
 					\Center!
 					\SetMaterial ASSETS.bg
 
+				\NewAnimation 0, 0, 0, ->
+					closeButton = base\GetCloseButton!
+					closeButton\AlignLeft base\GetWide! / 2 - max_size / 2 - closeButton\GetWide! * 1.25
+					closeButton\MoveToFront!
+
 				with \Add "DImageButton"
 					cardSize = max_size * (410/900)
 					finalSizeW, finalSizeH = GAMEMODE.Render.FitMaterial ASSETS.card, cardSize, cardSize
