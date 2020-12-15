@@ -514,12 +514,12 @@ hud.SetupButtons = (state, impostor) =>
 				\SetModel LocalPlayer!\GetModel!
 
 				\SetFOV 36
-				\SetCamPos \GetCamPos! - Vector 0, 0, 18
+				\SetCamPos \GetCamPos! - Vector 0, 0, 4
 				with \GetEntity!
 					playerColor = localPlayerTable.color\ToVector!
 					.GetPlayerColor = -> playerColor
 
-					\SetAngles Angle 0, 45, 0
+					\SetAngles Angle 0, 90, 0
 					\SetPos \GetPos! - Vector 0, 0, 4
 
 				.LayoutEntity = ->
@@ -551,7 +551,7 @@ hud.SetupButtons = (state, impostor) =>
 						.SetStencilZFailOperation STENCIL_KEEP
 
 					\SetAlpha 255 * if GAMEMODE.GameData.DeadPlayers[localPlayerTable]
-						0.35
+						0.65
 					else
 						1
 
