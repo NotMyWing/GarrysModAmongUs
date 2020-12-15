@@ -20,8 +20,13 @@ hook.Add "Move", "NMW AU Move", (ply, mvd) ->
 	if isAlive and mvd\KeyDown IN_WALK
 		mvd\SetButtons bit.band mvd\GetButtons!, bit.bnot IN_WALK
 
-	if (CLIENT and (@GameData.Vented or (IsValid(@Hud.CurrentVGUI) and @Hud.CurrentVGUI\IsVisible!) or IsValid(@Hud.Kill))) or
-		(SERVER and (@GameData.CurrentVGUI[playerTable] or @GameData.Vented[playerTable]))
+	if (CLIENT and (@GameData.Vented or
+			((@GameData.UnVentTime or 0) > CurTime!) or
+			(IsValid(@Hud.CurrentVGUI) and @Hud.CurrentVGUI\IsVisible!) or
+			IsValid(@Hud.Kill)
+		)) or (SERVER and (@GameData.CurrentVGUI[playerTable] or
+			@GameData.Vented[playerTable])
+		)
 			mvd\SetVelocity Vector 0, 0, 0
 			return true
 

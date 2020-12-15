@@ -231,7 +231,7 @@ GM.Player_Vent = (playerTable, vent) =>
 			if vent.ViewAngle
 				playerTable.entity\SetEyeAngles vent.ViewAngle
 
-			@Net_BroadcastVent playerTable.entity, vent\GetPos!
+			@Net_BroadcastVent playerTable.entity, vent\GetPos!, playerTable.entity\EyeAngles!
 			@Player_Hide playerTable.entity
 			@Player_PauseKillCooldown playerTable
 
@@ -263,7 +263,7 @@ GM.Player_UnVent = (playerTable, instant) =>
 		playerTable.entity\SetPos outPoint
 
 		handle = "vent" .. playerTable.nickname
-		@Net_BroadcastVent playerTable.entity, vent\GetPos!, true
+		@Net_BroadcastVent playerTable.entity, vent\GetPos!, playerTable.entity\EyeAngles!, true
 
 		vent\TriggerOutput "OnVentOut", playerTable.entity
 

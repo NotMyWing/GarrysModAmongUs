@@ -187,6 +187,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 			when GAMEMODE.VentNotifyReason.UnVent
 				surface.PlaySound "au/vent_open.ogg"
 				GAMEMODE.GameData.Vented = false
+				GAMEMODE.GameData.UnVentTime = CurTime! + 0.65
 
 			when GAMEMODE.VentNotifyReason.Move
 				surface.PlaySound table.Random {
@@ -213,10 +214,11 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	when GAMEMODE.FlowTypes.VentAnim
 		ent = net.ReadEntity!
 		pos = net.ReadVector!
+		ang = net.ReadAngle!
 		appearing = net.ReadBool!
 
 		if ent ~= LocalPlayer!
-			GAMEMODE\CreateVentAnim ent, pos, appearing
+			GAMEMODE\CreateVentAnim ent, pos, ang, appearing
 
 	--
 	-- Meeting 1/4.

@@ -126,11 +126,12 @@ GM.Net_BroadcastGameOver = (reason) =>
 -- @param ply Player entity.
 -- @param where Where?
 -- @param appearing Is the person venting out?
-GM.Net_BroadcastVent = (ply, where, appearing = false) =>
+GM.Net_BroadcastVent = (ply, where, angles, appearing = false) =>
 	net.Start "NMW AU Flow"
 	net.WriteUInt @FlowTypes.VentAnim, @FlowSize
 	net.WriteEntity ply
 	net.WriteVector where
+	net.WriteAngle angles
 	net.WriteBool appearing
 	net.SendPVS where
 

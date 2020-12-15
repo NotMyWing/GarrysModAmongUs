@@ -195,14 +195,25 @@ hook.Add "EntityEmitSound", "TimeWarpSounds", (t) -> false if t.Entity\IsRagdoll
 hook.Add "CreateClientsideRagdoll", "test", (owner, rag) ->
 	rag\GetPhysicsObject!\SetMaterial "gmod_silent"
 
-GM.CreateVentAnim = (ply, pos, appearing) =>
+GM.CreateVentAnim = (ply, pos, ang, appearing) =>
+	if not IsValid ply
+		@Logger.Error "CreateVentAnim received an invalid player! This should never happen!"
+		return
+
 	with ventAnim = ents.CreateClientside "vent_jump"
-		playerColor = ply\GetAUPlayerTable!.color\ToVector!
+		playerColor = ply\GetPlayerColor!
 		.GetPlayerColor = -> playerColor
+		.Appearing = appearing
+
+		angles = with ang
+			.p = 0
+			.r = 0
+
+		\SetAngles angles
 
 		\SetPos pos
 		\SetModel ply\GetModel!
-		.Appearing = appearing
+
 		\Spawn!
 		\Activate!
 
