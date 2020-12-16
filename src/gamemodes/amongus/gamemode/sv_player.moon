@@ -350,11 +350,11 @@ GM.PlayerSpawn = (ply) =>
 	if nil == hook.Call "PlayerSetModel", @, ply
 		ply\SetModel defaultModel
 
-	with defaultSpeed = 200
-		ply\SetSlowWalkSpeed defaultSpeed
-		ply\SetWalkSpeed defaultSpeed
-		ply\SetRunSpeed  defaultSpeed
-		ply\SetMaxSpeed  defaultSpeed
+	with movementSpeed = 190 * @ConVarSnapshots.PlayerSpeedMod\GetFloat!
+		ply\SetSlowWalkSpeed movementSpeed
+		ply\SetWalkSpeed movementSpeed
+		ply\SetRunSpeed  movementSpeed
+		ply\SetMaxSpeed  movementSpeed
 
 	ply\SetViewOffset Vector 0, 0, 64 - 16
 	ply\SetTeam 1

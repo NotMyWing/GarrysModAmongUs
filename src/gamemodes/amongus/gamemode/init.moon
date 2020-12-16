@@ -73,3 +73,18 @@ GM.Initialize = =>
 
 	-- screw implicit returns man
 	return
+
+cvars.AddChangeCallback GAMEMODE.ConVars.PlayerSpeedMod\GetName!, ((_, _, new) ->
+	return if GAMEMODE\IsGameInProgress! or GAMEMODE\IsGameCommencing!
+
+	new = tonumber new
+	return if not new
+
+	for ply in *player.GetAll!
+		with movementSpeed = 190 * new
+			ply\SetSlowWalkSpeed movementSpeed
+			ply\SetWalkSpeed movementSpeed
+			ply\SetRunSpeed  movementSpeed
+			ply\SetMaxSpeed  movementSpeed
+
+), "speedmod"

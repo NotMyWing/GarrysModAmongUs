@@ -51,6 +51,7 @@ GM.ConVars =
 	ConfirmEjects:   CreateConVar "au_confirm_ejects"  , 1 , flags, "", 0, 1
 	AllTalk:         GetConVar "sv_alltalk"
 	TaskbarUpdates:  CreateConVar "au_taskbar_updates" , 0 , flags, "", 0, 2
+	PlayerSpeedMod:  CreateConVar "au_player_speed_mod", 1 , flags, "", 0.5, 3
 
 	MeetingCooldown:   CreateConVar "au_meeting_cooldown"      , 20, flags, "", 1, 60
 	MeetingsPerPlayer: CreateConVar "au_meeting_available"     , 2 , flags, "", 1, 5

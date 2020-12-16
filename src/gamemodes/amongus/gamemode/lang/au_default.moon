@@ -149,6 +149,7 @@ with GM.Lang\Get "en"
 		au_killdistance_mod: "Kill Distance"
 		sv_alltalk:          "All Talk"
 		au_taskbar_updates:  "Taskbar Updates"
+		au_player_speed_mod: "Player Speed"
 
 		au_meeting_available: "Meetings per Player"
 		au_meeting_cooldown:  "Meeting Button Cooldown"

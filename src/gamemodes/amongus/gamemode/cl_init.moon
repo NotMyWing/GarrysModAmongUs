@@ -27,6 +27,7 @@ GM.ConVarsDisplay = {
 			{ "Mod"    , "KillDistanceMod" }
 			{ "Bool"   , "AllTalk"         }
 			{ "Select" , "TaskbarUpdates"  }
+			{ "Mod"    , "PlayerSpeedMod"  }
 		}
 	}
 	{

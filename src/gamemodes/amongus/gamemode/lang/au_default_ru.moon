@@ -143,6 +143,7 @@ with GM.Lang\Get "ru"
 		au_killdistance_mod: "Дистанция убийства"
 		sv_alltalk:          "Разговор без ограничений"
 		au_taskbar_updates:  "Обновления шкалы заданий"
+		au_player_speed_mod: "Скорость передвижения"
 
 		au_meeting_available: "Экстренных собраний"
 		au_meeting_cooldown:  "Перезарядка собраний"
