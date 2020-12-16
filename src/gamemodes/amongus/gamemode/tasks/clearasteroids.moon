@@ -25,6 +25,7 @@ if CLIENT
 
 		bg: Material "au/gui/tasks/clearasteroids/base.png", "smooth"
 		kil: Material "au/gui/tasks/clearasteroids/weapons_explosion.png", "smooth"
+		reticle: Material "au/gui/tasks/clearasteroids/weapons_reticle.png"
 	}
 
 	ROTATION_MATRIX = Matrix!
@@ -35,7 +36,7 @@ if CLIENT
 
 		with base
 			\Setup with parent = vgui.Create "Panel"
-				max_size = ScrH! * 0.7
+				max_size = ScrH! * 0.85
 				\SetSize max_size, max_size
 				.Paint = (_, w, h) ->
 					surface.SetMaterial ASSETS.bg
@@ -55,8 +56,56 @@ if CLIENT
 					\SetMouseInputEnabled true
 					.OnMousePressed = ->
 						surface.PlaySound SOUNDS.fire
+						\UpdateReticle!
 
 					nextSpawn = CurTime! + math.random!
+
+					reticleSize = inner_max_size * 0.175
+					reticlePosX = inner_max_size / 2
+					reticlePosY = inner_max_size / 2
+					beamWidth = inner_max_size * 0.0175
+
+					.UpdateReticle = ->
+						reticlePosX, reticlePosY = \LocalCursorPos!
+
+					.PaintOver = ->
+						beamOriginY = inner_max_size
+
+						surface.SetDrawColor 35, 110, 70
+						surface.DisableClipping true
+						for i = 1, 2
+							beamOriginX = if i == 1
+								0
+							else
+								inner_max_size
+
+							dx = reticlePosX - beamOriginX
+							dy = reticlePosY - beamOriginY
+
+							theta = math.deg math.atan2 dy, dx
+							length = math.sqrt dy*dy + dx*dx
+
+							ltsx, ltsy = \LocalToScreen 0, 0
+							vec = Vector ltsx + beamOriginX, ltsy + beamOriginY, 0
+
+							m = with ROTATION_MATRIX
+								\Identity!
+								\Translate vec
+								\Rotate Angle 0, 270 + theta, 0
+								\Translate -vec
+
+							cam.PushModelMatrix ROTATION_MATRIX, true
+							surface.DrawRect beamOriginX - beamWidth / 2, beamOriginY,
+								beamWidth, length
+							cam.PopModelMatrix!
+
+						surface.DisableClipping false
+
+						surface.SetDrawColor 255, 255, 255
+						surface.SetMaterial ASSETS.reticle
+						surface.DrawTexturedRect reticlePosX - reticleSize / 2, reticlePosY - reticleSize / 2,
+							reticleSize, reticleSize
+
 					.Think = ->
 						if asteroidCount < 3 and CurTime! > nextSpawn
 							nextSpawn = CurTime! + math.random!
@@ -95,6 +144,7 @@ if CLIENT
 											\Remove!
 
 								.OnMousePressed = ->
+									innerPanel\UpdateReticle!
 									destroyed += 1
 									if @GetCurrentStep! <= taskTable.Count
 										base\Submit @GetCurrentStep! == taskTable.Count
@@ -140,11 +190,14 @@ if CLIENT
 
 									render.SetScissorRect 0, 0, 0, 0, false
 
-					label = with \Add "DLabel"
+					label = with \Add "DOutlinedLabel"
 						\SetFont "NMW AU PlaceholderText"
 						\SetContentAlignment 5
 						\Dock BOTTOM
+						\SetTall max_size * 0.05
 						\SizeToContents!
+						\SetZPos 9001
+						\SetMouseInputEnabled false
 						.Think = ->
 							\SetText TRANSLATE("task.clearAsteroids.destroyed") destroyed
 			\Popup!
