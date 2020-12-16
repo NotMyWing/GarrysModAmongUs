@@ -48,6 +48,7 @@ if CLIENT
 				pad = max_size * (28/506)
 				\DockPadding pad, pad, pad, pad
 				with innerPanel = \Add "Panel"
+					inner_max_size = max_size - pad * 2
 					local label
 
 					\Dock FILL
@@ -63,13 +64,18 @@ if CLIENT
 
 							with\Add "DPanel"
 								hit = false
-								pos = max_size * 0.01 * math.random 0, 100
-								size = max_size * 0.15
+								pos = inner_max_size * 0.01 * math.random 0, 100
+								size = inner_max_size * 0.15
 
-								posX = max_size
+								posX = inner_max_size
 								posY = pos
 
-								vel = math.random(300, 700) * Vector(max_size/2 - posX, max_size/2 - posY)\GetNormalized!
+								-- chosen completely arbitrarily, but hey, it feels good
+								velOffset = 3/8 * inner_max_size
+								vel = math.random(300, 700) * Vector(
+									inner_max_size/2 - posX,
+									inner_max_size/2 - posY + math.random -velOffset, velOffset
+								)\GetNormalized!
 
 								rotation = math.random 0, 360
 								rotVel = math.random -120, 120
