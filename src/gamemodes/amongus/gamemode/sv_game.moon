@@ -124,7 +124,7 @@ GM.Game_Start = =>
 		-- Create the time limit timer if the cvar is set.
 		-- That's quite an interesting sentence.
 		timelimit = @ConVarSnapshots.TimeLimit\GetInt!
-		timelimitHandle = "timelimitHandle"
+		timelimitHandle = "timelimit"
 		if timelimit > 0
 			@GameData.Timers[timelimitHandle] = true
 
