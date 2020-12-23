@@ -379,8 +379,9 @@ GM.TracePlayer = (playerTable, filter = 0) =>
 		-- Prevent dead players from being able to target corpses.
 		continue if entClass == "prop_ragdoll" and @GameData.DeadPlayers[playerTable]
 
-		-- Prevent regular players from using vents.
-		continue if (entClass == "func_vent" or entClass == "prop_vent") and not @GameData.Imposters[playerTable]
+		-- Prevent regular and dead players from using vents.
+		continue if (entClass == "func_vent" or entClass == "prop_vent") and
+			(not @GameData.Imposters[playerTable] or @GameData.DeadPlayers[playerTable])
 
 		-- Only highlight sabotage buttons when they're active, and when the player isn't dead.
 		if (entClass == "func_sabotage_button" or entClass == "prop_sabotage_button")
