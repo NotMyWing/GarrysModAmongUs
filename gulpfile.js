@@ -4,6 +4,7 @@ const del = require('del');
 const renderSvg = require('./tools/resvg');
 const minifyLua = require('./tools/luamin');
 const compileMoonscript = require('./tools/moonscript');
+const optimizeLua = require ('./tools/optimizations');
 
 const lastRunCache = new Map();
 function lastRunIgnoreErrors(task) {
@@ -52,6 +53,7 @@ clean.description = "Cleans the build.";
  */
 function lua() {
 	return gulp.src('src/**/*.lua', { since: lastRunIgnoreErrors(lua) })
+		.pipe(optimizeLua())
 		.pipe(minifyLua())
 		.pipe(gulp.dest('dest', { mode: 0777 }));
 }
@@ -64,6 +66,7 @@ lua.description = "Copies and minifies lua files.";
 function moon() {
 	return gulp.src('src/**/*.moon', { since: lastRunIgnoreErrors(moon) })
 		.pipe(compileMoonscript())
+		.pipe(optimizeLua())
 		// .pipe(minifyLua())
 		.pipe(gulp.dest('dest', { mode: 0777 }));
 }

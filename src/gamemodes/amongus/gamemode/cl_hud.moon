@@ -312,23 +312,22 @@ hook.Add "HUDPaintBackground", "NMW AU Hud", ->
 			color = GAMEMODE\GetHighlightColor GAMEMODE.UseHighlight
 			if color
 				cam.Start3D!
-				with render
-					.ClearStencil!
+				render.ClearStencil!
 
-					.SetStencilEnable true
-					.SetStencilTestMask 0xFF
-					.SetStencilWriteMask 0xFF
-					.SetStencilReferenceValue 0x01
+				render.SetStencilEnable true
+				render.SetStencilTestMask 0xFF
+				render.SetStencilWriteMask 0xFF
+				render.SetStencilReferenceValue 0x01
 
-					.SetStencilCompareFunction STENCIL_NEVER
-					.SetStencilFailOperation STENCIL_REPLACE
-					.SetStencilZFailOperation STENCIL_REPLACE
+				render.SetStencilCompareFunction STENCIL_NEVER
+				render.SetStencilFailOperation STENCIL_REPLACE
+				render.SetStencilZFailOperation STENCIL_REPLACE
 
-					GAMEMODE.UseHighlight\DrawModel!
+				GAMEMODE.UseHighlight\DrawModel!
 
-					.SetStencilCompareFunction STENCIL_LESSEQUAL
-					.SetStencilFailOperation STENCIL_KEEP
-					.SetStencilZFailOperation STENCIL_KEEP
+				render.SetStencilCompareFunction STENCIL_LESSEQUAL
+				render.SetStencilFailOperation STENCIL_KEEP
+				render.SetStencilZFailOperation STENCIL_KEEP
 
 				cam.End3D!
 

@@ -1043,65 +1043,64 @@ meeting.OpenDiscuss = (caller, time) =>
 			-- inside the background circle using stencils.
 			--
 			-- Thank god Garry's Mod has stencils.
-			with render
-				.PushFilterMag TEXFILTER.ANISOTROPIC
-				.PushFilterMin TEXFILTER.ANISOTROPIC
-				.ClearStencil!
+			render.PushFilterMag TEXFILTER.ANISOTROPIC
+			render.PushFilterMin TEXFILTER.ANISOTROPIC
+			render.ClearStencil!
 
-				.SetStencilEnable true
-				.SetStencilTestMask 0xFF
-				.SetStencilWriteMask 0xFF
-				.SetStencilReferenceValue 0x01
+			render.SetStencilEnable true
+			render.SetStencilTestMask 0xFF
+			render.SetStencilWriteMask 0xFF
+			render.SetStencilReferenceValue 0x01
 
-				.SetStencilCompareFunction STENCIL_NEVER
-				.SetStencilFailOperation STENCIL_REPLACE
-				.SetStencilZFailOperation STENCIL_REPLACE
+			render.SetStencilCompareFunction STENCIL_NEVER
+			render.SetStencilFailOperation STENCIL_REPLACE
+			render.SetStencilZFailOperation STENCIL_REPLACE
 
-				surface.DrawPoly _.circle
+			surface.DrawPoly _.circle
 
-				.SetStencilCompareFunction STENCIL_LESSEQUAL
-				.SetStencilFailOperation STENCIL_KEEP
-				.SetStencilZFailOperation STENCIL_KEEP
+			render.SetStencilCompareFunction STENCIL_LESSEQUAL
+			render.SetStencilFailOperation STENCIL_KEEP
+			render.SetStencilZFailOperation STENCIL_KEEP
 
-				.PopFilterMag!
-				.PopFilterMin!
+			render.PopFilterMag!
+			render.PopFilterMin!
 
-				ltsx, ltsy = _\LocalToScreen 0, 0
+			ltsx, ltsy = _\LocalToScreen 0, 0
 
-				-- Let's enter the abyss.
-				do
-					v = Vector ltsx + w/3, ltsy + h / 1.5, 0
+			-- Let's enter the abyss.
+			do
+				v = Vector ltsx + w/3, ltsy + h / 1.5, 0
 
-					with ROTATION_MATRIX
-						\Identity!
-						\Translate v
-						\SetAngles Angle 0, (math.sin(math.rad(CurTime! * 1200))) * 2, 0
-						\Translate -v
+				with ROTATION_MATRIX
+					\Identity!
+					\Translate v
+					\SetAngles Angle 0, (math.sin(math.rad(CurTime! * 1200))) * 2, 0
+					\Translate -v
 
-					cam.PushModelMatrix ROTATION_MATRIX, true
-					surface.SetMaterial MAT_DISCUSS.yes_crewLeft
-					surface.DrawTexturedRect -w*0.15, h/2-h*0.125, w/2 + w*0.1, h/2+h*0.2
-					cam.PopModelMatrix!
+				cam.PushModelMatrix ROTATION_MATRIX, true
+				surface.SetMaterial MAT_DISCUSS.yes_crewLeft
+				surface.DrawTexturedRect -w*0.15, h/2-h*0.125, w/2 + w*0.1, h/2+h*0.2
+				cam.PopModelMatrix!
 
-				-- Let's enter the abyss one more time.
-				do
-					v = Vector ltsx + w/2 + w/4, ltsy + h / 2 + h/3, 0
+			-- Let's enter the abyss one more time.
+			do
+				v = Vector ltsx + w/2 + w/4, ltsy + h / 2 + h/3, 0
 
-					with ROTATION_MATRIX
-						\Identity!
-						\Translate v
-						\SetAngles Angle 0, (math.cos(math.rad(CurTime! * 1200))) * 2, 0
-						\Translate -v
+				with ROTATION_MATRIX
+					\Identity!
+					\Translate v
+					\SetAngles Angle 0, (math.cos(math.rad(CurTime! * 1200))) * 2, 0
+					\Translate -v
 
-					cam.PushModelMatrix ROTATION_MATRIX, true
-					surface.SetMaterial MAT_DISCUSS.yes_crewRight
-					surface.DrawTexturedRect w/2, h/2-h*0.05, w/2 + w*0.2, h/2+h*0.2
-					cam.PopModelMatrix!
+				cam.PushModelMatrix ROTATION_MATRIX, true
+				surface.SetMaterial MAT_DISCUSS.yes_crewRight
+				surface.DrawTexturedRect w/2, h/2-h*0.05, w/2 + w*0.2, h/2+h*0.2
+				cam.PopModelMatrix!
 
-				.SetStencilEnable false
+				render.SetStencilEnable false
 
-				surface.SetMaterial MAT_DISCUSS.border
-				surface.DrawTexturedRect 0, 0, w, h
+			surface.SetMaterial MAT_DISCUSS.border
+			surface.DrawTexturedRect 0, 0, w, h
 
 	-- And finally, something simple.
 	-- The "Discuss!" text.
