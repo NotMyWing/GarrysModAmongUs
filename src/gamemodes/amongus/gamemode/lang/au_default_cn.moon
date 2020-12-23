@@ -61,7 +61,7 @@ with GM.Lang\Get "cn"
 			text: string.format "%d秒", time
 			color: Color 255, 0, 0
 		}, {
-			text: "才能开启紧急会议"
+			text: "才能开启 召开紧急会议"
 		}
 	}
 
@@ -69,7 +69,7 @@ with GM.Lang\Get "cn"
 		{
 			text: string.format "船员%s还能再召开", nickname
 		}, {
-			text: string.format "%d", uses
+			text: string.format "%d次", uses
 			color: Color 255, 0, 0
 		}, {
 			text: "紧急会议"
@@ -118,7 +118,7 @@ with GM.Lang\Get "cn"
 	["splash.text"] = (isPlaying, imposterCount) ->	"有%s个内鬼在" ..
 		(isPlaying and "我们之中" or "团队中")
 
-	["hud.sabotageAndKill"] = "破坏并杀死所有人"
+	["hud.sabotageAndKill"] = "破坏设备并杀死所有人"
 	["hud.countdown"] = "游戏将在%d秒后开始"
 	["hud.tasks"] = "任务："
 	["hud.fakeTasks"] = "假任务："
@@ -129,7 +129,7 @@ with GM.Lang\Get "cn"
 
 	["hud.cvar.au_taskbar_updates.0"] = "总是"
 	["hud.cvar.au_taskbar_updates.1"] = "会议"
-	["hud.cvar.au_taskbar_updates.2"] = "决不"
+	["hud.cvar.au_taskbar_updates.2"] = "永不"
 
 	cvars = {
 		au_max_imposters:    "最大内鬼数"
@@ -142,9 +142,9 @@ with GM.Lang\Get "cn"
 		au_meeting_available: "每个玩家的会议"
 		au_meeting_cooldown:  "会议按钮冷却时间"
 		au_meeting_vote_time: "投票时间"
-		au_meeting_vote_pre_time:  "预投票时间"
+		au_meeting_vote_pre_time:  "投票前时间"
 		au_meeting_vote_post_time: "计票时间"
-		au_confirm_ejects:         "确认弹射"
+		au_confirm_ejects:         "确认弹射 被票身份"
 		au_meeting_anonymous: "匿名投票"
 
 		au_tasks_short:  "短任务"
