@@ -1,4 +1,4 @@
-with GM.Lang\Get "cn"
+CN = with GM.Lang\Get "zh-CN"
 	["tasks.totalCompleted"] = "已完成的任务数"
 	["tasks.totalCompleted.sabotaged"] = "通信系统遭到破坏"
 
@@ -230,3 +230,5 @@ with GM.Lang\Get "cn"
 
 	for key, value in pairs settingsCvars
 		["help.settings.#{key}"] = value
+
+table.CopyFromTo CN, GM.Lang\Get "zh-TW"
