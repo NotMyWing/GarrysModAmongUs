@@ -358,7 +358,7 @@ hook.Add "HUDPaintBackground", "NMW AU Hud", ->
 				pos = highlight.entity\WorldSpaceCenter!\ToScreen!
 
 				nearestPoint = highlight.entity\NearestPoint LocalPlayer!\EyePos!
-				value = (1 - math.max 0, math.min 1, (1/GAMEMODE.BaseUseRadius) * nearestPoint\Distance LocalPlayer!\EyePos!)
+				value = (1 - math.max 0, math.min 1, 0.6 * (1/GAMEMODE.BaseUseRadius) * nearestPoint\Distance LocalPlayer!\EyePos!)
 				size = 0.125 * math.min ScrH!, ScrW!
 
 				-- Since Garry's Mod doesn't allow scaling fonts on the go,
