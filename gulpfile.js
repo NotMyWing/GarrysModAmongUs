@@ -5,6 +5,7 @@ const renderSvg = require('./tools/resvg');
 const minifyLua = require('./tools/luamin');
 const compileMoonscript = require('./tools/moonscript');
 const optimizeLua = require ('./tools/optimizations');
+const discourageLuaMod = require ('./tools/discourageLuaModification');
 
 const lastRunCache = new Map();
 function lastRunIgnoreErrors(task) {
@@ -67,6 +68,7 @@ function moon() {
 	return gulp.src('src/**/*.moon', { since: lastRunIgnoreErrors(moon) })
 		.pipe(compileMoonscript())
 		.pipe(optimizeLua())
+		.pipe(discourageLuaMod())
 		// .pipe(minifyLua())
 		.pipe(gulp.dest('dest', { mode: 0777 }));
 }
