@@ -13,7 +13,7 @@ with GM.Lang\Get "de"
 		["reactor"]:        "Reaktor"
 		["lowerEngine"]:   "Unterer Motor"
 		["security"]:       "Sicherheit"
-		["electrical"]:     "Elektrizität"
+		["electrical"]:     "Technikraum"
 		["medbay"]:         "Krankenzimmer"
 		["storage"]:        "Lagerraum"
 		["shields"]:        "Schilde"
@@ -34,10 +34,10 @@ with GM.Lang\Get "de"
 		"alignEngineOutput": "Motorausgang ausrichten"
 		"calibrateDistributor": "Verteiler kalibrieren"
 		"chartCourse": "Kurs zeichnen"
-		"cleanO2Filter": "O2 Filter reinigen"
-		"clearAsteroids": "Asteroiden entfernen"
+		"cleanO2Filter": "O2-Filter reinigen"
+		"clearAsteroids": "Asteroiden zerstören"
 		"emptyGarbage": "Müll leeren"
-		"emptyChute": "Rutsche leeren"
+		"emptyChute": "Schacht leeren"
 		"fixWiring": "Verkabelung reparieren"
 		"inspectSample": "Probe inspizieren"
 		"primeShields": "Schilde aktivieren"
@@ -61,7 +61,7 @@ with GM.Lang\Get "de"
 			text: string.format "%ds", time
 			color: Color 255, 0, 0
 		}, {
-			text: "vor dem Notfall warten"
+			text: "vor der nächsten Notfallsitzung warten"
 		}
 	}
 
@@ -101,10 +101,7 @@ with GM.Lang\Get "de"
 				else
 					"%s war ein Verräter."
 			else
-				if total == 1
-					"%s war nicht der Verräter."
-				else
-					"%s war nicht ein Verräter."
+				"%s war kein Verräter."
 		else
 			"%s wurde rausgeworfen."), nickname
 
@@ -119,17 +116,17 @@ with GM.Lang\Get "de"
 	["splash.spectator"] = "Zuschauer"
 	["splash.crewmate"]  = "Crewmitglied"
 	["splash.text"] = (isPlaying, imposterCount) ->
-		amongSubtext = isPlaying and "uns" or "sie"
+		amongSubtext = isPlaying and "uns" or "ihnen"
 
 		return if imposterCount == 1
 			"Es ist %s Verräter unter " .. amongSubtext
 		else
 			"Es sind %s Verräter unter " .. amongSubtext
 
-	["hud.sabotageAndKill"] = "Sabotiere und töte jeden."
+	["hud.sabotageAndKill"] = "Sabotiere und töte alle."
 	["hud.countdown"] = "Startet in %d"
 	["hud.tasks"] = "Aufgaben:"
-	["hud.fakeTasks"] = "Gefälschte Aufgaben:"
+	["hud.fakeTasks"] = "Vortäusch-Aufgaben:"
 	["hud.taskComplete"] = "Aufgabe erledigt!"
 	["hud.cvar.disabled"] = "Deaktiviert"
 	["hud.cvar.enabled"] = "Aktiviert"
@@ -142,24 +139,24 @@ with GM.Lang\Get "de"
 	cvars = {
 		au_max_imposters:    "Max. Verräter"
 		au_kill_cooldown:    "Tötungsabklingzeit"
-		au_time_limit:       "Zeitgrenze"
-		au_killdistance_mod: "Tötungsdistanz"
+		au_time_limit:       "Zeitlimit"
+		au_killdistance_mod: "Tötungsreichweite"
 		sv_alltalk:          "Alle sprechen"
-		au_taskbar_updates:  "Aufgabenübersicht Aktualisierungen"
+		au_taskbar_updates:  "Aufgabenfortschritt aktualisieren"
 		au_player_speed_mod: "Spielergeschwindigkeit"
 
 		au_meeting_available: "Sitzungen pro Spieler"
-		au_meeting_cooldown:  "Abklingzeit Sitzungsknopf"
-		au_meeting_vote_time: "Abstimmzeit"
-		au_meeting_vote_pre_time:  "Vor-Abstimmzeit"
-		au_meeting_vote_post_time: "Nach-Abstimmzeit"
+		au_meeting_cooldown:  "Abklingzeit Notfallsitzungen"
+		au_meeting_vote_time: "Abstimmungszeit"
+		au_meeting_vote_pre_time:  "Zeit vor Abstimmung"
+		au_meeting_vote_post_time: "Zeit nach Abstimmung"
 		au_confirm_ejects:         "Abstimmungen bestätigen"
 		au_meeting_anonymous: "Anonymes abstimmen"
 
 		au_tasks_short:  "Kurze Aufgaben"
 		au_tasks_long:   "Lange Aufgaben"
 		au_tasks_common: "Gewöhnliche Aufgaben"
-		au_tasks_enable_visual: "Visuelle Aufgaben"
+		au_tasks_enable_visual: "Sichtbare Aufgaben"
 	}
 
 	for name, value in pairs cvars
@@ -169,7 +166,7 @@ with GM.Lang\Get "de"
 
 	["prepare.admin"] = "Du bist ein Admin!"
 	["prepare.spectator"] = "Du bist ein Zuschauer."
-	["prepare.pressToStart"] = "Drücke [%s] um das Spiel zu starten-."
+	["prepare.pressToStart"] = "Drücke [%s] um das Spiel zu starten."
 
 	["prepare.invalidMap"] = "Ungültige Karte!"
 	["prepare.invalidMap.subText"] = "Keine manifest-Datei für die Karte gefunden."
@@ -198,7 +195,7 @@ with GM.Lang\Get "de"
 		pressToStart:  "DRÜCKE UM ZU STARTEN  -->"
 		selectAnomaly: "ANOMALIE AUSWÄHLEN."
 		hello:         "HALLO."
-		badResult:     "SCHLECHTES RESULTAT."
+		badResult:     "FALSCHES ERGEBNIS."
 		thankYou:      "DANKE!"
 		randomText: table.Random {
 			"DU MUSST NICHT WARTEN."
