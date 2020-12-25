@@ -5,7 +5,7 @@ with GM.Lang\Get "de"
 	["tasks.commsSabotaged"] = "Kommunikation sabotiert"
 	["tasks.lightsSabotaged"] = "Lichter reparieren (%d%%)"
 	["tasks.reactorSabotaged"] = "Reaktorschmelze in %d s. (%d/%d)"
-	["tasks.oxygenSabotaged"] = "Kein Sauerstoff mehr in %d s. (%d/%d)"
+	["tasks.oxygenSabotaged"] = "Sauerstoff verbraucht in %d s. (%d/%d)"
 
 	areas = {
 		["cafeteria"]:      "Cafeteria"
