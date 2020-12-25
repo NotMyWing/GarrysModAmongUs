@@ -1,0 +1,244 @@
+with GM.Lang\Get "de"
+	["tasks.totalCompleted"] = "AUFGABEN ABGESCHLOSSEN"
+	["tasks.totalCompleted.sabotaged"] = "KOMMUNIKATION SABOTIERT"
+
+	["tasks.commsSabotaged"] = "Kommunikation sabotiert"
+	["tasks.lightsSabotaged"] = "Lichter reparieren (%d%%)"
+	["tasks.reactorSabotaged"] = "Reaktorschmelze in %d s. (%d/%d)"
+	["tasks.oxygenSabotaged"] = "Kein Sauerstoff mehr in %d s. (%d/%d)"
+
+	areas = {
+		["cafeteria"]:      "Cafeteria"
+		["upperEngine"]:   "Oberer Motor"
+		["reactor"]:        "Reaktor"
+		["lowerEngine"]:   "Unterer Motor"
+		["security"]:       "Sicherheit"
+		["electrical"]:     "Elektrizität"
+		["medbay"]:         "Krankenzimmer"
+		["storage"]:        "Lagerraum"
+		["shields"]:        "Schilde"
+		["communications"]: "Kommunikation"
+		["navigation"]:     "Navigation"
+		["o2"]:             "O2"
+		["admin"]:          "Admin"
+		["weapons"]:        "Waffen"
+	}
+
+	for area, areaName in pairs areas
+		["area.#{area}"] = areaName
+		["task.divertPower.area.#{area}"] = "Strom umleiten zu #{areaName}"
+		["vent.#{area}"] = "Zu #{areaName} venten"
+
+	taskNames = {
+		"divertPower": "Strom umleiten"
+		"alignEngineOutput": "Motorausgang ausrichten"
+		"calibrateDistributor": "Verteiler kalibrieren"
+		"chartCourse": "Kurs zeichnen"
+		"cleanO2Filter": "O2 Filter reinigen"
+		"clearAsteroids": "Asteroiden entfernen"
+		"emptyGarbage": "Müll leeren"
+		"emptyChute": "Rutsche leeren"
+		"fixWiring": "Verkabelung reparieren"
+		"inspectSample": "Probe inspizieren"
+		"primeShields": "Schilde aktivieren"
+		"stabilizeSteering": "Steuerung stabilisieren"
+		"startReactor": "Reactor starten"
+		"submitScan": "Scan übermitteln"
+		"swipeCard": "Karte durchziehen"
+		"unlockManifolds": "Verteiler entriegeln"
+		"uploadData": "Daten herunterladen"
+		"uploadData.2": "Daten hochladen"
+		"fuelEngines": "Motoren tanken"
+	}
+
+	for task, taskName in pairs taskNames
+		["task.#{task}"] = taskName
+
+	["meetingButton.cooldown"] = (time) -> {
+		{
+			text: "Crewmitglieder müssen"
+		}, {
+			text: string.format "%ds", time
+			color: Color 255, 0, 0
+		}, {
+			text: "vor dem Notfall warten"
+		}
+	}
+
+	["meetingButton.default"] = (nickname, uses) -> {
+		{
+			text: string.format "Crewmitglied %s hat", nickname
+		}, {
+			text: string.format "%d", uses
+			color: Color 255, 0, 0
+		}, {
+			text: "Notfalltreffen übrig"
+		}
+	}
+
+	["meetingButton.crisis"] = -> {
+		{
+			text: "NOTFALLTREFFEN KÖNNEN NICHT WÄHREND"
+		}, {
+			text: "KRISEN EINBERUFEN WERDEN"
+		}
+	}
+
+	["task.clearAsteroids.destroyed"] = "Zerstört: %d"
+
+	["eject.remaining"] = (remaining) ->
+		string.format "%d Verräter übrig.", remaining
+
+	["eject.reason.tie"]     = "Niemand wurde rausgeworfen. (Gleichstand)"
+	["eject.reason.skipped"] = "Niemand wurde rausgeworfen. (Übersprungen)"
+	["eject.reason.generic"] = "Niemand wurde rausgeworfen."
+
+	["eject.text"] = (nickname, confirm, isImposter, total) ->
+		string.format (if confirm
+			if isImposter
+				if total == 1
+					"%s war der Verräter."
+				else
+					"%s war ein Verräter."
+			else
+				if total == 1
+					"%s war nicht der Verräter."
+				else
+					"%s war nicht ein Verräter."
+		else
+			"%s wurde rausgeworfen."), nickname
+
+	["meeting.timer.begins"]     = (time) -> string.format "Abstimmung startet in: %ds", time
+	["meeting.timer.ends"]       = (time) -> string.format "Abstimmung endet in: %ds", time
+	["meeting.timer.proceeding"] = (time) -> string.format "Fortsetzen in: %ds", time
+	["meeting.header"] = "Wer ist der Verräter?"
+
+	["splash.victory"] = "Sieg"
+	["splash.defeat"]  = "Niederlage"
+	["splash.imposter"]  = "Verräter"
+	["splash.spectator"] = "Zuschauer"
+	["splash.crewmate"]  = "Crewmitglied"
+	["splash.text"] = (isPlaying, imposterCount) ->
+		amongSubtext = isPlaying and "uns" or "sie"
+
+		return if imposterCount == 1
+			"Es ist %s Verräter unter " .. amongSubtext
+		else
+			"Es sind %s Verräter unter " .. amongSubtext
+
+	["hud.sabotageAndKill"] = "Sabotiere und töte jeden."
+	["hud.countdown"] = "Startet in %d"
+	["hud.tasks"] = "Aufgaben:"
+	["hud.fakeTasks"] = "Gefälschte Aufgaben:"
+	["hud.taskComplete"] = "Aufgabe erledigt!"
+	["hud.cvar.disabled"] = "Deaktiviert"
+	["hud.cvar.enabled"] = "Aktiviert"
+	["hud.cvar.time"] = "%d s."
+
+	["hud.cvar.au_taskbar_updates.0"] = "Immer"
+	["hud.cvar.au_taskbar_updates.1"] = "Treffen"
+	["hud.cvar.au_taskbar_updates.2"] = "Nie"
+
+	cvars = {
+		au_max_imposters:    "Max. Verräter"
+		au_kill_cooldown:    "Tötungsabklingzeit"
+		au_time_limit:       "Zeitgrenze"
+		au_killdistance_mod: "Tötungsdistanz"
+		sv_alltalk:          "Alle sprechen"
+		au_taskbar_updates:  "Taskbar Updates"
+		au_player_speed_mod: "Player Speed"
+
+		au_meeting_available: "Meetings per Player"
+		au_meeting_cooldown:  "Meeting Button Cooldown"
+		au_meeting_vote_time: "Voting Time"
+		au_meeting_vote_pre_time:  "Pre-Voting Time"
+		au_meeting_vote_post_time: "Post-Voting Time"
+		au_confirm_ejects:         "Confirm Ejects"
+		au_meeting_anonymous: "Anonymous voting"
+
+		au_tasks_short:  "Short Tasks"
+		au_tasks_long:   "Long Tasks"
+		au_tasks_common: "Common Tasks"
+		au_tasks_enable_visual: "Visual Tasks"
+	}
+
+	for name, value in pairs cvars
+		["cvar.#{name}"] = value
+
+	["vote.voted"] = "%s has voted. %s remaining."
+
+	["prepare.admin"] = "You're an Admin!"
+	["prepare.spectator"] = "You're a Spectator."
+	["prepare.pressToStart"] = "Press [%s] to start the game."
+
+	["prepare.invalidMap"] = "Invalid Map!"
+	["prepare.invalidMap.subText"] = "No map manifest file found."
+
+	["prepare.warmup"] = "Warm-Up Time!"
+	["prepare.waitingForPlayers"] = "Waiting for players..."
+	["prepare.waitingForAdmin"] = "Waiting for an Admin to start the game."
+	["prepare.commencing"] = "The game will start in %d s."
+	["prepare.imposterCount"] = (count) ->
+		string.format (if count == 1
+			"%d Imposter"
+		else
+			"%d Imposters"), count
+
+	["connected.spectating"] = "%s has joined as a spectator."
+	["connected.spawned"] = "%s is ready to play."
+	["connected.disconnected"] = "%s has left the game!"
+
+	["chat.noTalkingDuringGame"] = "You cannot talk during the game!"
+
+	inspectSample = {
+		eta:           "ETA %d."
+		addingReagent: "ADDING REAGENT."
+		oneMore:       "1 MORE."
+		testComplete:  "TEST COMPLETE."
+		pressToStart:  "PRESS TO START  -->"
+		selectAnomaly: "SELECT ANOMALY."
+		hello:         "HELLO."
+		badResult:     "BAD RESULT."
+		thankYou:      "THANK YOU!"
+		randomText: table.Random {
+			"YOU DON'T NEED TO WAIT."
+			"GO DO SOMETHING ELSE."
+			"TAKE A BREAK."
+			"GO GRAB A COFFEE."
+		}
+	}
+
+	for key, value in pairs inspectSample
+		["tasks.inspectSample.#{key}"] = value
+
+	controls = {
+		"map": "Öffne die Karte / Sabotage"
+		"kill": "Töten"
+		"use": "Benutzen"
+		"report": "Leiche melden"
+		"hideTasks": "Aufgabenliste verstecken"
+		"toggleNoClip": "Geister-No-Clip umstellen"
+		"showHelp": "Dieses Menü"
+	}
+
+	for key, value in pairs controls
+		["help.controls.#{key}"] = value
+
+	tabs = {
+		"color": "Farbe"
+		"settings": "Einstellungen"
+		"game":  "Spiel"
+		"controls": "Steuerung"
+		"about": "Über"
+	}
+
+	for key, value in pairs tabs
+		["help.tab.#{key}"] = value
+
+	settingsCvars = {
+		"au_spectator_mode": "Zuschauermodus"
+		"au_debug_drawversion": "Zeige die aktuelle Version an"
+	}
+
+	for key, value in pairs settingsCvars
+		["help.settings.#{key}"] = value
