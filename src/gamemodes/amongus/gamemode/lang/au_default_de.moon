@@ -72,13 +72,13 @@ with GM.Lang\Get "de"
 			text: string.format "%d", uses
 			color: Color 255, 0, 0
 		}, {
-			text: "Notfalltreffen übrig"
+			text: "Notfallsitzungen übrig"
 		}
 	}
 
 	["meetingButton.crisis"] = -> {
 		{
-			text: "NOTFALLTREFFEN KÖNNEN NICHT WÄHREND"
+			text: "NOTFALLSITZUNGEN KÖNNEN NICHT WÄHREND"
 		}, {
 			text: "KRISEN EINBERUFEN WERDEN"
 		}
@@ -136,7 +136,7 @@ with GM.Lang\Get "de"
 	["hud.cvar.time"] = "%d s."
 
 	["hud.cvar.au_taskbar_updates.0"] = "Immer"
-	["hud.cvar.au_taskbar_updates.1"] = "Treffen"
+	["hud.cvar.au_taskbar_updates.1"] = "Sitzungen"
 	["hud.cvar.au_taskbar_updates.2"] = "Nie"
 
 	cvars = {
@@ -145,66 +145,66 @@ with GM.Lang\Get "de"
 		au_time_limit:       "Zeitgrenze"
 		au_killdistance_mod: "Tötungsdistanz"
 		sv_alltalk:          "Alle sprechen"
-		au_taskbar_updates:  "Taskbar Updates"
-		au_player_speed_mod: "Player Speed"
+		au_taskbar_updates:  "Aufgabenübersicht Aktualisierungen"
+		au_player_speed_mod: "Spielergeschwindigkeit"
 
-		au_meeting_available: "Meetings per Player"
-		au_meeting_cooldown:  "Meeting Button Cooldown"
-		au_meeting_vote_time: "Voting Time"
-		au_meeting_vote_pre_time:  "Pre-Voting Time"
-		au_meeting_vote_post_time: "Post-Voting Time"
-		au_confirm_ejects:         "Confirm Ejects"
-		au_meeting_anonymous: "Anonymous voting"
+		au_meeting_available: "Sitzungen pro Spieler"
+		au_meeting_cooldown:  "Abklingzeit Sitzungsknopf"
+		au_meeting_vote_time: "Abstimmzeit"
+		au_meeting_vote_pre_time:  "Vor-Abstimmzeit"
+		au_meeting_vote_post_time: "Nach-Abstimmzeit"
+		au_confirm_ejects:         "Abstimmungen bestätigen"
+		au_meeting_anonymous: "Anonymes abstimmen"
 
-		au_tasks_short:  "Short Tasks"
-		au_tasks_long:   "Long Tasks"
-		au_tasks_common: "Common Tasks"
-		au_tasks_enable_visual: "Visual Tasks"
+		au_tasks_short:  "Kurze Aufgaben"
+		au_tasks_long:   "Lange Aufgaben"
+		au_tasks_common: "Gewöhnliche Aufgaben"
+		au_tasks_enable_visual: "Visuelle Aufgaben"
 	}
 
 	for name, value in pairs cvars
 		["cvar.#{name}"] = value
 
-	["vote.voted"] = "%s has voted. %s remaining."
+	["vote.voted"] = "%s hat abgestimmt. %s verbleiben."
 
-	["prepare.admin"] = "You're an Admin!"
-	["prepare.spectator"] = "You're a Spectator."
-	["prepare.pressToStart"] = "Press [%s] to start the game."
+	["prepare.admin"] = "Du bist ein Admin!"
+	["prepare.spectator"] = "Du bist ein Zuschauer."
+	["prepare.pressToStart"] = "Drücke [%s] um das Spiel zu starten-."
 
-	["prepare.invalidMap"] = "Invalid Map!"
-	["prepare.invalidMap.subText"] = "No map manifest file found."
+	["prepare.invalidMap"] = "Ungültige Karte!"
+	["prepare.invalidMap.subText"] = "Keine manifest-Datei für die Karte gefunden."
 
-	["prepare.warmup"] = "Warm-Up Time!"
-	["prepare.waitingForPlayers"] = "Waiting for players..."
-	["prepare.waitingForAdmin"] = "Waiting for an Admin to start the game."
-	["prepare.commencing"] = "The game will start in %d s."
+	["prepare.warmup"] = "Aufwärmzeit!"
+	["prepare.waitingForPlayers"] = "Auf Spieler warten..."
+	["prepare.waitingForAdmin"] = "Auf Admin warten, welcher das Spiel startet."
+	["prepare.commencing"] = "Das Spiel startet in %d s."
 	["prepare.imposterCount"] = (count) ->
 		string.format (if count == 1
-			"%d Imposter"
+			"%d Verräter"
 		else
-			"%d Imposters"), count
+			"%d Verräter"), count
 
-	["connected.spectating"] = "%s has joined as a spectator."
-	["connected.spawned"] = "%s is ready to play."
-	["connected.disconnected"] = "%s has left the game!"
+	["connected.spectating"] = "%s ist als Zuschauer beigetreten."
+	["connected.spawned"] = "%s ist bereit zum spielen."
+	["connected.disconnected"] = "%s hat das Spiel verlassen!"
 
-	["chat.noTalkingDuringGame"] = "You cannot talk during the game!"
+	["chat.noTalkingDuringGame"] = "Du kannst während der Runde nicht reden!"
 
 	inspectSample = {
 		eta:           "ETA %d."
-		addingReagent: "ADDING REAGENT."
-		oneMore:       "1 MORE."
-		testComplete:  "TEST COMPLETE."
-		pressToStart:  "PRESS TO START  -->"
-		selectAnomaly: "SELECT ANOMALY."
-		hello:         "HELLO."
-		badResult:     "BAD RESULT."
-		thankYou:      "THANK YOU!"
+		addingReagent: "REAGENZ HINZUFÜGEN."
+		oneMore:       "1 MEHR."
+		testComplete:  "TEST ABGESCHLOSSEN."
+		pressToStart:  "DRÜCKE UM ZU STARTEN  -->"
+		selectAnomaly: "ANOMALIE AUSWÄHLEN."
+		hello:         "HALLO."
+		badResult:     "SCHLECHTES RESULTAT."
+		thankYou:      "DANKE!"
 		randomText: table.Random {
-			"YOU DON'T NEED TO WAIT."
-			"GO DO SOMETHING ELSE."
-			"TAKE A BREAK."
-			"GO GRAB A COFFEE."
+			"DU MUSST NICHT WARTEN."
+			"GEHE ETWAS ANDERES MACHEN."
+			"MACH PAUSE."
+			"HOL DIR EINEN KAFFEE."
 		}
 	}
 
