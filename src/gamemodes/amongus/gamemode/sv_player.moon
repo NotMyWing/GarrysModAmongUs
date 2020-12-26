@@ -479,8 +479,8 @@ hook.Add "PlayerSay", "NMW AU DeadChat", (ply) ->
 	if not GAMEMODE\IsMeetingInProgress!
 		playerTable = IsValid(ply) and ply\GetAUPlayerTable!
 
-		-- ...unless he's dead/a spectator.
-		if (playerTable and not ply\IsDead!) or not playerTable
+		-- ... but only if they're a living player
+		if (playerTable and not ply\IsDead!)
 			GAMEMODE\Net_SendGameChatError playerTable
 			return ""
 
