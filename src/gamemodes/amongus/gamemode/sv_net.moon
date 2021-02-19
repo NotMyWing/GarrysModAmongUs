@@ -3,6 +3,7 @@
 -- @module sv_net
 
 util.AddNetworkString "NMW AU Flow"
+util.AddNetworkString "AU ChangeCvar"
 
 --- Sends the game state update.
 -- @param ply Player entity.
@@ -422,6 +423,7 @@ net.Receive "NMW AU Flow", (len, ply) ->
 					ply\SetPlayerColor GAMEMODE.Colors[preferred]\ToVector!
 
 				GAMEMODE\Net_UpdateGameState ply
+				GAMEMODE\Net_SyncGameSettings ply
 
 		--
 		-- Player has closed the task window.
@@ -532,3 +534,34 @@ GM.SetOnAutoPilot = (newState) =>
 -- @return You guessed it again.
 GM.SetFullyInitializedPlayerCount = (newCount) =>
 	SetGlobalInt "NMW AU FullyInitializedPlayers", newCount
+
+GM.Net_SyncGameSettings = (ply) =>
+	for _, cvar in ipairs GAMEMODE.replicatedWritableCvars
+		net.Start "AU ChangeCvar"
+		net.WriteString GAMEMODE.ConVars[cvar]\GetName!
+		net.WriteString GAMEMODE.ConVars[cvar]\GetString!
+		net.Send ply
+
+skipSync = {}
+for _, cvar in ipairs GAMEMODE.replicatedWritableCvars
+	cvars.AddChangeCallback GAMEMODE.ConVars[cvar]\GetName!, ((cvar, oldValue, newValue) ->
+		if skipSync[cvar]
+			skipSync[cvar] = false
+		else
+			net.Start "AU ChangeCvar"
+			net.WriteString cvar
+			net.WriteString newValue
+			net.Broadcast!
+	), "SendToClient"
+
+net.Receive "AU ChangeCvar", (len, ply) ->
+	isWritableCvar = (cvarName) ->
+		for _, cvar in ipairs GAMEMODE.replicatedWritableCvars
+			if GAMEMODE.ConVars[cvar]\GetName! == cvarName
+				return true
+		return false
+
+	cvar = net.ReadString!
+	if CAMI.PlayerHasAccess(ply, GAMEMODE.PRIV_CHANGE_SETTINGS) and isWritableCvar(cvar)
+		skipSync[cvar] = true
+		RunConsoleCommand cvar, net.ReadString!

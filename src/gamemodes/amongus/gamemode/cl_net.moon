@@ -498,3 +498,24 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 
 	when GAMEMODE.FlowTypes.GameChatNotification
 		chat.AddText Color(220, 32, 32), "[Among Us] ", Color(255, 255, 0), tostring TRANSLATE "chat.noTalkingDuringGame"
+
+skipSync = {}
+for _, cvar in ipairs GAMEMODE.replicatedWritableCvars
+	cvars.AddChangeCallback GAMEMODE.ConVars[cvar]\GetName!, ((cvar, oldValue, newValue) ->
+		if skipSync[cvar]
+			skipSync[cvar] = false
+		elseif CAMI.PlayerHasAccess LocalPlayer!, GAMEMODE.PRIV_CHANGE_SETTINGS
+			net.Start "AU ChangeCvar"
+			net.WriteString cvar
+			net.WriteString newValue
+			net.SendToServer!
+		else
+			print "Only admins can change ConVar #{cvar}"
+			skipSync[cvar] = true
+			RunConsoleCommand cvar, oldValue
+	), "SendToServer"
+
+net.Receive "AU ChangeCvar", (len, ply) ->
+	cvar = net.ReadString!
+	skipSync[cvar] = true
+	RunConsoleCommand cvar, net.ReadString!

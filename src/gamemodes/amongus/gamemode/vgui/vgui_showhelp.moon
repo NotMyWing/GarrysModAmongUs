@@ -340,7 +340,7 @@ return vgui.RegisterTable {
 										.Paint = (_, w, h) ->
 											draw.RoundedBox cornerRadiusBase * 1.5, 0, 0, w, h, entryColor
 
-										element = if (CAMI.PlayerHasAccess LocalPlayer!, GAMEMODE.PRIV_CHANGE_SETTINGS) and LocalPlayer!\GetNWBool "NMW AU Host"
+										element = if CAMI.PlayerHasAccess LocalPlayer!, GAMEMODE.PRIV_CHANGE_SETTINGS
 											-- Show the admin stuffs to admins.
 											switch type
 												when "Int", "Time", "Mod"
@@ -360,7 +360,14 @@ return vgui.RegisterTable {
 
 														depressed = false
 														.OnDepressed = -> depressed = true
-														.OnReleased  = -> depressed = false
+														.OnReleased  = -> 
+															depressed = false
+															if conVarName == "sv_alltalk"
+																-- sending value here to server because sv_alltalk doesn't callback on client (https://github.com/Facepunch/garrysmod-issues/issues/3503)
+																net.Start "AU ChangeCvar"
+																net.WriteString conVarName
+																net.WriteString \GetChecked() and "0" or "1"
+																net.SendToServer!
 
 														.Paint = (_, w, h) ->
 															depressedPadding = w * 0.025
