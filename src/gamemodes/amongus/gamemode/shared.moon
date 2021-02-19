@@ -17,7 +17,8 @@ GM.WorkshopID = "{{CI_WORKSHOP_ID}}"
 GM.Version    = "manual-build" if GM.Version    == "{{" .. "CI_GAMEMODE_VERSION}}"
 GM.WorkshopID = nil            if GM.WorkshopID == "{{" .. "CI_WORKSHOP_ID}}"
 
-flags = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED
+flags = FCVAR_ARCHIVE
+flagsRep = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED
 
 --- Table of all ConVars the game mode is using.
 -- These are tracked and cannot be changed during the round.
@@ -45,7 +46,7 @@ flags = bit.bor FCVAR_ARCHIVE, FCVAR_REPLICATED
 -- @field ForceAutoWarmup (Bool) Should the automated round management be forced?
 GM.ConVars =
 	ImposterCount:   CreateConVar "au_max_imposters"   , 1 , flags, "", 1, 10
-	MinPlayers:      CreateConVar "au_min_players"     , 3 , flags, "", 3, 128
+	MinPlayers:      CreateConVar "au_min_players"     , 3 , flagsRep, "", 3, 128
 	KillCooldown:    CreateConVar "au_kill_cooldown"   , 20, flags, "", 1, 60
 	KillDistanceMod: CreateConVar "au_killdistance_mod", 1 , flags, "", 1, 3
 	ConfirmEjects:   CreateConVar "au_confirm_ejects"  , 1 , flags, "", 0, 1
@@ -65,19 +66,42 @@ GM.ConVars =
 	TasksCommon: CreateConVar "au_tasks_common"       , 1, flags, "", 0, 5
 	TasksVisual: CreateConVar "au_tasks_enable_visual", 0, flags, "", 0, 1
 
-	DistributeTasksToBots: CreateConVar "au_debug_bot_tasks" , 0, flags, "", 0, 1
-	MeetingBotVote:        CreateConVar "au_debug_bot_vote"  , 0, flags, "", 0, 1
+	DistributeTasksToBots: CreateConVar "au_debug_bot_tasks" , 0, flagsRep, "", 0, 1
+	MeetingBotVote:        CreateConVar "au_debug_bot_vote"  , 0, flagsRep, "", 0, 1
 
 	TimeLimit: CreateConVar "au_time_limit", 600, flags, "", 0, 1200
-	Countdown: CreateConVar "au_countdown" , 5  , flags, "", 1, 10
+	Countdown: CreateConVar "au_countdown" , 5  , flagsRep, "", 1, 10
 
-	WarmupTime:      CreateConVar "au_warmup_time"      , 60, flags, "", 0, 120
-	ForceAutoWarmup: CreateConVar "au_warmup_force_auto", 0 , flags, "", 0, 1
+	WarmupTime:      CreateConVar "au_warmup_time"      , 60, flagsRep, "", 0, 120
+	ForceAutoWarmup: CreateConVar "au_warmup_force_auto", 0 , flagsRep, "", 0, 1
 
 	PlayerModel: CreateConVar "au_player_model", "models/amongus/player/player.mdl",
-		flags, ""
+		flagsRep, ""
 	CorpseModel: CreateConVar "au_corpse_model", "models/amongus/player/corpse.mdl",
-		flags, ""
+		flagsRep, ""
+
+GM.replicatedWritableCvars =	{
+	"ImposterCount"
+	"KillCooldown"
+  "TimeLimit"
+  "KillDistanceMod"
+  "AllTalk"
+  "TaskbarUpdates"
+  "PlayerSpeedMod"
+
+  "MeetingsPerPlayer"
+  "MeetingCooldown"
+  "VoteTime"
+  "VotePreTime"
+  "VotePostTime"
+  "ConfirmEjects"
+  "VoteAnonymous"
+
+  "TasksShort"
+  "TasksLong"
+  "TasksCommon"
+  "TasksVisual"
+}
 
 --- Enum of all colors players can get.
 -- @table GM.Colors
