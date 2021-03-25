@@ -121,6 +121,8 @@ GM.Game_Start = =>
 		-- TO-DO: print chat message.
 		return if #initializedPlayers < @ConVars.MinPlayers\GetInt!
 
+		hook.Call "GMAU PreGameStart"
+
 		-- Create the time limit timer if the cvar is set.
 		-- That's quite an interesting sentence.
 		timelimit = @ConVarSnapshots.TimeLimit\GetInt!
