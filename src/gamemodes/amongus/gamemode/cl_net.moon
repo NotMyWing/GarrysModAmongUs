@@ -149,6 +149,7 @@ net.Receive "NMW AU Flow", -> switch net.ReadUInt GAMEMODE.FlowSize
 	--
 	when GAMEMODE.FlowTypes.BroadcastDead
 		if GAMEMODE.GameData.Lookup_PlayerByID
+			GAMEMODE.GameData.DeadPlayers = {}
 			count = net.ReadUInt 8
 			for i = 1, count
 				id = net.ReadUInt 8
