@@ -262,3 +262,6 @@ hook.Add "OnEntityCreated", "NMW AU PaintRagdolls", (ent) ->
 		if playerTable
 			playerColor = playerTable.color\ToVector!
 			ent.GetPlayerColor = -> playerColor
+
+hook.Add "NotifyShouldTransmit", "NMW AU TransmitWorkaround", (ent, shouldTransmit) ->
+	pac.ToggleIgnoreEntity ent, not shouldTransmit, "GMAU" if pac and ent\IsPlayer!

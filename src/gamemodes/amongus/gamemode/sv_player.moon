@@ -2,6 +2,23 @@
 -- Handles everything related to players, from hiding to killing and venting.
 -- @module sv_player
 
+-- Helper function for recursive transmit enabling/disabling.
+setPreventTransmitRecursive = (entity, target, state, memo = {}) ->
+	if not memo[entity]
+		entity\SetPreventTransmit target, state
+		memo[entity] = true
+
+		children = for otherEntity in *ents.GetAll!
+			if otherEntity\GetOwner! == entity or
+				otherEntity\GetMoveParent! == entity or
+				otherEntity\GetParent! == entity
+					otherEntity
+			else
+				continue
+
+		setPreventTransmitRecursive otherEntity,
+			target, state, memo for otherEntity in *children
+
 --- Hides or unhides the player in question.
 -- This does in fact HIDE the player, preventing the server from
 -- transmitting his data to others completely.
@@ -10,7 +27,7 @@
 GM.Player_Hide = (ply, hide = true) =>
 	for otherPly in *player.GetAll!
 		if otherPly ~= ply
-			ply\SetPreventTransmit otherPly, hide
+			setPreventTransmitRecursive ply, otherPly, hide
 
 --- Unhides the player.
 -- A small wrapper for my, as well as your, convenience.
@@ -34,10 +51,10 @@ GM.Player_HideForAlivePlayers = (ply) =>
 		otherPlayerTable = otherPly\GetAUPlayerTable!
 
 		if not otherPlayerTable or @GameData.DeadPlayers[otherPlayerTable]
-			ply\SetPreventTransmit otherPly, false
-			otherPly\SetPreventTransmit ply, false
+			setPreventTransmitRecursive ply, otherPly, false
+			setPreventTransmitRecursive otherPly, ply, false
 		else
-			ply\SetPreventTransmit otherPly, true
+			setPreventTransmitRecursive ply, otherPly, true
 
 --- Sets the player as dead.
 -- @param playerTable Player table.
