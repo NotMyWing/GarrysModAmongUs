@@ -407,6 +407,9 @@ hook.Add "ScoreboardHide", "NMW AU Map", ->
 
 	return nil
 
+hook.Add "PlayerBindPress", "PlayerBindPressExample", (ply, bind, pressed) ->
+	GAMEMODE\HUD_ShowHelp! if pressed and bind == "gm_showhelp"
+
 concommand.Add "au_debug_eject_test", ->
 	if IsValid GAMEMODE.Hud.Eject
 		GAMEMODE.Hud.Eject\Remove!

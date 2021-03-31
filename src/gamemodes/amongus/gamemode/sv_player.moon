@@ -505,8 +505,6 @@ hook.Add "PlayerSay", "NMW AU DeadChat", (ply) ->
 
 hook.Add "IsSpawnpointSuitable", "NMW AU SpawnSuitable", -> true
 
-hook.Add "ShowHelp", "NMW AU ShowHelp", (ply) -> GAMEMODE\Net_SendShowHelp ply
-
 hook.Add "PlayerNoClip", "NMW AU NoClip", (ply) ->
 	if ply\IsDead!
 		return true

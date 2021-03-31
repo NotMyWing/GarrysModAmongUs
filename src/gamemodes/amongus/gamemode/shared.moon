@@ -166,7 +166,6 @@ GM.FlowTypes = { value, i for i, value in ipairs {
 
 	"ConVarSnapshots"
 	"ConnectDisconnect"
-	"ShowHelp"
 	"UpdateMyColor"
 }}
 
