@@ -170,10 +170,26 @@ GM.Game_Start = =>
 			--	memo[a] = 1
 			-- if not b.entity\IsBot!
 			-- 	memo[b] = 1
-
-			memo[a] = memo[a] or math.random!
-			memo[b] = memo[b] or math.random!
+			if not memo[a]
+				if @PlayersMarkedForImposter[a.entity]
+					memo[a] = math.random! + 1
+				elseif @PlayersMarkedForCrew[a.entity]
+					memo[a] = math.random! - 1
+				else
+					memo[a] = math.random!
+			
+			if not memo[b]
+				if @PlayersMarkedForImposter[b.entity]
+					memo[b] = math.random! + 1
+				elseif @PlayersMarkedForCrew[b.entity]
+					memo[b] = math.random! - 1
+				else
+					memo[b] = math.random!
+			
 			memo[a] > memo[b]
+
+		@PlayersMarkedForCrew = {}
+		@PlayersMarkedForImposter = {}
 
 		imposterCount = math.min GAMEMODE.ConVarSnapshots.ImposterCount\GetInt!, @GetImposterCount #initializedPlayers
 		for index, ply in ipairs @GameData.PlayerTables
