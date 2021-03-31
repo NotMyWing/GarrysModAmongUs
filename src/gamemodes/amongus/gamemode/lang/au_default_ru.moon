@@ -87,10 +87,14 @@ with GM.Lang\Get "ru"
 	["task.clearAsteroids.destroyed"] = "Уничтожено: %d"
 
 	["eject.remaining"] = (remaining) ->
-		if remaining == 1
-			string.format "Остался 1 Предатель."
-		else
-			string.format "Осталось %d Предателей.", remaining
+		string.format (switch remaining % 10
+			when 1
+				"Остался %s Предатель."
+			when 2, 3, 4
+				"Осталось %s Предателя."
+			else
+				"Осталось %s Предателей."
+		), remaining
 
 	["eject.reason.tie"]     = "Не было принято единого решения."
 	["eject.reason.skipped"] = "Было решено пропустить голосование."
@@ -118,10 +122,14 @@ with GM.Lang\Get "ru"
 	["splash.text"] = (isPlaying, imposterCount) ->
 		amongSubtext = isPlaying and "нас" or "них"
 
-		return if imposterCount == 1
-			"1 Предатель среди " .. amongSubtext
-		else
-			"%s Предателей среди " .. amongSubtext
+		return string.format (switch remaining % 10
+			when 1
+				"%s Предатель среди #{amongSubtext}"
+			when 2, 3, 4
+				"%s Предателя среди #{amongSubtext}"
+			else
+				"%s Предателей среди #{amongSubtext}"
+		), imposterCount
 
 	["hud.sabotageAndKill"] = "Устраивай саботажи и убивай всех."
 	["hud.countdown"] = "Начало через %d"
@@ -173,7 +181,7 @@ with GM.Lang\Get "ru"
 
 	["prepare.warmup"] = "Время подготовки!"
 	["prepare.waitingForPlayers"] = "Ожидание других игроков..."
-	["prepare.waitingForAdmin"] = "Ожидание начало матча Админом."
+	["prepare.waitingForAdmin"] = "Ожидание начала матча Админом."
 	["prepare.commencing"] = "Игра начнётся через %d с."
 	["prepare.imposterCount"] = (count) ->
 		string.format (if count == 1
@@ -181,15 +189,15 @@ with GM.Lang\Get "ru"
 		else
 			"%d Предателей"), count
 
-	["connected.spectating"] = "%s зашёл в игру наблюдателем."
-	["connected.spawned"] = "%s готов играть."
-	["connected.disconnected"] = "%s покинул игру!"
+	["connected.spectating"] = "%s зашёл(ла) в игру наблюдателем."
+	["connected.spawned"] = "%s готов(а) играть."
+	["connected.disconnected"] = "%s покинул(а) игру!"
 
 	["chat.noTalkingDuringGame"] = "Ты не можешь говорить во время игры!"
 
 	inspectSample = {
 		eta:           "%d СЕК."
-		addingReagent: "ДОБАВЬТЕ РЕАГЕНТ."
+		addingReagent: "РЕАГЕНТ ДОБАВЛЯЕТСЯ."
 		oneMore:       "ЕЩЁ РАЗ."
 		testComplete:  "ТЕСТИРОВАНИЕ ЗАВЕРШЕНО."
 		pressToStart:  "НАЖМИТЕ ДЛЯ СТАРТА -->"
@@ -212,7 +220,7 @@ with GM.Lang\Get "ru"
 		"map": "Открыть карту или саботаж"
 		"kill": "Убить"
 		"use": "Использовать"
-		"report": "Обнаружить тело"
+		"report": "Доложить о теле"
 		"hideTasks": "Скрыть список заданий"
 		"toggleNoClip": "Включить полёт призрака"
 		"showHelp": "Текущее меню"
