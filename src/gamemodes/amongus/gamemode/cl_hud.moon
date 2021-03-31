@@ -297,15 +297,10 @@ COLOR_WHITE = Color 255, 255, 255
 COLOR_BLACK = Color 0, 0, 0, 160
 
 hook.Add "HUDPaintBackground", "NMW AU Hud", ->
-	if GAMEMODE.ClientSideConVars.DrawVersion\GetBool!
-		draw.SimpleText "EARLY ALPHA BUILD. EXPECT BUGS.", "NMW AU Version",
+	if GAMEMODE.Version and GAMEMODE.ClientSideConVars.DrawVersion\GetBool!
+		draw.SimpleText "VERSION: #{string.upper GAMEMODE.Version}.", "NMW AU Version",
 			ScrW! * 0.99, ScrH! * 0.01, COLOR_WHITE_VERSION,
 			TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP
-
-		if GAMEMODE.Version
-			draw.SimpleText "VERSION: #{string.upper GAMEMODE.Version}.", "NMW AU Version",
-				ScrW! * 0.99, ScrH! * 0.01 + ScreenScale(12), COLOR_WHITE_VERSION,
-				TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP
 
 	if GAMEMODE\IsGameInProgress!
 		if IsValid GAMEMODE.UseHighlight

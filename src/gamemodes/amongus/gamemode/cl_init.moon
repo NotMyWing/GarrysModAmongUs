@@ -58,7 +58,7 @@ flagsUInfo = bit.bor FCVAR_ARCHIVE, FCVAR_USERINFO
 
 GM.ClientSideConVars = {
 	PreferredColor:  CreateConVar "au_preferred_color"     , 0  , flagsUInfo, "", 0, 128
-	DrawVersion:     CreateConVar "au_debug_drawversion"   , 1  , flags     , "", 0, 1
+	DrawVersion:     CreateConVar "au_debug_drawversion"   , 0  , flags     , "", 0, 1
 	MaxChatMessages: CreateConVar "au_meeting_max_messages", 100, flags     , "", 0, 200
 	SpectatorMode:   CreateConVar "au_spectator_mode"      , 0  , flagsUInfo, "", 0, 1
 }
