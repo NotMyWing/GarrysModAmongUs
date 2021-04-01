@@ -384,6 +384,28 @@ GM.GetFullyInitializedPlayers = => return for ply in *player.GetAll!
 	else
 		continue
 
+GM.PlayersMarkedForCrew or= {}
+GM.PlayersMarkedForImposter or= {}
+--- Marks a player to become crewmate next round.
+-- This function doesn't overwrite the imposter count and therefor will be ignored if too many players are marked.
+-- @param ply Player entity.
+GM.Player_MarkCrew = (ply) =>
+	@PlayersMarkedForCrew[ply] = true
+	@PlayersMarkedForImposter[ply] = false
+
+--- Marks a player to become crewmate next round.
+-- This function doesn't overwrite the imposter count and therefor will be ignored if too many players are marked.
+-- @param ply Player entity.
+GM.Player_MarkImposter = (ply) =>
+	@PlayersMarkedForCrew[ply] = false
+	@PlayersMarkedForImposter[ply] = true
+
+--- Unmarks a player
+-- @param ply Player entity.
+GM.Player_UnMark = (ply) =>
+	@PlayersMarkedForCrew[ply] = false
+	@PlayersMarkedForImposter[ply] = false
+
 hook.Add "PlayerInitialSpawn", "NMW AU AutoPilot", (ply) -> with GAMEMODE
 	oldAutoPilot = \IsOnAutoPilot!
 
