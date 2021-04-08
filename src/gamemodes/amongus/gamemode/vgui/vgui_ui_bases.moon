@@ -17,6 +17,7 @@ vgui.Register "AmongUsVGUIBase", {
 			\SetText ""
 			\SetMaterial ASSETS.close
 			\SetSize ScrH! * 0.09, ScrH! * 0.09
+			\SetZPos 1
 			\Hide!
 
 	-- Prepares the base using the provided panel.
