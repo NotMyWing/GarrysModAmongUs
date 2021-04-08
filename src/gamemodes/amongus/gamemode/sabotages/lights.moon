@@ -106,7 +106,7 @@ if CLIENT
 		if IsValid(ent) and GAMEMODE\IsPlayerBody(ent)
 			ent.RenderOverride = corpseRenderOverride
 
-comms = {
+lights = {
 	Init: (data) =>
 		@Base.Init @, data
 
@@ -114,6 +114,7 @@ comms = {
 			@SetMajor true
 			@SetPersistent true
 			@SetNetworkable "Lights"
+			@SetNetworkable "Reverse"
 
 	OnStart: =>
 		@Base.OnStart @
@@ -128,6 +129,7 @@ comms = {
 			if btn
 				@SetActivationButtons btn
 				@SetLights GAMEMODE.Util.Shuffle { true, true, false, false, false }
+				@SetReverse GAMEMODE.Util.Shuffle { true, true, false, false, false }
 
 		else
 			@__taskEntry = GAMEMODE\HUD_AddTaskEntry!
@@ -168,61 +170,285 @@ comms = {
 			@SetDirty!
 
 	GetLights: => @__lights
+
+	SetReverse: (value) =>
+		@__reverse = value
+		if SERVER
+			@SetDirty!
+
+	GetReverse: => @__reverse
 }
 
 if CLIENT
-	with comms
-		.CreateVGUI = =>
-			base = vgui.Create "AmongUsSabotageBase"
+	COLOR_ACTIVE = Color 0, 255, 0
+	COLOR_INACTIVE = Color 26, 77, 26
 
-			with base
-				\SetSabotage @
-				\Setup with vgui.Create "DPanel"
-					max_size = ScrH! * 0.7
+	ASSETS = {asset, Material("au/gui/sabotages/lights/#{asset}.png", "smooth") for asset in *{
+		"base"
+		"switch"
+		"switchshadow"
+		"light"
+		"lightshine"
+		"switchflipped"
+		"wires"
+	}}
 
-					\SetSize max_size, max_size * 0.325
-					\SetBackgroundColor Color 64, 64, 64
+	SOUNDS =
+		switch: "au/panel_electrical_switch.ogg"
 
-					for i = 1, 2
-						with \Add "Panel"
-							margin = ScrH! * 0.01
-							\DockMargin margin * 4, 0, margin * 4, margin * 4
-							\SetTall ScrH! * 0.05
-							\Dock BOTTOM
+	class LimitedLinkedList
+		new: (@__max = 1, @__count = 0) =>
+		getFirst: => @__first
+		getLast: => @__last
+		getCount: => math.min @__max, @__count
 
-							with \Add "Panel"
-								\SetTall ScrH! * 0.05
+		push: (value) =>
+			@__count += 1 if @__count <= @__max
 
-								for j = 1, 5
-									if i == 2
-										with \Add "Panel"
-											\SetWide ScrH! * 0.05
-											\DockMargin 0, 0, ScrH! * 0.05, 0
-											\Dock LEFT
+			node = { :value }
 
-											active = Color 32, 250, 32
-											inactive = Color 8, 8, 8
+			-- If the first element already exists...
+			if @__first
+				-- link the new node to it and vice versa.
+				node.next = @__first
+				@__first.prev = node
 
-											.Paint = (_, w, h) ->
-												surface.SetDrawColor @GetLights![j] and active or inactive
-												surface.DrawRect 0, 0, w, h
-									else
-										with \Add "DButton"
-											\SetWide ScrH! * 0.05
-											\DockMargin 0, 0, ScrH! * 0.05, 0
-											\Dock LEFT
-											\SetText ""
-											.DoClick = ->
-												if @GetActive!
-													base\Submit j, false
+			-- otherwise make the new node the last element.
+			else
+				@__last = node
 
-								\NewAnimation 0, 0, 0, ->
-									\InvalidateLayout!
-									\NewAnimation 0, 0, 0, ->
-										\SizeToChildren true, false
-										\Center!
-				\Popup!
+			@__first = node
 
-			return base
+			-- If we've reached the max amount of elements,
+			-- unlink the last one and tell the GC to get rid of it.
+			if @__count > @__max
+				@__last = @__last.prev
+				@__last.next = nil
 
-return comms
+	lights.SetLights = (value) =>
+		@__lights = value
+
+		return if not @__reverse
+		return if not @downSwitches or not @upSwitches
+
+		@__numActive = 0
+		for i = 1, 5
+			@__numActive += 1 if value[i]
+
+			upSwitch = @__reverse[i] and @downSwitches[i] or @upSwitches[i]
+			downSwitch =  @__reverse[i] and @upSwitches[i] or @downSwitches[i]
+
+			upSwitch\SetVisible value[i] if IsValid upSwitch
+			downSwitch\SetVisible not value[i] if IsValid downSwitch
+
+	OSCIL_COUNT = 120
+
+	PAINT_OSCIL = (w, h) =>
+		current = @ValueList\getFirst!
+		surface.SetDrawColor 0, 255, 0
+
+		i = 1
+		-- Traverse the linked list.
+		while current
+			if current.prev
+				-- Multiply and flip the values.
+				cy = h - h * current.value
+				py = h - h * current.prev.value
+
+				-- Flip the values again.
+				cx = w - w * ((i - 1) / (OSCIL_COUNT - 1))
+				px = w - w * ((i - 2) / (OSCIL_COUNT - 1))
+
+				-- This will probably look horrible for 4K players.
+				-- But oh well!
+				surface.DrawLine cx, cy, px, py
+
+			current = current.next
+			i += 1
+
+	lights.CreateVGUI = =>
+		base = vgui.Create "AmongUsSabotageBase"
+
+		with base
+			\SetSabotage @
+			\Setup with vgui.Create "DImage"
+				-- Count the amount of active lights.
+				@__numActive = 0
+				for i = 1, 5
+					@__numActive += 1 if @GetLights![i]
+
+				max_size = ScrH! * 0.85
+
+				\SetSize max_size, max_size
+				\SetMaterial ASSETS.base
+
+				oscilWidth  = (max_size / 504) * 422
+				oscilHeight = (max_size / 504) * 58
+
+				oscilX = (max_size / 504) * 42
+				topOscilY = (max_size / 504) * 40
+				midOscilY = (max_size / 504) * 140
+				botOscilY = (max_size / 504) * 240
+
+				wiresWidth = (max_size / 504) * 530
+				wiresHeight = (max_size / 504) * 525
+
+				wiresOffsetX = (max_size / 504) * -50
+				wiresOffsetY = (max_size / 504) * -150
+
+				-- Override Paint and draw wires behind the panel.
+				-- Hacky but gets the job done.
+				oldPaint = .Paint
+				.Paint = (w, h) =>
+					old = DisableClipping true
+
+					surface.SetDrawColor 255, 255, 255
+					surface.SetMaterial ASSETS.wires
+					surface.DrawTexturedRect w/2 - wiresWidth/2 + wiresOffsetX,
+						h/2 - wiresHeight/2 + wiresOffsetY,
+						wiresWidth, wiresHeight
+
+					DisableClipping old
+
+					oldPaint @, w, h
+
+				-- Top oscillator.
+				-- Random data. Fast.
+				with \Add "Panel"
+					-- Define the oscillation function to avoid duplicating code.
+					oscFunc = ->
+						0.1 + math.random! * 0.8
+
+					\SetPos oscilX, topOscilY
+					\SetSize oscilWidth, oscilHeight
+					.Paint = PAINT_OSCIL
+
+					-- Pre-fill the linked list with data.
+					.ValueList = LimitedLinkedList OSCIL_COUNT
+					for i = 1, OSCIL_COUNT
+						.ValueList\push oscFunc!
+
+					nextOscillation = 0
+					.Think = ->
+						-- Roughly 120 oscillations per second.
+						-- Avoid oscillating faster with higher FPS.
+						if nextOscillation < CurTime!
+							nextOscillation = CurTime! + 0.016
+
+							-- Double push because Think is FPS-bound.
+							-- lmao
+							for i = 1, 2
+								.ValueList\push oscFunc!
+
+				-- Middle oscillator.
+				-- Horizontal bar that displays the amount of active lights,
+				-- ships with annoying flickering.
+				with \Add "Panel"
+					\SetPos oscilX, midOscilY
+					\SetSize oscilWidth, oscilHeight
+
+					with \Add "Panel"
+						margin = oscilHeight * 0.1
+						\DockMargin margin, margin, margin, margin
+						\Dock FILL
+
+						.Paint = (_, w, h) ->
+							surface.SetDrawColor 0, 255, 0
+							surface.DrawRect 0, 0,
+								w * ((@__numActive / 5) * 0.98 + math.random! * 0.02), h
+
+				-- Bottom oscillator.
+				-- Similar to the top oscillator, but instead displays useful info.
+				with \Add "Panel"
+					\SetPos oscilX, botOscilY
+					\SetSize oscilWidth, oscilHeight
+
+					.ValueList = LimitedLinkedList OSCIL_COUNT
+					for i = 1, OSCIL_COUNT
+						.ValueList\push (@__numActive / 5) * 0.9 + math.random! * 0.1
+
+					.Paint = PAINT_OSCIL
+
+					nextOscillation = 0
+					.Think = ->
+						-- Roughly 60 oscillations per second.
+						-- Avoid oscillating faster with higher FPS.
+						if nextOscillation < CurTime!
+							nextOscillation = CurTime! + 0.016
+							.ValueList\push (@__numActive / 5) * 0.9 + math.random! * 0.1
+
+				switchOriginX = (max_size / 504) * 61
+				switchOriginY = (max_size / 504) * 386
+				switchYOffset = (max_size / 504) * 4
+				switchSpacing = (max_size / 504) * 97
+				switchWidth = (max_size / 504) * 39
+				switchHeight = (max_size / 504) * 52
+
+				lightWidth = (max_size / 504) * 32
+				lightHeight = (max_size / 504) * 33
+				lightOffset = (max_size / 504) * 54
+
+				@upSwitches = {}
+				@downSwitches = {}
+
+				submit = ->
+					if @GetActive!
+						surface.PlaySound SOUNDS.switch
+						base\Submit i, false
+
+				for i = 1, 5
+					-- Shadow.
+					with \Add "DImage"
+						\SetSize switchWidth, switchHeight
+						\SetPos switchOriginX - switchWidth / 2 + switchSpacing * (i - 1),
+							switchOriginY - switchYOffset
+						\SetMaterial ASSETS.switchshadow
+
+					-- Up switch.
+					@upSwitches[i] = with \Add "DImageButton"
+						\SetSize switchWidth, switchHeight
+						\SetPos switchOriginX - switchWidth / 2 + switchSpacing * (i - 1),
+							switchOriginY + switchYOffset - switchHeight
+						\SetMaterial ASSETS.switch
+						.DoClick = submit
+
+						shouldHide = not @GetLights![i]
+						if @GetReverse![i]
+							shouldHide = not shouldHide
+
+						\Hide! if shouldHide
+
+					-- Down switch.
+					@downSwitches[i] = with \Add "DImageButton"
+						\SetSize switchWidth, switchHeight
+						\SetPos switchOriginX - switchWidth / 2 + switchSpacing * (i - 1),
+							switchOriginY - switchYOffset
+						\SetMaterial ASSETS.switchflipped
+						.DoClick = submit
+
+						shouldHide = @GetLights![i]
+						if @GetReverse![i]
+							shouldHide = not shouldHide
+
+						\Hide! if shouldHide
+
+					-- LED.
+					with \Add "Panel"
+						\SetSize lightWidth, lightHeight
+						\SetPos switchOriginX - lightWidth / 2 + switchSpacing * (i - 1),
+							switchOriginY + lightOffset
+
+						.Paint = (_, w, h) ->
+							surface.SetDrawColor @GetLights![i] and COLOR_ACTIVE or COLOR_INACTIVE
+							surface.SetMaterial ASSETS.light
+							surface.DrawTexturedRect 0, 0, w, h
+
+						with \Add "DImage"
+							\Dock FILL
+							\SetMaterial ASSETS.lightshine
+
+			\Popup!
+
+		return base
+
+return lights
