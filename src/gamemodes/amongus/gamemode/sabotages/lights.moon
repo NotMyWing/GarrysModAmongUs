@@ -183,12 +183,15 @@ if CLIENT
 	COLOR_ACTIVE = Color 0, 255, 0
 	COLOR_INACTIVE = Color 26, 77, 26
 
+	COMMONS = {asset, Material("au/gui/sabotages/common/#{asset}.png", "smooth") for asset in *{
+		"light"
+		"lightshine"
+	}}
+
 	ASSETS = {asset, Material("au/gui/sabotages/lights/#{asset}.png", "smooth") for asset in *{
 		"base"
 		"switch"
 		"switchshadow"
-		"light"
-		"lightshine"
 		"switchflipped"
 		"wires"
 	}}
@@ -411,12 +414,12 @@ if CLIENT
 
 						.Paint = (_, w, h) ->
 							surface.SetDrawColor @GetLights![i] and COLOR_ACTIVE or COLOR_INACTIVE
-							surface.SetMaterial ASSETS.light
+							surface.SetMaterial COMMONS.light
 							surface.DrawTexturedRect 0, 0, w, h
 
 						with \Add "DImage"
 							\Dock FILL
-							\SetMaterial ASSETS.lightshine
+							\SetMaterial COMMONS.lightshine
 
 			\Popup!
 
