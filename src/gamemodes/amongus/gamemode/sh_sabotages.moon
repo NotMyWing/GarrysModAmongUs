@@ -60,7 +60,7 @@ if CLIENT
 
 		if instance = GAMEMODE.GameData.Sabotages[data.sabotageId]
 			instance\ButtonUse GAMEMODE.GameData.Lookup_PlayerByEntity[LocalPlayer!], data.button
-			GAMEMODE\HUD_OpenVGUI instance\CreateVGUI!
+			GAMEMODE\HUD_OpenVGUI instance\CreateVGUI data
 			return true
 
 else
