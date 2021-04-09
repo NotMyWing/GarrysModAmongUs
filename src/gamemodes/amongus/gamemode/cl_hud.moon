@@ -204,7 +204,7 @@ GM.HUD_TrackTaskOnMap = (entity, track = true) =>
 			else
 				\UnTrack entity
 
-GM.HUD_AddTaskEntry = => @Hud\AddTaskEntry!
+GM.HUD_AddTaskEntry = (...) => @Hud\AddTaskEntry ...
 
 GM.HUD_Countdown = (time) =>
 	if time > CurTime! and IsValid @__splash

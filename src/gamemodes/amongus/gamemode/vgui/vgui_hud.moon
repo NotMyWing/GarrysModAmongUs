@@ -367,8 +367,6 @@ hud.SetupButtons = (state, impostor) =>
 						oldPaint @, w, h
 
 					\SizeToContentsX!
-
-			@tasks = {}
 			@taskBox = with \Add "Panel"
 				\Dock FILL
 				padding = ScrW! * 0.005
@@ -605,7 +603,7 @@ hud.ToggleTaskList = (value) =>
 			@taskBox\AlphaTo 0, 0.1, 0, ->
 				@taskBox\Hide!
 
-hud.AddTaskEntry = =>
+hud.AddTaskEntry = (force = false) =>
 	return unless IsValid @taskBox
 
 	return with @taskBox\Add "DOutlinedLabel"
@@ -651,6 +649,9 @@ hud.AddTaskEntry = =>
 			oldSetText @, ...
 			@InvalidateParent!
 
+		if not force and not LocalPlayer!\IsImposter! and GAMEMODE\GetCommunicationsDisabled!
+			\Hide!
+
 hud.Think = =>
 	if IsValid @roundOverlay
 		with @roundOverlay
@@ -674,15 +675,15 @@ hud.Think = =>
 				-- Wipe the task list and add a blinker.
 				-- Mess with the taskbar text.
 				if commsSabotaged
-					@__commsBlinker = GAMEMODE\HUD_AddTaskEntry!
+					if not LocalPlayer!\IsImposter!
+						for child in *@taskBox\GetChildren!
+							child\Hide!
+
+					@__commsBlinker = GAMEMODE\HUD_AddTaskEntry true
 					if IsValid @__commsBlinker then with @__commsBlinker
 						\SetColor Color 255, 230, 0
 						\SetText tostring TRANSLATE "tasks.commsSabotaged"
 						\SetBlink true
-
-					if not LocalPlayer!\IsImposter!
-						for task in *@tasks
-							task\Hide!
 
 					\SetText "  " .. TRANSLATE "tasks.totalCompleted.sabotaged"
 					\SetColor Color 255, 64, 64
@@ -693,12 +694,12 @@ hud.Think = =>
 				-- Restore the task list and remove the blinker.
 				-- Fix the taskbar text.
 				else
+					if not LocalPlayer!\IsImposter!
+						for child in *@taskBox\GetChildren!
+							child\Show!
+
 					if IsValid @__commsBlinker
 						@__commsBlinker\Remove!
-
-					if not LocalPlayer!\IsImposter!
-						for task in *@tasks
-							task\Show!
 
 					\SetText "  " .. TRANSLATE "tasks.totalCompleted"
 					\SetColor Color 255, 255, 255
