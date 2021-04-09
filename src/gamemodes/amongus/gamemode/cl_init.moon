@@ -265,3 +265,35 @@ hook.Add "OnEntityCreated", "NMW AU PaintRagdolls", (ent) ->
 
 hook.Add "NotifyShouldTransmit", "NMW AU TransmitWorkaround", (ent, shouldTransmit) ->
 	pac.ToggleIgnoreEntity ent, not shouldTransmit, "GMAU" if pac and ent\IsPlayer!
+
+class LimitedLinkedList
+	new: (@__max = 1, @__count = 0) =>
+	getFirst: => @__first
+	getLast: => @__last
+	getCount: => math.min @__max, @__count
+
+	push: (value) =>
+		@__count += 1 if @__count <= @__max
+
+		node = { :value }
+
+		-- If the first element already exists...
+		if @__first
+			-- link the new node to it and vice versa.
+			node.next = @__first
+			@__first.prev = node
+
+		-- otherwise make the new node the last element.
+		else
+			@__last = node
+
+		@__first = node
+
+		-- If we've reached the max amount of elements,
+		-- unlink the last one and tell the GC to get rid of it.
+		if @__count > @__max
+			@__last = @__last.prev
+			@__last.next = nil
+
+-- Not doing this kills Garry's Mod for god unknown reason.
+GM.Util.LimitedLinkedList = (...) -> LimitedLinkedList ...

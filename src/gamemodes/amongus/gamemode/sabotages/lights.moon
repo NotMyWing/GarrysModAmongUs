@@ -196,35 +196,6 @@ if CLIENT
 	SOUNDS =
 		switch: "au/panel_electrical_switch.ogg"
 
-	class LimitedLinkedList
-		new: (@__max = 1, @__count = 0) =>
-		getFirst: => @__first
-		getLast: => @__last
-		getCount: => math.min @__max, @__count
-
-		push: (value) =>
-			@__count += 1 if @__count <= @__max
-
-			node = { :value }
-
-			-- If the first element already exists...
-			if @__first
-				-- link the new node to it and vice versa.
-				node.next = @__first
-				@__first.prev = node
-
-			-- otherwise make the new node the last element.
-			else
-				@__last = node
-
-			@__first = node
-
-			-- If we've reached the max amount of elements,
-			-- unlink the last one and tell the GC to get rid of it.
-			if @__count > @__max
-				@__last = @__last.prev
-				@__last.next = nil
-
 	lights.SetLights = (value) =>
 		@__lights = value
 
@@ -324,7 +295,7 @@ if CLIENT
 					.Paint = PAINT_OSCIL
 
 					-- Pre-fill the linked list with data.
-					.ValueList = LimitedLinkedList OSCIL_COUNT
+					.ValueList = GAMEMODE.Util.LimitedLinkedList OSCIL_COUNT
 					for i = 1, OSCIL_COUNT
 						.ValueList\push oscFunc!
 
@@ -363,7 +334,7 @@ if CLIENT
 					\SetPos oscilX, botOscilY
 					\SetSize oscilWidth, oscilHeight
 
-					.ValueList = LimitedLinkedList OSCIL_COUNT
+					.ValueList = GAMEMODE.Util.LimitedLinkedList OSCIL_COUNT
 					for i = 1, OSCIL_COUNT
 						.ValueList\push (@__numActive / 5) * 0.9 + math.random! * 0.1
 
