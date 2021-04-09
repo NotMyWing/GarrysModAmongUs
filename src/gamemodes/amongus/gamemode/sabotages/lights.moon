@@ -391,12 +391,12 @@ if CLIENT
 				@upSwitches = {}
 				@downSwitches = {}
 
-				submit = ->
-					if @GetActive!
-						surface.PlaySound SOUNDS.switch
-						base\Submit i, false
-
 				for i = 1, 5
+					submit = ->
+						if @GetActive!
+							surface.PlaySound SOUNDS.switch
+							base\Submit i, false
+
 					-- Shadow.
 					with \Add "DImage"
 						\SetSize switchWidth, switchHeight
