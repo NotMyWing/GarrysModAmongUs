@@ -801,10 +801,10 @@ meeting.OpenDiscuss = (caller, time) =>
 					-- Imposters get the highest priority, and dead people get the lowest priority.
 					table.sort playerList, (a, b) ->
 						alive = IsValid(a.entity) and not GAMEMODE.GameData.DeadPlayers[a]
-						va = (alive and GAMEMODE.GameData.Imposters[a] and 1) or alive and 0.5 or 0
+						va = alive and 0.5 or 0
 
 						alive = IsValid(b.entity) and not GAMEMODE.GameData.DeadPlayers[b]
-						vb = (alive and GAMEMODE.GameData.Imposters[b] and 1) or alive and 0.5 or 0
+						vb = alive and 0.5 or 0
 
 						return va > vb
 
