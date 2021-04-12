@@ -245,3 +245,7 @@ with GM.Lang\Get "en"
 
 	for key, value in pairs settingsCvars
 		["help.settings.#{key}"] = value
+
+	["sabotage.reactor.hold"] = "Hold to stop meltdown"
+	["sabotage.reactor.waiting"] = "Waiting for second user"
+	["sabotage.reactor.nominal"] = "Reactor nominal"

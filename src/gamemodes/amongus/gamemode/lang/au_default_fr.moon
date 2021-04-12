@@ -247,3 +247,7 @@ with GM.Lang\Get "fr"
 
 	for key, value in pairs settingsCvars
 		["help.settings.#{key}"] = value
+
+	["sabotage.reactor.hold"] = "Maintenir pour stopper fusion"
+	["sabotage.reactor.waiting"] = "En attente du 2e utilisateur"
+	["sabotage.reactor.nominal"] = "Réacteur minime"

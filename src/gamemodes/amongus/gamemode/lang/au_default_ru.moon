@@ -247,3 +247,7 @@ with GM.Lang\Get "ru"
 
 	for key, value in pairs settingsCvars
 		["help.settings.#{key}"] = value
+
+	["sabotage.reactor.hold"] = "Удерживайте для остановки расплавления"
+	["sabotage.reactor.waiting"] = "Ожидание второго пользователя"
+	["sabotage.reactor.nominal"] = "Реактор в норме"

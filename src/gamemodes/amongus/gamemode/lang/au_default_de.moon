@@ -239,3 +239,7 @@ with GM.Lang\Get "de"
 
 	for key, value in pairs settingsCvars
 		["help.settings.#{key}"] = value
+
+	["sabotage.reactor.hold"] = "Halten, um Schmelze zu stoppen"
+	["sabotage.reactor.waiting"] = "Warten auf zweiten Nutzer"
+	["sabotage.reactor.nominal"] = "Reaktor nominal"
