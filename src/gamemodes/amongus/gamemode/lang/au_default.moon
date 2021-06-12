@@ -241,6 +241,7 @@ with GM.Lang\Get "en"
 	settingsCvars = {
 		"au_spectator_mode": "Spectator mode"
 		"au_debug_drawversion": "Display the current version"
+		"au_vgui_lookaround": "Enable lookaround in task UIs"
 	}
 
 	for key, value in pairs settingsCvars

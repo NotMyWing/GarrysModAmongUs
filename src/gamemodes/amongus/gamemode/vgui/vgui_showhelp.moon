@@ -257,7 +257,12 @@ return vgui.RegisterTable {
 					separatorWidth, separatorWidth
 
 				with \GetCanvas!
-					cvars = { "au_spectator_mode", "au_debug_drawversion" }
+					cvars = {
+						"au_spectator_mode"
+						"au_debug_drawversion"
+						"au_vgui_lookaround"
+					}
+
 					for cvar in *cvars
 						with \Add "DCheckBoxLabel"
 							\Dock TOP

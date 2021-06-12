@@ -2,6 +2,36 @@ ASSETS = {
 	close: Material "au/gui/closebutton.png", "smooth"
 }
 
+LOOKAROUND_BUF = 0
+LOOKAROUND_LASTPOS = Vector!
+
+sign = (x) -> x > 0 and 1 or (x < 0 and -1 or 0)
+
+-- Parabola with points Y=1 in X=-max and X=max, and Y=0 in X=0.
+curvify = (x, max) -> math.Clamp (1 / (max * max) * x * x * sign x), -1, 1
+
+hook.Add "CalcView", "GMAU VGUI LookAround", (ply, _, angles) ->
+	return if LOOKAROUND_BUF <= 0
+
+	buf = math.EaseInOut LOOKAROUND_BUF, 0.8, 0
+	LOOKAROUND_BUF = math.max 0, LOOKAROUND_BUF - FrameTime! * 6
+
+	return if not GAMEMODE.ClientSideConVars.LookAround\GetBool!
+	return if ply ~= LocalPlayer!
+
+	if vgui.CursorVisible!
+		LOOKAROUND_LASTPOS.x, LOOKAROUND_LASTPOS.y = input.GetCursorPos!
+
+	scrw05 = ScrW! / 2
+	scrh05 = ScrH! / 2
+	max = math.max scrw05, scrh05
+
+	angles.yaw += 12.5 * buf * curvify scrw05 - LOOKAROUND_LASTPOS.x, max
+	angles.pitch += 16 * buf * curvify LOOKAROUND_LASTPOS.y - scrh05, max
+
+	return
+		angles: angles
+
 -----------------------------
 --  GENERAL-USE VGUI BASE  --
 -----------------------------
@@ -107,8 +137,11 @@ vgui.Register "AmongUsVGUIBase", {
 	--- Handles mouse clicks 3.
 	OnCursorExited: => @wasPressed = false
 
-	--- Closes the UI when Escape is pressed.
+	--- Closes the UI when Escape is pressed and resets the lookaround buffer.
 	Think: =>
+		if @__isOpened and (@__lookAround or @__lookAround == nil)
+			LOOKAROUND_BUF = 1
+
 		if @__isOpened and gui.IsGameUIVisible!
 			gui.HideGameUI!
 			@Close true
@@ -132,6 +165,10 @@ vgui.Register "AmongUsVGUIBase", {
 	--- Sets whether the panel should be deleted on close.
 	SetDeleteOnClose: (value) => @__deleteOnClose = value
 	GetDeleteOnClose: => @__deleteOnClose or false
+
+	--- Sets whether the panel should or shouldn't be contributing to the lookaround buffer.
+	SetLookAroundEnabled: (value) => @__lookAround = value
+	GetLookAroundEnabled: => if @__lookAround == nil then true else @__lookAround
 
 	Paint: =>
 

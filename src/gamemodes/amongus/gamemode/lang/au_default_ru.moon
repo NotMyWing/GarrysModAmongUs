@@ -243,6 +243,7 @@ with GM.Lang\Get "ru"
 	settingsCvars = {
 		"au_spectator_mode": "Режим наблюдателя"
 		"au_debug_drawversion": "Отображать версию в правом углу"
+		"au_vgui_lookaround": "Разрешить оглядывание по сторонам в тасках"
 	}
 
 	for key, value in pairs settingsCvars
