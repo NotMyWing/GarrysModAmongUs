@@ -122,14 +122,18 @@ with GM.Lang\Get "ru"
 	["splash.text"] = (isPlaying, imposterCount) ->
 		amongSubtext = isPlaying and "нас" or "них"
 
-		return string.format (switch remaining % 10
-			when 1
-				"%s Предатель среди #{amongSubtext}"
-			when 2, 3, 4
-				"%s Предателя среди #{amongSubtext}"
-			else
-				"%s Предателей среди #{amongSubtext}"
-		), imposterCount
+		imposterWord = "Предателей"
+
+		imposterCountMod = imposterCount % 100
+		if imposterCountMod <= 10 or imposterCountMod >= 20
+			imposterCountMod %= 10
+
+			imposterWord = if imposterCountMod > 1 and imposterCountMod < 5
+				"Предателя"
+			elseif imposterCountMod == 1
+				"Предатель"
+
+		string.format "%s %s среди %s", imposterCount, imposterWord, amongSubtext
 
 	["hud.sabotageAndKill"] = "Устраивай саботажи и убивай всех."
 	["hud.countdown"] = "Начало через %d"
