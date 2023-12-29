@@ -3,11 +3,11 @@ with GM.Lang\Get "tr"
 	["tasks.totalCompleted.sabotaged"] = "İLETİŞİM SABOTE EDİLDİ"
 
 	["tasks.commsSabotaged"] = "İletişim Sabote Edildi"
-  ["tasks.lightsSabotaged"] = "Işıkları Düzelt (%d%%)"
-	["tasks.reactorSabotaged"] = "%d saniye içinde reaktör eriyecek. (%d/%d )"
-	["tasks.oxygenSabotaged"] = "%d saniye içinde oksijen tükenecek. (%d/%d )"
+    ["tasks.lightsSabotaged"] = "Işıkları Düzelt (%d%%)"
+	["tasks.reactorSabotaged"] = "%d saniye içinde reaktör eriyecek. (%d/%d)"
+	["tasks.oxygenSabotaged"] = "%d saniye içinde oksijen tükenecek. (%d/%d)"
 
-⇥areas = {
+	areas = {
 		["cafeteria"]:     "Kafeterya"
 		["upperEngine"]:   "Üst Motor"
 		["reactor"]:       "Reaktör"
@@ -24,37 +24,37 @@ with GM.Lang\Get "tr"
 		["weapons"]:        "Silahlar"
 	}
 
-for area, areaName in pairs areas
+	for area, areaName in pairs areas
 		["area.#{area}"] = areaName
 		["task.divertPower.area.#{area}"] = "Gücü #{areaName} alanına yönlendir"
 		["vent.#{area}"] = "#{areaName} adlı yere sız"
 
 	taskNames = {
-		"divertPower": " Gücü Yönlendir"
+		"divertPower": "Gücü Yönlendir"
 		"alignEngineOutput": "Motor Çıkış Gücünü Hizala"
-		"calibrateDistributor ": "Distribütörü Kalibre Et"
+		"calibrateDistributor": "Distribütörü Kalibre Et"
 		"chartCourse": "Rota Planı"
 		"cleanO2Filter": "O2 Filtresini Temizle"
-		"clearAsteroids": "Asteroitleri Temizle "
+		"clearAsteroids": "Asteroitleri Temizle"
 		"emptyGarbage": "Çöpü Boşalt"
-		"emptyChute": "Boş Kanal "
-		"fixWiring": "Kablolamayı Düzelt "
+		"emptyChute": "Kanalı Temizle"
+		"fixWiring": "Kablolamayı Düzelt"
 		"inspectSample": "Numuneyi İncele"
-		"primeShields": "Asal Kalkanlar "
+		"primeShields": "Asal Kalkanlar"
 		"stabilizeSteering": "Direksiyonu Stabilize Edin"
-		"startReactor": "Reaktörü Başlat "
+		"startReactor": "Reaktörü Başlat"
 		"submitScan": "Taramayı Gönder"
 		"swipeCard": "Kartı Kaydır"
-		"unlockManifolds": "Manifoldların Kilidini Aç "
+		"unlockManifolds": "Manifoldların Kilidini Aç"
 		"uploadData": "Veri İndir"
 		"uploadData.2": "Veri Yükle"
-		"fuelEngines ": "Motorlara Yakıt Doldur"
+		"fuelEngines": "Motorlara Yakıt Doldur"
 	}
 
-for task, taskName in pairs taskNames
+	for task, taskName in pairs taskNames
 		["task.#{task}"] = taskName
 
-	["meetingButton.cooldown"]= (time) -> {
+	["meetingButton.cooldown"] = (time) -> {
 		{
 			text: "Mürettebat Beklemeli"
 		}, {
@@ -94,7 +94,7 @@ for task, taskName in pairs taskNames
 
 	["eject.reason.tie"]     = "Kimse atılmadı. (Berabere)"
 	["eject.reason.skipped"] = "Kimse atılmadı. (Atlandı)"
-	["eject.reason.tie"]     = "Kimse atılmadı. 
+	["eject.reason.tie"]     = "Kimse atılmadı."
 
 	["eject.text"] = (nickname, confirm, isImposter, total) ->
 		string.format (if confirm
@@ -112,8 +112,8 @@ for task, taskName in pairs taskNames
 			"%s atıldı."), nickname
 
 	["meeting.timer.begins"]     = (time) -> string.format "Oylama %ds içinde başlayacak", time
-	["meeting.timer.ends"]= (time) -> string.format "Oylama %ds içinde bitecek", time
-	["meeting.timer.proceeding"]= (time) -> string.format ""%ds içinde devam edilecek", time
+	["meeting.timer.ends"] 		 = (time) -> string.format "Oylama %ds içinde bitecek", time
+	["meeting.timer.proceeding"] = (time) -> string.format ""%ds içinde devam edilecek", time
 	["meeting.header"] = "Sahtekar Kim?"
 
 	["splash.victory"] = "Zafer"
@@ -121,7 +121,7 @@ for task, taskName in pairs taskNames
 	["splash.imposter"]  = "Sahtekar"
 	["splash.spectator"] = "İzleyici"
 	["splash.crewmate"]  = "Mürettebat arkadaşı"
-	["splash.text"]=( isPlaying, imposterCount) ->
+	["splash.text"] = (isPlaying, imposterCount) ->
 		amongSubtext = isPlaying and "us" or "them"
 
 		return if imposterCount == 1
@@ -156,7 +156,7 @@ for task, taskName in pairs taskNames
 		au_ meeting_vote_time: "Oy Verme Süresi"
 		au_ meeting_vote_pre_time:  "Ön Oylama Süresi"
 		au_ meeting_vote_post_time: "Oylama Sonrası Süre"
-		au_confirm_ejects:         "Atılmaları Onayla"
+		au_confirm_ejects:          "Atılmaları Onayla"
 		au_ meeting_ononymous: "Anonim oylama"
 
 		au_tasks_short:  "Kısa Görevler"
@@ -172,7 +172,7 @@ for task, taskName in pairs taskNames
 
 	["prepare.admin"] = "Sen bir Yöneticisin!"
 	["prepare.spectator"] = "İzleyicisin."
-["prepare.pressToStart"] = "Oyunu başlatmak için [%s] bas."
+	["prepare.pressToStart"] = "Oyunu başlatmak için [%s] bas."
 
 	["prepare.invalidMap"] = "Geçersiz Harita!"
 	["prepare.invalidMap.subText"] = "Harita bildirim dosyası bulunamadı."
@@ -181,7 +181,7 @@ for task, taskName in pairs taskNames
 	["prepare.waitingForPlayers"] = "Oyuncular bekleniyor..."
 	["prepare.waitingForAdmin"] = "Bir Yöneticinin oyunu başlatması bekleniyor."
 	["prepare.commencing"] = "Oyun %d saniye içinde başlayacak."
-	["prepare.imposterCount"]=( count) ->
+	["prepare.imposterCount"] = (count) ->
 		string.format (sayım == 1 ise
 			"%d Sahtekar"
 		else
@@ -230,7 +230,7 @@ for task, taskName in pairs taskNames
 	tabs = {
 		"color": "Renk"
 		"settings": "Ayarlar"
-		"oyun": "Oyun"
+		"game": "Oyun"
 		"controls": "Kontroller",
 		"about": "Hakkında"
 	}
@@ -239,7 +239,7 @@ for task, taskName in pairs taskNames
 		["help.tab.#{key}"] = value
 
 	settingsCvars = {
-		"Au_SPECTATOR_MODE": "İzleyici modu"
+		"au_spectator_mode": "İzleyici modu"
 		"au_debug_drawversion": "Geçerli sürümü göster"
 		"au_vgui_lookaround": "Görev kullanıcı arayüzlerinde bakınmayı etkinleştir"
 	}
