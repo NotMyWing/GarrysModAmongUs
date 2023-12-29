@@ -112,8 +112,8 @@ with GM.Lang\Get "tr"
 			"%s atıldı."), nickname
 
 	["meeting.timer.begins"]     = (time) -> string.format "Oylama %ds içinde başlayacak", time
-	["meeting.timer.ends"] 		 = (time) -> string.format "Oylama %ds içinde bitecek", time
-	["meeting.timer.proceeding"] = (time) -> string.format ""%ds içinde devam edilecek", time
+	["meeting.timer.ends"] 	     = (time) -> string.format "Oylama %ds içinde bitecek", time
+	["meeting.timer.proceeding"] = (time) -> string.format "%ds içinde devam edilecek", time
 	["meeting.header"] = "Sahtekar Kim?"
 
 	["splash.victory"] = "Zafer"
@@ -122,12 +122,12 @@ with GM.Lang\Get "tr"
 	["splash.spectator"] = "İzleyici"
 	["splash.crewmate"]  = "Mürettebat arkadaşı"
 	["splash.text"] = (isPlaying, imposterCount) ->
-		amongSubtext = isPlaying and "us" or "them"
+		amongSubtext = isPlaying and "" or ""
 
 		return if imposterCount == 1
-			"Arasında %s Sahtekar var" .. amongSubtext
+			"Aramızda %s Sahtekar var" .. amongSubtext
 		else
-			"Arasında %s Sahtekar var" .. amongSubtext
+			"Aramızda %s Sahtekar var" .. amongSubtext
 
 	["hud.sabotageAndKill"] = "Sabote et ve herkesi öldür."
 	["hud.countdown"] = "%d içinde başlıyor"
@@ -215,7 +215,7 @@ with GM.Lang\Get "tr"
 		["tasks.inspectSample.#{key}"] = value
 
 	controls = {
-		"map": "Haritayı aç/ sabotaj et"
+		"map": "Haritayı aç / sabotaj et"
 		"kill": "Öldür"
 		"use": "Kullan"
 		"report": "Cesedi bildir"
