@@ -177,12 +177,12 @@ with GM.Lang\Get "tr"
 	["prepare.invalidMap"] = "Geçersiz Harita!"
 	["prepare.invalidMap.subText"] = "Harita bildirim dosyası bulunamadı."
 
-	["prepare.warmup"] = "Isınma Süresi!"
+	["prepare.warmup"] = "Isınma Zamanı!"
 	["prepare.waitingForPlayers"] = "Oyuncular bekleniyor..."
 	["prepare.waitingForAdmin"] = "Bir Yöneticinin oyunu başlatması bekleniyor."
 	["prepare.commencing"] = "Oyun %d saniye içinde başlayacak."
 	["prepare.imposterCount"] = (count) ->
-		string.format (sayım == 1 ise
+		string.format (if count == 1
 			"%d Sahtekar"
 		else
 			"%d Sahtekar"), count
