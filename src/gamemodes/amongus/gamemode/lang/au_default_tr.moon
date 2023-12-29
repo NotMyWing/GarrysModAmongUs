@@ -122,7 +122,7 @@ with GM.Lang\Get "tr"
 	["splash.spectator"] = "İzleyici"
 	["splash.crewmate"]  = "Mürettebat arkadaşı"
 	["splash.text"] = (isPlaying, imposterCount) ->
-		amongSubtext = isPlaying and "" or ""
+		amongSubtext = isPlaying and " " or " "
 
 		return if imposterCount == 1
 			"Aramızda %s Sahtekar var" .. amongSubtext
