@@ -88,9 +88,9 @@ with GM.Lang\Get "tr"
 
 	["eject.remaining"] = (remaining) ->
 		if remaining == 1
-			string.format "1 Sahtekar kaldı."
+			string.format "1 Casus kaldı."
 		else
-			string.format "%d Sahtekar kaldı.", remaining
+			string.format "%d Casus kaldı.", remaining
 
 	["eject.reason.tie"]     = "Kimse atılmadı. (Berabere)"
 	["eject.reason.skipped"] = "Kimse atılmadı. (Atlandı)"
@@ -100,34 +100,34 @@ with GM.Lang\Get "tr"
 		string.format (if confirm
 			if isImposter
 				if total == 1
-					"%s Sahtekardı."
+					"%s Casustu."
 				else
-					"%s bir Sahtekardı."
+					"%s bir Casustu."
 		else
 				if total == 1
-					"%s Sahtekar değildi."
+					"%s Casus değildi."
 				else
-					"%s bir Sahtekar değildi."
+					"%s bir Casus değildi."
 		else
 			"%s atıldı."), nickname
 
 	["meeting.timer.begins"]     = (time) -> string.format "Oylama %ds içinde başlayacak", time
 	["meeting.timer.ends"] 	     = (time) -> string.format "Oylama %ds içinde bitecek", time
 	["meeting.timer.proceeding"] = (time) -> string.format "%ds içinde devam edilecek", time
-	["meeting.header"] = "Sahtekar Kim?"
+	["meeting.header"] = "Casus Kim?"
 
 	["splash.victory"] = "Zafer"
 	["splash.defeat"]  = "Yenilgi"
-	["splash.imposter"]  = "Sahtekar"
+	["splash.imposter"]  = "Casus"
 	["splash.spectator"] = "İzleyici"
 	["splash.crewmate"]  = "Mürettebat arkadaşı"
 	["splash.text"] = (isPlaying, imposterCount) ->
 		amongSubtext = isPlaying and " " or " "
 
 		return if imposterCount == 1
-			"Aramızda %s Sahtekar var" .. amongSubtext
+			"Aramızda %s Casus var" .. amongSubtext
 		else
-			"Aramızda %s Sahtekar var" .. amongSubtext
+			"Aramızda %s Casus var" .. amongSubtext
 
 	["hud.sabotageAndKill"] = "Sabote et ve herkesi öldür."
 	["hud.countdown"] = "%d içinde başlıyor"
@@ -143,7 +143,7 @@ with GM.Lang\Get "tr"
 	["hud.cvar.au_taskbar_updates.2"] = "Asla"
 
 	cvars = {
-		au_max_imposters:    "Maks. Sahtekar"
+		au_max_imposters:    "Maks. Casus"
 		au_kill_cooldown:    "Öldürme Bekleme Süresi"
 		au_time_limit:       "Zaman Sınırı"
 		au_killdistance_mod: "Öldürme Mesafesi"
