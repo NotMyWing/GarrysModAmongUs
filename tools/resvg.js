@@ -1,6 +1,18 @@
 const { Transform } = require('stream');
 const path = require('path');
-const { render } = require('resvg-node');
+const { Resvg } = require('@resvg/resvg-js');
+// const { render } = require('resvg-node');
+
+/**
+ * Make resvg-js support old function
+ * @param {string} svgData A string containing the SVG xml.
+ * @param {Options | undefined} option (Optional) The SVG rendering options.
+ * @returns — A node.js Buffer containing the rendered PNG.
+ */
+function render(svgData, option) {
+	const resvg = new Resvg(svgData, option)
+	return resvg.render().asPng()
+}
 
 const { streamToBuffer } = require('./util');
 

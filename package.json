@@ -20,13 +20,12 @@
     "clean": "gulp clean",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "dependencies": {},
   "devDependencies": {
-    "del": "^6.0.0",
+    "del": "^6.1.1",
     "gulp": "^4.0.2",
-    "gulp-zip": "^5.0.2",
+    "gulp-zip": "^5.1.0",
     "luamin": "^1.0.4",
-    "resvg-node": "^0.1.2",
-    "through2": "^4.0.2"
+    "through2": "^4.0.2",
+    "@resvg/resvg-js": "^2.6.2"
   }
 }

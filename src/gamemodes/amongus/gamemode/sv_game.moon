@@ -84,7 +84,7 @@ GM.Game_CleanUp = (soft) =>
 			"env_soundscape"
 			"env_soundscape_proxy"
 			"env_soundscape_triggerable"
-		}
+		}, () =>
 
 GM.Game_Start = =>
 	-- Bail if the manifest is missing or malformed.
@@ -179,7 +179,7 @@ GM.Game_Start = =>
 					memo[a] = math.random! - 1
 				else
 					memo[a] = math.random!
-			
+
 			if not memo[b]
 				if @PlayersMarkedForImposter[b.entity]
 					memo[b] = math.random! + 1
@@ -187,7 +187,7 @@ GM.Game_Start = =>
 					memo[b] = math.random! - 1
 				else
 					memo[b] = math.random!
-			
+
 			memo[a] > memo[b]
 
 		@PlayersMarkedForCrew = {}
